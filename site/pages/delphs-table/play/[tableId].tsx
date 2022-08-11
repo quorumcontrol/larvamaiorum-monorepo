@@ -3,13 +3,13 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import LoggedInLayout from "../../src/components/LoggedInLayout";
-import useIsClientSide from "../../src/hooks/useIsClientSide";
-import useMqttMessages from "../../src/hooks/useMqttMessages";
-import { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from "../../src/utils/mqtt";
-import promiseWaiter from "../../src/utils/promiseWaiter";
-import relayer from "../../src/utils/relayer";
-import SingletonQueue from "../../src/utils/singletonQueue";
+import LoggedInLayout from "../../../src/components/LoggedInLayout";
+import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import useMqttMessages from "../../../src/hooks/useMqttMessages";
+import { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from "../../../src/utils/mqtt";
+import promiseWaiter from "../../../src/utils/promiseWaiter";
+import relayer from "../../../src/utils/relayer";
+import SingletonQueue from "../../../src/utils/singletonQueue";
 
 const txQueue = new SingletonQueue()
 
@@ -118,8 +118,8 @@ const Play: NextPage = () => {
   return (
     <LoggedInLayout>
       <VStack spacing={fullScreen ? '0' : '10'}>
-        <Heading>Find the Wootgump, don't get rekt.</Heading>
-        <Text>Left Mouse (single finger) to orbit, right mouse (2 fingers) to pan, click-and-hold to set your player's destination (the blue star will move).</Text>
+        <Heading>Find the Wootgump, don&apos;t get rekt.</Heading>
+        <Text>Left Mouse (single finger) to orbit, right mouse (2 fingers) to pan, click-and-hold to set your player&apos;s destination (the blue star will move).</Text>
         {isClient && <Box
           id="game"
           as='iframe'
