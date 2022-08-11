@@ -20,7 +20,7 @@ const LoggedInLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =
     if (isClient && !loading && !username) {
       router.push('/')
     }
-  }, [isClient, loading, username])
+  }, [isClient, loading, username, router])
 
   if (!isClient || loading) {
     return (

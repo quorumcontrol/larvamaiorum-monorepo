@@ -88,7 +88,7 @@ const Play: NextPage = () => {
         }), '*')
       })
     })
-  }, [relayer, tableId])
+  }, [tableId])
 
   useEffect(() => {
     const handler = async (evt:MessageEvent) => {
