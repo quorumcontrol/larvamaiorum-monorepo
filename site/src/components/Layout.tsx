@@ -75,6 +75,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
         <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
         <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
+        <NavItem href="/classic">Classic</NavItem>
         
         <Spacer />
 
