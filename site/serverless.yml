@@ -1,0 +1,37 @@
+service: delphs-faucet
+configValidationMode: off
+useDotenv: true
+
+provider:
+  name: scaleway
+  runtime: node16 # Available node runtimes are listed in documentation
+  # Global Environment variables - used in every functions
+  env:
+    test: test
+  secret:
+    env_delphsPrivateKey: ${env:DELPHS_PRIVATE_KEY}
+  scwToken: ${env:SCW_SECRET_KEY}
+  scwProject: ${env:SCW_DEFAULT_PROJECT_ID}
+  scwRegion: ${env:SCW_REGION}
+
+plugins:
+  - serverless-scaleway-functions
+  - serverless-plugin-typescript
+
+custom:
+  serverlessPluginTypescript:
+    tsConfigFileLocation: './tsconfig.serverless.json'
+
+package:
+  patterns:
+    - '!.gitignore'
+    - '!.git/**'
+
+functions:
+  faucet:
+    handler: serverless/faucet.handle
+    memoryLimit: 2048
+    maxScale: 1
+    # Local environment variables - used only in given function
+    env:
+      TESTNET: "true"

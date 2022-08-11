@@ -1,0 +1,53 @@
+{
+  "name": "delphs-table-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "local-handler": "ts-node -P ./tsconfig.serverless.json server/handler.ts",
+    "prod-start": "PM2_HOME=~/.pm2-delph pm2 start ts-node -- -P ./tsconfig.serverless.json server/handler.ts",
+    "prod-restart": "PM2_HOME=~/.pm2-delph pm2 restart all"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^2.2.1",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@ethersproject/experimental": "^5.6.3",
+    "@faker-js/faker": "^7.3.0",
+    "@fontsource/dm-sans": "^4.5.7",
+    "@fontsource/zen-dots": "^4.5.7",
+    "@rainbow-me/rainbowkit": "0.4.5",
+    "ethers": "^5.6.8",
+    "exponential-backoff": "^3.1.0",
+    "framer-motion": "^6.3.11",
+    "kasumah-multicall": "^0.0.48",
+    "mqtt": "^4.3.7",
+    "next": "12.1.6",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "react-hook-form": "^7.32.1",
+    "react-query": "^3.39.1",
+    "skale-relayer-contracts": "^0.0.6",
+    "wagmi": "^0.5.3"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^4.9.1",
+    "@types/debug": "^4.1.7",
+    "@types/node": "17.0.42",
+    "@types/react": "18.0.12",
+    "@types/react-dom": "18.0.5",
+    "@types/uuid": "^8.3.4",
+    "dotenv": "^16.0.1",
+    "eslint": "8.17.0",
+    "eslint-config-next": "12.1.6",
+    "kasumah-relay-wrapper": "^0.0.48",
+    "pm2": "^5.2.0",
+    "serverless-plugin-typescript": "^2.1.2",
+    "serverless-scaleway-functions": "^0.4.0",
+    "ts-node": "^10.9.1",
+    "typescript": "4.7.3"
+  }
+}
