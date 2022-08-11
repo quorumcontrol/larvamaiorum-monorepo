@@ -81,10 +81,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDiceRoller__factory>;
     getContractFactory(
-      name: "IPlayer",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPlayer__factory>;
-    getContractFactory(
       name: "Lobby",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Lobby__factory>;
@@ -190,11 +186,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IDiceRoller>;
-    getContractAt(
-      name: "IPlayer",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IPlayer>;
     getContractAt(
       name: "Lobby",
       address: string,
