@@ -11,6 +11,8 @@ import {
   LinkBox,
   LinkOverlay,
   Spinner,
+  HStack,
+  Flex,
 } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
@@ -20,6 +22,7 @@ import useIsClientSide from "../hooks/useIsClientSide";
 import { useUsername } from "../hooks/Player";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
+import AppLink from "./AppLink";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isClient = useIsClientSide();
@@ -48,23 +51,30 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <Container p={10} maxW="1200">
       <Stack direction={["column", "row"]} spacing="5">
-        <LinkBox>
+        <LinkBox display='flex'>
           <NextLink href="/" passHref>
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
               <Image src={logo} alt="Crypto Colosseum logo" />
-              {isClient && username && (
-                <NextLink href="/" passHref>
-                  <Text>{username}</Text>
-                </NextLink>
-              )}
             </LinkOverlay>
           </NextLink>
         </LinkBox>
+        {/* <HStack direction={["column", "row"]} mt='0' pt='0'> */}
+        <Flex alignItems={'center'} justifyContent={'space-between'}>
+          <AppLink href="/delphs-table" display="flex">
+            Delph&apos;s Table
+          </AppLink>
+          </Flex>
+        {/* </HStack> */}
         <Spacer />
 
-        <Box ml="5">
+        <VStack ml="5">
           <ConnectButton showBalance={false} chainStatus={"none"} />
-        </Box>
+          {isClient && username && (
+            <NextLink href="/" passHref>
+              <Text>{username}</Text>
+            </NextLink>
+          )}
+        </VStack>
       </Stack>
 
       <VStack mt="10" spacing={5}>
@@ -76,6 +86,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Link href="https://larvamaiorum.com/">
             A Crypto Colosseum: Larva Maiorum experience.
           </Link>
+        </Text>
+        <Text pt="4" fontSize="12px">
+          &copy; 2022 Quorum Control GmbH
         </Text>
       </Box>
     </Container>

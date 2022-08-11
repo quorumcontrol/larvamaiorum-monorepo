@@ -4,5 +4,14 @@
     top: 0;
     left: 0;
     z-index: -1;
-    filter: opacity(0.3) blur(7px);
+    filter: opacity(0.2) blur(10px);
+}
+
+.stroked {
+    -webkit-text-stroke: 1px #FFC658;
+    color: transparent;
+}
+
+#full-video {
+    border-radius: 10px;
 }

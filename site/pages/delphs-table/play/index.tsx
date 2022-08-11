@@ -10,14 +10,14 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
-import LoggedInLayout from "../../src/components/LoggedInLayout";
+import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import {
   useRegisterInterest,
   useWaitForTable,
   useWaitingPlayers,
-} from "../../src/hooks/Lobby";
-import { useUsername } from "../../src/hooks/Player";
-import useIsClientSide from "../../src/hooks/useIsClientSide";
+} from "../../../src/hooks/Lobby";
+import { useUsername } from "../../../src/hooks/Player";
+import useIsClientSide from "../../../src/hooks/useIsClientSide";
 
 const Play: NextPage = () => {
   const { address } = useAccount();
@@ -29,7 +29,7 @@ const Play: NextPage = () => {
 
   const handleTableRunning = useCallback(
     (tableId?: string) => {
-      router.push(`/play/${tableId}`);
+      router.push(`/delphs-table/play/${tableId}`);
     },
     [router]
   );
@@ -48,7 +48,7 @@ const Play: NextPage = () => {
       <LoggedInLayout>
         <VStack spacing={10}>
           <Heading>Play</Heading>
-          <Text>Find the Wootgump, don't get rekt.</Text>
+          <Text>Find the Wootgump, don&apos;t get rekt.</Text>
           <VStack p="4" spacing="2" borderWidth={1} borderColor="white">
             <Text mb="4">Players waiting for a table</Text>
             {isLoading && <Spinner />}

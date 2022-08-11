@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import NextLink from "next/link";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
+import AppLink from "../../src/components/AppLink";
 import Layout from "../../src/components/Layout";
 import { useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
@@ -37,12 +38,12 @@ const Home: NextPage = () => {
                 <Text>
                   Looks like this is your first time here. Let&apos;s get you setup. You&apos;ll
                   need to have{" "}
-                  <NextLink passHref href="https://boa.larvamaiorum.com/claim">
-                    <Link>a Badge of Assembly</Link>
-                  </NextLink>
+                  <AppLink href="https://boa.larvamaiorum.com/claim">
+                    a Badge of Assembly
+                  </AppLink>
                   {" "}to play.
                 </Text>
-                <NextLink passHref href="/new">
+                <NextLink passHref href="/delphs-table/new">
                   <Link>
                     <Button>Create Account</Button>
                   </Link>
@@ -59,7 +60,7 @@ const Home: NextPage = () => {
                   <Button onClick={() => login()}>Login</Button>
                 )}
                 {isLoggedIn && (
-                  <NextLink passHref href="/play">
+                  <NextLink passHref href="/delphs-table/play">
                     <Link>
                       <Button>Play</Button>
                     </Link>
