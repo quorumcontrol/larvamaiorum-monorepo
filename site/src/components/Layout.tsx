@@ -24,6 +24,19 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import AppLink from "./AppLink";
 
+const NavItem: React.FC<{ href: string; children: React.ReactNode }> = ({
+  href,
+  children,
+}) => {
+  return (
+    <Flex alignItems={"center"} justifyContent={"space-between"}>
+      <AppLink href={href} display="flex" fontSize="md">
+        {children}
+      </AppLink>
+    </Flex>
+  );
+};
+
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isClient = useIsClientSide();
   const { address } = useAccount();
@@ -51,20 +64,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <Container p={10} maxW="1200">
       <Stack direction={["column", "row"]} spacing="5">
-        <LinkBox display='flex'>
+        <LinkBox display="flex">
           <NextLink href="/" passHref>
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
               <Image src={logo} alt="Crypto Colosseum logo" />
             </LinkOverlay>
           </NextLink>
         </LinkBox>
-        {/* <HStack direction={["column", "row"]} mt='0' pt='0'> */}
-        <Flex alignItems={'center'} justifyContent={'space-between'}>
-          <AppLink href="/delphs-table" display="flex">
-            Delph&apos;s Table
-          </AppLink>
-          </Flex>
-        {/* </HStack> */}
+
+        <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
+        <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
+        <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
+        
         <Spacer />
 
         <VStack ml="5">

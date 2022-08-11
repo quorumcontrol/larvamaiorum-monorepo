@@ -2,6 +2,6 @@
 package = "@netlify/plugin-nextjs"
 
 [build]
-  base = "delphs-table-site/"
+  base = "site/"
   command = "yarn build"
   publish = ".next"
