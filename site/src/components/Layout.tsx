@@ -29,8 +29,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [navigating, setNavigating] = useState(false);
 
   useEffect(() => {
-    const handleStart = (url: string) => url !== router.asPath && setNavigating(true);
-    const handleComplete = (url: string) => url === router.asPath && setNavigating(false);
+    const handleStart = (url: string) =>
+      url !== router.asPath && setNavigating(true);
+    const handleComplete = (url: string) =>
+      url === router.asPath && setNavigating(false);
 
     router.events.on("routeChangeStart", handleStart);
     router.events.on("routeChangeComplete", handleComplete);
@@ -50,18 +52,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <NextLink href="/" passHref>
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
               <Image src={logo} alt="Crypto Colosseum logo" />
-              <Heading size="sm" ml="5">
-                Delph's Table
-              </Heading>
+              {isClient && username && (
+                <NextLink href="/" passHref>
+                  <Text>{username}</Text>
+                </NextLink>
+              )}
             </LinkOverlay>
           </NextLink>
         </LinkBox>
         <Spacer />
-        {isClient && username && (
-          <NextLink href="/" passHref>
-            <Text>{username}</Text>
-          </NextLink>
-        )}
+
         <Box ml="5">
           <ConnectButton showBalance={false} chainStatus={"none"} />
         </Box>

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { handle as serverlessHandler } from '../../../serverless/faucet'
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   
   const body = req.body
 
@@ -13,3 +13,5 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
   })
 
 }
+
+export default handler

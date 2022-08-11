@@ -97,7 +97,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <ChakraProvider theme={theme}>
             <Head>
-              <title>Crypto Colosseum: Delph's Table</title>
+              <title>Crypto Colosseum: Delph&apos;s Table</title>
               <meta name="viewport" content="width=device-width, initial-scale=1" />
               <meta charSet="utf-8" />
               <meta

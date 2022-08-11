@@ -12,16 +12,16 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Layout from "../src/components/Layout";
+import Layout from "../../src/components/Layout";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { useLogin, UserData } from "../src/hooks/useUser";
+import { useLogin, UserData } from "../../src/hooks/useUser";
 import debug from "debug";
 import { useRouter } from "next/router";
-import { useUserBadges } from "../src/hooks/BadgeOfAssembly";
+import { useUserBadges } from "../../src/hooks/BadgeOfAssembly";
 import NextLink from "next/link";
 import { useAccount } from "wagmi";
-import useIsClientSide from "../src/hooks/useIsClientSide";
+import useIsClientSide from "../../src/hooks/useIsClientSide";
 
 const log = debug("NewUserPage");
 
@@ -66,14 +66,14 @@ const NewUser: NextPage = () => {
     <>
       <Layout>
         <VStack spacing={10}>
-          <Text>Looks like you're new here. Let's get you setup.</Text>
+          <Text>Looks like you&apos;re new here. Let&apos;s get you setup.</Text>
           {!hasBadges && !isLoading && (
             <Text>
               You need to have{" "}
               <NextLink passHref href="https://boa.larvamaiorum.com/claim">
                 <Link>a Badge of Assembly</Link>
               </NextLink>
-              {" "}to play. It looks like you don't have any of these.
+              {" "}to play. It looks like you don&apos;t have any of these.
             </Text>
           )}
           <Box>
