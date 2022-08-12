@@ -8,6 +8,7 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
+  Theme,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
@@ -16,6 +17,7 @@ import Script from "next/script";
 import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
 import "../styles/video-background.css";
 import "video.js/dist/video-js.css";
+import merge from 'lodash.merge'
 
 const { chains, provider } = configureChains(
   [
@@ -117,16 +119,25 @@ const theme = extendTheme({
 
 const queryClient = new QueryClient();
 
+const rainbowTheme = merge(darkTheme(), {
+  colors: {
+    accentColor: '#D14509',
+  },
+  fonts: {
+    body: 'Cairo, sans-serif'
+  },
+  radii: {
+    connectButton: '0px'
+  }
+} as Theme);
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider
           chains={chains}
-          theme={darkTheme({
-            ...darkTheme.accentColors.orange,
-            fontStack: "system",
-          })}
+          theme={rainbowTheme}
         >
           <ChakraProvider theme={theme}>
             <Head>
