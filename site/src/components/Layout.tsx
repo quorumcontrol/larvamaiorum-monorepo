@@ -82,9 +82,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <VStack ml="5">
           <ConnectButton showBalance={false} chainStatus={"none"} />
           {isClient && username && (
-            <NextLink href="/" passHref>
-              <Text>{username}</Text>
-            </NextLink>
+            <AppLink href={`/profile/${address}`}>
+              {username}
+            </AppLink>
           )}
         </VStack>
       </Stack>

@@ -46,7 +46,7 @@ const BadgeClaimCard: React.FC<{
   );
 };
 
-const ChainInfo: NextPage = () => {
+const BadgeOfAssemblyHome: NextPage = () => {
   return (
     <>
       <Head>
@@ -83,4 +83,4 @@ const ChainInfo: NextPage = () => {
   );
 };
 
-export default ChainInfo;
+export default BadgeOfAssemblyHome;
