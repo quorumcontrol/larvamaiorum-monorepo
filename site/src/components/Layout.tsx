@@ -62,6 +62,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <>
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        zIndex={-1}
+        backgroundImage={topologyImage.src}
+        height={topologyImage.height}
+        width={topologyImage.width}
+        opacity="0.7"
+      />
       <Container p={10} maxW="1400" zIndex={1}>
         <Stack direction={["column", "row"]} spacing="5">
           <LinkBox display="flex">
@@ -102,17 +112,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Text>
         </Box>
       </Container>
-            
-      <Box
-        position="absolute"
-        top="0"
-        left="0"
-        zIndex={0}
-        backgroundImage={topologyImage.src}
-        height={topologyImage.height}
-        width={topologyImage.width}
-        opacity="0.4"
-      />
     </>
   );
 };
