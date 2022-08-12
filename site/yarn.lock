@@ -1253,15 +1253,15 @@
   resolved "https://registry.npmjs.org/@faker-js/faker/-/faker-7.3.0.tgz"
   integrity sha512-1W0PZezq2rxlAssoWemi9gFRD8IQxvf0FPL5Km3TOmGHFG7ib0TbFBJ0yC7D/1NsxunjNTK6WjUXV8ao/mKZ5w==
 
-"@fontsource/dm-sans@^4.5.7":
-  version "4.5.7"
-  resolved "https://registry.npmjs.org/@fontsource/dm-sans/-/dm-sans-4.5.7.tgz"
-  integrity sha512-pYzU78F4HZHMpERjarfOnQZ20XL2thfDXTaZW30CoQgfqgZSSxHDfB6bVrs6jUPrgeAxK5ZuGG9hkpvZJT7SdQ==
+"@fontsource/bebas-neue@^4.5.8":
+  version "4.5.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/bebas-neue/-/bebas-neue-4.5.8.tgz#dcac807b13fed842cdb4161c13c249ff2d7c4ef1"
+  integrity sha512-kgNZf/DbDyybH8LcJ28xg7Po3N4eWdUJnh0hsvpcLV8bYvFG1oGl01saQzCJwWbviayi/0EZEY0t6cSKt9Ey1g==
 
-"@fontsource/zen-dots@^4.5.7":
-  version "4.5.7"
-  resolved "https://registry.npmjs.org/@fontsource/zen-dots/-/zen-dots-4.5.7.tgz"
-  integrity sha512-tIDJou7hPmfgD7f03O8ncSKqbaFLIo+/+JDzncufvZcgqKfD7a0pjzaJ/KK8oauuTWQVAdfNhBDrkb5ANbRVdQ==
+"@fontsource/cairo@^4.5.10":
+  version "4.5.10"
+  resolved "https://registry.yarnpkg.com/@fontsource/cairo/-/cairo-4.5.10.tgz#03e195b371866f98b03bc640363a02c364474f41"
+  integrity sha512-HNl7EowpV5k1yvhKdrG8/3dK9cCMc8gphN7LQfWlLKCi8vthgYU3iwV9u8ahaBLWzH8P46UEG41DWiVSSKdLqA==
 
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"

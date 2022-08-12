@@ -62,7 +62,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [router]);
 
   return (
-    <Container p={10} maxW="1200">
+    <Container p={10} maxW="1400">
       <Stack direction={["column", "row"]} spacing="5">
         <LinkBox display="flex">
           <NextLink href="/" passHref>

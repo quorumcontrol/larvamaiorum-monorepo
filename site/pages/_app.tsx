@@ -1,17 +1,21 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { extendTheme, ChakraProvider } from "@chakra-ui/react";
-import "@fontsource/dm-sans";
-import "@fontsource/zen-dots";
-import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
+import "@fontsource/cairo";
+import "@fontsource/bebas-neue";
+import "@rainbow-me/rainbowkit/styles.css";
+import {
+  getDefaultWallets,
+  RainbowKitProvider,
+  darkTheme,
+} from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Script from "next/script";
 import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
 import "../styles/video-background.css";
-import 'video.js/dist/video-js.css'
+import "video.js/dist/video-js.css";
 
 const { chains, provider } = configureChains(
   [
@@ -69,16 +73,39 @@ const theme = extendTheme({
       body: {
         fontSize: "22px",
         bg: "brand.background",
+        fontWeight: '400',
       },
     },
   },
   fonts: {
-    heading: "Zen Dots, sans-serif",
-    body: "DM Sans, sans-serif",
+    heading: "Bebas Neue, cursive",
+    body: "Cairo, sans-serif",
   },
   colors: {
     brand: {
-      background: "#030D20",
+      background: "#101010",
+      buttonOrange: '#D14509',
+    },
+  },
+  components: {
+    Button: {
+      variants: {
+        primary: {
+          fontWeight: '700',
+          bg: 'brand.buttonOrange'
+        }
+      }
+    },
+    Heading: {
+      baseStyle: {
+      },
+      sizes: {
+        xl: {
+          fontSize: "5xl",
+          lineHeight: '80px',
+          letterSpacing: '0.025em',
+        }
+      }
     },
   },
 });
@@ -99,7 +126,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           <ChakraProvider theme={theme}>
             <Head>
               <title>Crypto Colosseum: Delph&apos;s Table</title>
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1"
+              />
               <meta charSet="utf-8" />
               <meta
                 property="og:site_name"
@@ -107,7 +137,10 @@ function MyApp({ Component, pageProps }: AppProps) {
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
-              <meta name="description" content="A game of harvest and battle." />
+              <meta
+                name="description"
+                content="A game of harvest and battle."
+              />
               <link rel="icon" href="/favicon.ico" />
               <meta
                 property="og:title"
@@ -121,7 +154,11 @@ function MyApp({ Component, pageProps }: AppProps) {
               />
 
               <meta name="twitter:card" content="summary" key="twcard" />
-              <meta name="twitter:creator" content="@larva_maiorum" key="twhandle" />
+              <meta
+                name="twitter:creator"
+                content="@larva_maiorum"
+                key="twhandle"
+              />
 
               <meta
                 property="og:url"
