@@ -275,15 +275,13 @@ const Home: NextPage = () => {
             <VStack alignItems="left" spacing="10">
               <VStack maxW="22em" alignItems="left">
                 <Heading textTransform="uppercase" size="2xl">
-                  Graphic Lore
+                  Badge of Assembly
                 </Heading>
                 <Text>
-                  The story of how the ancient aliens first discovered the large
-                  $SKL deposits in the arctic regions of earth.
+                  These badges are your gateway to the crypto world. They are also your team make you more powerful over time. Collect them all if you can.
                 </Text>
                 <Text>
-                  Part I of this graphic novella will mint page-by-page starting
-                  September 1.
+                  Having a badge qualifies you for airdrops, playing our mini-games, joining special discord channels and levels up your characters as your team does better.
                 </Text>
               </VStack>
               <HStack overflowX="scroll" spacing="10">
