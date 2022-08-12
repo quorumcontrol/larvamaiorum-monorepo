@@ -3,7 +3,6 @@ import {
   Container,
   VStack,
   Box,
-  Heading,
   Stack,
   Spacer,
   Text,
@@ -11,7 +10,6 @@ import {
   LinkBox,
   LinkOverlay,
   Spinner,
-  HStack,
   Flex,
 } from "@chakra-ui/react";
 import Image from "next/image";
@@ -23,6 +21,7 @@ import { useUsername } from "../hooks/Player";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import AppLink from "./AppLink";
+import topologyImage from "../../assets/images/topology.svg";
 
 const NavItem: React.FC<{ href: string; children: React.ReactNode }> = ({
   href,
@@ -62,48 +61,59 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [router]);
 
   return (
-    <Container p={10} maxW="1400">
-      <Stack direction={["column", "row"]} spacing="5">
-        <LinkBox display="flex">
-          <NextLink href="/" passHref>
-            <LinkOverlay flexDir="row" display="flex" alignItems="center">
-              <Image src={logo} alt="Crypto Colosseum logo" />
-            </LinkOverlay>
-          </NextLink>
-        </LinkBox>
+    <>
+      <Container p={10} maxW="1400" zIndex={1}>
+        <Stack direction={["column", "row"]} spacing="5">
+          <LinkBox display="flex">
+            <NextLink href="/" passHref>
+              <LinkOverlay flexDir="row" display="flex" alignItems="center">
+                <Image src={logo} alt="Crypto Colosseum logo" />
+              </LinkOverlay>
+            </NextLink>
+          </LinkBox>
 
-        <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
-        <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
-        <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
-        <NavItem href="/classic">Classic</NavItem>
-        
-        <Spacer />
+          <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
+          <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
+          <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
+          <NavItem href="/classic">Classic</NavItem>
 
-        <VStack ml="5">
-          <ConnectButton showBalance={false} chainStatus={"none"} />
-          {isClient && username && (
-            <AppLink href={`/profile/${address}`}>
-              {username}
-            </AppLink>
-          )}
+          <Spacer />
+
+          <VStack ml="5">
+            <ConnectButton showBalance={false} chainStatus={"none"} />
+            {isClient && username && (
+              <AppLink href={`/profile/${address}`}>{username}</AppLink>
+            )}
+          </VStack>
+        </Stack>
+
+        <VStack mt="10" spacing={5}>
+          {navigating && <Spinner />}
+          {!navigating && children}
         </VStack>
-      </Stack>
-
-      <VStack mt="10" spacing={5}>
-        {navigating && <Spinner />}
-        {!navigating && children}
-      </VStack>
-      <Box as="footer" mt="200" textAlign="center">
-        <Text fontSize="sm">
-          <Link href="https://larvamaiorum.com/">
-            A Crypto Colosseum: Larva Maiorum experience.
-          </Link>
-        </Text>
-        <Text pt="4" fontSize="12px">
-          &copy; 2022 Quorum Control GmbH
-        </Text>
-      </Box>
-    </Container>
+        <Box as="footer" mt="200" textAlign="center">
+          <Text fontSize="sm">
+            <Link href="https://larvamaiorum.com/">
+              A Crypto Colosseum: Larva Maiorum experience.
+            </Link>
+          </Text>
+          <Text pt="4" fontSize="12px">
+            &copy; 2022 Quorum Control GmbH
+          </Text>
+        </Box>
+      </Container>
+            
+      <Box
+        position="absolute"
+        top="0"
+        left="0"
+        zIndex={0}
+        backgroundImage={topologyImage.src}
+        height={topologyImage.height}
+        width={topologyImage.width}
+        opacity="0.4"
+      />
+    </>
   );
 };
 
