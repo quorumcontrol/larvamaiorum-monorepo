@@ -6,7 +6,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Layout>
-        <VStack mt="30" spacing={5}>
+        <VStack spacing={5}>
           <Heading textTransform="uppercase">Delph&apos;s Table</Heading>
           <Text>Find the Wootgump, don&apos;t get rekt.</Text>
           <Text>Delph&apos;s Table is multiplayer game with rewards from prize pools to NFT drops.</Text>
