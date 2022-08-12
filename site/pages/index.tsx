@@ -7,6 +7,8 @@ import {
   keyframes,
   Button,
   Flex,
+  HStack,
+  Spacer,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -114,6 +116,38 @@ const Home: NextPage = () => {
               JOIN DISCORD
             </Button>
           </Box>
+
+          <Flex
+            border="dashed"
+            w="100%"
+            overflow="hidden"
+            minH="800px"
+            borderColor="brand.orange"
+            borderWidth="1px"
+            alignItems="center"
+            p="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="5"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading textTransform="uppercase" size="2xl">
+                  Masks of the<br />Ancient ones
+                </Heading>
+                <Text>
+                  1,111 Genesis masks launching Q3 2022. Only in the SKALEverse.
+                  This special collection entitles the wearer to the absolute best game items at launch.
+                  Gladiator warriors and ultra rare artifacts bless the wearer of these wootgump infused masks.
+                </Text>
+              </VStack>
+
+              <Spacer />
+              <Box border="solid" h="300px" w="500px"></Box>
+            </Stack>
+          </Flex>
         </VStack>
       </Layout>
     </>

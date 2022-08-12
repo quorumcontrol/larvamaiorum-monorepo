@@ -84,7 +84,7 @@ const theme = extendTheme({
   colors: {
     brand: {
       background: "#101010",
-      buttonOrange: '#D14509',
+      orange: '#D14509',
     },
   },
   components: {
@@ -92,7 +92,7 @@ const theme = extendTheme({
       variants: {
         primary: {
           fontWeight: '700',
-          bg: 'brand.buttonOrange'
+          bg: 'brand.orange'
         }
       }
     },
@@ -103,6 +103,11 @@ const theme = extendTheme({
         xl: {
           fontSize: "5xl",
           lineHeight: '80px',
+          letterSpacing: '0.025em',
+        },
+        '2xl': {
+          fontSize: "7xl",
+          lineHeight: '99px',
           letterSpacing: '0.025em',
         }
       }
