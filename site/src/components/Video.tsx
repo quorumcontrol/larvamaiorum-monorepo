@@ -21,10 +21,14 @@ interface VideoProps extends BoxProps {
   autoPlay?: boolean
   loop?: boolean
   muted?: boolean
+  playsInline?:boolean
 }
 
 const Video: React.FC<VideoProps> = (props) => {
   const { animationUrl, ...videoProps} = props
+  if (typeof videoProps.playsInline === 'undefined') {
+    videoProps.playsInline = true
+  }
 
   return (
     <Box

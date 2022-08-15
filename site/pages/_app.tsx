@@ -18,7 +18,6 @@ import Script from "next/script";
 import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
 import "../styles/video-background.css";
 import "video.js/dist/video-js.css";
-import 'pure-react-carousel/dist/react-carousel.es.css';
 
 const { chains, provider } = configureChains(
   [

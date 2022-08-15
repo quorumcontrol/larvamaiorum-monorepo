@@ -11,7 +11,7 @@ const BadgeClaimCard: React.FC<{
   return (
     <Box borderRadius="lg" borderWidth="1px" w="sm" pb="8">
       <Box h="70%" backgroundColor="#000">
-        <Video animationUrl={animationUrl} loop muted />
+        <Video animationUrl={animationUrl} loop muted autoPlay/>
       </Box>
       <VStack p="5" mb="5" spacing={6}>
         <Text

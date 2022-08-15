@@ -4,7 +4,6 @@ import {
   Heading,
   Box,
   Stack,
-  keyframes,
   Button,
   Flex,
   HStack,
@@ -13,46 +12,16 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
-import VideoModal from "../src/components/VideoModal";
 import Layout from "../src/components/Layout";
-import placeHolderHistoria from "../assets/images/placeHolderHistoria.png";
 import BadgeClaimCard from "../src/components/BadgeClaimCard";
-import {
-  CarouselProvider,
-  Slider,
-  Slide,
-  ButtonBack,
-  ButtonNext,
-} from "pure-react-carousel";
+import historiaTitle from "../assets/images/historiaTitle.png";
+import historiaLocked from "../assets/images/historiaLocked.png";
+import Carousel, { Slide } from "../src/components/Carousel";
 
 const Home: NextPage = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-  }, [setIsOpen]);
-
-  //   const translate = keyframes`
-  //   from {transform: translateY(100px)}
-  //   to {transform: translateY(0)}
-  // `;
-  //   const fade = keyframes`
-  //   from {opacity: 0}
-  //   to {opacity: 1}
-  // `;
-
-  // const easeInAnimation = (order = 0) => {
-  //   const offset = 4 * order;
-  //   return `${translate} 1.${offset}s 0s ease-in-out, ${fade} 4.${offset}s 0s ease-in-out`;
-  // };
-
   const description = `
   1,111 Genesis masks launching Q3 2022. Only in the SKALEverse. Crypto Colosseum: Larva Maiorum is a play2earn blockchain game set in crypto-rome. Battle your warriors, equip your recruits, craft NFT items.
   `.trim();
-
-  useEffect(() => {
-    console.log("render");
-  }, []);
 
   return (
     <>
@@ -85,7 +54,6 @@ const Home: NextPage = () => {
           key="og:image:alt"
         />
       </Head>
-      <VideoModal isOpen={isOpen} onClose={onClose} />
       <Layout>
         <VStack w="100%" spacing="10">
           <Box
@@ -97,14 +65,11 @@ const Home: NextPage = () => {
           >
             <video
               id="video-background"
-              // controls
               muted
               autoPlay
               loop
               preload="auto"
-              // width="640"
-              // height="264"
-              // poster="MY_VIDEO_POSTER.jpg"
+              playsInline
               data-setup="{}"
             >
               <source src="/video/teaserBackground.mp4" type="video/mp4" />
@@ -187,7 +152,7 @@ const Home: NextPage = () => {
             </Stack>
           </Flex>
 
-          <Flex
+          <Box
             border="dashed"
             w="100%"
             overflow="hidden"
@@ -196,28 +161,40 @@ const Home: NextPage = () => {
             borderWidth="1px"
             p="50px"
           >
-            <VStack alignItems="left" spacing="10">
-              <VStack maxW="22em" alignItems="left">
-                <Heading textTransform="uppercase" size="2xl">
-                  Graphic Lore
-                </Heading>
-                <Text>
-                  The story of how the ancient aliens first discovered the large
-                  $SKL deposits in the arctic regions of earth.
-                </Text>
-                <Text>
-                  Part I of this graphic novella will mint page-by-page starting
-                  September 1.
-                </Text>
-              </VStack>
-              <HStack>
-                <Image
-                  src={placeHolderHistoria}
-                  alt="placeholder image for when the novel mints"
-                />
-              </HStack>
+            <VStack maxW="22em" alignItems="left">
+              <Heading textTransform="uppercase" size="2xl">
+                Graphic Lore
+              </Heading>
+              <Text>
+                The story of how the ancient aliens first discovered the large
+                $SKL deposits in the arctic regions of earth.
+              </Text>
+              <Text>
+                Part I of this graphic novella will mint page-by-page starting
+                September 1.
+              </Text>
             </VStack>
-          </Flex>
+            <Box mt="10">
+              <Carousel slideCount={6}>
+                <Slide>
+                  <Image
+                    src={historiaTitle}
+                    alt="placeholder image for when the novel mints"
+                  />
+                </Slide>
+                {new Array(5).fill(true).map((_, i) => {
+                  return (
+                    <Slide key={`historia-locked-${i}`}>
+                      <Image
+                        src={historiaLocked}
+                        alt="placeholder image for when the novel mints"
+                      />
+                    </Slide>
+                  );
+                })}
+              </Carousel>
+            </Box>
+          </Box>
 
           <Flex
             border="dashed"
@@ -261,6 +238,7 @@ const Home: NextPage = () => {
                   width="100%"
                   height="100%"
                   data-setup="{}"
+                  playsInline
                 >
                   <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
 
@@ -282,51 +260,44 @@ const Home: NextPage = () => {
             borderWidth="1px"
             p="50px"
           >
-              <VStack maxW="22em" alignItems="left">
-                <Heading textTransform="uppercase" size="2xl">
-                  Badge of Assembly
-                </Heading>
-                <Text>
-                  A badge qualifies you for airdrops, playing our mini-games,
-                  joining special discord channels and levels up your characters
-                  as your team does better.
-                </Text>
-              </VStack>
-              <Box w="100%" mt="10">
-                <CarouselProvider
-                  totalSlides={3}
-                  naturalSlideWidth={33}
-                  naturalSlideHeight={60}
-                  visibleSlides={3}
-                >
-                  <Slider>
-                    <Slide index={0}>
-                      <BadgeClaimCard
-                        animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
-                        name="Antiqui Posessor"
-                        url="/badge-of-assembly/claim/antiqui"
-                        description="Claimable with 1000 SKL on mainnet or a member of the classic game."
-                      />
-                    </Slide>
-                    <Slide index={1}>
-                      <BadgeClaimCard
-                        animationUrl="ipfs://bafybeihze2e6pzygreosakvcemomkvorbtlqazdp2ovjx5qzxcalrt44lm"
-                        name="Ruby Genesis"
-                        url="/badge-of-assembly/claim/ruby"
-                        description="Claimable by performing one transaction on the Europa network."
-                      />
-                    </Slide>
-                    <Slide index={1}>
-                      <BadgeClaimCard
-                        animationUrl="ipfs://bafybeiefqqlksz3hx6r2omyga5l26caiupg32n6t752qkoinkg46fq2e7q"
-                        name="SKALE Enjoyooor"
-                        url="/badge-of-assembly/claim/enjoyooor"
-                        description="Claimable by buying $SKL on Ruby.exchange within the last 3 days."
-                      />
-                    </Slide>
-                  </Slider>
-                </CarouselProvider>
-              </Box>
+            <VStack maxW="22em" alignItems="left">
+              <Heading textTransform="uppercase" size="2xl">
+                Badge of Assembly
+              </Heading>
+              <Text>
+                A badge qualifies you for airdrops, playing our mini-games,
+                joining special discord channels and levels up your characters
+                as your team does better.
+              </Text>
+            </VStack>
+            <Box mt="10">
+              <Carousel slideCount={3}>
+                <Slide>
+                  <BadgeClaimCard
+                    animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
+                    name="Antiqui Posessor"
+                    url="/badge-of-assembly/claim/antiqui"
+                    description="Claimable with 1000 SKL on mainnet or a member of the classic game."
+                  />
+                </Slide>
+                <Slide>
+                  <BadgeClaimCard
+                    animationUrl="ipfs://bafybeihze2e6pzygreosakvcemomkvorbtlqazdp2ovjx5qzxcalrt44lm"
+                    name="Ruby Genesis"
+                    url="/badge-of-assembly/claim/ruby"
+                    description="Claimable by performing one transaction on the Europa network."
+                  />
+                </Slide>
+                <Slide>
+                  <BadgeClaimCard
+                    animationUrl="ipfs://bafybeiefqqlksz3hx6r2omyga5l26caiupg32n6t752qkoinkg46fq2e7q"
+                    name="SKALE Enjoyooor"
+                    url="/badge-of-assembly/claim/enjoyooor"
+                    description="Claimable by buying $SKL on Ruby.exchange within the last 3 days."
+                  />
+                </Slide>
+              </Carousel>
+            </Box>
           </Box>
         </VStack>
       </Layout>
