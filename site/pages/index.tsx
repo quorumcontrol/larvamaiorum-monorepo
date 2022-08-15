@@ -18,6 +18,8 @@ import historiaTitle from "../assets/images/historiaTitle.png";
 import historiaLocked from "../assets/images/historiaLocked.png";
 import Carousel, { Slide } from "../src/components/Carousel";
 
+const boxPadding = ['0', '50px']
+
 const Home: NextPage = () => {
   const description = `
   1,111 Genesis masks launching Q3 2022. Only in the SKALEverse. Crypto Colosseum: Larva Maiorum is a play2earn blockchain game set in crypto-rome. Battle your warriors, equip your recruits, craft NFT items.
@@ -55,15 +57,16 @@ const Home: NextPage = () => {
         />
       </Head>
       <Layout>
-        <VStack w="100%" spacing="10">
+        <VStack w="full" spacing="10">
           <Box
-            p="50px"
+            p={boxPadding}
             position="relative"
-            w="100%"
+            w="full"
             overflow="hidden"
-            minH="800px"
           >
-            <video
+            <Box
+              as='video'
+
               id="video-background"
               muted
               autoPlay
@@ -71,14 +74,15 @@ const Home: NextPage = () => {
               preload="auto"
               playsInline
               data-setup="{}"
+              display={['none', 'block']}
             >
               <source src="/video/teaserBackground.mp4" type="video/mp4" />
               <p className="vjs-no-js">
                 To view this video please enable JavaScript, and consider
                 upgrading to a web browser that supports HTML5 video
               </p>
-            </video>
-            <Box maxW="25em" mt="150px">
+            </Box>
+            <Box maxW="25em" mt={['0', '150px']}>
               <Heading textTransform="uppercase">
                 Become the most powerful and important warrior patron.
                 <br />
@@ -96,14 +100,13 @@ const Home: NextPage = () => {
           </Box>
 
           <Flex
-            border="dashed"
             w="100%"
             overflow="hidden"
-            minH="800px"
+            borderStyle={['none', "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             alignItems="center"
-            p="50px"
+            p={boxPadding}
           >
             <Stack
               direction={["column", "row"]}
@@ -125,7 +128,7 @@ const Home: NextPage = () => {
               </VStack>
 
               <Spacer />
-              <Box h="300px" w="600px">
+              <Box>
                 <video
                   id="full-video"
                   controls
@@ -153,13 +156,11 @@ const Home: NextPage = () => {
           </Flex>
 
           <Box
-            border="dashed"
-            w="100%"
-            overflow="hidden"
-            minH="800px"
+            w="full"
+            borderStyle={['none', "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
-            p="50px"
+            p={boxPadding}
           >
             <VStack maxW="22em" alignItems="left">
               <Heading textTransform="uppercase" size="2xl">
@@ -197,14 +198,12 @@ const Home: NextPage = () => {
           </Box>
 
           <Flex
-            border="dashed"
             w="100%"
-            overflow="hidden"
-            minH="800px"
+            borderStyle={['none', "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             alignItems="center"
-            p="50px"
+            p={boxPadding}
           >
             <Stack
               direction={["column", "row"]}
@@ -230,7 +229,7 @@ const Home: NextPage = () => {
               </VStack>
 
               <Spacer />
-              <Box h="300px" w="600px">
+              <Box>
                 <video
                   id="full-video"
                   controls
@@ -238,7 +237,6 @@ const Home: NextPage = () => {
                   width="100%"
                   height="100%"
                   data-setup="{}"
-                  playsInline
                 >
                   <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
 
@@ -252,13 +250,12 @@ const Home: NextPage = () => {
           </Flex>
 
           <Box
-            border="dashed"
             w="100%"
             overflow="hidden"
-            minH="800px"
+            borderStyle={['none', "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
-            p="50px"
+            p={boxPadding}
           >
             <VStack maxW="22em" alignItems="left">
               <Heading textTransform="uppercase" size="2xl">

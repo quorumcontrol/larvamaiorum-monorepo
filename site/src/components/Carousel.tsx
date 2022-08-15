@@ -5,14 +5,32 @@ import {
   Spacer,
   Text,
   TextProps,
+  useBreakpoint,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+
+function sizeFromBreakpoint(breakpoint:string) {
+  switch(breakpoint) {
+    case 'base':
+      return 100
+    case 'sm':
+      return 100
+    case 'md':
+      return 50
+    default:
+      return 33
+  }
+}
 
 export const Slide: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+
+  const breakpoint = useBreakpoint()
+
   return (
-    <Flex h="full" w="33%" shadow="md" flex="none">
+    <Flex h="full" w={`${sizeFromBreakpoint(breakpoint)}%`} shadow="md" flex="none">
       {children}
     </Flex>
   );
@@ -20,6 +38,8 @@ export const Slide: React.FC<{ children: React.ReactNode }> = ({
 
 const Carousel: React.FC<FlexProps & { slideCount: number }> = (props) => {
   const { children, slideCount, ...flexOpts } = props;
+  const breakpoint = useBreakpoint()
+  console.log("width: ", breakpoint)
 
   const arrowStyles: TextProps = {
     cursor: "pointer",
@@ -48,7 +68,7 @@ const Carousel: React.FC<FlexProps & { slideCount: number }> = (props) => {
 
   const carouselStyle = {
     transition: "all .5s",
-    ml: `-${currentSlide * 33}%`,
+    ml: `-${currentSlide * (sizeFromBreakpoint(breakpoint))}%`,
   };
   return (
     <Box>
