@@ -95,7 +95,15 @@ const theme = extendTheme({
         primary: {
           textTransform: 'uppercase',
           fontWeight: '700',
-          bg: 'brand.orange'
+          bg: 'brand.orange',
+          borderRadius: '0',
+        },
+        secondary: {
+          borderRadius: '0',
+          textTransform: 'uppercase',
+          fontWeight: '700',
+          background: "rgba(209, 69, 9, 0.05)",
+          border: "1px solid rgba(233, 108, 55, 0.5)",
         }
       }
     },

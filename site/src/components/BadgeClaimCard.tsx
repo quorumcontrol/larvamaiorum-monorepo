@@ -27,7 +27,7 @@ const BadgeClaimCard: React.FC<{
           {description}
         </Text>
         <NextLink href={url}>
-          <Button>Claim</Button>
+          <Button variant="secondary">Claim</Button>
         </NextLink>
       </VStack>
     </Box>
