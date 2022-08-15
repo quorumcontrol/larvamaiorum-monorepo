@@ -18,7 +18,7 @@ import historiaTitle from "../assets/images/historiaTitle.png";
 import historiaLocked from "../assets/images/historiaLocked.png";
 import Carousel, { Slide } from "../src/components/Carousel";
 
-const boxPadding = ['0', '50px']
+const boxPadding = ["0", "50px"];
 
 const Home: NextPage = () => {
   const description = `
@@ -58,15 +58,9 @@ const Home: NextPage = () => {
       </Head>
       <Layout>
         <VStack w="full" spacing="10">
-          <Box
-            p={boxPadding}
-            position="relative"
-            w="full"
-            overflow="hidden"
-          >
+          <Flex p={boxPadding} position="relative" w="full" overflow="hidden">
             <Box
-              as='video'
-
+              as="video"
               id="video-background"
               muted
               autoPlay
@@ -74,7 +68,7 @@ const Home: NextPage = () => {
               preload="auto"
               playsInline
               data-setup="{}"
-              display={['none', 'block']}
+              display={["none", "block"]}
             >
               <source src="/video/teaserBackground.mp4" type="video/mp4" />
               <p className="vjs-no-js">
@@ -82,27 +76,30 @@ const Home: NextPage = () => {
                 upgrading to a web browser that supports HTML5 video
               </p>
             </Box>
-            <Box maxW="25em" mt={['0', '150px']}>
-              <Heading textTransform="uppercase">
-                Become the most powerful and important warrior patron.
-                <br />
-                Welcome to Crypto Colosseum.
-              </Heading>
-              <Text>
-                Warrior patrons compete for power and prestige. Immerse yourself
-                in wootgump fueled adventures. Your earnings are only capped by
-                your skill. Crypto Rome is not a safe place.
-              </Text>
+            <Box>
+              {" "}
+              <Box maxW="25em">
+                <Heading size={["lg", "xl"]}>
+                  Become the most powerful and important warrior patron.
+                  <br />
+                  Welcome to Crypto Colosseum.
+                </Heading>
+                <Text>
+                  Warrior patrons compete for power and prestige. Immerse
+                  yourself in wootgump fueled adventures. Your earnings are only
+                  capped by your skill. Crypto Rome is not a safe place.
+                </Text>
+              </Box>
+              <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                JOIN DISCORD
+              </Button>
             </Box>
-            <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-              JOIN DISCORD
-            </Button>
-          </Box>
+          </Flex>
 
           <Flex
             w="100%"
             overflow="hidden"
-            borderStyle={['none', "dashed"]}
+            borderStyle={["none", "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             alignItems="center"
@@ -115,9 +112,7 @@ const Home: NextPage = () => {
               alignItems="center"
             >
               <VStack maxW="22em" alignItems="left">
-                <Heading textTransform="uppercase" size="2xl">
-                  Larva Maiorum
-                </Heading>
+                <Heading size={["xl", "2xl"]}>Larva Maiorum</Heading>
                 <Text>
                   &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
                   collection launching Q3 2022. Only in the SKALEverse. This
@@ -157,15 +152,13 @@ const Home: NextPage = () => {
 
           <Box
             w="full"
-            borderStyle={['none', "dashed"]}
+            borderStyle={["none", "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             p={boxPadding}
           >
             <VStack maxW="22em" alignItems="left">
-              <Heading textTransform="uppercase" size="2xl">
-                Graphic Lore
-              </Heading>
+              <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
               <Text>
                 The story of how the ancient aliens first discovered the large
                 $SKL deposits in the arctic regions of earth.
@@ -199,7 +192,7 @@ const Home: NextPage = () => {
 
           <Flex
             w="100%"
-            borderStyle={['none', "dashed"]}
+            borderStyle={["none", "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             alignItems="center"
@@ -212,9 +205,7 @@ const Home: NextPage = () => {
               alignItems="center"
             >
               <VStack maxW="22em" alignItems="left">
-                <Heading textTransform="uppercase" size="2xl">
-                  Delph&apos;s Table
-                </Heading>
+                <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
                 <Text>
                   The Oracle of Delphi is worried you are not prepared to
                   support your warriors in the Arctic Jungle. He released a
@@ -252,15 +243,13 @@ const Home: NextPage = () => {
           <Box
             w="100%"
             overflow="hidden"
-            borderStyle={['none', "dashed"]}
+            borderStyle={["none", "dashed"]}
             borderColor="brand.orange"
             borderWidth="1px"
             p={boxPadding}
           >
             <VStack maxW="22em" alignItems="left">
-              <Heading textTransform="uppercase" size="2xl">
-                Badge of Assembly
-              </Heading>
+              <Heading size={["xl", "2xl"]}>Badge of Assembly</Heading>
               <Text>
                 A badge qualifies you for airdrops, playing our mini-games,
                 joining special discord channels and levels up your characters

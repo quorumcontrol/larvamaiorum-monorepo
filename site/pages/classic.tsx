@@ -13,8 +13,8 @@ const Home: NextPage = () => {
         <title>Crypto Colosseum: Classic</title>
       </Head>
       <Layout>
-        <VStack spacing={10} textAlign="center">
-          <Heading textTransform="uppercase">Crypto Colosseum: Classic</Heading>
+        <VStack spacing={10} alignItems="left">
+          <Heading size={["xl","2xl"]}>Crypto Colosseum: Classic</Heading>
           <Text>
             Crypto Colosseum: Classic has been live on the Polygon network for
             over a year.<br />It has often been in the top 10 games on that network.

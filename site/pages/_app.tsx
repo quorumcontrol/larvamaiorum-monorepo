@@ -111,6 +111,11 @@ const theme = extendTheme({
       baseStyle: {
       },
       sizes: {
+        lg: {
+          fontSize: "3xl",
+          lineHeight: '50px',
+          letterSpacing: '0.025em',
+        },
         xl: {
           fontSize: "5xl",
           lineHeight: '80px',

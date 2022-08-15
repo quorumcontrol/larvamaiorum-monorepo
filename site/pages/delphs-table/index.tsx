@@ -6,11 +6,16 @@ const Home: NextPage = () => {
   return (
     <>
       <Layout>
-        <VStack spacing={5}>
-          <Heading textTransform="uppercase">Delph&apos;s Table</Heading>
-          <Text>Find the Wootgump, don&apos;t get rekt.</Text>
-          <Text>Delph&apos;s Table is multiplayer game with rewards from prize pools to NFT drops.</Text>
-          <Text>Launching 7 September, 2022</Text>
+        <VStack spacing={5} alignItems="left">
+          <Box maxW="40rem">
+            <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
+            <Text>
+            Find the Wootgump, don&apos;t get rekt. Delph&apos;s Table is multiplayer game with rewards from prize
+              pools to NFT drops.
+            </Text>
+            <Text>Launching 7 September, 2022</Text>
+          </Box>
+
           <Box p="3" rounded="10px" bg="blackAlpha.400">
             <video
               id="full-video"

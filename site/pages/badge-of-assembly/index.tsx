@@ -17,8 +17,8 @@ const BadgeOfAssemblyHome: NextPage = () => {
         <title>Crypto Colosseum: Badge of Assembly Claim Page</title>
       </Head>
       <Layout>
-        <VStack spacing={5} textAlign="center">
-          <Heading textTransform="uppercase">Badge of Assembly</Heading>
+        <VStack spacing={5} alignItems="left" maxW="40rem">
+          <Heading size={["xl", "2xl"]}>Badge of Assembly</Heading>
           <Text>
             These badges are your gateway to the crypto world, your team, and your path to success.<br />
             The more badges you possess, the more powerful you will become.
