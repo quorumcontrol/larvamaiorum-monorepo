@@ -161,10 +161,7 @@ const Home: NextPage = () => {
               <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
               <Text>
                 The story of how the ancient aliens first discovered the large
-                $SKL deposits in the arctic regions of earth.
-              </Text>
-              <Text>
-                Part I of this graphic novella will mint page-by-page starting
+                $SKL deposits in the arctic regions of earth. Part I of this graphic novella will mint page-by-page starting
                 September 1.
               </Text>
             </VStack>
