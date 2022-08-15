@@ -26,6 +26,7 @@
     "kasumah-multicall": "^0.0.48",
     "mqtt": "^4.3.7",
     "next": "12.1.6",
+    "pure-react-carousel": "^1.29.0",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.32.1",

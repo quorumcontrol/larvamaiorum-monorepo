@@ -17,10 +17,13 @@ const BadgeOfAssemblyHome: NextPage = () => {
         <title>Crypto Colosseum: Badge of Assembly Claim Page</title>
       </Head>
       <Layout>
-        <VStack spacing={5}>
+        <VStack spacing={5} textAlign="center">
           <Heading textTransform="uppercase">Badge of Assembly</Heading>
-          <Text>These badges are your entry pass to the crypto roman world. They are your team and your tribe.</Text>
-          <Text>The more badges you possess, the more powerful you will become.</Text>
+          <Text>
+            These badges are your gateway to the crypto world, your team, and your path to success.<br />
+            The more badges you possess, the more powerful you will become.
+          </Text>
+          <Text>Collect them all if you can.</Text>
         </VStack>
         <Stack direction={["column", "row"]} spacing="10">
           <BadgeClaimCard

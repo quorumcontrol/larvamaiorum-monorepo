@@ -21,7 +21,7 @@ const Home: NextPage = () => {
           </Text>
           <Box>
             <Link href="https://arena.cryptocolosseum.com" target="_blank">
-              <Button variant="solid">Visit the Arena</Button>
+              <Button variant="primary">Visit the Arena</Button>
             </Link>
           </Box>
           <Box>

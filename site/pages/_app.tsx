@@ -10,6 +10,7 @@ import {
   darkTheme,
   Theme,
 } from "@rainbow-me/rainbowkit";
+import merge from 'lodash.merge'
 import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -17,7 +18,7 @@ import Script from "next/script";
 import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
 import "../styles/video-background.css";
 import "video.js/dist/video-js.css";
-import merge from 'lodash.merge'
+import 'pure-react-carousel/dist/react-carousel.es.css';
 
 const { chains, provider } = configureChains(
   [
@@ -93,6 +94,7 @@ const theme = extendTheme({
     Button: {
       variants: {
         primary: {
+          textTransform: 'uppercase',
           fontWeight: '700',
           bg: 'brand.orange'
         }
@@ -141,31 +143,31 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <ChakraProvider theme={theme}>
             <Head>
-              <title>Crypto Colosseum: Delph&apos;s Table</title>
+              <title>Crypto Colosseum: Larva Maiorum</title>
+              <meta charSet="utf-8" />
               <meta
                 name="viewport"
                 content="width=device-width, initial-scale=1"
               />
-              <meta charSet="utf-8" />
               <meta
                 property="og:site_name"
-                content="Crypto Colosseum: Delph's Table"
+                content="Crypto Colosseum: Larva Maiorum"
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
               <meta
                 name="description"
-                content="A game of harvest and battle."
+                content="Welcome to Crypto Rome. Immerse yourself in wootgump infused struggle for power and glory."
               />
               <link rel="icon" href="/favicon.ico" />
               <meta
                 property="og:title"
-                content="Crypto Colosseum: Delph's Table"
+                content="Crypto Colosseum: Larva Maiorum"
                 key="ogtitle"
               />
               <meta
                 property="og:description"
-                content="A game of harvest and battle."
+                content="Welcome to Crypto Rome. Immerse yourself in wootgump infused struggle for power and glory."
                 key="ogdesc"
               />
 
@@ -178,7 +180,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
               <meta
                 property="og:url"
-                content="https://delphs.larvamaiorum.com"
+                content="https://cryptocolosseum.com"
                 key="ogurl"
               />
             </Head>

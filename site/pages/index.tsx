@@ -13,11 +13,18 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import VideoModal from "../src/components/VideoModal";
 import Layout from "../src/components/Layout";
 import placeHolderHistoria from "../assets/images/placeHolderHistoria.png";
 import BadgeClaimCard from "../src/components/BadgeClaimCard";
+import {
+  CarouselProvider,
+  Slider,
+  Slide,
+  ButtonBack,
+  ButtonNext,
+} from "pure-react-carousel";
 
 const Home: NextPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,23 +32,27 @@ const Home: NextPage = () => {
     setIsOpen(false);
   }, [setIsOpen]);
 
-  const translate = keyframes`
-  from {transform: translateY(100px)}
-  to {transform: translateY(0)}
-`;
-  const fade = keyframes`
-  from {opacity: 0}
-  to {opacity: 1}
-`;
+  //   const translate = keyframes`
+  //   from {transform: translateY(100px)}
+  //   to {transform: translateY(0)}
+  // `;
+  //   const fade = keyframes`
+  //   from {opacity: 0}
+  //   to {opacity: 1}
+  // `;
 
-  const easeInAnimation = (order = 0) => {
-    const offset = 4 * order;
-    return `${translate} 1.${offset}s 0s ease-in-out, ${fade} 4.${offset}s 0s ease-in-out`;
-  };
+  // const easeInAnimation = (order = 0) => {
+  //   const offset = 4 * order;
+  //   return `${translate} 1.${offset}s 0s ease-in-out, ${fade} 4.${offset}s 0s ease-in-out`;
+  // };
 
   const description = `
   1,111 Genesis masks launching Q3 2022. Only in the SKALEverse. Crypto Colosseum: Larva Maiorum is a play2earn blockchain game set in crypto-rome. Battle your warriors, equip your recruits, craft NFT items.
   `.trim();
+
+  useEffect(() => {
+    console.log("render");
+  }, []);
 
   return (
     <>
@@ -137,14 +148,13 @@ const Home: NextPage = () => {
             >
               <VStack maxW="22em" alignItems="left">
                 <Heading textTransform="uppercase" size="2xl">
-                  Masks of the
-                  <br />
-                  Ancient ones
+                  Larva Maiorum
                 </Heading>
                 <Text>
-                  1,111 Genesis masks launching Q3 2022. Only in the SKALEverse.
-                  This special collection entitles the wearer to the absolute
-                  best game items at launch. Gladiator warriors and ultra rare
+                  &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
+                  collection launching Q3 2022. Only in the SKALEverse. This
+                  special collection entitles the wearer to the absolute best
+                  game items at launch. Gladiator warriors and ultra rare
                   artifacts bless the wearer of these wootgump infused masks.
                 </Text>
               </VStack>
@@ -263,7 +273,7 @@ const Home: NextPage = () => {
             </Stack>
           </Flex>
 
-          <Flex
+          <Box
             border="dashed"
             w="100%"
             overflow="hidden"
@@ -272,40 +282,52 @@ const Home: NextPage = () => {
             borderWidth="1px"
             p="50px"
           >
-            <VStack alignItems="left" spacing="10">
               <VStack maxW="22em" alignItems="left">
                 <Heading textTransform="uppercase" size="2xl">
                   Badge of Assembly
                 </Heading>
                 <Text>
-                  These badges are your gateway to the crypto world. They are also your team make you more powerful over time. Collect them all if you can.
-                </Text>
-                <Text>
-                  Having a badge qualifies you for airdrops, playing our mini-games, joining special discord channels and levels up your characters as your team does better.
+                  A badge qualifies you for airdrops, playing our mini-games,
+                  joining special discord channels and levels up your characters
+                  as your team does better.
                 </Text>
               </VStack>
-              <HStack overflowX="scroll" spacing="10">
-                <BadgeClaimCard
-                  animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
-                  name="Antiqui Posessor"
-                  url="/badge-of-assembly/claim/antiqui"
-                  description="Claimable with 1000 SKL on mainnet or a member of the classic game."
-                />
-                <BadgeClaimCard
-                  animationUrl="ipfs://bafybeihze2e6pzygreosakvcemomkvorbtlqazdp2ovjx5qzxcalrt44lm"
-                  name="Ruby Genesis"
-                  url="/badge-of-assembly/claim/ruby"
-                  description="Claimable by performing one transaction on the Europa network."
-                />
-                <BadgeClaimCard
-                  animationUrl="ipfs://bafybeiefqqlksz3hx6r2omyga5l26caiupg32n6t752qkoinkg46fq2e7q"
-                  name="SKALE Enjoyooor"
-                  url="/badge-of-assembly/claim/enjoyooor"
-                  description="Claimable by buying $SKL on Ruby.exchange within the last 3 days."
-                />
-              </HStack>
-            </VStack>
-          </Flex>
+              <Box w="100%" mt="10">
+                <CarouselProvider
+                  totalSlides={3}
+                  naturalSlideWidth={33}
+                  naturalSlideHeight={60}
+                  visibleSlides={3}
+                >
+                  <Slider>
+                    <Slide index={0}>
+                      <BadgeClaimCard
+                        animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
+                        name="Antiqui Posessor"
+                        url="/badge-of-assembly/claim/antiqui"
+                        description="Claimable with 1000 SKL on mainnet or a member of the classic game."
+                      />
+                    </Slide>
+                    <Slide index={1}>
+                      <BadgeClaimCard
+                        animationUrl="ipfs://bafybeihze2e6pzygreosakvcemomkvorbtlqazdp2ovjx5qzxcalrt44lm"
+                        name="Ruby Genesis"
+                        url="/badge-of-assembly/claim/ruby"
+                        description="Claimable by performing one transaction on the Europa network."
+                      />
+                    </Slide>
+                    <Slide index={1}>
+                      <BadgeClaimCard
+                        animationUrl="ipfs://bafybeiefqqlksz3hx6r2omyga5l26caiupg32n6t752qkoinkg46fq2e7q"
+                        name="SKALE Enjoyooor"
+                        url="/badge-of-assembly/claim/enjoyooor"
+                        description="Claimable by buying $SKL on Ruby.exchange within the last 3 days."
+                      />
+                    </Slide>
+                  </Slider>
+                </CarouselProvider>
+              </Box>
+          </Box>
         </VStack>
       </Layout>
     </>
