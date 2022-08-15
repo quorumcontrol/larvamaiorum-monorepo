@@ -29,19 +29,19 @@ const BadgeOfAssemblyHome: NextPage = () => {
           <BadgeClaimCard
             animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
             name="Antiqui Posessor"
-            url="./claim/antiqui"
+            url="/badge-of-assembly/claim/antiqui"
             description="Claimable with 1000 SKL on mainnet or a member of the classic game."
           />
           <BadgeClaimCard
             animationUrl="ipfs://bafybeihze2e6pzygreosakvcemomkvorbtlqazdp2ovjx5qzxcalrt44lm"
             name="Ruby Genesis"
-            url="./claim/ruby"
+            url="/badge-of-assembly/claim/ruby"
             description="Claimable by performing one transaction on the Europa network."
           />
           <BadgeClaimCard
             animationUrl="ipfs://bafybeiefqqlksz3hx6r2omyga5l26caiupg32n6t752qkoinkg46fq2e7q"
             name="SKALE Enjoyooor"
-            url="./claim/enjoyooor"
+            url="/badge-of-assembly/claim/enjoyooor"
             description="Claimable by buying $SKL on Ruby.exchange within the last 3 days."
           />
         </Stack>

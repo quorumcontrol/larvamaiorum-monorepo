@@ -16,7 +16,7 @@ const Home: NextPage = () => {
             <Text>Launching 7 September, 2022</Text>
           </Box>
 
-          <Box p="3" rounded="10px" bg="blackAlpha.400">
+          <Box p="3">
             <video
               id="full-video"
               controls

@@ -107,7 +107,7 @@ const Home: NextPage = () => {
           >
             <Stack
               direction={["column", "row"]}
-              spacing="5"
+              spacing="10"
               w="100%"
               alignItems="center"
             >
@@ -197,7 +197,7 @@ const Home: NextPage = () => {
           >
             <Stack
               direction={["column", "row"]}
-              spacing="5"
+              spacing="10"
               w="100%"
               alignItems="center"
             >

@@ -101,7 +101,7 @@ const ClaimButton: React.FC<{
 
   return (
     <Button
-      variant="solid"
+      variant="primary"
       size="lg"
       onClick={() => mutation.mutate({ address, txHash })}
     >
@@ -175,9 +175,7 @@ const ClaimEnjoyooor: NextPage = () => {
           <Box
             borderRadius="lg"
             borderWidth="1px"
-            w="sm"
-            h="md"
-            overflow="hidden"
+            maxW="md"
             p="5"
           >
             <VStack align="left" spacing="10">
@@ -211,9 +209,7 @@ const ClaimEnjoyooor: NextPage = () => {
           <Box
             borderRadius="lg"
             borderWidth="1px"
-            w="sm"
-            h="md"
-            overflow="hidden"
+            maxW="md"
             p="5"
           >
             <VStack align="left" spacing="10">

@@ -22,6 +22,7 @@ const useSKLBalance = (address?: string) => {
       skl.callStatic.getAndUpdateDelegatedAmount(address!),
     ]);
     const liquid = BigNumber.from(balance.tokenBalances[0].tokenBalance);
+    console.log('liquid: ', liquid)
     return {
       staked,
       liquid,

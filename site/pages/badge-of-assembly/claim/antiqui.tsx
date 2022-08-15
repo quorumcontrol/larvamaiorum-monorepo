@@ -101,7 +101,7 @@ const ClaimButton: React.FC<{
 
   return (
     <Button
-      variant="solid"
+      variant="primary"
       size="lg"
       onClick={() => mutation.mutate({ address })}
     >
@@ -113,11 +113,11 @@ const ClaimButton: React.FC<{
 const Claim: NextPage = () => {
   const { address, isConnected:isSuccess } = useAccount();
   const { data } = useSKLBalance(address);
-  const isDomReady = useIsClientSide();
+  const isClient = useIsClientSide();
   const canClaim = data && data.total.gte(threshold);
   const [didMint, setDidMint] = useState(false);
 
-  if (!isDomReady) {
+  if (!isClient) {
     return (
       <>
         <Head>
@@ -145,7 +145,7 @@ const Claim: NextPage = () => {
           </Box>
           <Text>
             Your badge is in your wallet. See it on{" "}
-            {isDomReady && isSuccess && address && (
+            {isClient && isSuccess && address && (
               <Link href={`/browse/${address}`} textDecoration="underline">
                 your personal page.
               </Link>
@@ -174,9 +174,7 @@ const Claim: NextPage = () => {
           <Box
             borderRadius="lg"
             borderWidth="1px"
-            w="sm"
-            h="md"
-            overflow="hidden"
+            maxW="md"
             p="5"
           >
             <VStack align="left" spacing="10">
@@ -214,8 +212,7 @@ const Claim: NextPage = () => {
           <Box
             borderRadius="lg"
             borderWidth="1px"
-            w="sm"
-            h="md"
+            maxW="md"
             overflow="hidden"
             p="5"
           >
