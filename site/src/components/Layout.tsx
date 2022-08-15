@@ -3,43 +3,15 @@ import {
   Container,
   VStack,
   Box,
-  Stack,
-  Spacer,
   Text,
   Link,
-  LinkBox,
-  LinkOverlay,
   Spinner,
-  Flex,
 } from "@chakra-ui/react";
-import Image from "next/image";
-import NextLink from "next/link";
-import logo from "../../assets/images/logo.svg";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import useIsClientSide from "../hooks/useIsClientSide";
-import { useUsername } from "../hooks/Player";
-import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
-import AppLink from "./AppLink";
 import topologyImage from "../../assets/images/topology.svg";
-
-const NavItem: React.FC<{ href: string; children: React.ReactNode }> = ({
-  href,
-  children,
-}) => {
-  return (
-    <Flex alignItems={"center"} justifyContent={"space-between"}>
-      <AppLink href={href} display="flex" fontSize="md">
-        {children}
-      </AppLink>
-    </Flex>
-  );
-};
+import Navigation from "./Navigation";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const isClient = useIsClientSide();
-  const { address } = useAccount();
-  const { data: username } = useUsername(address);
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
 
@@ -75,29 +47,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         maxW="100vw"
       />
       <Container p={10} maxW="1400" zIndex={1}>
-        <Stack direction={["column", "row"]} spacing="5">
-          <LinkBox display="flex">
-            <NextLink href="/" passHref>
-              <LinkOverlay flexDir="row" display="flex" alignItems="center">
-                <Image src={logo} alt="Crypto Colosseum logo" />
-              </LinkOverlay>
-            </NextLink>
-          </LinkBox>
-
-          <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
-          <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
-          <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
-          <NavItem href="/classic">Classic</NavItem>
-
-          <Spacer />
-
-          <VStack ml="5">
-            <ConnectButton showBalance={false} chainStatus={"none"} />
-            {isClient && username && (
-              <AppLink href={`/profile/${address}`}>{username}</AppLink>
-            )}
-          </VStack>
-        </Stack>
+        <Navigation />
 
         <VStack mt="10" spacing={5} alignItems="left">
           {navigating && <Spinner />}

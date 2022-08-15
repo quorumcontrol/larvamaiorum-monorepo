@@ -12,6 +12,7 @@
     "prod-restart": "PM2_HOME=~/.pm2-delph pm2 restart all"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.8",
     "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
