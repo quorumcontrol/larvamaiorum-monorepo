@@ -1,6 +1,5 @@
 
 import { providers, utils, Wallet } from "ethers";
-import { defaultNetwork } from '../src/utils/SkaleChains'
 import debug from 'debug'
 import { badgeOfAssemblyContract, trustedForwarderContract } from "../src/utils/contracts";
 import SingletonQueue from '../src/utils/singletonQueue'
