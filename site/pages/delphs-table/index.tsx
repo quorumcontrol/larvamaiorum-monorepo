@@ -11,7 +11,7 @@ const Home: NextPage = () => {
             <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
             <Text>
               Find the Wootgump, don&apos;t get rekt. Delph&apos;s Table is
-              multiplayer game with rewards from prize pools to NFT drops.
+              a multiplayer game with rewards from prize pools to NFT drops.
             </Text>
             <Text>Launching 7 September, 2022</Text>
           </Box>

@@ -128,7 +128,7 @@ const Home: NextPage = () => {
                 <Heading size={["xl", "2xl"]}>Larva Maiorum</Heading>
                 <Text>
                   &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
-                  collection launching Q3 2022. Only in the SKALEverse. This
+                  collection launching Q3 2022. This
                   special collection entitles the wearer to the absolute best
                   game items at launch. Gladiator warriors and ultra rare
                   artifacts bless the wearer of these wootgump infused masks.
@@ -177,7 +177,7 @@ const Home: NextPage = () => {
               <Text>
                 The story of how the ancient aliens first discovered the large
                 $SKL deposits in the arctic regions of earth. Part I of this
-                graphic novella will mint page-by-page starting September 1.
+                graphic novella mints page-by-page starting September 1.
               </Text>
             </VStack>
             <Box mt="10">
