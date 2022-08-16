@@ -8,6 +8,7 @@ import {
   Flex,
   HStack,
   Spacer,
+  LinkBox,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -17,6 +18,7 @@ import BadgeClaimCard from "../src/components/BadgeClaimCard";
 import historiaTitle from "../assets/images/historiaTitle.png";
 import historiaLocked from "../assets/images/historiaLocked.png";
 import Carousel, { Slide } from "../src/components/Carousel";
+import Link from "next/link";
 
 const boxPadding = ["0", "50px"];
 
@@ -98,9 +100,11 @@ const Home: NextPage = () => {
                   capped by your skill. Crypto Rome is not a safe place.
                 </Text>
               </Box>
-              <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                JOIN DISCORD
-              </Button>
+              <Link href="https://discord.gg/tTSNvAuK">
+                <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                  JOIN DISCORD
+                </Button>
+              </Link>
             </Box>
           </Flex>
 
@@ -108,7 +112,7 @@ const Home: NextPage = () => {
             w="100%"
             overflow="hidden"
             backgroundImage={["none", border]}
-            borderBottom={["1px dashed", 'none']}
+            borderBottom={["1px dashed", "none"]}
             borderBottomColor={"brand.orange"}
             alignItems="center"
             p={boxPadding}
@@ -162,7 +166,7 @@ const Home: NextPage = () => {
           <Box
             w="full"
             backgroundImage={["none", border]}
-            borderBottom={["1px dashed", 'none']}
+            borderBottom={["1px dashed", "none"]}
             borderBottomColor={"brand.orange"}
             alignItems="center"
             p={boxPadding}
@@ -201,7 +205,7 @@ const Home: NextPage = () => {
           <Flex
             w="100%"
             backgroundImage={["none", border]}
-            borderBottom={["1px dashed", 'none']}
+            borderBottom={["1px dashed", "none"]}
             borderBottomColor={"brand.orange"}
             alignItems="center"
             p={boxPadding}

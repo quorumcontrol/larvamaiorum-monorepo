@@ -6,10 +6,13 @@ import {
   Text,
   Link,
   Spinner,
+  HStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import topologyImage from "../../assets/images/topology.svg";
 import Navigation from "./Navigation";
+import { SocialIcon } from 'react-social-icons';
+
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
@@ -53,7 +56,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           {navigating && <Spinner />}
           {!navigating && children}
         </VStack>
-        <Box as="footer" mt="200" textAlign="center">
+        <VStack as="footer" mt="200" textAlign="center" alignItems="center">
+          <HStack>
+            <SocialIcon url="https://twitter.com/larva_maiorum" />
+            <SocialIcon url="https://discord.gg/tTSNvAuK" />
+            <SocialIcon url="https://t.me/crypto_colosseum" />
+          </HStack>
           <Text fontSize="sm">
             <Link href="https://larvamaiorum.com/">
               A Crypto Colosseum: Larva Maiorum experience.
@@ -62,7 +70,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Text pt="4" fontSize="12px">
             &copy; 2022 Quorum Control GmbH
           </Text>
-        </Box>
+        </VStack>
       </Container>
     </>
   );

@@ -31,6 +31,7 @@
     "react-dom": "18.1.0",
     "react-hook-form": "^7.32.1",
     "react-query": "^3.39.1",
+    "react-social-icons": "^5.14.0",
     "skale-relayer-contracts": "^0.0.6",
     "video.js": "^7.20.1",
     "wagmi": "^0.5.3"

@@ -22,7 +22,7 @@ const Browse: NextPage = () => {
         <meta name="description" content={`Larva Maiorum profile page for ${address}`} />
       </Head>
       <Layout>
-        <VStack spacing="10">
+        <VStack spacing="10" alignItems="left">
           <Text fontSize="lg">{username || address || "..."}</Text>
           <Heading>BADGES</Heading>
           <Stack direction={["column", "row"]} spacing="10">
