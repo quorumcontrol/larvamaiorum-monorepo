@@ -70,7 +70,7 @@ const NewUser: NextPage = () => {
           {!hasBadges && !isLoading && (
             <Text>
               You need to have{" "}
-              <NextLink passHref href="https://boa.larvamaiorum.com/claim">
+              <NextLink passHref href="/badge-of-assembly">
                 <Link>a Badge of Assembly</Link>
               </NextLink>
               {" "}to play. It looks like you don&apos;t have any of these.

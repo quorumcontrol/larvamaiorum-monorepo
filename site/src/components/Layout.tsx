@@ -63,9 +63,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <SocialIcon url="https://t.me/crypto_colosseum" />
           </HStack>
           <Text fontSize="sm">
-            <Link href="https://larvamaiorum.com/">
-              A Crypto Colosseum: Larva Maiorum experience.
-            </Link>
+            A Crypto Colosseum: Larva Maiorum experience.
           </Text>
           <Text pt="4" fontSize="12px">
             &copy; 2022 Quorum Control GmbH

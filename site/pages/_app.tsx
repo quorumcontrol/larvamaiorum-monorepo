@@ -10,7 +10,7 @@ import {
   darkTheme,
   Theme,
 } from "@rainbow-me/rainbowkit";
-import merge from 'lodash.merge'
+import merge from "lodash.merge";
 import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -75,7 +75,7 @@ const theme = extendTheme({
       body: {
         fontSize: "22px",
         bg: "brand.background",
-        fontWeight: '400',
+        fontWeight: "400",
       },
     },
   },
@@ -86,47 +86,46 @@ const theme = extendTheme({
   colors: {
     brand: {
       background: "#101010",
-      orange: '#D14509',
+      orange: "#D14509",
     },
   },
   components: {
     Button: {
       variants: {
         primary: {
-          textTransform: 'uppercase',
-          fontWeight: '700',
-          bg: 'brand.orange',
-          borderRadius: '0',
+          textTransform: "uppercase",
+          fontWeight: "700",
+          bg: "brand.orange",
+          borderRadius: "0",
         },
         secondary: {
-          borderRadius: '0',
-          textTransform: 'uppercase',
-          fontWeight: '700',
+          borderRadius: "0",
+          textTransform: "uppercase",
+          fontWeight: "700",
           background: "rgba(209, 69, 9, 0.05)",
           border: "1px solid rgba(233, 108, 55, 0.5)",
-        }
-      }
+        },
+      },
     },
     Heading: {
-      baseStyle: {
-      },
+      baseStyle: {},
       sizes: {
         lg: {
           fontSize: "3xl",
-          lineHeight: '50px',
-          letterSpacing: '0.025em',
+          lineHeight: "50px",
+          letterSpacing: "0.025em",
         },
         xl: {
           fontSize: "5xl",
-          lineHeight: '80px',
-          letterSpacing: '0.025em',
+          lineHeight: "80px",
+          letterSpacing: "0.025em",
         },
-        '2xl': {
+        "2xl": {
           fontSize: "7xl",
-          lineHeight: '99px',
-          letterSpacing: '0.025em',
-        }
-      }
+          lineHeight: "99px",
+          letterSpacing: "0.025em",
+        },
+      },
     },
   },
 });
@@ -135,24 +134,21 @@ const queryClient = new QueryClient();
 
 const rainbowTheme = merge(darkTheme(), {
   colors: {
-    accentColor: '#D14509',
+    accentColor: "#D14509",
   },
   fonts: {
-    body: 'Cairo, sans-serif'
+    body: "Cairo, sans-serif",
   },
   radii: {
-    connectButton: '0px'
-  }
+    connectButton: "0px",
+  },
 } as Theme);
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider
-          chains={chains}
-          theme={rainbowTheme}
-        >
+        <RainbowKitProvider chains={chains} theme={rainbowTheme}>
           <ChakraProvider theme={theme}>
             <Head>
               <title>Crypto Colosseum: Larva Maiorum</title>
@@ -191,9 +187,21 @@ function MyApp({ Component, pageProps }: AppProps) {
               />
 
               <meta
+                property="og:image:alt"
+                content="A 3D rendered gladiator holding an axe standing next to fire."
+                key="og:image:alt"
+              />
+
+              <meta
                 property="og:url"
                 content="https://cryptocolosseum.com"
                 key="ogurl"
+              />
+
+              <meta
+                property="og:image"
+                content="/socialThumbnail.png"
+                key="ogimage"
               />
             </Head>
             <Script

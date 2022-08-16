@@ -6,12 +6,9 @@ import {
   Stack,
   Button,
   Flex,
-  HStack,
   Spacer,
-  LinkBox,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Head from "next/head";
 import Image from "next/image";
 import Layout from "../src/components/Layout";
 import BadgeClaimCard from "../src/components/BadgeClaimCard";
@@ -25,41 +22,8 @@ const boxPadding = ["0", "50px"];
 const border = `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23D14509' stroke-width='1' stroke-dasharray='8%2c 15' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");`;
 
 const Home: NextPage = () => {
-  const description = `
-  1,111 Genesis masks launching Q3 2022. Only in the SKALEverse. Crypto Colosseum: Larva Maiorum is a play2earn blockchain game set in crypto-rome. Battle your warriors, equip your recruits, craft NFT items.
-  `.trim();
-
   return (
     <>
-      <Head>
-        <title>Crypto Colosseum: Larva Maiorum</title>
-        <meta name="description" content={description} />
-        <meta
-          property="og:title"
-          content="Crypto Colosseum: Larva Maiorum"
-          key="ogtitle"
-        />
-        <meta property="og:description" content={description} key="ogdesc" />
-
-        <meta name="twitter:card" content="summary" key="twcard" />
-        <meta name="twitter:creator" content="@larva_maiorum" key="twhandle" />
-
-        <meta
-          property="og:url"
-          content="https://larvamaiorum.com"
-          key="ogurl"
-        />
-        <meta
-          property="og:image"
-          content="/socialThumbnail.png"
-          key="ogimage"
-        />
-        <meta
-          property="og:image:alt"
-          content="A 3D rendered gladiator holding an axe standing next to fire."
-          key="og:image:alt"
-        />
-      </Head>
       <Layout>
         <VStack w="full" spacing="10">
           <Flex

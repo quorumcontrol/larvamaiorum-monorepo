@@ -38,7 +38,7 @@ const Home: NextPage = () => {
                 <Text>
                   Looks like this is your first time here. Let&apos;s get you setup. You&apos;ll
                   need to have{" "}
-                  <AppLink href="https://boa.larvamaiorum.com/claim">
+                  <AppLink href="/badge-of-assembly">
                     a Badge of Assembly
                   </AppLink>
                   {" "}to play.
