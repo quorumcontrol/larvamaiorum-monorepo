@@ -20,6 +20,8 @@ import Carousel, { Slide } from "../src/components/Carousel";
 
 const boxPadding = ["0", "50px"];
 
+const border = `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23D14509' stroke-width='1' stroke-dasharray='8%2c 15' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");`;
+
 const Home: NextPage = () => {
   const description = `
   1,111 Genesis masks launching Q3 2022. Only in the SKALEverse. Crypto Colosseum: Larva Maiorum is a play2earn blockchain game set in crypto-rome. Battle your warriors, equip your recruits, craft NFT items.
@@ -58,7 +60,13 @@ const Home: NextPage = () => {
       </Head>
       <Layout>
         <VStack w="full" spacing="10">
-          <Flex p={boxPadding} position="relative" w="full" overflow="hidden">
+          <Flex
+            p={boxPadding}
+            pb="50px"
+            position="relative"
+            w="full"
+            overflow="hidden"
+          >
             <Box
               as="video"
               id="video-background"
@@ -99,11 +107,12 @@ const Home: NextPage = () => {
           <Flex
             w="100%"
             overflow="hidden"
-            borderStyle={["none", "dashed"]}
-            borderColor="brand.orange"
-            borderWidth="1px"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", 'none']}
+            borderBottomColor={"brand.orange"}
             alignItems="center"
             p={boxPadding}
+            pb="50px"
           >
             <Stack
               direction={["column", "row"]}
@@ -152,17 +161,19 @@ const Home: NextPage = () => {
 
           <Box
             w="full"
-            borderStyle={["none", "dashed"]}
-            borderColor="brand.orange"
-            borderWidth="1px"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", 'none']}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
             p={boxPadding}
+            pb="50px"
           >
             <VStack maxW="22em" alignItems="left">
               <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
               <Text>
                 The story of how the ancient aliens first discovered the large
-                $SKL deposits in the arctic regions of earth. Part I of this graphic novella will mint page-by-page starting
-                September 1.
+                $SKL deposits in the arctic regions of earth. Part I of this
+                graphic novella will mint page-by-page starting September 1.
               </Text>
             </VStack>
             <Box mt="10">
@@ -189,11 +200,12 @@ const Home: NextPage = () => {
 
           <Flex
             w="100%"
-            borderStyle={["none", "dashed"]}
-            borderColor="brand.orange"
-            borderWidth="1px"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", 'none']}
+            borderBottomColor={"brand.orange"}
             alignItems="center"
             p={boxPadding}
+            pb="50px"
           >
             <Stack
               direction={["column", "row"]}
@@ -239,11 +251,10 @@ const Home: NextPage = () => {
 
           <Box
             w="100%"
-            overflow="hidden"
-            borderStyle={["none", "dashed"]}
-            borderColor="brand.orange"
-            borderWidth="1px"
+            backgroundImage={["none", border]}
+            alignItems="center"
             p={boxPadding}
+            pb="50px"
           >
             <VStack maxW="22em" alignItems="left">
               <Heading size={["xl", "2xl"]}>Badge of Assembly</Heading>
