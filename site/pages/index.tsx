@@ -229,7 +229,7 @@ const Home: NextPage = () => {
               <Text>
                 A badge qualifies you for airdrops, playing our mini-games,
                 joining special discord channels and levels up your characters
-                as your team does better.
+                as your team does better. Collect them all if you can.
               </Text>
             </VStack>
             <Box mt="10">
