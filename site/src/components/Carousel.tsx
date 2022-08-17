@@ -8,6 +8,7 @@ import {
   useBreakpoint,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useSwipeable } from "react-swipeable";
 
 function sizeFromBreakpoint(breakpoint:string) {
   switch(breakpoint) {
@@ -38,6 +39,20 @@ export const Slide: React.FC<{ children: React.ReactNode }> = ({
 const Carousel: React.FC<FlexProps & { slideCount: number }> = (props) => {
   const { children, slideCount, ...flexOpts } = props;
   const breakpoint = useBreakpoint()
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const prevSlide = () => {
+    setCurrentSlide((s) => (s === 0 ? slideCount - 1 : s - 1));
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((s) => (s === slideCount - 1 ? 0 : s + 1));
+  };
+
+  const handlers = useSwipeable({
+    onSwipedLeft: (_eventData) => nextSlide(),
+    onSwipedRight: (_eventData) => prevSlide(),
+  });
 
   const arrowStyles: TextProps = {
     cursor: "pointer",
@@ -54,15 +69,7 @@ const Carousel: React.FC<FlexProps & { slideCount: number }> = (props) => {
       bg: "black",
     },
   };
-  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const prevSlide = () => {
-    setCurrentSlide((s) => (s === 0 ? slideCount - 1 : s - 1));
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((s) => (s === slideCount - 1 ? 0 : s + 1));
-  };
 
   const carouselStyle = {
     transition: "all .5s",
@@ -81,7 +88,7 @@ const Carousel: React.FC<FlexProps & { slideCount: number }> = (props) => {
           </Text>
         </Flex>
       </Box>
-      <Flex w="full" alignItems="center" justifyContent="center">
+      <Flex w="full" alignItems="center" justifyContent="center" {...handlers}>
         <Flex w="full" overflow="hidden" pos="relative">
           <Flex w="full" {...flexOpts} {...carouselStyle}>
             {children}
