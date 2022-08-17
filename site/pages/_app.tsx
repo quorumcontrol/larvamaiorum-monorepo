@@ -165,7 +165,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <link rel="icon" href="/favicon.ico" />
               <meta
                 name="description"
-                content="Welcome to Crypto Rome. Immerse yourself in wootgump infused struggle for power and glory."
+                content="Welcome to Crypto Rome. Immerse yourself in a wootgump infused struggle for power and glory."
               />
               <link rel="icon" href="/favicon.ico" />
               <meta
@@ -175,7 +175,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               />
               <meta
                 property="og:description"
-                content="Welcome to Crypto Rome. Immerse yourself in wootgump infused struggle for power and glory."
+                content="Welcome to Crypto Rome. Immerse yourself in a wootgump infused struggle for power and glory."
                 key="ogdesc"
               />
 
