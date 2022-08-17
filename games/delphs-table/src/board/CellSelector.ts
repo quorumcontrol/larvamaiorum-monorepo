@@ -29,13 +29,13 @@ class CellSelector extends ScriptTypeBase {
 
     // Add a mousedown event handler
     this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.mouseDown, this);
-    this.app.mouse.on(pc.EVENT_MOUSEUP, this.clearEvent, this);
-    this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.clearEvent, this);
+    this.app.mouse.on(pc.EVENT_MOUSEUP, this.clearMouseEvent, this);
+    this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.clearMouseEvent, this);
 
     // Add touch event only if touch is available
     if (this.app.touch) {
       this.app.touch.on(pc.EVENT_TOUCHSTART, this.touchStart, this);
-      this.app.touch.on(pc.EVENT_TOUCHMOVE, this.clearEvent, this);
+      this.app.touch.on(pc.EVENT_TOUCHMOVE, this.maybeClearTouchEvent, this);
     }
 
     this.app.on(MESSAGE_EVENT, this.handleExternalEvent, this)
@@ -87,8 +87,22 @@ class CellSelector extends ScriptTypeBase {
       }
     }
   }
+  
+  maybeClearTouchEvent(e: pc.TouchEvent) {
+    if (this.startedEvent) {
+      const distance = this.getDistance(e.touches[0].x, e.touches[0].y)
+      // if they use two fingers or just move their finger a little, then we can ignore it and keep going
+      if (distance < 10 && e.touches.length === 1) {
+        console.log('no clear, tiny movement')
+        e.event.preventDefault()
+      } else {
+        console.log('clearing')
+        this.startedEvent = undefined
+      }
+    }
+  }
 
-  clearEvent(e: pc.MouseEvent) {
+  clearMouseEvent(e: pc.MouseEvent) {
     this.startedEvent = undefined
     e.event.preventDefault()
   }
@@ -104,6 +118,14 @@ class CellSelector extends ScriptTypeBase {
     }
     e.event.preventDefault();
   }
+
+  private getDistance = function (x:number, y:number) {
+    // Return the distance between the two points
+    var dx = this.startedEvent.x - x;
+    var dy = this.startedEvent.y - y;    
+    
+    return Math.sqrt((dx * dx) + (dy * dy));
+};
 
   doRaycast(screenX: number, screenY: number) {
     if (!this.canSelect) {
