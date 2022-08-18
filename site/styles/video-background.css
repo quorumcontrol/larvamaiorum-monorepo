@@ -7,6 +7,17 @@
     filter: opacity(0.5) blur(0px);
 }
 
+#jungle-video-background {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    filter: opacity(0.2) blur(5px);
+    object-fit: fill;
+}
+
 .stroked {
     -webkit-text-stroke: 1px #FFC658;
     color: transparent;

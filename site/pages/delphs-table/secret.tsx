@@ -1,4 +1,12 @@
-import { VStack, Text, Heading, Box, Spinner, Link, Button } from "@chakra-ui/react";
+import {
+  VStack,
+  Text,
+  Heading,
+  Box,
+  Spinner,
+  Link,
+  Button,
+} from "@chakra-ui/react";
 import type { NextPage } from "next";
 import NextLink from "next/link";
 import { useCallback } from "react";
@@ -17,13 +25,22 @@ const Home: NextPage = () => {
     isLoggedIn,
     login,
     readyToLogin,
-    isLoggingIn:relayerLoading
+    isLoggingIn: relayerLoading,
   } = useLogin();
   const isClient = useIsClientSide();
-  const handler = useCallback((topic:string,msg:Buffer) => {
-    console.log('mqtt: ', topic, msg.toString())
-  }, [])
-  useMqttMessages(handler)
+  const handler = useCallback((topic: string, msg: Buffer) => {
+    console.log("mqtt: ", topic, msg.toString());
+  }, []);
+  useMqttMessages(handler);
+
+  if (isClient && !isLoading && address && !username) {
+    return (
+      <Layout>
+        <Heading>Delph&apos;s Table</Heading>
+        <Text>You need an account to play</Text>
+      </Layout>
+    );
+  }
 
   return (
     <>
@@ -36,18 +53,13 @@ const Home: NextPage = () => {
             {isClient && !isLoading && address && !username && (
               <VStack>
                 <Text>
-                  Looks like this is your first time here. Let&apos;s get you setup. You&apos;ll
-                  need to have{" "}
+                  Looks like this is your first time here. Let&apos;s get you
+                  setup. You&apos;ll need to have{" "}
                   <AppLink href="/badge-of-assembly">
                     a Badge of Assembly
-                  </AppLink>
-                  {" "}to play.
+                  </AppLink>{" "}
+                  to play.
                 </Text>
-                <NextLink passHref href="/delphs-table/new">
-                  <Link>
-                    <Button>Create Account</Button>
-                  </Link>
-                </NextLink>
               </VStack>
             )}
             {isClient && !isLoading && address && username && (
