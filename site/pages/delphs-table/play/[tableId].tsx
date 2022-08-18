@@ -6,9 +6,9 @@ import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import useMqttMessages from "../../../src/hooks/useMqttMessages";
+import { useRelayer } from "../../../src/hooks/useUser";
 import { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from "../../../src/utils/mqtt";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
-import relayer from "../../../src/utils/relayer";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 
 const txQueue = new SingletonQueue()
@@ -20,6 +20,7 @@ const Play: NextPage = () => {
   const { tableId:untypedTableId } = router.query
   const tableId = untypedTableId as string
   const { address } = useAccount();
+  const { data:relayer } = useRelayer();
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
   const [fullScreen, setFullScreen] = useState(false)
@@ -54,8 +55,8 @@ const Play: NextPage = () => {
   }, [setFullScreen])
 
   const handleMessage = useCallback(async (appEvent:AppEvent) => {
-    if (!relayer.ready()) {
-      throw new Error('no signer')
+    if (!relayer?.ready()) {
+      throw new Error('no relayer')
     }
 
     console.log('params', tableId, appEvent.data[0], appEvent.data[1])
@@ -88,7 +89,7 @@ const Play: NextPage = () => {
         }), '*')
       })
     })
-  }, [tableId])
+  }, [tableId, relayer])
 
   useEffect(() => {
     const handler = async (evt:MessageEvent) => {

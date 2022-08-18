@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "react-query";
-import { useAccount } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 import { lobbyContract, playerContract } from "../utils/contracts";
-import relayer from "../utils/relayer";
+import { useRelayer } from "./useUser";
 
 const WAITING_PLAYERS_KEY = "waiting-players"
 
@@ -29,7 +29,7 @@ export const useWaitingPlayers = () => {
     return () => {
       lobbyContract().off(filter, handleEvt);
     };
-  }, [lobbyContract, query]);
+  }, [query]);
 
   return query;
 };
@@ -49,14 +49,15 @@ export const useWaitForTable = (onTableStarted: (tableId?: string) => any) => {
     return () => {
       lobbyContract().off(filter, handle);
     };
-  }, [address, lobbyContract]);
+  }, [address, onTableStarted]);
 };
 
 export const useRegisterInterest = () => {
   const queryClient = useQueryClient();
+  const { data:relayer } = useRelayer()
 
   return useMutation(async ({ name, addr }: { name: string, addr: string }) => {
-    if (!relayer.ready()) {
+    if (!relayer?.ready()) {
       throw new Error("the relayer must be ready to register interest");
     }
     const tx = await relayer.wrapped.lobby().registerInterest();

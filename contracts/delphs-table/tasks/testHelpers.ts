@@ -57,6 +57,13 @@ task('player')
     console.log(await player.name(addr))
   })
 
+task('address-from-username')
+  .addParam('username')
+  .setAction(async ({ username }, hre) => {
+    const player = await getPlayerContract(hre)
+    console.log(await player.usernameToAddress(username))
+  })
+
 task('run-game')
   .addParam('id')
   .setAction(async ({ id }, hre) => {

@@ -33,8 +33,10 @@ const deviceWallet = memoize(() => {
 class RelayManager extends EventEmitter {
   deviceToken?: Token
   relayer?: KasumahRelayer
-  forwarder?: TrustedForwarder
-  user?:Signer
+  forwarder: TrustedForwarder
+  user:Signer
+
+  private setupForTokenCreationPromise:Promise<any>
 
   private preTokenData?:PreTokenData
 
@@ -43,6 +45,13 @@ class RelayManager extends EventEmitter {
       return deviceWallet()
     }
     return undefined
+  }
+
+  constructor(user:Signer) {
+    super()
+    this.user = user
+    this.forwarder = trustedForwarderContract().connect(this.deviceWallet!)
+    this.setupForTokenCreationPromise = this.setupForTokenCreation()
   }
 
   wrapped = {
@@ -57,18 +66,15 @@ class RelayManager extends EventEmitter {
     })
   }
 
-  async setupForTokenCreation(user: Signer) {
-    if (this.user && this.user === user) {
-      console.log('setup for token creation called twice')
-      return // we are already doing this with a user
-    }
-    this.user = user
-    this.forwarder = trustedForwarderContract().connect(this.deviceWallet!)
+  waitForReady() {
+    return this.setupForTokenCreationPromise
+  }
 
+  async setupForTokenCreation() {
     if (!this.deviceWallet) {
       throw new Error('missing device wallet')
     }
-    this.preTokenData = await bytesToSignForToken(this.forwarder, user, this.deviceWallet, SESSION_EXPIRY)
+    this.preTokenData = await bytesToSignForToken(this.forwarder, this.user, this.deviceWallet, SESSION_EXPIRY)
     this.emit('readyForTokenCreation')
     return this.preTokenData
   }
@@ -151,6 +157,4 @@ class RelayManager extends EventEmitter {
 
 }
 
-const manager = new RelayManager()
-
-export default manager
+export default RelayManager
