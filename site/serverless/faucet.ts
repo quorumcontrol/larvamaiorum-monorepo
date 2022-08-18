@@ -1,29 +1,22 @@
 
 import { providers, utils, Wallet } from "ethers";
 import debug from 'debug'
-import { badgeOfAssemblyContract, trustedForwarderContract } from "../src/utils/contracts";
+import { trustedForwarderContract } from "../src/utils/contracts";
 import SingletonQueue from '../src/utils/singletonQueue'
 import { NonceManager } from "@ethersproject/experimental";
 import { skaleProvider } from "../src/utils/skaleProvider";
-import { isTestnet } from '../src/utils/networks'
-
-const TESTNET_BOA = "0x881256ada5dD7CcB2457226C4bC978B067daF70B";
-const MAINNET_BOA = "0x2C6FD25071Fd516947682f710f6e9F5eD610207F";
-
-export const BOA_ADDRESS = isTestnet ? TESTNET_BOA : MAINNET_BOA
 
 const singletonQueue = new SingletonQueue()
 
 const log = debug('faucet')
 debug.enable('*')
 
-if (!process.env.env_delphsPrivateKey) {
-  throw new Error("must have a DELPHS private key")
+if (!process.env.FAUCET_PRIVATE_KEY) {
+  throw new Error("must have a FAUCET_PRIVATE_KEY")
 }
 
-const schainSigner = new NonceManager(new Wallet(process.env.env_delphsPrivateKey).connect(skaleProvider))
+const schainSigner = new NonceManager(new Wallet(process.env.FAUCET_PRIVATE_KEY).connect(skaleProvider))
 
-const badgeOfAssembly = badgeOfAssemblyContract()
 const trustedForwarder = trustedForwarderContract()
 
 const highWaterForSFuel = utils.parseEther('1')
@@ -32,9 +25,8 @@ export async function handle(event: any, context: any, callback: any) {
   const { relayerAddress, userAddress, token, issuedAt } = JSON.parse(event.body)
 
   // first get the balances
-  const [relayerBalance, badgeTokens, isVerified] = await Promise.all([
+  const [relayerBalance, isVerified] = await Promise.all([
     skaleProvider.getBalance(relayerAddress),
-    badgeOfAssembly.userTokens(userAddress),
     trustedForwarder.verify(userAddress, relayerAddress, issuedAt, token)
   ])
 
@@ -48,18 +40,7 @@ export async function handle(event: any, context: any, callback: any) {
     })
   }
 
-  log(userAddress, 'relayerAddres', relayerAddress, 'sfuel (relayer): ', utils.formatEther(relayerBalance), 'badges: ', badgeTokens.length, 'relayer balance: ', utils.formatEther(relayerBalance))
-
-  if (badgeTokens.length === 0) {
-    log(userAddress, 'no badge')
-    return callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: 'requires badge',
-        input: event,
-      }),
-    })
-  }
+  log(userAddress, 'relayerAddres', relayerAddress, 'sfuel (relayer): ', utils.formatEther(relayerBalance), 'badges: ', 'relayer balance: ', utils.formatEther(relayerBalance))
 
   if (relayerBalance.gte(highWaterForSFuel)) {
     log(relayerAddress, 'relayer has enough sfuel')
@@ -105,7 +86,5 @@ export async function handle(event: any, context: any, callback: any) {
       console.error('error sending transaction or doing callback: ', err)
       process.exit(1) // the simplest way to restore the nonce manager is to exit
     }
-
   })
-
 }

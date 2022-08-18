@@ -1,4 +1,4 @@
-service: delphs-faucet
+service: larvam-maiorum-faucet
 configValidationMode: off
 useDotenv: true
 
@@ -6,10 +6,8 @@ provider:
   name: scaleway
   runtime: node16 # Available node runtimes are listed in documentation
   # Global Environment variables - used in every functions
-  env:
-    test: test
-  secret:
-    env_delphsPrivateKey: ${env:DELPHS_PRIVATE_KEY}
+  # secret:
+  #   env_delphsPrivateKey: ${env:DELPHS_PRIVATE_KEY}
   scwToken: ${env:SCW_SECRET_KEY}
   scwProject: ${env:SCW_DEFAULT_PROJECT_ID}
   scwRegion: ${env:SCW_REGION}
@@ -28,10 +26,19 @@ package:
     - '!.git/**'
 
 functions:
-  faucet:
+  mainnet-faucet:
     handler: serverless/faucet.handle
     memoryLimit: 2048
     maxScale: 1
     # Local environment variables - used only in given function
     env:
-      TESTNET: "true"
+      NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      FAUCET_PRIVATE_KEY: ${env:FAUCET_PRIVATE_KEY}
+  testnet-faucet:
+    handler: serverless/faucet.handle
+    memoryLimit: 2048
+    maxScale: 1
+    # Local environment variables - used only in given function
+    secret:
+      FAUCET_PRIVATE_KEY: ${env:FAUCET_PRIVATE_KEY}

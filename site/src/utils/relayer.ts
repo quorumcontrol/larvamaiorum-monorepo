@@ -8,9 +8,11 @@ import { wrapContract } from 'kasumah-relay-wrapper'
 import { bytesToSignForToken, createToken, PreTokenData, Token } from 'skale-relayer-contracts'
 import EventEmitter from 'events'
 import { backOff } from 'exponential-backoff'
+import { isTestnet } from './networks'
 
-const FAUCET_URL =
-  "https://delphsfaucetd3cqn3r9-faucet.functions.fnc.fr-par.scw.cloud";
+const FAUCET_URL = isTestnet ? 
+  "https://larvammaiorumfaucetgjxd8a5h-testnet-faucet.functions.fnc.fr-par.scw.cloud" :
+  "https://larvammaiorumfaucetgjxd8a5h-mainnet-faucet.functions.fnc.fr-par.scw.cloud"
 
 const thresholdForFaucet = utils.parseEther("0.25");
 
