@@ -169,7 +169,7 @@ const Play: NextPage = () => {
                 <HStack>
                   <Text fontWeight="800">Fabulosity</Text>
                   <Spacer />
-                  <Text>2 GUMP</Text>
+                  <Text>2 $GUMP</Text>
                 </HStack>
                 <HStack spacing="4">
                   <Text>ATK:300</Text>
