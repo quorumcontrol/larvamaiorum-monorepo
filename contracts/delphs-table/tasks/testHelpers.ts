@@ -1,22 +1,8 @@
 import "@nomiclabs/hardhat-ethers"
 import { utils, Wallet } from "ethers"
-import { keccak256 } from "ethers/lib/utils"
 import { task } from 'hardhat/config'
 import { getDelphsTableContract, getDeployer, getPlayerContract } from "./helpers"
 import { faker } from '@faker-js/faker'
-
-function hashString(msg: string) {
-  return keccak256(Buffer.from(msg))
-}
-
-task('start')
-  .addParam('id')
-  .setAction(async ({ id }, hre) => {
-    const delphs = await getDelphsTableContract(hre)
-    const tx = await delphs.start(id)
-    console.log('tx', tx.hash)
-    await tx.wait()
-  })
 
 task('tick')
   .setAction(async (_, hre) => {
@@ -64,18 +50,6 @@ task('setup-bots', 'setup a number of bots')
 
   })
 
-async function getBots(num: number) {
-  const { default: botSetup } = await import('../bots')
-  const botNames = Object.keys(botSetup)
-  return botNames.slice(0, num).map((name) => {
-    return {
-      name,
-      ...botSetup[name]
-    }
-  })
-
-}
-
 task('player')
   .addParam('addr')
   .setAction(async ({ addr }, hre) => {
@@ -100,36 +74,4 @@ task('run-game')
       console.log('ok')
     }
     console.log('done')
-  })
-
-task('board')
-  .addParam('name')
-  .addParam('addresses')
-  .addOptionalParam('bots', 'number of bots to add to the board')
-  .addOptionalParam('rounds', 'number of rounds')
-  .setAction(async ({ name, addresses, bots: userBots, rounds: userRounds }, hre) => {
-
-    const rounds = userRounds ? parseInt(userRounds, 10) : 50
-    const botNumber = userBots ? parseInt(userBots, 10) : 0
-    const delphs = await getDelphsTableContract(hre)
-    const deployer = await getDeployer(hre)
-    const player = await getPlayerContract(hre)
-
-    const isOk = await Promise.all(addresses.split(',').map((addr: string) => {
-      return player.name(addr)
-    }))
-
-    isOk.forEach((is, i) => {
-      if (!is) {
-        console.error(`Uninitilized: ${addresses.split(',')[i]}`)
-        throw new Error('address is not initialized')
-      }
-    })
-
-    const tableAddrs: string[] = addresses.split(',').concat((await getBots(botNumber)).map((bot) => bot.address as string))
-    const seeds = tableAddrs.map((addr) => hashString(`${name}-${addr}`))
-
-    const id = hashString(name)
-    await (await delphs.createTable(id, tableAddrs, seeds, rounds, deployer.address)).wait()
-    console.log('table id: ', id)
   })
