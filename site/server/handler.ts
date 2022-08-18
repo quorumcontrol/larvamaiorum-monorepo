@@ -5,9 +5,10 @@ import { keccak256 } from "ethers/lib/utils";
 import { faker } from '@faker-js/faker'
 import { NonceManager } from '@ethersproject/experimental'
 import * as dotenv from "dotenv";
-import botSetup from '../contracts/bots'
+import testnetBots from '../contracts/bots-testnet'
+import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory } from "../contracts/typechain";
-import { addresses } from "../src/utils/networks";
+import { addresses, isTestnet } from "../src/utils/networks";
 import { delphsContract, lobbyContract, playerContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
@@ -24,7 +25,7 @@ const NUMBER_OF_ROUNDS = 30
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
 
-if (!process.env.env_delphsPrivateKey) {
+if (!process.env.DELPHS_PRIVATE_KEY) {
   console.error('no private key')
   throw new Error("must have a DELPHS private key")
 }
@@ -32,6 +33,8 @@ if (!process.env.env_delphsPrivateKey) {
 function hashString(msg: string) {
   return keccak256(Buffer.from(msg))
 }
+
+const botSetup = isTestnet ? testnetBots : mainnetBots
 
 async function getBots(num: number) {
   const botNames = Object.keys(botSetup)
@@ -47,7 +50,7 @@ const singleton = new SingletonQueue()
 
 const provider = skaleProvider
 
-const wallet = new NonceManager(new Wallet(process.env.env_delphsPrivateKey!).connect(provider))
+const wallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
 
 const lobby = lobbyContract().connect(wallet)
 const delphs = delphsContract().connect(wallet)
