@@ -86,6 +86,8 @@ class ChainConnector extends ScriptTypeBase {
   //   this.handleTick(this.latest.add(1) , constants.Zero, roll);
   // }
 
+
+
   private handleIframeEvents(evt:any) {
     try {
       switch (evt.type) {
@@ -207,6 +209,26 @@ class ChainConnector extends ScriptTypeBase {
     });
   }
 
+  private pingParentPage() {
+    const warriors = this.grid.warriors.sort((a,b) => {
+      return b.wootgumpBalance - a.wootgumpBalance
+    }).map((w) => {
+      return {
+        id: w.id,
+        name: w.name,
+        currentHealth: w.currentHealth,
+        initialHealth: w.initialHealth,
+        wootgumpBalance: w.wootgumpBalance,
+        attack: w.attack,
+        defense: w.defense,
+      }
+    })
+    parent.postMessage(JSON.stringify({
+      type: 'gameTick',
+      data: warriors,
+    }), '*')
+  }
+
   private handleTick(
     index: BigNumber,
     _blockNumber: BigNumber,
@@ -268,6 +290,7 @@ class ChainConnector extends ScriptTypeBase {
         if (this.grid.isOver()) {
           this.entity.fire(GAME_OVER_EVT)
         }
+        this.pingParentPage()
       }
     } catch (err) {
       console.error('error handling async tick: ', err)

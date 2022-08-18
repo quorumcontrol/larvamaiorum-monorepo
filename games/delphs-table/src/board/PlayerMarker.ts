@@ -42,10 +42,10 @@ class PlayerMarker extends ScriptTypeBase {
 
   update() {
     if (this.warrior) {
-      this.threeDNameScript.text = `${this.warrior.name} (WG: ${this.warrior.wootgumpBalance})`
+      // this.threeDNameScript.text = `${this.warrior.name} (WG: ${this.warrior.wootgumpBalance})`
       // this.healthText.element!.text = `${Math.ceil(this.warrior.currentHealth)}`
       // this.gumpText.element!.text = `Gump: ${this.warrior.wootgumpBalance}`
-      this.stats.element!.text = `HP:${Math.ceil(this.warrior.currentHealth)}/${this.warrior.initialHealth} A:${this.warrior.attack}  D:${this.warrior.defense}`
+      // this.stats.element!.text = `HP:${Math.ceil(this.warrior.currentHealth)}/${this.warrior.initialHealth} A:${this.warrior.attack}  D:${this.warrior.defense}`
     }
   }
 
@@ -154,7 +154,7 @@ class PlayerMarker extends ScriptTypeBase {
   setWarrior(warrior: Warrior) {
     this.warrior = warrior
     // this.name.element!.text = warrior.name
-    this.threeDNameScript.text = `${warrior.name}`
+    this.threeDNameScript.text = warrior.name
     const config = getGameConfig(this.app.root)
     if (config.currentPlayer === warrior) {
       mustFindByName(this.entity, 'PlayerArrow').enabled = true
