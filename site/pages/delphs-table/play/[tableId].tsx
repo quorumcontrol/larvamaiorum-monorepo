@@ -1,4 +1,15 @@
-import { VStack, Text, Heading, Box, Stack, OrderedList, ListItem, HStack, Spacer, Flex } from "@chakra-ui/react";
+import {
+  VStack,
+  Text,
+  Heading,
+  Box,
+  Stack,
+  OrderedList,
+  ListItem,
+  HStack,
+  Spacer,
+  Flex,
+} from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,13 +22,50 @@ import { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from "../../../src/utils/mqtt";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
+import Video from "../../../src/components/Video";
 
 const txQueue = new SingletonQueue();
 
 interface AppEvent {
   type: string;
-  data: [number, number];
+  data: any[];
 }
+
+interface GameWarrior {
+  id: string;
+  name: string;
+  wootgumpBalance: number;
+  attack: number;
+  defense: number;
+  currentHealth: number;
+  initialHealth: number;
+}
+
+const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
+  warrior: {
+    name,
+    wootgumpBalance,
+    attack,
+    defense,
+    currentHealth,
+    initialHealth,
+  },
+}) => {
+  return (
+    <ListItem pl="3">
+      <HStack>
+        <Text fontWeight="800">{name}</Text>
+        <Spacer />
+        <Text>{wootgumpBalance} $GUMP</Text>
+      </HStack>
+      <HStack spacing="4">
+        <Text>ATK:{attack}</Text>
+        <Text>HP:{Math.floor(currentHealth)}/{initialHealth}</Text>
+        <Text>DEF:{defense}</Text>
+      </HStack>
+    </ListItem>
+  );
+};
 
 const Play: NextPage = () => {
   const router = useRouter();
@@ -28,6 +76,7 @@ const Play: NextPage = () => {
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
   const [fullScreen, setFullScreen] = useState(false);
+  const [warriors, setWarriors] = useState<GameWarrior[]>([]);
 
   const mqttHandler = useCallback((topic: string, msg: Buffer) => {
     switch (topic) {
@@ -57,6 +106,13 @@ const Play: NextPage = () => {
   }, []);
 
   useMqttMessages(mqttHandler);
+
+  const handleGameTickMessage = useCallback(
+    (evt: AppEvent) => {
+      setWarriors(evt.data);
+    },
+    [setWarriors]
+  );
 
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => !old);
@@ -130,6 +186,8 @@ const Play: NextPage = () => {
             break;
           case "fullScreenClick":
             return handleFullScreenMessage();
+          case "gameTick":
+            return handleGameTickMessage(appEvent);
           default:
             console.log("unhandled message type: ", appEvent);
         }
@@ -141,47 +199,55 @@ const Play: NextPage = () => {
       console.log("removing destination listener");
       window.removeEventListener("message", handler);
     };
-  }, [handleMessage, handleFullScreenMessage]);
+  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage]);
 
   return (
-    <LoggedInLayout>
-      <Flex direction={["column", "column", "column", "row"]} >
-        <Box p={[0, 0, 0, 6]} backgroundImage={['none', 'none', 'none', border]} minW="75%">
-          {isClient && (
-            <Box
-              id="game"
-              as="iframe"
-              src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
-              ref={iframe}
-              top="0"
-              left="0"
-              w={fullScreen ? "100vw" : "100%"}
-              minH={fullScreen ? "100vh" : "70vh"}
-              position={fullScreen ? "fixed" : undefined}
-              zIndex={4_000_000}
-            />
-          )}
-        </Box>
-        <Spacer />
-        <Box p="6" maxW={["100%", "100%", "100%", "33%"]} backgroundImage={['none', 'none', 'none', border]}>
-            <OrderedList  fontSize="md" stylePosition={"outside"}>
-              <ListItem pl="3">
-                <HStack>
-                  <Text fontWeight="800">Fabulosity</Text>
-                  <Spacer />
-                  <Text>2 $GUMP</Text>
-                </HStack>
-                <HStack spacing="4">
-                  <Text>ATK:300</Text>
-                  <Text>HP:245/700</Text>
-                  <Text>DEF:473</Text>
-                </HStack>
-              </ListItem>
+    <>
+      <Video
+        animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
+        loop
+        muted
+        autoPlay
+        id="jungle-video-background"
+      />
+      <LoggedInLayout>
+        <Flex direction={["column", "column", "column", "row"]}>
+          <Box
+            minW="75%"
+          >
+            {isClient && (
+              <Box
+                id="game"
+                as="iframe"
+                src={`https://playcanv.as/e/b/eeM4MATH/?tableId=${tableId}&player=${address}`}
+                // src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
+                ref={iframe}
+                top="0"
+                left="0"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={4_000_000}
+              />
+            )}
+          </Box>
+          <Spacer />
+          <Box
+            p="6"
+            maxW={["100%", "100%", "100%", "33%"]}
+            backgroundImage={["none", "none", "none", border]}
+          >
+            <OrderedList fontSize="md" spacing={4}>
+              {warriors.map((w) => {
+                return (
+                  <WarriorListItem warrior={w} key={`warrior-stats-${w.id}`} />
+                );
+              })}
             </OrderedList>
-        </Box>
-      </Flex>
-
-    </LoggedInLayout>
+          </Box>
+        </Flex>
+      </LoggedInLayout>
+    </>
   );
 };
 
