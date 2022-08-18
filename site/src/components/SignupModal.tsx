@@ -15,6 +15,8 @@ import {
   Spinner,
   Box,
   HStack,
+  ModalFooter,
+  Link,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -43,6 +45,8 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
   const { login } = useLogin();
   const queryClient = useQueryClient();
 
+  const [isSkipped, setIsSkipped] = useState(false);
+
   const onSubmit = async ({ username }: FormData) => {
     const queryKey = ["/player/username/", address];
     try {
@@ -61,39 +65,47 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={!isSkipped && isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent p="6" bg="brand.background" maxW="600px">
         <ModalBody backgroundImage={border} p="6">
-          <Heading>Create your username</Heading>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <VStack spacing="10">
-                <FormControl isRequired isInvalid={!!errors.username} isDisabled={loading}>
-                  <FormLabel htmlFor="username">
-                    What do you want to be called?
-                  </FormLabel>
-                  <Input
-                    id="username"
-                    type="text"
-                    {...register("username", { required: true })}
-                  />
-                  <FormHelperText>You can change this later.</FormHelperText>
-                  <FormErrorMessage>Username is required.</FormErrorMessage>
-                </FormControl>
-                <FormControl>
-                  <Button variant="primary" disabled={loading} type="submit">
-                    {!loading && "Save"}
-                    {loading && <Spinner />}
-                  </Button>
-                  {loading &&  <FormHelperText>Confirm in your wallet.</FormHelperText>}
-                </FormControl>
-              </VStack>
-            </form>
+          <Heading>Your Name</Heading>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <VStack spacing="10">
+              <FormControl
+                isRequired
+                isInvalid={!!errors.username}
+                isDisabled={loading}
+              >
+                <FormLabel htmlFor="username">
+                  What do you want to be called?
+                </FormLabel>
+                <Input
+                  id="username"
+                  type="text"
+                  {...register("username", { required: true })}
+                />
+                <FormHelperText>You can change this later.</FormHelperText>
+                <FormErrorMessage>Username is required.</FormErrorMessage>
+              </FormControl>
+              <FormControl>
+                <Button variant="primary" disabled={loading} type="submit">
+                  {!loading && "Save"}
+                  {loading && <Spinner />}
+                </Button>
+                {loading && (
+                  <FormHelperText>Confirm in your wallet.</FormHelperText>
+                )}
+              </FormControl>
+            </VStack>
+          </form>
         </ModalBody>
 
-        {/* <ModalFooter>
-          <Text>Not now</Text>
-        </ModalFooter> */}
+        <ModalFooter>
+          <Link fontSize="md" onClick={() => setIsSkipped(true)}>
+            Skip
+          </Link>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );
