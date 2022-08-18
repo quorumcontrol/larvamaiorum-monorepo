@@ -27,7 +27,7 @@ export const useLogin = () => {
     return () => {
       relayer.off('readyForTokenCreation', readyForTokenHandler)
     }
-  }, [relayer, setCanCreateToken])
+  }, [setCanCreateToken])
 
   const login = useCallback(async (username?:string) => {
     try{
@@ -49,7 +49,7 @@ export const useLogin = () => {
       setIsLoggingIn(false)
     }
   
-  }, [canCreateToken, relayer, setIsLoggingIn, setLoggedIn]);
+  }, [canCreateToken, setIsLoggingIn, setLoggedIn]);
 
  
   return { relayer, isLoggingIn, isLoggedIn, login, readyToLogin: canCreateToken };

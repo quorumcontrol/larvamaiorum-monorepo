@@ -7430,10 +7430,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-skale-relayer-contracts@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.npmjs.org/skale-relayer-contracts/-/skale-relayer-contracts-0.0.6.tgz"
-  integrity sha512-0mhsBR/J4omYVciwGVEliozDV/qsvJZlLTq30rOcV8Rdkf2I1j8t8gw1bDECkds1okCr/84NXZlsXP8MOtH5MQ==
+skale-relayer-contracts@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/skale-relayer-contracts/-/skale-relayer-contracts-0.0.8.tgz#51e219cb7aa256caf47820d0ad5610fc96fc0591"
+  integrity sha512-1AwPL+WPe7eqMDgg8Hs6Cmp9/uZzrNZghP7Z4mQcYngfzfrRrY/Qzwsi3ElO/Rk+n9tsEu/jum5bZe1UjjaQlw==
 
 slash@^3.0.0:
   version "3.0.0"

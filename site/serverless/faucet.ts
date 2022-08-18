@@ -6,6 +6,8 @@ import SingletonQueue from '../src/utils/singletonQueue'
 import { NonceManager } from "@ethersproject/experimental";
 import { skaleProvider } from "../src/utils/skaleProvider";
 
+const SESSION_EXPIRY = 43200
+
 const singletonQueue = new SingletonQueue()
 
 const log = debug('faucet')
@@ -27,7 +29,7 @@ export async function handle(event: any, context: any, callback: any) {
   // first get the balances
   const [relayerBalance, isVerified] = await Promise.all([
     skaleProvider.getBalance(relayerAddress),
-    trustedForwarder.verify(userAddress, relayerAddress, issuedAt, token)
+    trustedForwarder.verify(userAddress, relayerAddress, issuedAt, SESSION_EXPIRY, token)
   ])
 
   if (!isVerified) {

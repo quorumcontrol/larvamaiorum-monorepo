@@ -10,6 +10,8 @@ import EventEmitter from 'events'
 import { backOff } from 'exponential-backoff'
 import { isTestnet } from './networks'
 
+const SESSION_EXPIRY = 43200
+
 const FAUCET_URL = isTestnet ? 
   "https://larvammaiorumfaucetgjxd8a5h-testnet-faucet.functions.fnc.fr-par.scw.cloud" :
   "https://larvammaiorumfaucetgjxd8a5h-mainnet-faucet.functions.fnc.fr-par.scw.cloud"
@@ -66,7 +68,7 @@ class RelayManager extends EventEmitter {
     if (!this.deviceWallet) {
       throw new Error('missing device wallet')
     }
-    this.preTokenData = await bytesToSignForToken(this.forwarder, user, this.deviceWallet)
+    this.preTokenData = await bytesToSignForToken(this.forwarder, user, this.deviceWallet, SESSION_EXPIRY)
     this.emit('readyForTokenCreation')
     return this.preTokenData
   }

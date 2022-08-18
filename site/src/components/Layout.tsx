@@ -12,11 +12,17 @@ import { useRouter } from "next/router";
 import topologyImage from "../../assets/images/topology.svg";
 import Navigation from "./Navigation";
 import { SocialIcon } from 'react-social-icons';
+import { useAccount } from "wagmi";
+import { useUsername } from "../hooks/Player";
+import SignupModal from "./SignupModal";
 
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
+  const { address, isConnected, isConnecting } = useAccount()
+  const { data:username, isLoading, isFetched } = useUsername(address)
   const [navigating, setNavigating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     const handleStart = (url: string) =>
@@ -35,6 +41,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     };
   }, [router]);
 
+  useEffect(() => {
+    setModalOpen(isConnected && isFetched && !username)
+  }, [setModalOpen, isConnected, isFetched, username])
+
+  const showSpinner = navigating || isConnecting || isLoading
+
   return (
     <>
       <Box
@@ -49,12 +61,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         overflow="hidden"
         maxW="100vw"
       />
+      <SignupModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       <Container p={10} maxW="1400" zIndex={1}>
         <Navigation />
 
         <VStack mt="10" spacing={5} alignItems="left">
-          {navigating && <Spinner />}
-          {!navigating && children}
+          {showSpinner && <Spinner />}
+          {!showSpinner && children}
         </VStack>
         <VStack as="footer" mt="200" textAlign="center" alignItems="center">
           <HStack>

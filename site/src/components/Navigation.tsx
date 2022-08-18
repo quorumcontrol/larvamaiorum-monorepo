@@ -20,9 +20,9 @@ import Image from "next/image";
 import AppLink from "./AppLink";
 import logo from "../../assets/images/logo.svg";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-// import useIsClientSide from "../hooks/useIsClientSide";
-// import { useAccount } from "wagmi";
-// import { useUsername } from "../hooks/Player";
+import useIsClientSide from "../hooks/useIsClientSide";
+import { useAccount } from "wagmi";
+import { useUsername } from "../hooks/Player";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -46,9 +46,9 @@ const NavItem: React.FC<{ href: string; children: React.ReactNode, isMobile?:boo
 
 const Navigation = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const isClient = useIsClientSide();
-  // const { address } = useAccount();
-  // const { data: username } = useUsername(address);
+  const isClient = useIsClientSide();
+  const { address } = useAccount();
+  const { data: username } = useUsername(address);
   const router = useRouter();
 
   useEffect(() => {
@@ -111,9 +111,9 @@ const Navigation = () => {
 
         <VStack ml="5">
           <ConnectButton showBalance={false} chainStatus={"none"} />
-          {/* {isClient && username && (
+          {isClient && username && (
             <AppLink href={`/profile/${address}`}>{username}</AppLink>
-          )} */}
+          )}
         </VStack>
       </HStack>
     </>
