@@ -7,9 +7,11 @@ error UsernameAlreadyClaimed();
 
 contract Player is ERC2771Context {
     event UserNameSet(address indexed player, string username);
+    event TeamSet(address indexed player, uint256 indexed team);
 
     mapping (address => string) public name;
     mapping (string => address) public usernameToAddress;
+    mapping (address => uint256) public team;
 
     constructor(address trustedForwarder) ERC2771Context(trustedForwarder) {}
 
@@ -23,6 +25,12 @@ contract Player is ERC2771Context {
         name[sender] = _name;
         usernameToAddress[_name] = sender;
         emit UserNameSet(sender, _name);
+        return true;
+    }
+    function setTeam(uint256 _team) public returns (bool) {
+        address sender = _msgSender();
+        team[sender] = _team;
+        emit TeamSet(sender, _team);
         return true;
     }
 }

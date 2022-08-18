@@ -38,6 +38,6 @@
     "@openzeppelin/contracts": "^4.6.0",
     "@types/dotenv": "^8.2.0",
     "hardhat-deploy": "^0.11.11",
-    "skale-relayer-contracts": "^0.0.4"
+    "skale-relayer-contracts": "^0.0.8"
   }
 }

@@ -6,7 +6,7 @@ const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
-  const { deploy, execute } = deployments;
+  const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
   await deploy("DiceRoller", {

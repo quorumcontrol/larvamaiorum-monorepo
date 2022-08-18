@@ -23,7 +23,9 @@ interface PlayerInterface extends ethers.utils.Interface {
   functions: {
     "isTrustedForwarder(address)": FunctionFragment;
     "name(address)": FunctionFragment;
+    "setTeam(uint256)": FunctionFragment;
     "setUsername(string)": FunctionFragment;
+    "team(address)": FunctionFragment;
     "usernameToAddress(string)": FunctionFragment;
   };
 
@@ -32,7 +34,12 @@ interface PlayerInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "name", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setTeam",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "setUsername", values: [string]): string;
+  encodeFunctionData(functionFragment: "team", values: [string]): string;
   encodeFunctionData(
     functionFragment: "usernameToAddress",
     values: [string]
@@ -43,21 +50,29 @@ interface PlayerInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setTeam", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setUsername",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "team", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "usernameToAddress",
     data: BytesLike
   ): Result;
 
   events: {
+    "TeamSet(address,uint256)": EventFragment;
     "UserNameSet(address,string)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "TeamSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UserNameSet"): EventFragment;
 }
+
+export type TeamSetEvent = TypedEvent<
+  [string, BigNumber] & { player: string; team: BigNumber }
+>;
 
 export type UserNameSetEvent = TypedEvent<
   [string, string] & { player: string; username: string }
@@ -114,10 +129,17 @@ export class Player extends BaseContract {
 
     name(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
+    setTeam(
+      _team: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setUsername(
       _name: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    team(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     usernameToAddress(
       arg0: string,
@@ -132,10 +154,17 @@ export class Player extends BaseContract {
 
   name(arg0: string, overrides?: CallOverrides): Promise<string>;
 
+  setTeam(
+    _team: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setUsername(
     _name: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  team(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   usernameToAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
 
@@ -147,12 +176,32 @@ export class Player extends BaseContract {
 
     name(arg0: string, overrides?: CallOverrides): Promise<string>;
 
+    setTeam(_team: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
+
     setUsername(_name: string, overrides?: CallOverrides): Promise<boolean>;
+
+    team(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     usernameToAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
+    "TeamSet(address,uint256)"(
+      player?: string | null,
+      team?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { player: string; team: BigNumber }
+    >;
+
+    TeamSet(
+      player?: string | null,
+      team?: BigNumberish | null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { player: string; team: BigNumber }
+    >;
+
     "UserNameSet(address,string)"(
       player?: string | null,
       username?: null
@@ -172,10 +221,17 @@ export class Player extends BaseContract {
 
     name(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    setTeam(
+      _team: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setUsername(
       _name: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    team(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     usernameToAddress(
       arg0: string,
@@ -194,9 +250,19 @@ export class Player extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    setTeam(
+      _team: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     setUsername(
       _name: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    team(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     usernameToAddress(

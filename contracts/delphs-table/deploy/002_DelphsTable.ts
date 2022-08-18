@@ -6,8 +6,8 @@ const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
-  const { deploy, get } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const { deploy, get } = deployments
+  const { deployer, delph } = await getNamedAccounts()
 
   const forwarder = await get('TrustedForwarder')
   const roller = await get('DiceRoller')
@@ -16,7 +16,7 @@ const func: DeployFunction = async function ({
     from: deployer,
     log: true,
     // deterministicDeployment: true,
-    args: [forwarder.address, roller.address, deployer],
+    args: [forwarder.address, roller.address, delph],
   });
 };
 export default func;

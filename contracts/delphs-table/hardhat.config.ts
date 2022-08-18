@@ -35,14 +35,17 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
-    tableAdmin: {
+    delph: {
       default: 1, // here this will by default take the first account as deployer
     },
   },
   networks: {
     skale: {
       url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
-      accounts: [process.env.DELPHS_PRIVATE_KEY].filter(
+      accounts: [
+        process.env.MAINNET_DEPLOYER_PRIVATE_KEY,
+        process.env.DELPHS_PRIVATE_KEY,
+      ].filter(
         (k) => !!k
       ) as string[],
       tags: ["mainnet"],
@@ -52,6 +55,7 @@ const config: HardhatUserConfig = {
       // gasPrice: 0,
       accounts: [
         process.env.SKALE_TEST_PRIVATE_KEY,
+        process.env.DELPHS_PRIVATE_KEY,
       ].filter((k) => !!k) as string[],
       tags: ["test", "testskale"],
     },

@@ -7,7 +7,7 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy, execute, get } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const { deployer, delph } = await getNamedAccounts();
 
   const forwarder = await get('TrustedForwarder')
 
@@ -29,6 +29,15 @@ const func: DeployFunction = async function ({
       },
       "setUsername",
       "deployer",
+    );
+    await execute(
+      "Player",
+      {
+        log: true,
+        from: delph,
+      },
+      "setUsername",
+      "Delph",
     );
   }
 };
