@@ -109,7 +109,7 @@ const Navigation = () => {
 
         <Spacer />
 
-        <VStack ml="5">
+        <VStack ml="5" minW="185px">
           <ConnectButton showBalance={false} chainStatus={"none"} />
           {isClient && username && (
             <AppLink href={`/profile/${address}`}>{username}</AppLink>
