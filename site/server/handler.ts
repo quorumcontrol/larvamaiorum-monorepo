@@ -157,6 +157,7 @@ const getDiceRollFromReceipt = (receipt:ContractReceipt) => {
 class TablePlayer {
 
   log: Debugger
+  private playing: boolean
 
   constructor() {
     this.log = debug('table-player')
@@ -166,6 +167,7 @@ class TablePlayer {
     this.log('table started, rolling the dice')
     singleton.push(async () => {
       try {
+        this.log('singleton queue played play tables')
         return await this.playTables()
       } catch (err) {
         console.error('error playing table: ', err)
@@ -182,6 +184,11 @@ class TablePlayer {
 
   private async playTables() {
     try {
+      if (this.playing) {
+        console.error('tried to run twice')
+        throw new Error('tried to run twice, exiting the program')
+      }
+      this.playing = true
       this.log('play tables')
       const ids = await orchestratorState.all()
       if (ids.length === 0) {
@@ -198,7 +205,7 @@ class TablePlayer {
           end: metadata.startedAt.add(metadata.gameLength)
         }
       }))
-      const endings = active.map((tourn) => tourn.end).sort((a, b) => b.sub(a).toNumber()) // sort to largest first
+      const endings = active.map((tourn) => tourn.end).sort((a, b) => a.sub(b).toNumber()) // sort to largest first
       const currentTick = await delphs.latestRoll()
 
       this.log('rolling from ', currentTick.toNumber(), 'to', endings[0].toNumber())
@@ -225,6 +232,8 @@ class TablePlayer {
     } catch (err) {
       console.error('error rolling: ', err)
       this.handleTableStarted()
+    } finally {
+      this.playing = false
     }
   }
 }
