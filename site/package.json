@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "local-handler": "ts-node -P ./tsconfig.serverless.json server/handler.ts",
-    "prod-start": "PM2_HOME=~/.pm2-delph pm2 start ts-node -- -P ./tsconfig.serverless.json server/handler.ts",
-    "prod-restart": "PM2_HOME=~/.pm2-delph pm2 restart all"
+    "prod-start": "PM2_HOME=~/.pm2-delph2 pm2 start ts-node -- -P ./tsconfig.serverless.json server/handler.ts",
+    "prod-restart": "PM2_HOME=~/.pm2-delph2 pm2 restart all"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.8",

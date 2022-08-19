@@ -93,9 +93,9 @@ class AsyncMqtt extends EventEmitter {
   }
 }
 
-export const NO_MORE_MOVES_CHANNEL = `/delphs-table-${defaultNetwork().id}/no-more-moves`
-export const ROLLS_CHANNEL = `/delphs-table-${defaultNetwork().id}/rolls`
-export const PING_CHANNEL = `/delphs-table-${defaultNetwork().id}/ping`
+export const NO_MORE_MOVES_CHANNEL = `/delphs-2-${defaultNetwork().id}/no-more-moves`
+export const ROLLS_CHANNEL = `/delphs-2-${defaultNetwork().id}/rolls`
+export const PING_CHANNEL = `/delphs-2-${defaultNetwork().id}/ping`
 
 const asyncClient = memoize(() => {
   log('mqtt connecting, ', isBrowser)
