@@ -1,19 +1,70 @@
+import debug from 'debug'
 
-class SingletonQueue {
-  pending?:Promise<any>
+const log = debug("util:syncher")
 
-  push(func:()=>Promise<any>):void {
-    if (this.pending) {
-      this.pending.finally(func).catch((err) => {
-        console.error('error in queued singleton queue: ', err)
-      })
-      return
-    }
-    this.pending = func().catch((err) => {
-      console.error('error in non-queued singleton queue: ', err)
-    })
-  }
-
+interface queuedFunction {
+  fn: Function
+  res: Function
+  rej: Function
 }
 
-export default SingletonQueue
+/**
+ * SimpleActor is used to serialize function calls, it is a single threaded
+ * actor that does one function after the next. Every send returns a promise
+ * that is executed after the serialization
+ */
+export class SimpleSyncher {
+  private queue: queuedFunction[]
+  private started: boolean
+  private name?: string
+  constructor(name?: string) {
+    this.started = false
+    this.queue = []
+    this.name = name
+  }
+
+  private async run() {
+    const queuedFn = this.queue.shift()
+    if (queuedFn === undefined) {
+      log(this.name, ' stopping syncher')
+      this.started = false
+      return
+    }
+    try {
+      log(this.name, ' run fn')
+      const resp = await queuedFn.fn()
+      log(this.name, ' finish fn')
+      queuedFn.res(resp)
+    } catch (err) {
+      log(this.name, ' rejecting: ', err)
+      queuedFn.rej(err)
+    }
+    if (this.queue.length > 0) {
+      log(this.name, "syncher queueing another")
+      this.run()
+    } else {
+      this.started = false
+    }
+  }
+
+  push<T>(fn:()=>Promise<T>):Promise<T> {
+    const p = new Promise<T>((resolve, reject) => {
+      this.queue.push({
+        fn: fn,
+        res: resolve,
+        rej: reject,
+      })
+      if (!this.started) {
+        log(this.name, " not started, starting")
+        this.started = true
+        this.run()
+        return
+      }
+      log(this.name, ' run already started')
+    })
+
+    return p
+  }
+}
+
+export default SimpleSyncher
