@@ -79,7 +79,7 @@ const Play: NextPage = () => {
   const [fullScreen, setFullScreen] = useState(false);
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
   const [ready, setReady] = useState(false)
-  useGameRunner(tableId, iframe.current, ready)
+  useGameRunner(tableId, iframe.current || undefined, ready)
 
   const mqttHandler = useCallback((topic: string, msg: Buffer) => {
     console.log('mqtt handler: ', topic, msg.toString())
