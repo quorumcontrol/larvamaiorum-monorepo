@@ -23,6 +23,7 @@ import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
 import Video from "../../../src/components/Video";
+import useGameRunner from "../../../src/hooks/gameRunner";
 
 const txQueue = new SingletonQueue();
 
@@ -77,6 +78,8 @@ const Play: NextPage = () => {
   const iframe = useRef<HTMLIFrameElement>(null);
   const [fullScreen, setFullScreen] = useState(false);
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
+  const [ready, setReady] = useState(false)
+  useGameRunner(tableId, iframe.current, ready)
 
   const mqttHandler = useCallback((topic: string, msg: Buffer) => {
     console.log('mqtt handler: ', topic, msg.toString())
@@ -91,16 +94,16 @@ const Play: NextPage = () => {
           "*"
         );
       }
-      case ROLLS_CHANNEL: {
-        const parsedMsg = JSON.parse(msg.toString());
-        return iframe.current?.contentWindow?.postMessage(
-          JSON.stringify({
-            type: "orchestratorRoll",
-            ...parsedMsg,
-          }),
-          "*"
-        );
-      }
+      // case ROLLS_CHANNEL: {
+      //   const parsedMsg = JSON.parse(msg.toString());
+      //   return iframe.current?.contentWindow?.postMessage(
+      //     JSON.stringify({
+      //       type: "orchestratorRoll",
+      //       ...parsedMsg,
+      //     }),
+      //     "*"
+      //   );
+      // }
       default:
         console.log("mqtt: ", topic);
     }
@@ -189,6 +192,8 @@ const Play: NextPage = () => {
             return handleFullScreenMessage();
           case "gameTick":
             return handleGameTickMessage(appEvent);
+          case "gm":
+            return setReady(true)
           default:
             console.log("unhandled message type: ", appEvent);
         }
@@ -220,8 +225,7 @@ const Play: NextPage = () => {
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/U8Z88ydP/?tableId=${tableId}&player=${address}`}
-                // src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
+                src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"

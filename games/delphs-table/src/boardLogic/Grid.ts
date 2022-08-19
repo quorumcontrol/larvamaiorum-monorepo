@@ -56,15 +56,13 @@ class Grid {
 
   doDevTick() {
     log(`------ tick: ${this.tick} seed: ${this.currentSeed} ------`)
-    // go through every cell and handle its updates
-    if (this.tick !== 0) {
-      this.everyCell((cell) => {
-        cell.doMovement(this.tick, this.currentSeed)
-      })
-    }
 
     this.everyCell((cell) => {
       cell.handleOutcomes(this.tick, this.currentSeed)
+    })
+
+    this.everyCell((cell) => {
+      cell.doMovement(this.tick, this.currentSeed)
     })
 
     // then update which tick we are at

@@ -3,7 +3,7 @@ import Cell from "./Cell";
 import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 
-interface WarriorStats {
+export interface WarriorStats {
   id: string;
   name: string;
   attack: number;
