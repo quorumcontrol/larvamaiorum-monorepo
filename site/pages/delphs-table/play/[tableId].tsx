@@ -79,6 +79,7 @@ const Play: NextPage = () => {
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
 
   const mqttHandler = useCallback((topic: string, msg: Buffer) => {
+    console.log('mqtt handler: ', topic, msg.toString())
     switch (topic) {
       case NO_MORE_MOVES_CHANNEL: {
         const { tick } = JSON.parse(msg.toString());
@@ -219,7 +220,7 @@ const Play: NextPage = () => {
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/eeM4MATH/?tableId=${tableId}&player=${address}`}
+                src={`https://playcanv.as/e/b/U8Z88ydP/?tableId=${tableId}&player=${address}`}
                 // src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
                 ref={iframe}
                 top="0"
