@@ -2,22 +2,22 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 
 import { createScript } from "../utils/createScriptDecorator";
 
-import { skaleTestnet } from "../utils/SkaleChains";
+import { skaleMainnet } from "../utils/SkaleChains";
 import { BigNumber, BytesLike, constants, ethers } from "ethers";
 import { DelphsTable, DelphsTable__factory, Player, Player__factory } from "../typechain";
 import Warrior from "../boardLogic/Warrior";
 import Grid from "../boardLogic/Grid";
 import BoardGenerate from "./BoardGenerate";
 import { DiceRolledEvent, StartedEvent } from "../typechain/DelphsTable";
-import addresses from '../deployments/skaletest/addresses.json'
+import addresses from '../deployments/skale/addresses.json'
 import MulticallWrapper from "kasumah-multicall";
 import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
 
 const log = console.log; //debug('chainConnector')
 
-const DELPHS_TESTNET_ADDRESS = addresses.DelphsTable
-const PLAYER_TESTNET_ADDRESS = addresses.Player
+const DELPHS_ADDRESS = addresses.DelphsTable
+const PLAYER_ADDRESS = addresses.Player
 
 function bigNumMin(a: BigNumber, b: BigNumber) {
   if (a.lte(b)) {
@@ -51,12 +51,12 @@ class ChainConnector extends ScriptTypeBase {
     this.handleTick = this.handleTick.bind(this);
     this.asyncHandleTick = this.asyncHandleTick.bind(this);
     this.handleStarted = this.handleStarted.bind(this);
-    this.provider = new ethers.providers.StaticJsonRpcProvider(skaleTestnet.rpcUrls.default);
+    this.provider = new ethers.providers.StaticJsonRpcProvider(skaleMainnet.rpcUrls.default);
 
-    const multicall = new MulticallWrapper(this.provider, skaleTestnet.id)
+    const multicall = new MulticallWrapper(this.provider, skaleMainnet.id)
 
-    this.delphs = multicall.syncWrap<DelphsTable>(DelphsTable__factory.connect(DELPHS_TESTNET_ADDRESS, this.provider));
-    this.player = multicall.syncWrap<Player>(Player__factory.connect(PLAYER_TESTNET_ADDRESS, this.provider));
+    this.delphs = multicall.syncWrap<DelphsTable>(DelphsTable__factory.connect(DELPHS_ADDRESS, this.provider));
+    this.player = multicall.syncWrap<Player>(Player__factory.connect(PLAYER_ADDRESS, this.provider));
 
     const boardGenerate = this.getScript<BoardGenerate>(this.entity, 'boardGenerate')
     if (!boardGenerate) {
