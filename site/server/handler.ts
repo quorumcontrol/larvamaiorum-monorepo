@@ -46,7 +46,7 @@ async function getBots(num: number) {
   })
 }
 
-const singleton = new SingletonQueue()
+const txSingleton = new SingletonQueue()
 
 const provider = skaleProvider
 
@@ -60,13 +60,16 @@ const orchestratorState = OrchestratorState__factory.connect(addresses().Orchest
 class TableMaker {
   log: Debugger
 
+  singleton: SingletonQueue
+
   constructor() {
     this.log = debug('table-maker')
+    this.singleton = new SingletonQueue('table-maker')
   }
 
   instantLobbyRegistration() {
     this.log('wait over, doing table maker')
-    singleton.push(async () => {
+    this.singleton.push(async () => {
       try {
         return await this.makeTable()
       } catch (err) {
@@ -115,11 +118,13 @@ class TableMaker {
           }
         })
 
-      const tx = await delphs.createAndStart(id, playersWithNamesAndSeeds.map((p) => p.address!), playersWithNamesAndSeeds.map((p) => p.seed), rounds, await wallet.getAddress(), { gasLimit: 1500000 })
-      this.log('table id: ', id, 'tx: ', tx.hash)
+      const tx = await txSingleton.push(async () => {
+        const startTx = await delphs.createAndStart(id, playersWithNamesAndSeeds.map((p) => p.address!), playersWithNamesAndSeeds.map((p) => p.seed), rounds, await wallet.getAddress(), { gasLimit: 1500000 })
+        await orchestratorState.add(id, { gasLimit: 1000000 })
+        await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
+        return startTx
+      }) 
       // on staging we do not have mtm
-      await orchestratorState.add(id, { gasLimit: 1000000 })
-      await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
       await tx.wait()
 
       this.log('done')
@@ -159,16 +164,19 @@ class TablePlayer {
   log: Debugger
   private playing: boolean
 
+  singleton: SingletonQueue
+
   constructor() {
     this.log = debug('table-player')
+    this.singleton = new SingletonQueue('table-player')
   }
 
   instantTableStarted() {
     this.log('table started, rolling the dice')
-    singleton.push(async () => {
+    this.singleton.push(async () => {
       try {
         this.log('singleton queue played play tables')
-        return await this.playTables()
+        return this.playTables()
       } catch (err) {
         console.error('error playing table: ', err)
         process.exit(1)
@@ -182,6 +190,8 @@ class TablePlayer {
     this.instantTableStarted()
   }
 
+  //0x5869a3debe3df78d166123c33b4e3a57419ad86bfeb3a57555897d150611133a first
+  
   private async playTables() {
     try {
       if (this.playing) {
@@ -196,7 +206,6 @@ class TablePlayer {
         return
       }
       const active = await Promise.all((ids).map(async (tableId) => {
-        this.log('active: ', tableId)
         const metadata = await delphs.tables(tableId)
         return {
           id: tableId,
@@ -205,10 +214,11 @@ class TablePlayer {
           end: metadata.startedAt.add(metadata.gameLength)
         }
       }))
+      this.log('actives: ', active.map((a) => ({id: a.id, start: a.start.toNumber(), end: a.end.toNumber()})))
       const endings = active.map((tourn) => tourn.end).sort((a, b) => a.sub(b).toNumber()) // sort to largest first
       const currentTick = await delphs.latestRoll()
 
-      this.log('rolling from ', currentTick.toNumber(), 'to', endings[0].toNumber())
+      this.log('rolling from ', currentTick.toNumber() + 1, 'to', endings[0].toNumber())
 
       for (let i = 0; i < endings[0].sub(currentTick).toNumber(); i++) {
         this.log('buffer')
@@ -217,17 +227,21 @@ class TablePlayer {
         mqttClient().publish(NO_MORE_MOVES_CHANNEL, JSON.stringify({ tick }))
         await promiseWaiter(STOP_MOVES_BUFFER * 1000)
 
-        this.log('rolling')
-        const tx = await delphs.rollTheDice({ gasLimit: 250000 })
+        this.log('rolling', tick)
+        const tx = await txSingleton.push(async () => {
+          return await delphs.rollTheDice({ gasLimit: 250000 })
+        })
         const receipt = await tx.wait()
         const diceRolledLog = getDiceRollFromReceipt(receipt)
-
+        this.log('publish', tick)
         mqttClient().publish(ROLLS_CHANNEL, JSON.stringify({ txHash: tx.hash, tick, random: diceRolledLog.args.random, blockNumber: receipt.blockNumber }))
         this.log('waiting')
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
       this.log('bulk remove')
-      await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500000 })
+      await txSingleton.push(() => {
+        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500000 })
+      })
       this.log('rolling complete')
     } catch (err) {
       console.error('error rolling: ', err)

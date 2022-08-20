@@ -5,9 +5,10 @@ import mqttClient, { ROLLS_CHANNEL } from '../utils/mqtt'
 import ThenArg from "../utils/ThenArg"
 import debug from 'debug'
 import SingletonQueue from "../utils/singletonQueue"
-import { BigNumber } from "ethers"
+import { BigNumber, BigNumberish } from "ethers"
+import { memoize } from "../utils/memoize"
 
-const log = debug('gameRunner')
+const log = console.log //debug('gameRunner')
 
 interface WarriorStats {
   id: string;
@@ -47,15 +48,15 @@ class GameRunner {
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
 
   constructor(tableId: string, iframe: HTMLIFrameElement) {
+    this.handleMqttMessage = this.handleMqttMessage.bind(this)
+    log('--------------- new game runnner')
     this.singleton = new SingletonQueue(`game-runner-${tableId}`)
     this.tableId = tableId
     this.iframe = iframe
   }
 
   async setup() {
-    mqttClient().on('message', (topic: string, msg: Buffer) => {
-      this.handleMqttMessage(topic, msg)
-    })
+    mqttClient().on('message', this.handleMqttMessage)
     const delphs = delphsContract()
 
     const [table, latest, players] = await Promise.all([
@@ -65,10 +66,27 @@ class GameRunner {
     ]);
     this.tableInfo = table
     this.players = players
-    if (latest.gte(table.startedAt)) {
+    if (this.shouldStart(latest)) {
       this.singleton.push(() => this.go(latest))
     }
     return this
+  }
+
+  stop() {
+    mqttClient().off('message', this.handleMqttMessage)
+  }
+
+  private shouldStart(tick:BigNumberish) {
+    if (!this.tableInfo) {
+      return false
+    }
+    return this.tableInfo.startedAt.gt(0) && BigNumber.from(tick).gte(this.tableInfo.startedAt)
+  }
+
+  private async refetchTableInfo() {
+    const delphs = delphsContract()
+
+    this.tableInfo = await delphs.tables(this.tableId)
   }
 
   private async go(latest: BigNumber) {
@@ -76,9 +94,10 @@ class GameRunner {
       console.error('tried to double start')
       return
     }
+    log('setting this.started to true')
     this.started = true
 
-    console.log('table info: ', this.tableInfo)
+    log('table info: ', this.tableInfo)
 
     if (!this.players || !this.tableInfo) {
       throw new Error('missing players or tableInfo')
@@ -109,12 +128,14 @@ class GameRunner {
     }))
 
     const firstRoll = await this.getRoll(this.tableInfo.startedAt.toNumber())
+    log('gameRunner first roll', firstRoll)
     const msg: SetupMessage = {
       tableId: this.tableId,
       firstRoll,
       warriors,
       gameLength: this.tableInfo.gameLength.toNumber(),
     }
+    log('shipping setup')
     this.ship('setup', { setup: msg })
     this.latest = BigNumber.from(firstRoll.index)
     if (latest.gt(this.tableInfo.startedAt)) {
@@ -125,29 +146,28 @@ class GameRunner {
   private async catchUp(start: BigNumber, end: BigNumber) {
     log("catching up", start.toString(), end.toString());
     const missing = await Promise.all(
-      Array(end.sub(start).add(1).toNumber())
+      Array(end.sub(start).toNumber() + 1)
         .fill(true)
         .map((_, i) => {
           return this.getRoll(start.add(i).toNumber());
         })
     );
-    // log("missing: ", missing);
+    log("missing: ", missing);
     missing.forEach((roll) => {
       this.ship('orchestratorRoll', { roll: roll })
     });
     this.latest = end
   }
 
-
   private handleMqttMessage(topic: string, msg: Buffer) {
-    console.log('game runner mqtt handler: ', topic, msg.toString())
+    log('game runner mqtt handler: ', topic, msg.toString())
     switch (topic) {
       case ROLLS_CHANNEL: {
         const parsedMsg = JSON.parse(msg.toString());
         this.singleton.push(() => this.handleOrchestratorRoll(parsedMsg))
       }
       default:
-        console.log("mqtt: ", topic);
+        log("mqtt unknown topic: ", topic);
     }
   }
 
@@ -162,7 +182,7 @@ class GameRunner {
   }
 
   private async getRoll(index: number): Promise<IFrameRoll> {
-    console.log('getting roll: ', index)
+    log('getting roll: ', index)
     const delphs = delphsContract()
     const [random, destinations] = await Promise.all([
       delphs.rolls(index),
@@ -176,23 +196,43 @@ class GameRunner {
     }
   }
 
-  private async handleOrchestratorRoll({ tick, random }: { txHash?: string, tick: number, random: string, blockNumber?: number }) {
-    console.log('tick found')
+  private async handleTick({ tick, random }:{ tick:number, random:string }) {
+    log('handling tick', tick)
+    if (!this.started) {
+      log('not started, refetching')
+      await this.refetchTableInfo()
+      if (!this.shouldStart(tick)) {
+        return
+      }
+      await this.go(this.tableInfo!.startedAt)
+    }
+
     if (BigNumber.from(tick).gt(this.latest.add(1))) {
       await this.catchUp(this.latest.add(1), BigNumber.from(tick))
     }
-    if (BigNumber.from(tick).lte(this.latest)) {
-      console.error("do not know, but tick is less than latest")
-      return
-    }
+
     const delphs = delphsContract()
     const destinations = await delphs.destinationsForRoll(this.tableId, tick - 1)
+    log('shipping tick ', tick)
     this.ship('orchestratorRoll', {
       roll: {
         index: tick,
         random,
         destinations: this.destinationsToIframe(destinations)
       }
+    })
+    this.latest = BigNumber.from(tick)
+  }
+
+  private async handleOrchestratorRoll({ tick, random }: { txHash?: string, tick: number, random: string, blockNumber?: number }) {
+    log('mqtt tick incoming: ', tick)
+    if (BigNumber.from(tick).lte(this.latest)) {
+      console.error("do not know, but tick is less than latest")
+      return
+    }
+
+    this.singleton.push(() => {
+      return this.handleTick({ tick, random })
     })
   }
 
@@ -207,15 +247,20 @@ class GameRunner {
   }
 }
 
+const getGameRunnerFor = memoize((tableId:string, iframe?: HTMLIFrameElement) => {
+  return new GameRunner(tableId!, iframe!).setup()
+})
+
 const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boolean) => {
   return useQuery(['/game-runner', tableId], async () => {
-    return new GameRunner(tableId!, iframe!).setup()
+    log("----------------------- useQuery refetched")
+    return getGameRunnerFor(tableId!, iframe!)
   }, {
     enabled: !!tableId && !!iframe && ready,
     refetchOnReconnect: false,
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
   })
 }
 
 export default useGameRunner
-

@@ -6,6 +6,7 @@ import Grid from "../boardLogic/Grid";
 import BoardGenerate from "./BoardGenerate";
 import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
+import SimpleSyncher from "../utils/singletonQueue";
 
 const log = console.log; //debug('chainConnector')
 
@@ -21,8 +22,6 @@ interface SetupMessage { tableId: string, warriors: WarriorStats[], gameLength: 
 class ChainConnector extends ScriptTypeBase {
   grid: Grid;
 
-  inProgress?: Promise<any>
-
   settingUp = false
 
   latest: number;
@@ -31,7 +30,10 @@ class ChainConnector extends ScriptTypeBase {
 
   timeToNextRound = -1;
 
+  singleton: SimpleSyncher
+
   initialize() {
+    this.singleton = new SimpleSyncher('chainConnector')
     log("chain connector initialized");
     this.handleTick = this.handleTick.bind(this);
     this.asyncHandleTick = this.asyncHandleTick.bind(this);
@@ -142,14 +144,10 @@ class ChainConnector extends ScriptTypeBase {
     if (this.grid.isOver()) {
       return
     }
-    log("tick: ", roll.index.toString());
-    if (this.inProgress) {
-      this.inProgress = this.inProgress.finally(() => {
-        return this.asyncHandleTick(roll)
-      })
-      return
-    }
-    this.inProgress = this.asyncHandleTick(roll)
+    log("queueing tick: ", roll.index.toString());
+    this.singleton.push(() => {
+      return this.asyncHandleTick(roll)
+    })
   }
 
   private async asyncHandleTick(
@@ -162,6 +160,7 @@ class ChainConnector extends ScriptTypeBase {
     try {
       log("async tick: ", index.toString());
       if (index !== this.latest + 1) {
+        console.error('should have received', this.latest + 1, ' but received ', index)
         throw new Error('receive out of order event')
       }
  

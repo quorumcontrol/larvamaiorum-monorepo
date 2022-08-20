@@ -9,6 +9,7 @@ import { createScript } from "../utils/createScriptDecorator";
 
 import mustFindByName from "../utils/mustFindByName";
 import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, SECONDS_BETWEEN_ROUNDS, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
+import SimpleSyncher from "../utils/singletonQueue";
 
 @createScript("hud")
 class Hud extends ScriptTypeBase {
@@ -19,11 +20,12 @@ class Hud extends ScriptTypeBase {
   roundTimer: Entity
   roundFadeTween?: Tween
 
-  inProgress?: Promise<any>
+  singleton: SimpleSyncher
 
   timeToNextRound = -1;
 
   initialize() {
+    this.singleton = new SimpleSyncher('hud')
     this.uiText = mustFindByName(this.entity, "Status");
     this.eventTemplate = mustFindByName(this.entity, "Event");
     this.roundTimer = mustFindByName(this.entity, "RoundTimer")
@@ -170,11 +172,9 @@ class Hud extends ScriptTypeBase {
         }
       })
     }
-    if (this.inProgress) {
-      this.inProgress = this.inProgress.then(playEvent.bind(this))
-      return
-    }
-    this.inProgress = playEvent.bind(this)()
+    this.singleton.push(() => {
+      return playEvent.bind(this)()
+    })
   }
 
   private getInterestingEvents(outcomes: CellOutComeDescriptor[][], player?: string): string[] {

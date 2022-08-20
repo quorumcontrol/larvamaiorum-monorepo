@@ -76,7 +76,7 @@ const Play: NextPage = () => {
   const [fullScreen, setFullScreen] = useState(false);
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
   const [ready, setReady] = useState(false)
-  useGameRunner(tableId, iframe.current || undefined, ready)
+  const { data:gameRunner } = useGameRunner(tableId, iframe.current || undefined, ready)
 
   const mqttHandler = useCallback((topic: string, msg: Buffer) => {
     console.log('mqtt handler: ', topic, msg.toString())
@@ -97,6 +97,15 @@ const Play: NextPage = () => {
   }, []);
 
   useMqttMessages(mqttHandler);
+
+  useEffect(() => {
+    return () => {
+      console.log('unmounted the play page')
+      if (gameRunner) {
+        gameRunner.stop()
+      }
+    }
+  }, [gameRunner])
 
   const handleGameTickMessage = useCallback(
     (evt: AppEvent) => {
