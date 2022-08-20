@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "local-handler": "ts-node -P ./tsconfig.serverless.json server/handler.ts",
-    "prod-start": "PM2_HOME=~/.pm2-delph2 pm2 start ts-node -- -P ./tsconfig.serverless.json server/handler.ts",
+    "local-handler": "node -r ts-node/register --preserve-symlinks server/handler.ts",
+    "prod-start": "PM2_HOME=~/.pm2-delph2 pm2 start node -- -r ts-node/register --preserve-symlinks server/handler.ts",
     "prod-restart": "PM2_HOME=~/.pm2-delph2 pm2 restart all",
     "copy-secrets": "scp .env.local mrunfucker@51.15.92.5:~/larvamaiorum-monorepo/site/ && scp contracts/bots-*.ts mrunfucker@51.15.92.5:~/larvamaiorum-monorepo/site/contracts/"
   },
