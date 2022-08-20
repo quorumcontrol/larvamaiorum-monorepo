@@ -191,7 +191,7 @@ class TablePlayer {
   }
 
   //0x5869a3debe3df78d166123c33b4e3a57419ad86bfeb3a57555897d150611133a first
-  
+
   private async playTables() {
     try {
       if (this.playing) {
@@ -215,7 +215,7 @@ class TablePlayer {
         }
       }))
       this.log('actives: ', active.map((a) => ({id: a.id, start: a.start.toNumber(), end: a.end.toNumber()})))
-      const endings = active.map((tourn) => tourn.end).sort((a, b) => a.sub(b).toNumber()) // sort to largest first
+      const endings = active.map((tourn) => tourn.end).sort((a, b) => b.sub(a).toNumber()) // sort to largest first
       const currentTick = await delphs.latestRoll()
 
       this.log('rolling from ', currentTick.toNumber() + 1, 'to', endings[0].toNumber())
