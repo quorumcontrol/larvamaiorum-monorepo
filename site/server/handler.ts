@@ -21,7 +21,7 @@ dotenv.config({
   path: '.env.local'
 })
 
-const NUMBER_OF_ROUNDS = 30
+const NUMBER_OF_ROUNDS = 20
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
 
