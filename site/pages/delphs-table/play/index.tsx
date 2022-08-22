@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import Video from "../../../src/components/Video";
@@ -27,6 +27,7 @@ const Play: NextPage = () => {
   const { address } = useAccount();
   const { data: username } = useUsername();
   const isClient = useIsClientSide();
+  const [manualWaiting, setManualWaiting] = useState(false)
   const { data: waitingPlayers, isLoading } = useWaitingPlayers();
   const registerInterestMutation = useRegisterInterest();
   const router = useRouter();
@@ -41,12 +42,13 @@ const Play: NextPage = () => {
 
   useWaitForTable(handleTableRunning);
 
-  const isWaiting = (waitingPlayers || []).some(
+  const isWaiting = manualWaiting || (waitingPlayers || []).some(
     (waiting) => waiting.addr === address
   );
 
   const onJoinClick = async () => {
     console.log("join click");
+    setManualWaiting(true)
     return registerInterestMutation.mutate({ name: username!, addr: address! });
   };
 
