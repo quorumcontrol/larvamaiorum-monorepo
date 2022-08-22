@@ -98,7 +98,7 @@ const Play: NextPage = () => {
           )}
           {isWaiting && (
             <HStack>
-              <Text>Waiting</Text>
+              <Text>Waiting for a table</Text>
               <Spinner />
             </HStack>
           )}

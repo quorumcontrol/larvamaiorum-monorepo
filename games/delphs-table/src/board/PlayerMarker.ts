@@ -16,14 +16,10 @@ class PlayerMarker extends ScriptTypeBase {
 
   // gridParent: Entity
   warrior?: Warrior
-  name: Entity
-  healthText: Entity
-  gumpText: Entity
   threeDNameEntity: Entity
   animationHolder: Entity
   humanoid: Entity
   threeDNameScript: any // textMesh script
-  stats: Entity
   previousPoint?: Vec3
   currentTween?: Tween
   deathTween?: Tween
@@ -33,13 +29,8 @@ class PlayerMarker extends ScriptTypeBase {
 
 
   initialize() {
-    // this.gridParent = this.entity.parent as Entity
-    this.name = mustFindByName(this.entity, "Name")
-    this.healthText = mustFindByName(this.entity, "HealthText")
-    this.gumpText = mustFindByName(this.entity, "GumpText")
     this.threeDNameEntity = mustFindByName(this.entity, "3DName")
     this.threeDNameScript = this.getScript(this.threeDNameEntity, "textMesh")!
-    this.stats = mustFindByName(this.entity, "Stats")
     this.animationHolder = mustFindByName(this.entity, 'HumanoidModel')
     this.humanoid = mustFindByName(this.entity, 'Viking')
   }
@@ -47,10 +38,6 @@ class PlayerMarker extends ScriptTypeBase {
   update() {
     if (this.warrior) {
       this.handleDead()
-      // this.threeDNameScript.text = `${this.warrior.name} (WG: ${this.warrior.wootgumpBalance})`
-      // this.healthText.element!.text = `${Math.ceil(this.warrior.currentHealth)}`
-      // this.gumpText.element!.text = `Gump: ${this.warrior.wootgumpBalance}`
-      // this.stats.element!.text = `HP:${Math.ceil(this.warrior.currentHealth)}/${this.warrior.initialHealth} A:${this.warrior.attack}  D:${this.warrior.defense}`
     }
   }
 
@@ -115,7 +102,6 @@ class PlayerMarker extends ScriptTypeBase {
         throw new Error('no initial location')
       }
       const position = this.localPositionFromCell(cell)
-      // this.entity.setLocalPosition(...position);
       this.entity.setLocalPosition(position.x, position.y, position.z);
       this.previousPoint = position
     } catch (err) {
@@ -151,9 +137,7 @@ class PlayerMarker extends ScriptTypeBase {
   rotateForBattle() {
     this.entity.setLocalEulerAngles(0, 180, 0)
     this.threeDNameEntity.setLocalEulerAngles(-15, 0, 0)
-    this.stats.setLocalEulerAngles(-15, 0, 0)
     this.threeDNameEntity.translateLocal(0, 7, 0)
-    this.stats.translateLocal(0, 7, 0)
     this.rotatedForBattle = true
   }
 
@@ -161,9 +145,7 @@ class PlayerMarker extends ScriptTypeBase {
     console.log(`${this.warrior?.id} unrotate after battle`)
     this.rotatedForBattle = false
     this.threeDNameEntity.translateLocal(0, -7, 0)
-    this.stats.translateLocal(0, -7, 0)
     this.threeDNameEntity.setLocalEulerAngles(-15, 180, 0)
-    this.stats.setLocalEulerAngles(-15, 180, 0)
     this.entity.setLocalEulerAngles(0, 0, 0)
   }
 

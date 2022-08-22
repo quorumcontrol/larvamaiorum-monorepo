@@ -1,4 +1,4 @@
-import { Entity, SineInOut, Tween } from "playcanvas";
+import { Entity, SineInOut, Tween, SoundComponent } from "playcanvas";
 import HelpText from "../appWide/HelpText";
 import { CellOutComeDescriptor } from "../boardLogic/Cell";
 import { TickOutput } from "../boardLogic/Grid";
@@ -20,9 +20,16 @@ class Hud extends ScriptTypeBase {
   roundTimer: Entity
   roundFadeTween?: Tween
 
+  miniQuestText: Entity
+  miniQuestTween?: Tween
+
+  soundPlayer:SoundComponent
+
   singleton: SimpleSyncher
 
   timeToNextRound = -1;
+
+  firstGumpAlerted = false
 
   initialize() {
     this.singleton = new SimpleSyncher('hud')
@@ -30,6 +37,7 @@ class Hud extends ScriptTypeBase {
     this.eventTemplate = mustFindByName(this.entity, "Event");
     this.roundTimer = mustFindByName(this.entity, "RoundTimer")
     this.roundText = mustFindByName(this.entity, "RoundText")
+    this.miniQuestText = mustFindByName(this.entity, "MiniQuestText")
     this.eventTemplate.enabled = false;
 
     const controller = getGameConfig(this.app.root).controller
@@ -50,6 +58,14 @@ class Hud extends ScriptTypeBase {
         data: [],
       }), '*')
     })
+
+
+    const component = mustFindByName(this.entity, 'Sound').findComponent('sound') as SoundComponent
+    if (!component) {
+      throw new Error('no sound component')
+    }
+    this.soundPlayer = component
+
   }
 
   update(dt: number) {
@@ -94,6 +110,19 @@ class Hud extends ScriptTypeBase {
     }).start()
   }
 
+  private updateMiniQuestText(txt: string) {
+    if (this.miniQuestTween) {
+      this.miniQuestTween.stop()
+    }
+    this.miniQuestText.element!.text = txt
+    let opacity = { value: 1.0 }
+    this.miniQuestText.element!.opacity = opacity.value
+
+    this.miniQuestTween = this.entity.tween(opacity).to({ value: 0.0 }, 4.0, SineInOut).on('update', () => {
+      this.miniQuestText.element!.opacity = opacity.value
+    }).start()
+  }
+
   rank(config: GameConfig, _tickOutput: TickOutput) {
     if (!config.currentPlayer || !config.grid) {
       return -1
@@ -102,6 +131,30 @@ class Hud extends ScriptTypeBase {
       return b.wootgumpBalance - a.wootgumpBalance
     })
     return sorted?.indexOf(config.currentPlayer) + 1
+  }
+
+  private handleFirstGump(tickOutput: TickOutput, playerId?: string) {
+    if (!playerId || this.firstGumpAlerted) {
+      return
+    }
+
+    let someoneHarvested = false
+
+    tickOutput.outcomes.forEach((row) => {
+      row.forEach((cellOutcome) => {
+        if (Object.keys(cellOutcome.harvested).length > 0) {
+          someoneHarvested = true
+        }
+        if (cellOutcome.harvested[playerId]) {
+          this.updateMiniQuestText('first gump!')
+          this.soundPlayer.slot('firstGump')?.play()
+        }
+      })
+    })
+
+    if (someoneHarvested) {
+      this.firstGumpAlerted = true
+    }
   }
 
   handleTick(tickOutput: TickOutput) {
@@ -119,11 +172,12 @@ class Hud extends ScriptTypeBase {
     }
     this.uiText.element!.text = text;
 
-
     // lets see if anything happened to the player themselves
     const events = this.getInterestingEvents(tickOutput.outcomes, player?.id)
     console.log('interesting: ', events)
     events.forEach(this.playEvent.bind(this))
+
+    this.handleFirstGump(tickOutput, player?.id)
 
     if (config.grid?.isOver()) {
       const gameOver = mustFindByName(this.entity, "GameOver");
@@ -190,6 +244,12 @@ class Hud extends ScriptTypeBase {
             interestingEvents.push(`${warriors[0].name} battles ${warriors[1].name}`)
           }
           if (battleTick.isOver) {
+            if (battleTick.winner?.id === player) {
+              this.soundPlayer.slot('youWon')?.play()
+            }
+            if (battleTick.loser?.id === player) {
+              this.soundPlayer.slot('youLost')?.play()
+            }
             return interestingEvents.push(`${battleTick.winner?.name} defeats ${battleTick.loser?.name}`)
           }
           if (player && warriors.map((w) => w.id).includes(player)) {
