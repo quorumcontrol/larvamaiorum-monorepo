@@ -185,19 +185,21 @@ class Hud extends ScriptTypeBase {
           interestingEvents.push(`You harvested ${outcome.harvested[player].length} Wootgump`)
         }
         outcome.battleTicks.forEach((battleTick) => {
+          const warriors = [battleTick.rolls[0].attacker, battleTick.rolls[0].defender]
           if (battleTick.tick === battleTick.startingTick) {
-            interestingEvents.push(`${battleTick.attacker.name} battles ${battleTick.defender.name}`)
+            interestingEvents.push(`${warriors[0].name} battles ${warriors[1].name}`)
           }
           if (battleTick.isOver) {
             return interestingEvents.push(`${battleTick.winner?.name} defeats ${battleTick.loser?.name}`)
           }
-          if (player && (battleTick.attacker.id === player || battleTick.defender.id === player)) {
-            if (battleTick.attackRoll > battleTick.defenseRoll) {
-              return interestingEvents.push(`${battleTick.attacker.name} attacks ${battleTick.defender.name} for ${battleTick.attackRoll - battleTick.defenseRoll} damage.`)
-            }
-            interestingEvents.push(`${battleTick.defender.name} blocks ${battleTick.attacker.name}.`)
+          if (player && warriors.map((w) => w.id).includes(player)) {
+            battleTick.rolls.forEach((roll) => {
+              if (roll.attackRoll > roll.defenseRoll) {
+                return interestingEvents.push(`${roll.attacker.name} attacks ${roll.defender.name} for ${roll.attackRoll - roll.defenseRoll} damage.`)
+              }
+              interestingEvents.push(`${roll.defender.name} blocks ${roll.attacker.name}.`)
+            })
           }
-
         })
       })
     })

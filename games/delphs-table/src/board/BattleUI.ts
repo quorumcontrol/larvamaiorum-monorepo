@@ -5,8 +5,7 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { TICK_EVT } from "../utils/rounds";
-
-const standardPlaces:[number,number,number][] = [[0.3,43,0.5],[-0.1,43.5,-0.4]]
+import SimpleSyncher from "../utils/singletonQueue";
 
 @createScript("battleUI")
 class BattleUI extends ScriptTypeBase {
@@ -17,8 +16,10 @@ class BattleUI extends ScriptTypeBase {
   textTemplate: Entity; // for now
   playerMarkerTemplate: Entity
   soundComponent: SoundComponent
+  singleton:SimpleSyncher
 
   initialize() {
+    this.singleton = new SimpleSyncher('battleUi')
     this.handleTick = this.handleTick.bind(this);
     if (!this.entity.render) {
       throw new Error("no render");
@@ -52,19 +53,27 @@ class BattleUI extends ScriptTypeBase {
   }
 
   handleTick(tick:BattleTickReport) {
-    const damageString = tick.attackRoll > tick.defenseRoll ? `${tick.attackRoll - tick.defenseRoll} damage` : 'blocked'
-    const text = `${tick.attacker.name} attacks ${tick.defender.name}. ${damageString}`
-    const textElement = this.textTemplate.clone() as Entity
-    textElement.enabled = true
-    this.entity.addChild(textElement)
-    textElement.element!.text = text    
-    textElement.setLocalScale(0.04, 4, 0.04)
-    textElement.setLocalPosition(0,50,0)
-    const startingPosition = textElement.getLocalPosition()
-    console.log('starting from: ', startingPosition)
-    textElement.tween(startingPosition).to({x: startingPosition.x, y: startingPosition.y + 200, z: startingPosition.z}, 5.0, pc.SineIn).start().on('complete', () => {
-      textElement.destroy()
+    tick.rolls.forEach((roll) => {
+      this.singleton.push(() => {
+        return new Promise<void>((resolve) => {
+          const damageString = roll.attackRoll > roll.defenseRoll ? `${roll.attackRoll - roll.defenseRoll} damage` : 'blocked'
+          const text = `${roll.attacker.name} attacks ${roll.defender.name}. ${damageString}`
+          const textElement = this.textTemplate.clone() as Entity
+          textElement.enabled = true
+          this.entity.addChild(textElement)
+          textElement.element!.text = text    
+          textElement.setLocalScale(0.04, 4, 0.04)
+          textElement.setLocalPosition(0,50,0)
+          const startingPosition = textElement.getLocalPosition()
+          console.log('starting from: ', startingPosition)
+          textElement.tween(startingPosition).to({x: startingPosition.x, y: startingPosition.y + 200, z: startingPosition.z}, 5.0, pc.SineIn).start().on('complete', () => {
+            textElement.destroy()
+            resolve()
+          })
+        })
+      })
     })
+    
   }
 
   setBattle(battle: Battle) {

@@ -13,12 +13,16 @@ interface BattleOptions {
   seed: string
 }
 
-export interface BattleTickReport {
-  id: string
+interface Roll {
   attacker: Warrior
   defender: Warrior
   attackRoll: number
   defenseRoll: number
+}
+
+export interface BattleTickReport {
+  id: string
+  rolls: Roll[]
   isOver: boolean
   winner?: Warrior
   loser?: Warrior
@@ -46,16 +50,7 @@ class Battle extends EventEmitter {
   doBattleTick(tick: number, seed: string):BattleTickReport {
     this.tick = tick
     this.seed = seed
-    const { attacker, defender } = this.getPositions()
-    const attackRoll = this.rand(attacker.attack)
-    const defenseRoll = this.rand(defender.defense)
-    if (attackRoll > defenseRoll) {
-      defender.currentHealth -= (attackRoll - defenseRoll)
-      this.log(`${attacker.name} hits ${defender.name} for ${attackRoll - defenseRoll} ${defender.currentHealth} left`)
-    } else {
-      this.log(`${defender.name} blocks ${attacker.name}`)
-    }
-    this.previousWinner = (attackRoll > defenseRoll) ? attacker : defender
+    const rolls = this.doSubTicks()
     if (this.isOver()) {
       const winner = this.winner()
       const loser = this.loser()
@@ -69,10 +64,7 @@ class Battle extends EventEmitter {
     }
     const report:BattleTickReport = {
       id: this.battleId(),
-      attacker,
-      defender,
-      attackRoll,
-      defenseRoll,
+      rolls,
       isOver: this.isOver(),
       winner: this.winner(),
       loser: this.loser(),
@@ -104,9 +96,35 @@ class Battle extends EventEmitter {
     })
   }
 
-  private getPositions() {
+  private doSubTicks() {
+    const rolls:Roll[] = []
+    for (let i = 0; i < 3; i++) {
+      if (this.isOver()) {
+        continue
+      }
+      const { attacker, defender } = this.getPositions(i)
+      const attackRoll = this.rand(attacker.attack, i.toString())
+      const defenseRoll = this.rand(defender.defense, i.toString())
+      if (attackRoll > defenseRoll) {
+        defender.currentHealth -= (attackRoll - defenseRoll)
+        this.log(`${attacker.name} hits ${defender.name} for ${attackRoll - defenseRoll} ${defender.currentHealth} left`)
+      } else {
+        this.log(`${defender.name} blocks ${attacker.name}`)
+      }
+      this.previousWinner = (attackRoll > defenseRoll) ? attacker : defender
+      rolls.push({
+        attacker,
+        defender,
+        attackRoll,
+        defenseRoll
+      })
+    }
+    return rolls
+  }
+
+  private getPositions(subTick:number) {
     if (this.previousWinner) {
-      const attackerIndex = this.rand(3)
+      const attackerIndex = this.rand(3, subTick.toString())
       let attacker:Warrior
       if (attackerIndex === 2) {
         attacker = this.previousWinner
@@ -117,13 +135,13 @@ class Battle extends EventEmitter {
       return { attacker, defender }
     }
 
-    const attacker = this.warriors[this.rand(2)]
+    const attacker = this.warriors[this.rand(2, subTick.toString())]
     const defender = this.warriors.find((w) => w !== attacker)!
     return { attacker, defender }
   }
 
-  private rand(max:number) {
-    return deterministicRandom(max, `${this.battleId()}-${this.tick}`, this.seed)
+  private rand(max:number, additional?:string) {
+    return deterministicRandom(max, `${this.battleId()}-${this.tick}${additional}`, this.seed)
   }
 
   battleId() {

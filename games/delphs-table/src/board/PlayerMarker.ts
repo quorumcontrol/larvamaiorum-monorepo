@@ -1,4 +1,4 @@
-import { Entity, SineInOut, Tween, Vec3 } from "playcanvas";
+import { Entity, SineIn, SineInOut, Tween, Vec3 } from "playcanvas";
 import Battle from "../boardLogic/Battle";
 import Cell from "../boardLogic/Cell";
 import Warrior from "../boardLogic/Warrior";
@@ -20,13 +20,16 @@ class PlayerMarker extends ScriptTypeBase {
   healthText: Entity
   gumpText: Entity
   threeDNameEntity: Entity
+  animationHolder: Entity
   humanoid: Entity
   threeDNameScript: any // textMesh script
   stats: Entity
   previousPoint?: Vec3
   currentTween?: Tween
+  deathTween?: Tween
   rotatedForBattle = false
 
+  dead = false
 
 
   initialize() {
@@ -37,11 +40,13 @@ class PlayerMarker extends ScriptTypeBase {
     this.threeDNameEntity = mustFindByName(this.entity, "3DName")
     this.threeDNameScript = this.getScript(this.threeDNameEntity, "textMesh")!
     this.stats = mustFindByName(this.entity, "Stats")
-    this.humanoid = mustFindByName(this.entity, 'HumanoidModel')
+    this.animationHolder = mustFindByName(this.entity, 'HumanoidModel')
+    this.humanoid = mustFindByName(this.entity, 'Viking')
   }
 
   update() {
     if (this.warrior) {
+      this.handleDead()
       // this.threeDNameScript.text = `${this.warrior.name} (WG: ${this.warrior.wootgumpBalance})`
       // this.healthText.element!.text = `${Math.ceil(this.warrior.currentHealth)}`
       // this.gumpText.element!.text = `Gump: ${this.warrior.wootgumpBalance}`
@@ -52,11 +57,37 @@ class PlayerMarker extends ScriptTypeBase {
   private setBattlingAnimation(isBattling: boolean) {
     try {
       console.log('set battling: ', isBattling)
-      this.humanoid.anim?.setBoolean('isBattling', isBattling)
+      this.animationHolder.anim?.setBoolean('isBattling', isBattling)
     } catch (err) {
       // sometimes during replay this item is destroyed before there is a chance foor the isBattling
       // to be set by the battleUI. This just ignores that error
       console.log('error setBattling: ', err)
+    }
+  }
+
+  private handleDead() {
+    if (!this.warrior) {
+      throw new Error('missing warrior')
+    }
+    if (this.warrior.currentHealth <= 0 && !this.dead) {
+      this.animationHolder.anim?.setBoolean('isDead', true)
+      this.dead = true
+      if (this.deathTween) {
+        this.deathTween.stop()
+      }
+      this.deathTween = this.humanoid.tween(this.humanoid.getLocalEulerAngles()).to(new Vec3(90, 0, -180), 1.5, SineIn).start()
+      this.humanoid.setLocalEulerAngles(90, 0, -180)
+      this.humanoid.setLocalPosition(0, -4, -0.838)
+    } else {
+      if (this.dead && this.warrior.currentHealth > 0) {
+        if (this.deathTween) {
+          this.deathTween.stop()
+        }
+        this.animationHolder.anim?.setBoolean('isDead', false)
+        this.humanoid.setLocalEulerAngles(-180, 0, -180)
+        this.humanoid.setLocalPosition(0, -5.2, -0.838)
+        this.dead = false
+      }
     }
   }
 
@@ -119,21 +150,21 @@ class PlayerMarker extends ScriptTypeBase {
 
   rotateForBattle() {
     this.entity.setLocalEulerAngles(0, 180, 0)
-    this.threeDNameEntity.setLocalEulerAngles(-15,0,0)
-    this.stats.setLocalEulerAngles(-15,0,0)
-    this.threeDNameEntity.translateLocal(0,7,0)
-    this.stats.translateLocal(0,7,0)
+    this.threeDNameEntity.setLocalEulerAngles(-15, 0, 0)
+    this.stats.setLocalEulerAngles(-15, 0, 0)
+    this.threeDNameEntity.translateLocal(0, 7, 0)
+    this.stats.translateLocal(0, 7, 0)
     this.rotatedForBattle = true
   }
 
   unrotateAfterBattle() {
     console.log(`${this.warrior?.id} unrotate after battle`)
     this.rotatedForBattle = false
-    this.threeDNameEntity.translateLocal(0,-7,0)
-    this.stats.translateLocal(0,-7,0)
-    this.threeDNameEntity.setLocalEulerAngles(-15,180,0)
-    this.stats.setLocalEulerAngles(-15,180,0)
-    this.entity.setLocalEulerAngles(0,0,0)
+    this.threeDNameEntity.translateLocal(0, -7, 0)
+    this.stats.translateLocal(0, -7, 0)
+    this.threeDNameEntity.setLocalEulerAngles(-15, 180, 0)
+    this.stats.setLocalEulerAngles(-15, 180, 0)
+    this.entity.setLocalEulerAngles(0, 0, 0)
   }
 
   handleBattleUI(battleUI: BattleUI) {
@@ -164,11 +195,11 @@ class PlayerMarker extends ScriptTypeBase {
     this.warrior.on('battle', (battle) => this.handleBattling(battle))
     this.warrior.on('battleOver', (battle) => this.handleBattleOver(battle))
     this.warrior.on('battleUI', (ui) => { this.handleBattleUI(ui) })
-    const newMaterial = this.humanoid.render!.meshInstances[0].material.clone();
-    const color:[number,number,number] = randomColor({ format: 'rgbArray', seed: `${warrior.id}${config.grid?.id}` }).map((c:number) => c/255);
+    const newMaterial = this.animationHolder.render!.meshInstances[0].material.clone();
+    const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `${warrior.id}${config.grid?.id}` }).map((c: number) => c / 255);
     (newMaterial as any).diffuse.set(color[0], color[1], color[2])
     newMaterial.update()
-    this.humanoid.render!.meshInstances[0].material = newMaterial
+    this.animationHolder.render!.meshInstances[0].material = newMaterial
   }
 }
 

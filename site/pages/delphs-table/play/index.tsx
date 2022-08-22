@@ -82,7 +82,6 @@ const Play: NextPage = () => {
           <Heading>Play Delph&apos;s Table</Heading>
           <Text>Find the Wootgump, don&apos;t get rekt.</Text>
           <VStack p="4" spacing="2">
-            {isLoading && <Spinner />}
             {((isClient && !isLoading && waitingPlayers) || []).map(
               (waiting) => {
                 return (
@@ -93,7 +92,7 @@ const Play: NextPage = () => {
               }
             )}
           </VStack>
-          {registerInterestMutation.isLoading && <Spinner />}
+          {/* {registerInterestMutation.isLoading && <Spinner />} */}
           {!isWaiting && !registerInterestMutation.isLoading && (
             <Button onClick={onJoinClick} variant="primary">Join Table</Button>
           )}
