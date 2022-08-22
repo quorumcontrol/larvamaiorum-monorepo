@@ -63,7 +63,7 @@ const Home: NextPage = () => {
                   capped by your skill. Crypto Rome is not a safe place.
                 </Text>
               </Box>
-              <Link href="https://discord.gg/tTSNvAuK">
+              <Link href="https://discord.gg/Z2S3EtQKCn">
                 <Button variant="primary" mt="10" px="1.5rem" py="2rem">
                   JOIN DISCORD
                 </Button>
