@@ -23,6 +23,7 @@ export type { OrchestratorState } from "./OrchestratorState";
 export type { Player } from "./Player";
 export type { TestDiceRoller } from "./TestDiceRoller";
 export type { Wootgump } from "./Wootgump";
+export type { IStructureInterface } from "./IStructureInterface";
 
 export { AccessControl__factory } from "./factories/AccessControl__factory";
 export { IAccessControl__factory } from "./factories/IAccessControl__factory";
@@ -46,3 +47,4 @@ export { OrchestratorState__factory } from "./factories/OrchestratorState__facto
 export { Player__factory } from "./factories/Player__factory";
 export { TestDiceRoller__factory } from "./factories/TestDiceRoller__factory";
 export { Wootgump__factory } from "./factories/Wootgump__factory";
+export { IStructureInterface__factory } from "./factories/IStructureInterface__factory";

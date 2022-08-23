@@ -100,6 +100,10 @@ declare module "hardhat/types/runtime" {
       name: "Wootgump",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Wootgump__factory>;
+    getContractFactory(
+      name: "IStructureInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IStructureInterface__factory>;
 
     getContractAt(
       name: "AccessControl",
@@ -211,6 +215,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Wootgump>;
+    getContractAt(
+      name: "IStructureInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IStructureInterface>;
 
     // default types
     getContractFactory(
