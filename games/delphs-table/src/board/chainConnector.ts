@@ -7,8 +7,9 @@ import BoardGenerate from "./BoardGenerate";
 import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
 import SimpleSyncher from "../utils/singletonQueue";
+import debug from 'debug'
 
-const log = console.log; //debug('chainConnector')
+const log = debug('chainConnector')
 
 interface IFrameRoll {
   index: number,
@@ -64,17 +65,17 @@ class ChainConnector extends ScriptTypeBase {
     try {
       switch (evt.type) {
         case 'orchestratorRoll':
-          console.log('orchestrator rolled', evt)
+          log('orchestrator rolled', evt)
           this.handleTick(evt.roll)
           return this.entity.fire(ORCHESTRATOR_TICK)
         case 'noMoreMoves':
-          console.log('orchestratored fired no more moves')
+          log('orchestratored fired no more moves')
           return this.entity.fire(NO_MORE_MOVES_EVT)
         case 'setup':
-          console.log('setup event fired')
+          log('setup event fired')
           this.handleIframeSetup(evt.setup)
         default:
-          console.log("EXPECTED unknown msg: ", evt)
+          log("EXPECTED unknown msg: ", evt)
       }
     } catch (err) {
       console.error('error handling event', err)
@@ -137,6 +138,7 @@ class ChainConnector extends ScriptTypeBase {
     parent.postMessage(JSON.stringify({
       type: 'gameTick',
       data: warriors,
+      tick: this.latest,
     }), '*')
   }
 

@@ -21,7 +21,6 @@ class MusicPlayer extends ScriptTypeBase {
   randomSlot() {
     // slots are expected to be named "0", "1", "2", etc
     const randomName = Math.floor(Math.random() * Object.keys(this.soundComponent.slots).length).toString()
-    console.log("music slot: ", randomName)
     const slot = this.soundComponent.slot(randomName)
     if (!slot) {
       throw new Error('missing slot on music')

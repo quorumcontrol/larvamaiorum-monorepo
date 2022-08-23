@@ -116,7 +116,7 @@ class Grid {
   }
 
   private initialCellPopulation(warriors:Warrior[]) {
-    console.log('initial cellpopulation: ', this.sizeX, this.sizeY)
+    log('initial cellpopulation: ', this.sizeX, this.sizeY)
     this.warriors = warriors
     warriors.forEach((warrior) => {
       this.grid[deterministicRandom(this.sizeX, `grid-${warrior.id}-x`, this.currentSeed)][deterministicRandom(this.sizeY, `grid-${warrior.id}-y`, this.currentSeed)].addWarrior(warrior)

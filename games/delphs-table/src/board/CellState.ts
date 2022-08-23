@@ -100,7 +100,6 @@ class CellState extends ScriptTypeBase {
         this.destinationElement.setLocalScale(1, 20, 1);
         this.destinationElement.setLocalPosition(rndX, 4, rndZ);
         if (pendingDest) {
-          console.log('tweening pendingDest')
           this.destinationTween = this.destinationElement.tween(this.destinationElement.getLocalPosition()).to({ x: rndX, y: 12, z: rndZ }, 1.0, pc.SineOut).yoyo(true).loop(true).start()
         }
       }

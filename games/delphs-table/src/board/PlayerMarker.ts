@@ -43,7 +43,6 @@ class PlayerMarker extends ScriptTypeBase {
 
   private setBattlingAnimation(isBattling: boolean) {
     try {
-      console.log('set battling: ', isBattling)
       this.animationHolder.anim?.setBoolean('isBattling', isBattling)
     } catch (err) {
       // sometimes during replay this item is destroyed before there is a chance foor the isBattling
@@ -112,12 +111,10 @@ class PlayerMarker extends ScriptTypeBase {
   }
 
   handleBattling(_battle: Battle) {
-    console.log('battling')
     this.setBattlingAnimation(true)
   }
 
   handleBattleOver(_battle: Battle) {
-    console.log('battleOver')
     this.setBattlingAnimation(false)
     if (this.rotatedForBattle) {
       this.unrotateAfterBattle()
@@ -142,7 +139,6 @@ class PlayerMarker extends ScriptTypeBase {
   }
 
   unrotateAfterBattle() {
-    console.log(`${this.warrior?.id} unrotate after battle`)
     this.rotatedForBattle = false
     this.threeDNameEntity.translateLocal(0, -7, 0)
     this.threeDNameEntity.setLocalEulerAngles(-15, 180, 0)
@@ -150,13 +146,11 @@ class PlayerMarker extends ScriptTypeBase {
   }
 
   handleBattleUI(battleUI: BattleUI) {
-    console.log('battle ui: ', battleUI)
     if (this.currentTween) {
       this.currentTween.stop()
     }
     const gridPositions = battleUI.gridPositions()
     const index = battleUI.battle!.warriors.indexOf(this.warrior!)
-    console.log("position: ", gridPositions[index])
     this.entity.setPosition(gridPositions[index].x, gridPositions[index].y, gridPositions[index].z);
     this.entity.translateLocal(0, 0.25, 0)
     if (index === 1) {

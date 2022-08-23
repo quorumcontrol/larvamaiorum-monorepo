@@ -72,7 +72,6 @@ class BoardGenerate extends ScriptTypeBase {
 
   setGrid(grid: Grid) {
     this.grid = grid;
-    console.log("set grid: ", this.grid);
     this.grid.everyCell(this.initialCellSetup);
     this.focusOnPlayerCell()
   }

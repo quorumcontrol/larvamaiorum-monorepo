@@ -2,6 +2,9 @@ import EventEmitter from "events";
 import Cell from "./Cell";
 import Grid from "./Grid";
 import { deterministicRandom } from "./random";
+import debug from 'debug'
+
+const log = debug('Warrior')
 
 export interface WarriorStats {
   id: string;
@@ -93,10 +96,10 @@ class Warrior extends EventEmitter implements WarriorStats {
   }
 
   setDestination(x: number, y: number) {
-    console.log('setting destination: ', x, y, ' existing: ', this.destination)
+    log('setting destination: ', x, y, ' existing: ', this.destination)
     this.destination = [x, y]
     if (this.pendingDestination && this.pendingDestination[0] === x && this.pendingDestination[1] === y) {
-      console.log('clearing pending destination')
+      log('clearing pending destination')
       this.clearPendingDestination()
     }
   }

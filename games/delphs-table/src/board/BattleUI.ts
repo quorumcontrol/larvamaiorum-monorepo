@@ -65,7 +65,6 @@ class BattleUI extends ScriptTypeBase {
           textElement.setLocalScale(0.04, 4, 0.04)
           textElement.setLocalPosition(0,50,0)
           const startingPosition = textElement.getLocalPosition()
-          console.log('starting from: ', startingPosition)
           textElement.tween(startingPosition).to({x: startingPosition.x, y: startingPosition.y + 200, z: startingPosition.z}, 5.0, pc.SineIn).start().on('complete', () => {
             textElement.destroy()
             resolve()

@@ -70,7 +70,7 @@ class CellSelector extends ScriptTypeBase {
           }
           break;
         default:
-          console.log('unknown message type: ', msg)
+          console.log('(expected) unknown message type: ', msg)
       }
     } catch {
       console.error('error with msg:', msg)
@@ -93,10 +93,8 @@ class CellSelector extends ScriptTypeBase {
       const distance = this.getDistance(e.touches[0].x, e.touches[0].y)
       // if they use two fingers or just move their finger a little, then we can ignore it and keep going
       if (distance < 10 && e.touches.length === 1) {
-        console.log('no clear, tiny movement')
         e.event.preventDefault()
       } else {
-        console.log('clearing')
         this.startedEvent = undefined
       }
     }
@@ -148,14 +146,11 @@ class CellSelector extends ScriptTypeBase {
 
     // Raycast between the two points and return the closest hit result
     const result = this.app.systems.rigidbody!.raycastFirst(from, to);
-    console.log('raycast', from, to, this.entity.camera!.farClip, result)
 
     // If there was a hit, store the entity
     if (result) {
       const hitEntity = result.entity;
-      console.log("You selected " + hitEntity.name);
       const currentPlayer = getGameConfig(this.app.root).currentPlayer
-      console.log('current player: ', currentPlayer)
       if (!currentPlayer) {
         console.log('no current player')
         return
@@ -168,7 +163,6 @@ class CellSelector extends ScriptTypeBase {
       if (!cellState.cell) {
         throw new Error('no cell')
       }
-      console.log('posting message from game')
       parent.postMessage(JSON.stringify({
         type: 'destinationSetter',
         data: [cellState.cell.x, cellState.cell.y],

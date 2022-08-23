@@ -44,9 +44,6 @@ class Hud extends ScriptTypeBase {
     controller.on(TICK_EVT, this.handleTick, this);
     controller.on(NO_MORE_MOVES_EVT, this.handleNoMoreMoves, this);
     controller.on(GAME_OVER_EVT, this.handleGameOver, this);
-    controller.on(ORCHESTRATOR_TICK, (data) => {
-      console.log('orchestrator tick', data)
-    })
 
     const helpScreenScript = this.getScript<HelpText>(mustFindByName(this.app.root, 'HelpScreen'), 'helpText')
     mustFindByName(this.entity, 'HelpButton').button?.on('click', () => {
@@ -201,7 +198,6 @@ class Hud extends ScriptTypeBase {
           this.entity.addChild(eventElement)
           eventElement.element!.text = eventText
           const curPosition = eventElement.getLocalPosition()
-          console.log(eventElement)
 
           let total = 0
           const duration = 3.0
