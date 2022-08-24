@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "solidity-linked-list/contracts/StructuredLinkedList.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract Wootgump is
     ERC20,
@@ -22,7 +22,7 @@ contract Wootgump is
 
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    uint256 public constant MAX_RANKING_SIZE = 10000;
+    uint256 public constant MAX_RANKING_SIZE = 500;
     uint256 private constant _HEAD = 0;
     bool private constant _NEXT = true;
 
@@ -103,9 +103,25 @@ contract Wootgump is
         }
         // console.log("sort user", user);
         uint256 balance = balanceOf(user);
+        if (balance == 0) {
+            return;
+        }
         valuesToAddresses[balance].add(user);
+
+        (, uint256 smallest) = list.getPreviousNode(_HEAD);
+
+        console.log("list size/bal/smallest", list.sizeOf(), smallest, balance);
+
+        if (list.sizeOf() >= MAX_RANKING_SIZE) {
+            if (balance <= smallest) {
+                return;
+            }
+            console.log('remove');
+            list.remove(smallest);
+        }
+
         if (!list.nodeExists(balance)) {
-            // console.log("insert");
+            console.log("insert");
             list.insertAfter(getSortedSpot(balance), balance);
         }
     }

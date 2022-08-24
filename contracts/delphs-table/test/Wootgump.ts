@@ -1,13 +1,24 @@
 import { expect } from "chai"
 import { loadFixture } from "ethereum-waffle"
-import { utils } from "ethers"
+import { utils, Wallet } from "ethers"
 import { ethers } from "hardhat"
+import { Wootgump } from "../typechain"
 import { deployForwarderAndRoller } from "./fixtures"
 
 describe.only("Wootgump", function () {
   async function getDeployer() {
     const signers = await ethers.getSigners()
     return { deployer: signers[0], signers }
+  }
+
+  async function demoBuildLeaderboard(wootgump:Wootgump) {
+    const vals = await wootgump.rankedValues(2)
+    const addrs = await Promise.all(
+      vals.map((v) => {
+        return wootgump.addressesForValue(v)
+      })
+    )
+    return addrs.flat()
   }
 
   async function deployWootgump() {
@@ -34,17 +45,24 @@ describe.only("Wootgump", function () {
       utils.parseEther("2").toString(),
     ])
 
-    async function demoBuildLeaderboard() {
-      const vals = await wootgump.rankedValues(2)
-      const addrs = await Promise.all(
-        vals.map((v) => {
-          return wootgump.addressesForValue(v)
-        })
-      )
-      return addrs.flat()
-    }
-    const leaderboard = await demoBuildLeaderboard()
+    const leaderboard = await demoBuildLeaderboard(wootgump)
     expect(leaderboard[0]).to.equal(signers[2].address)
     expect(leaderboard[1]).to.equal(signers[1].address)
   })
+
+  it("ranks 10000", async () => {
+    const { wootgump } = await loadFixture(deployWootgump)
+    const windowSize = 100
+    for (let i = 0; i < 700; i += windowSize) {
+      const mints = new Array(windowSize).fill(true).map((_, j) => {
+        const random = Wallet.createRandom()
+        return {
+          to: random.address,
+          amount: utils.parseEther((i + j).toString()),
+        }
+      })
+      console.log("minting: ", i)
+      await (await wootgump.bulkMint(mints)).wait()
+    }
+  }).timeout(120000)
 })
