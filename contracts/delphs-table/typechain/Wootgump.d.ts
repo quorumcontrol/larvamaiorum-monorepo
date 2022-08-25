@@ -22,10 +22,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface WootgumpInterface extends ethers.utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "MAX_RANKING_SIZE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "PAUSER_ROLE()": FunctionFragment;
-    "addressesForValue(uint256)": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -43,7 +41,6 @@ interface WootgumpInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "rankedValues(uint256)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -59,20 +56,12 @@ interface WootgumpInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "MAX_RANKING_SIZE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "MINTER_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "PAUSER_ROLE",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "addressesForValue",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "allowance",
@@ -125,10 +114,6 @@ interface WootgumpInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "rankedValues",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "renounceRole",
     values: [BytesLike, string]
   ): string;
@@ -160,19 +145,11 @@ interface WootgumpInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_RANKING_SIZE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "PAUSER_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "addressesForValue",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
@@ -204,10 +181,6 @@ interface WootgumpInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "rankedValues",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
@@ -326,16 +299,9 @@ export class Wootgump extends BaseContract {
   functions: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    MAX_RANKING_SIZE(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     PAUSER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    addressesForValue(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string[]]>;
 
     allowance(
       owner: string,
@@ -414,11 +380,6 @@ export class Wootgump extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    rankedValues(
-      max: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { vals: BigNumber[] }>;
-
     renounceRole(
       role: BytesLike,
       account: string,
@@ -460,16 +421,9 @@ export class Wootgump extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  MAX_RANKING_SIZE(overrides?: CallOverrides): Promise<BigNumber>;
-
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
   PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  addressesForValue(
-    value: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string[]>;
 
   allowance(
     owner: string,
@@ -548,11 +502,6 @@ export class Wootgump extends BaseContract {
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
-  rankedValues(
-    max: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
-
   renounceRole(
     role: BytesLike,
     account: string,
@@ -594,16 +543,9 @@ export class Wootgump extends BaseContract {
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    MAX_RANKING_SIZE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
     PAUSER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    addressesForValue(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string[]>;
 
     allowance(
       owner: string,
@@ -676,11 +618,6 @@ export class Wootgump extends BaseContract {
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
-
-    rankedValues(
-      max: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
 
     renounceRole(
       role: BytesLike,
@@ -826,16 +763,9 @@ export class Wootgump extends BaseContract {
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_RANKING_SIZE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     PAUSER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    addressesForValue(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     allowance(
       owner: string,
@@ -917,11 +847,6 @@ export class Wootgump extends BaseContract {
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    rankedValues(
-      max: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     renounceRole(
       role: BytesLike,
       account: string,
@@ -966,16 +891,9 @@ export class Wootgump extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    MAX_RANKING_SIZE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     PAUSER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    addressesForValue(
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     allowance(
       owner: string,
@@ -1059,11 +977,6 @@ export class Wootgump extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    rankedValues(
-      max: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     renounceRole(
       role: BytesLike,

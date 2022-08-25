@@ -6,8 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "solidity-linked-list/contracts/StructuredLinkedList.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "hardhat/console.sol";
 
 contract Wootgump is
@@ -17,19 +15,8 @@ contract Wootgump is
     AccessControl,
     ERC2771Context
 {
-    using StructuredLinkedList for StructuredLinkedList.List;
-    StructuredLinkedList.List private list;
-
-    using EnumerableSet for EnumerableSet.AddressSet;
-
-    uint256 public constant MAX_RANKING_SIZE = 500;
-    uint256 private constant _HEAD = 0;
-    bool private constant _NEXT = true;
-
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-
-    mapping(uint256 => EnumerableSet.AddressSet) private valuesToAddresses;
 
     struct BulkMint {
         address to;
@@ -69,70 +56,11 @@ contract Wootgump is
         _mint(to, amount);
     }
 
-    function rankedValues(uint256 max) public view returns (uint256[] memory vals) {
-        vals = new uint256[](max);
-        (bool exists, uint256 node) = list.getNextNode(_HEAD);
-        uint256 i = 0;
-        while (exists && i < max) {
-            vals[i] = node;
-            (exists, node) = list.getNextNode(node);
-            i++;
-        }
-        return vals;
-    }
-
-    function addressesForValue(uint256 value) external view returns (address[] memory) {
-        return valuesToAddresses[value].values();
-    }
-
-    function removeUserFromValue(address user) internal {
-        if (user == address(0)) {
-            return;
-        }
-        uint256 balance = balanceOf(user);
-        EnumerableSet.AddressSet storage set = valuesToAddresses[balance];
-        set.remove(user);
-        if (set.length() == 0) {
-            list.remove(balance);
-        }
-    }
-
-    function sortUser(address user) internal {
-        if (user == address(0)) {
-            return;
-        }
-        // console.log("sort user", user);
-        uint256 balance = balanceOf(user);
-        if (balance == 0) {
-            return;
-        }
-        valuesToAddresses[balance].add(user);
-
-        (, uint256 smallest) = list.getPreviousNode(_HEAD);
-
-        console.log("list size/bal/smallest", list.sizeOf(), smallest, balance);
-
-        if (list.sizeOf() >= MAX_RANKING_SIZE) {
-            if (balance <= smallest) {
-                return;
-            }
-            console.log('remove');
-            list.remove(smallest);
-        }
-
-        if (!list.nodeExists(balance)) {
-            console.log("insert");
-            list.insertAfter(getSortedSpot(balance), balance);
-        }
-    }
-
     function _beforeTokenTransfer(
         address from,
         address to,
         uint256 amount
     ) internal override whenNotPaused {
-        removeUserFromValue(from);
-        removeUserFromValue(to);
         super._beforeTokenTransfer(from, to, amount);
     }
 
@@ -144,8 +72,8 @@ contract Wootgump is
         uint256 amount
     ) internal override(ERC20) {
         super._afterTokenTransfer(from, to, amount);
-        sortUser(from);
-        sortUser(to);
+        // _rankUser(from);
+        // _rankUser(to);
     }
 
     // function _mint(address to, uint256 amount)
@@ -179,18 +107,5 @@ contract Wootgump is
         returns (bytes calldata)
     {
         return ERC2771Context._msgData();
-    }
-
-    function getSortedSpot(uint256 _value) internal view returns (uint256) {
-        if (list.sizeOf() == 0) {
-            return 0;
-        }
-
-        uint256 next;
-        (, next) = list.getAdjacent(_HEAD, _NEXT);
-        while ((next != 0) && ((_value < next) != _NEXT)) {
-            next = list.list[next][_NEXT];
-        }
-        return next;
     }
 }

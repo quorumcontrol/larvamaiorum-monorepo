@@ -5,21 +5,21 @@ import { ethers } from "hardhat"
 import { Wootgump } from "../typechain"
 import { deployForwarderAndRoller } from "./fixtures"
 
-describe.only("Wootgump", function () {
+describe("Wootgump", function () {
   async function getDeployer() {
     const signers = await ethers.getSigners()
     return { deployer: signers[0], signers }
   }
 
-  async function demoBuildLeaderboard(wootgump:Wootgump) {
-    const vals = await wootgump.rankedValues(2)
-    const addrs = await Promise.all(
-      vals.map((v) => {
-        return wootgump.addressesForValue(v)
-      })
-    )
-    return addrs.flat()
-  }
+  // async function demoBuildLeaderboard(wootgump:Wootgump) {
+  //   const vals = await wootgump.rankedValues(2)
+  //   const addrs = await Promise.all(
+  //     vals.map((v) => {
+  //       return wootgump.addressesForValue(v)
+  //     })
+  //   )
+  //   return addrs.flat()
+  // }
 
   async function deployWootgump() {
     const { deployer } = await loadFixture(getDeployer)
@@ -34,21 +34,21 @@ describe.only("Wootgump", function () {
     return { wootgump }
   }
 
-  it("ranks", async () => {
-    const { signers } = await getDeployer()
-    const { wootgump } = await loadFixture(deployWootgump)
-    await wootgump.mint(signers[1].address, utils.parseEther("1"))
-    await wootgump.mint(signers[2].address, utils.parseEther("2"))
-    const vals = await wootgump.rankedValues(2)
-    expect(vals.map((v) => v.toString())).to.have.members([
-      utils.parseEther("1").toString(),
-      utils.parseEther("2").toString(),
-    ])
+  // it("ranks", async () => {
+  //   const { signers } = await getDeployer()
+  //   const { wootgump } = await loadFixture(deployWootgump)
+  //   await wootgump.mint(signers[1].address, utils.parseEther("1"))
+  //   await wootgump.mint(signers[2].address, utils.parseEther("2"))
+  //   const vals = await wootgump.rankedValues(2)
+  //   expect(vals.map((v) => v.toString())).to.have.members([
+  //     utils.parseEther("1").toString(),
+  //     utils.parseEther("2").toString(),
+  //   ])
 
-    const leaderboard = await demoBuildLeaderboard(wootgump)
-    expect(leaderboard[0]).to.equal(signers[2].address)
-    expect(leaderboard[1]).to.equal(signers[1].address)
-  })
+  //   const leaderboard = await demoBuildLeaderboard(wootgump)
+  //   expect(leaderboard[0]).to.equal(signers[2].address)
+  //   expect(leaderboard[1]).to.equal(signers[1].address)
+  // })
 
   it("ranks 10000", async () => {
     const { wootgump } = await loadFixture(deployWootgump)
@@ -62,7 +62,8 @@ describe.only("Wootgump", function () {
         }
       })
       console.log("minting: ", i)
-      await (await wootgump.bulkMint(mints)).wait()
+      const receipt = await (await wootgump.bulkMint(mints)).wait()
+      console.log("gas: ", receipt.gasUsed)
     }
   }).timeout(120000)
 })
