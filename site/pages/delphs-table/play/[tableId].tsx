@@ -109,6 +109,7 @@ const Play: NextPage = () => {
 
   const handleGameTickMessage = useCallback(
     (evt: AppEvent) => {
+      console.log('game tick: ', evt)
       setWarriors(evt.data);
     },
     [setWarriors]
@@ -195,10 +196,10 @@ const Play: NextPage = () => {
         }
       }
     };
-    console.log("add destination listener");
+    console.log("add iframe msg listener");
     window.addEventListener("message", handler);
     return () => {
-      console.log("removing destination listener");
+      console.log("removing iframe msg listener");
       window.removeEventListener("message", handler);
     };
   }, [handleMessage, handleFullScreenMessage, handleGameTickMessage]);

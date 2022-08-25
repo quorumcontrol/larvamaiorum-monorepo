@@ -1,0 +1,6 @@
+{
+  "extension": ["ts", "tsx"],
+  "spec": ["tests/**/*.ts"],
+  "require": ["ts-node/register"],
+  "timeout": 15000
+}

@@ -1,5 +1,5 @@
 
-import { ContractReceipt, Wallet } from "ethers";
+import { BigNumber, ContractReceipt, Wallet } from "ethers";
 import debug, { Debugger } from 'debug'
 import { keccak256 } from "ethers/lib/utils";
 import { faker } from '@faker-js/faker'
@@ -9,13 +9,14 @@ import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
-import { delphsContract, lobbyContract, playerContract } from "../src/utils/contracts";
+import { delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
 import mqttClient, { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from '../src/utils/mqtt'
 import Pinger from "./pinger";
 import { DiceRolledEvent } from "../contracts/typechain/DelphsTable";
+import BoardRunner from "./BoardRunner";
 
 dotenv.config({
   path: '.env.local'
@@ -56,6 +57,7 @@ const lobby = lobbyContract().connect(wallet)
 const delphs = delphsContract().connect(wallet)
 const player = playerContract().connect(wallet)
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
+const wootgump = wootgumpContract().connect(wallet)
 
 class TableMaker {
   log: Debugger
@@ -135,19 +137,6 @@ class TableMaker {
   }
 }
 
-
-// const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
-//   const evt = receipt.logs.find((log) => {
-//     return log.topics[0] === battleCompletedTopic
-//   })
-//   if (!evt) {
-//     throw new Error('bad transaction hash: missing battle completed topic')
-//   }
-//   const parsedEvt = battleInterface.parseLog(evt)
-//   console.log('parsed event: ', parsedEvt)
-//   return parsedEvt as unknown as  BattleCompletedEvent
-// }
-
 const diceRolledTopic = delphs.interface.getEventTopic('DiceRolled')
 const getDiceRollFromReceipt = (receipt:ContractReceipt) => {
   const evt = receipt.logs.find((l) => {
@@ -189,8 +178,6 @@ class TablePlayer {
     await promiseWaiter(15000)
     this.instantTableStarted()
   }
-
-  //0x5869a3debe3df78d166123c33b4e3a57419ad86bfeb3a57555897d150611133a first
 
   private async playTables() {
     try {
@@ -238,8 +225,24 @@ class TablePlayer {
         this.log('waiting')
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
-      this.log('bulk remove')
-      await txSingleton.push(() => {
+      
+      const results = (await Promise.all(active.map(async (table) => {
+        this.log('collecting results for', table.id)
+        const runner = new BoardRunner(table.id)
+        await runner.run()
+        return runner.gumpOutput()
+      }))).reduce((memo:Record<string, {to: string, amount: BigNumber}>, gumpResults) => {
+        Object.keys(gumpResults).forEach((playerId) => {
+          memo[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
+          memo[playerId].amount = memo[playerId].amount.add(gumpResults[playerId])
+        })
+        return memo
+      }, {})
+
+      this.log('queuing bulk and prizes')
+      await txSingleton.push(async () => {
+        const tx = await wootgump.bulkMint(Object.values(results))
+        this.log('wootgump prize tx: ', tx.hash)
         return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500000 })
       })
       this.log('rolling complete')
