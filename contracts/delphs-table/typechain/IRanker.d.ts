@@ -19,55 +19,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface RankerInterface extends ethers.utils.Interface {
+interface IRankerInterface extends ethers.utils.Interface {
   functions: {
-    "MAX_RANKINGS()": FunctionFragment;
-    "clearRankingQueue(uint256)": FunctionFragment;
-    "pendingRankings()": FunctionFragment;
     "queueRanking(address,uint256)": FunctionFragment;
-    "ranked()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "MAX_RANKINGS",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "clearRankingQueue",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "pendingRankings",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "queueRanking",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "ranked", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "MAX_RANKINGS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "clearRankingQueue",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "pendingRankings",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "queueRanking",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ranked", data: BytesLike): Result;
 
   events: {};
 }
 
-export class Ranker extends BaseContract {
+export class IRanker extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -108,35 +78,15 @@ export class Ranker extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: RankerInterface;
+  interface: IRankerInterface;
 
   functions: {
-    MAX_RANKINGS(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    clearRankingQueue(
-      max: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    pendingRankings(overrides?: CallOverrides): Promise<[string[]]>;
-
     queueRanking(
       user: string,
       balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    ranked(overrides?: CallOverrides): Promise<[string[]]>;
   };
-
-  MAX_RANKINGS(overrides?: CallOverrides): Promise<BigNumber>;
-
-  clearRankingQueue(
-    max: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  pendingRankings(overrides?: CallOverrides): Promise<string[]>;
 
   queueRanking(
     user: string,
@@ -144,64 +94,29 @@ export class Ranker extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  ranked(overrides?: CallOverrides): Promise<string[]>;
-
   callStatic: {
-    MAX_RANKINGS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    clearRankingQueue(
-      max: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    pendingRankings(overrides?: CallOverrides): Promise<string[]>;
-
     queueRanking(
       user: string,
       balance: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    ranked(overrides?: CallOverrides): Promise<string[]>;
   };
 
   filters: {};
 
   estimateGas: {
-    MAX_RANKINGS(overrides?: CallOverrides): Promise<BigNumber>;
-
-    clearRankingQueue(
-      max: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    pendingRankings(overrides?: CallOverrides): Promise<BigNumber>;
-
     queueRanking(
       user: string,
       balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    ranked(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    MAX_RANKINGS(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    clearRankingQueue(
-      max: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    pendingRankings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     queueRanking(
       user: string,
       balance: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    ranked(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

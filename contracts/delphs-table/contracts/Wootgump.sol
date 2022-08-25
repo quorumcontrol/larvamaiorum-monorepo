@@ -6,7 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "hardhat/console.sol";
+import "./interfaces/IRanker.sol";
+// import "hardhat/console.sol";
 
 contract Wootgump is
     ERC20,
@@ -17,6 +18,9 @@ contract Wootgump is
 {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant RANKER_SETTER_ROLE = keccak256("RANKER_SETTER");
+
+    IRanker public ranker;
 
     struct BulkMint {
         address to;
@@ -30,6 +34,11 @@ contract Wootgump is
         _grantRole(DEFAULT_ADMIN_ROLE, initialOwner);
         _grantRole(PAUSER_ROLE, initialOwner);
         _grantRole(MINTER_ROLE, initialOwner);
+        _grantRole(RANKER_SETTER_ROLE, initialOwner);
+    }
+
+    function setRanker(address rankerAddress) onlyRole(RANKER_SETTER_ROLE) public {
+        ranker = IRanker(rankerAddress);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
@@ -56,13 +65,13 @@ contract Wootgump is
         _mint(to, amount);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override whenNotPaused {
-        super._beforeTokenTransfer(from, to, amount);
-    }
+    // function _beforeTokenTransfer(
+    //     address from,
+    //     address to,
+    //     uint256 amount
+    // ) internal override whenNotPaused {
+    //     super._beforeTokenTransfer(from, to, amount);
+    // }
 
     // The following functions are overrides required by Solidity.
 
@@ -72,23 +81,9 @@ contract Wootgump is
         uint256 amount
     ) internal override(ERC20) {
         super._afterTokenTransfer(from, to, amount);
-        // _rankUser(from);
-        // _rankUser(to);
+        ranker.queueRanking(from, balanceOf(from));
+        ranker.queueRanking(from, balanceOf(to));
     }
-
-    // function _mint(address to, uint256 amount)
-    //     internal
-    //     override(ERC20)
-    // {
-    //     super._mint(to, amount);
-    // }
-
-    // function _burn(address account, uint256 amount)
-    //     internal
-    //     override(ERC20)
-    // {
-    //     super._burn(account, amount);
-    // }
 
     function _msgSender()
         internal

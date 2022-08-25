@@ -3,7 +3,7 @@ import { loadFixture } from "ethereum-waffle"
 import { utils, Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-describe.only("Ranker", function () {
+describe("Ranker", function () {
 
   async function deployRanker() {
     const signers = await ethers.getSigners()
@@ -25,14 +25,7 @@ describe.only("Ranker", function () {
     await expect(ranker.connect(eve).queueRanking(rando.address, utils.parseEther('100'))).to.be.reverted
   })
 
-  // it('ranks the first time', async () => {
-  //   // we pretend the wootgump contract is the deployer here
-  //   const { ranker } = await loadFixture(deployRanker)
-  //   const rando = Wallet.createRandom()
-  //   await expect(ranker.queueRanking(rando.address, utils.parseEther('100'))).to.not.be.reverted
-  // })
-
-  it('clears rank queues', async () => {
+  it('[end-to-end] queues rankings and clears rank queues', async () => {
     const { ranker } = await loadFixture(deployRanker)
     const addrs:string[] = []
     for (let i = 0; i < 5; i++) {

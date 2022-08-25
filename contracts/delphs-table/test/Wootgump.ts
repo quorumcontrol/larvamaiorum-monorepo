@@ -24,6 +24,7 @@ describe("Wootgump", function () {
   async function deployWootgump() {
     const { deployer } = await loadFixture(getDeployer)
     const { forwarder } = await loadFixture(deployForwarderAndRoller)
+
     const WootgumpFactory = await ethers.getContractFactory("Wootgump")
     const wootgump = await WootgumpFactory.deploy(
       forwarder.address,
@@ -31,24 +32,13 @@ describe("Wootgump", function () {
     )
     await wootgump.deployed()
     expect(Buffer.from(WootgumpFactory.bytecode.slice(2, -1)).length).to.be.lte(26_000)
-    return { wootgump }
+
+    const RankerFactory = await ethers.getContractFactory("Ranker")
+    const ranker = await RankerFactory.deploy(wootgump.address)
+    await ranker.deployed()
+    await wootgump.setRanker(ranker.address)
+    return { wootgump, ranker }
   }
-
-  // it("ranks", async () => {
-  //   const { signers } = await getDeployer()
-  //   const { wootgump } = await loadFixture(deployWootgump)
-  //   await wootgump.mint(signers[1].address, utils.parseEther("1"))
-  //   await wootgump.mint(signers[2].address, utils.parseEther("2"))
-  //   const vals = await wootgump.rankedValues(2)
-  //   expect(vals.map((v) => v.toString())).to.have.members([
-  //     utils.parseEther("1").toString(),
-  //     utils.parseEther("2").toString(),
-  //   ])
-
-  //   const leaderboard = await demoBuildLeaderboard(wootgump)
-  //   expect(leaderboard[0]).to.equal(signers[2].address)
-  //   expect(leaderboard[1]).to.equal(signers[1].address)
-  // })
 
   it("ranks 10000", async () => {
     const { wootgump } = await loadFixture(deployWootgump)

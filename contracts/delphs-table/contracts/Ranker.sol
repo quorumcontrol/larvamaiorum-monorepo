@@ -2,9 +2,10 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "hardhat/console.sol";
+import "./interfaces/IRanker.sol";
+// import "hardhat/console.sol";
 
-contract Ranker
+contract Ranker is IRanker
 {
     error FourOhOneUnauthorized();
 
@@ -39,7 +40,7 @@ contract Ranker
       _wootgumpContract = wootgumpContractAddress;
     }
 
-    function queueRanking(address user, uint256 balance) public {
+    function queueRanking(address user, uint256 balance) override public {
       if (msg.sender != _wootgumpContract) {
         revert FourOhOneUnauthorized();
       }
@@ -50,13 +51,13 @@ contract Ranker
     function clearRankingQueue(uint256 max) public {
       address[] memory queuedUsers = new address[](max);
       for (uint256 i = 0; i < max; i++) {
-        console.log('get queued at ', i);
+        // console.log('get queued at ', i);
         queuedUsers[i] = _queuedAddresses.at(i);
       }
       uint256 len = queuedUsers.length;
       for (uint256 i = 0; i < len; i++) {
         address addr = queuedUsers[i];
-        console.log("ranking", addr);
+        // console.log("ranking", addr);
         rank(addr, _queuedBalances[addr]);
         _queuedAddresses.remove(addr);
       }
@@ -69,9 +70,9 @@ contract Ranker
       (uint256 id, Node storage node) = getNext(_nodes[_HEAD]);
       for (uint256 i = 0; i < (count - 1); i++) {
         rankedUsers[i] = node.user;
-        console.log("get next for", id);
+        // console.log("get next for", id);
         (id,node) = getNext(node);
-        console.log("next", id);
+        // console.log("next", id);
       }
       return rankedUsers;
     }
@@ -82,18 +83,17 @@ contract Ranker
 
     //TODO: protect caller
     function rank(address user, uint256 balance) internal {
-
+      removeNode(_nodeForAddress[user]); // #removeNode handles the no node returned case.
       if (balance == 0) {
-        console.log("zero balance return");
+        // console.log("zero balance return");
         return;
       }
       if (_count >= MAX_RANKINGS && balance < _nodes[_tail].balance) {
-        console.log("_count or lower balance return");
+        // console.log("_count or lower balance return");
         return; // nothing to do here
       }
-      removeNode(_nodeForAddress[user]);
       (uint256 id, Node storage node) = findPosition(balance);
-      console.log("insert after", id);
+      // console.log("insert after", id);
       _nodeForAddress[user] = insertAfter(id, node, user, balance);
     }
 
@@ -134,7 +134,7 @@ contract Ranker
     function findPosition(uint256 balance) internal view returns (uint256 id, Node storage) {
       Node storage currentNode = _nodes[_tail];
       id = _tail;
-      console.log("before while");
+      // console.log("before while");
       while (currentNode.balance < balance) {
         (id, currentNode) = getPrev(currentNode);
         // console.log('currentNode', id, currentNode.next);
