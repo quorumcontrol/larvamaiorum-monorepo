@@ -91,7 +91,7 @@ const Home: NextPage = () => {
                 <Heading size={["xl", "2xl"]}>Larva Maiorum</Heading>
                 <Text>
                   &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
-                  collection launching Q3 2022. This
+                  collection launching soon. This
                   special collection entitles the wearer to the absolute best
                   game items at launch. Gladiator warriors and ultra rare
                   artifacts bless the wearer of these wootgump infused masks.
