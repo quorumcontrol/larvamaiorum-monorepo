@@ -1,0 +1,35 @@
+service: lore-books-metadata
+configValidationMode: off
+useDotenv: true
+
+provider:
+  name: scaleway
+  runtime: node16 # Available node runtimes are listed in documentation
+  # Global Environment variables - used in every functions
+  # secret:
+  #   env_delphsPrivateKey: ${env:DELPHS_PRIVATE_KEY}
+  scwToken: ${env:SCW_SECRET_KEY}
+  scwProject: ${env:SCW_DEFAULT_PROJECT_ID}
+  scwRegion: ${env:SCW_REGION}
+
+plugins:
+  - serverless-scaleway-functions
+  - serverless-plugin-typescript
+
+package:
+  patterns:
+    - '!.gitignore'
+    - '!.git/**'
+
+functions:
+  mainnet-metadata:
+    handler: serverless/handler.handle
+    memoryLimit: 512
+    maxScale: 5
+    # Local environment variables - used only in given function
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+  testnet-metadata:
+    handler: serverless/handler.handle
+    memoryLimit: 512
+    maxScale: 5

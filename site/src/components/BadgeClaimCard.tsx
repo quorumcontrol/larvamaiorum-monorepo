@@ -5,7 +5,7 @@ import Video from "./Video";
 const BadgeClaimCard: React.FC<{
   animationUrl: string;
   name: string;
-  url: string;
+  url?: string;
   description: string;
 }> = ({ animationUrl, name, url, description }) => {
   return (
@@ -27,9 +27,14 @@ const BadgeClaimCard: React.FC<{
           {description}
         </Text>
         <Box>
+          {url && (
           <NextLink href={url}>
-            <Button variant="secondary">Claim</Button>
-          </NextLink>
+          <Button variant="secondary">Claim</Button>
+        </NextLink>
+          )}
+          {!url && (
+            <Text fontSize="md">Available Soon.</Text>
+          )}
         </Box>
       </VStack>
     </Box>
