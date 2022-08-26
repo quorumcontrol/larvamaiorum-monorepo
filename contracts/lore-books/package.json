@@ -2,9 +2,13 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
-    "hardhat": "^2.10.2"
+    "hardhat": "^2.10.2",
+    "serverless-plugin-typescript": "^2.1.2",
+    "serverless-scaleway-functions": "^0.4.1"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "dotenv": "^16.0.1",
     "hardhat-deploy": "^0.11.12"
   }
 }
