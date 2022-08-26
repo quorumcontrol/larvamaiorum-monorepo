@@ -58,6 +58,7 @@ const config: HardhatUserConfig = {
         process.env.DELPHS_PRIVATE_KEY,
       ].filter((k) => !!k) as string[],
       tags: ["test", "testskale"],
+      timeout: 10000000,
     },
   },
 };
