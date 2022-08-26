@@ -91,10 +91,10 @@ const Home: NextPage = () => {
                 <Heading size={["xl", "2xl"]}>Larva Maiorum</Heading>
                 <Text>
                   &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
-                  collection launching soon. This
-                  special collection entitles the wearer to the absolute best
-                  game items at launch. Gladiator warriors and ultra rare
-                  artifacts bless the wearer of these wootgump infused masks.
+                  collection launching soon. This special collection entitles
+                  the wearer to the absolute best game items at launch.
+                  Gladiator warriors and ultra rare artifacts bless the wearer
+                  of these wootgump infused masks.
                 </Text>
               </VStack>
 
@@ -233,6 +233,20 @@ const Home: NextPage = () => {
             </VStack>
             <Box mt="10">
               <Carousel slideCount={3}>
+                <Slide>
+                  <BadgeClaimCard
+                    animationUrl="ipfs://bafybeihikpbbu27n5mwvbhp6h7kbxkly2lyg3omhpeth6sigzzbq7qtcqa"
+                    name="GoodGhosting Genesis Badge"
+                    description="Claimable by having interacted with the GoodGhosting smart contracts."
+                  />
+                </Slide>
+                <Slide>
+                  <BadgeClaimCard
+                    animationUrl="ipfs://bafybeignwce32es4mllodltf6jvdtr44pxxoqe7ysbf4ozoumhpd6d26iu"
+                    name="NFT Club Berlin Genesis Badge"
+                    description="Claimable by being a member of the NFT Club Berlin discord server."
+                  />
+                </Slide>
                 <Slide>
                   <BadgeClaimCard
                     animationUrl="ipfs://bafybeia7ngq2a2ch7my7ffub2vbcbdtffdbefitqjute7gdk7ul5xmb2w4"
