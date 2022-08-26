@@ -232,7 +232,7 @@ const Home: NextPage = () => {
               </Text>
             </VStack>
             <Box mt="10">
-              <Carousel slideCount={3}>
+              <Carousel slideCount={5}>
                 <Slide>
                   <BadgeClaimCard
                     animationUrl="ipfs://bafybeihikpbbu27n5mwvbhp6h7kbxkly2lyg3omhpeth6sigzzbq7qtcqa"
