@@ -6,15 +6,34 @@ const func: DeployFunction = async function ({
   deployments,
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
-  const { deploy, get } = deployments;
+  const { deploy, get, execute } = deployments;
   const { deployer, delph } = await getNamedAccounts();
 
   const forwarder = await get('TrustedForwarder')
 
-  await deploy("Wootgump", {
+  const gump = await deploy("Wootgump", {
     from: deployer,
     log: true,
     args: [forwarder.address, delph],
-  });
+  })
+
+  const ranker = await deploy("Ranker", {
+    from: deployer,
+    log: true,
+    args: [gump.address],
+  })
+
+  if (ranker.newlyDeployed) {
+    execute(
+      "Wootgump",
+      {
+        log: true,
+        from: delph,
+      },
+      "setRanker",
+      ranker.address
+    )
+  }
+
 };
 export default func;

@@ -11,16 +11,6 @@ describe("Wootgump", function () {
     return { deployer: signers[0], signers }
   }
 
-  // async function demoBuildLeaderboard(wootgump:Wootgump) {
-  //   const vals = await wootgump.rankedValues(2)
-  //   const addrs = await Promise.all(
-  //     vals.map((v) => {
-  //       return wootgump.addressesForValue(v)
-  //     })
-  //   )
-  //   return addrs.flat()
-  // }
-
   async function deployWootgump() {
     const { deployer } = await loadFixture(getDeployer)
     const { forwarder } = await loadFixture(deployForwarderAndRoller)
@@ -40,7 +30,7 @@ describe("Wootgump", function () {
     return { wootgump, ranker }
   }
 
-  it("ranks 10000", async () => {
+  it("mints 7000", async () => {
     const { wootgump } = await loadFixture(deployWootgump)
     const windowSize = 100
     for (let i = 0; i < 700; i += windowSize) {
@@ -51,9 +41,9 @@ describe("Wootgump", function () {
           amount: utils.parseEther((i + j).toString()),
         }
       })
-      console.log("minting: ", i)
-      const receipt = await (await wootgump.bulkMint(mints)).wait()
-      console.log("gas: ", receipt.gasUsed)
+      // console.log("minting: ", i)
+      await expect(wootgump.bulkMint(mints)).to.not.be.reverted
+      // console.log("gas: ", receipt.gasUsed)
     }
   }).timeout(120000)
 })

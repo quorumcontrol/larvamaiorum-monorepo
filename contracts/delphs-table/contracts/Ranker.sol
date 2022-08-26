@@ -64,11 +64,12 @@ contract Ranker is IRanker
       possiblyTrimTail();
     }
 
-    function ranked() public view returns (address[] memory) {
-      uint256 count = _count;
-      address[] memory rankedUsers = new address[](count - 1);
+    function ranked(uint256 userMax) public view returns (address[] memory) {
+      uint256 max = userMax > 0 ? userMax : _count - 1;
+
+      address[] memory rankedUsers = new address[](max);
       (uint256 id, Node storage node) = getNext(_nodes[_HEAD]);
-      for (uint256 i = 0; i < (count - 1); i++) {
+      for (uint256 i = 0; i < max; i++) {
         rankedUsers[i] = node.user;
         // console.log("get next for", id);
         (id,node) = getNext(node);
@@ -77,8 +78,15 @@ contract Ranker is IRanker
       return rankedUsers;
     }
 
-    function pendingRankings() public view returns (address[] memory) {
-      return _queuedAddresses.values();
+    function pendingRankings(uint256 max) public view returns (address[] memory) {
+      if (max == 0) {
+        return _queuedAddresses.values();
+      }
+      address[] memory queuedUsers = new address[](max);
+      for (uint256 i = 0; i < max; i++) {
+        queuedUsers[i] = _queuedAddresses.at(i);
+      }
+      return queuedUsers;
     }
 
     //TODO: protect caller

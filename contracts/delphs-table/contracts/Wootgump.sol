@@ -65,14 +65,6 @@ contract Wootgump is
         _mint(to, amount);
     }
 
-    // function _beforeTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 amount
-    // ) internal override whenNotPaused {
-    //     super._beforeTokenTransfer(from, to, amount);
-    // }
-
     // The following functions are overrides required by Solidity.
 
     function _afterTokenTransfer(

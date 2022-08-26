@@ -23,9 +23,9 @@ interface RankerInterface extends ethers.utils.Interface {
   functions: {
     "MAX_RANKINGS()": FunctionFragment;
     "clearRankingQueue(uint256)": FunctionFragment;
-    "pendingRankings()": FunctionFragment;
+    "pendingRankings(uint256)": FunctionFragment;
     "queueRanking(address,uint256)": FunctionFragment;
-    "ranked()": FunctionFragment;
+    "ranked(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -38,13 +38,16 @@ interface RankerInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "pendingRankings",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "queueRanking",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "ranked", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "ranked",
+    values: [BigNumberish]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "MAX_RANKINGS",
@@ -118,7 +121,10 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    pendingRankings(overrides?: CallOverrides): Promise<[string[]]>;
+    pendingRankings(
+      max: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string[]]>;
 
     queueRanking(
       user: string,
@@ -126,7 +132,10 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    ranked(overrides?: CallOverrides): Promise<[string[]]>;
+    ranked(
+      userMax: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string[]]>;
   };
 
   MAX_RANKINGS(overrides?: CallOverrides): Promise<BigNumber>;
@@ -136,7 +145,10 @@ export class Ranker extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  pendingRankings(overrides?: CallOverrides): Promise<string[]>;
+  pendingRankings(
+    max: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
 
   queueRanking(
     user: string,
@@ -144,7 +156,7 @@ export class Ranker extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  ranked(overrides?: CallOverrides): Promise<string[]>;
+  ranked(userMax: BigNumberish, overrides?: CallOverrides): Promise<string[]>;
 
   callStatic: {
     MAX_RANKINGS(overrides?: CallOverrides): Promise<BigNumber>;
@@ -154,7 +166,10 @@ export class Ranker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    pendingRankings(overrides?: CallOverrides): Promise<string[]>;
+    pendingRankings(
+      max: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
 
     queueRanking(
       user: string,
@@ -162,7 +177,7 @@ export class Ranker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    ranked(overrides?: CallOverrides): Promise<string[]>;
+    ranked(userMax: BigNumberish, overrides?: CallOverrides): Promise<string[]>;
   };
 
   filters: {};
@@ -175,7 +190,10 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    pendingRankings(overrides?: CallOverrides): Promise<BigNumber>;
+    pendingRankings(
+      max: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     queueRanking(
       user: string,
@@ -183,7 +201,10 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    ranked(overrides?: CallOverrides): Promise<BigNumber>;
+    ranked(
+      userMax: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -194,7 +215,10 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    pendingRankings(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pendingRankings(
+      max: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     queueRanking(
       user: string,
@@ -202,6 +226,9 @@ export class Ranker extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    ranked(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    ranked(
+      userMax: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }
