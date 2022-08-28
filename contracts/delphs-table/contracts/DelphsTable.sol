@@ -5,12 +5,13 @@ import "./interfaces/IDiceRoller.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
-error NoTwoRollsPerBlock();
-error Unauthorized();
-error AlreadyExists();
-error AlreadyStarted();
-
 contract DelphsTable is AccessControl, ERC2771Context {
+    error NoTwoRollsPerBlock();
+    error Unauthorized();
+    error AlreadyExists();
+    error AlreadyStarted();
+    error CantCreateAlreadyStarted();
+
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     event DiceRolled(
@@ -44,6 +45,8 @@ contract DelphsTable is AccessControl, ERC2771Context {
         address owner;
         uint256 startedAt; // the roll number started at
         uint256 gameLength; // number of rolls to play
+        uint32 tableSize;
+        uint32 wootgumpMultiplier; // base chance of spawning, per 1000 (basis points);
     }
 
     struct Stats {
@@ -74,40 +77,25 @@ contract DelphsTable is AccessControl, ERC2771Context {
         return latestRoll;
     }
 
-    function createTable(
-        bytes32 id,
-        address[] calldata playerAddresses,
-        bytes32[] calldata statSeeds,
-        uint256 length,
-        address owner
-    ) public {
+    function createTable(Table calldata newTable) public {
+        if (newTable.startedAt > 0) {
+            revert CantCreateAlreadyStarted();
+        }
         if (!hasRole(ADMIN_ROLE, _msgSender())) {
             revert Unauthorized();
         }
-        Table storage table = tables[id];
-        if (table.players.length > 0) {
+        if (tables[newTable.id].players.length > 0) {
             revert AlreadyExists();
         }
-        tables[id] = Table({
-            id: id,
-            players: playerAddresses,
-            seeds: statSeeds,
-            gameLength: length,
-            owner: owner,
-            startedAt: 0
-        });
-        emit TableCreated(id);
+        tables[newTable.id] = newTable;
+        emit TableCreated(newTable.id);
     }
 
     function createAndStart(
-        bytes32 id,
-        address[] calldata playerAddresses,
-        bytes32[] calldata statSeeds,
-        uint256 length,
-        address owner
+        Table calldata newTable
     ) external {
-        createTable(id, playerAddresses, statSeeds, length, owner);
-        start(id);
+        createTable(newTable);
+        start(newTable.id);
     }
 
     function start(bytes32 id) public returns (uint256) {

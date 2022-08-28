@@ -3,7 +3,7 @@ import { loadFixture } from "ethereum-waffle"
 import { utils, Wallet } from "ethers"
 import { ethers } from "hardhat"
 
-describe.only("Ranker", function () {
+describe("Ranker", function () {
 
   async function deployRanker() {
     const signers = await ethers.getSigners()

@@ -24,8 +24,8 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     "ADMIN_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "blockOfRoll(uint256)": FunctionFragment;
-    "createAndStart(bytes32,address[],bytes32[],uint256,address)": FunctionFragment;
-    "createTable(bytes32,address[],bytes32[],uint256,address)": FunctionFragment;
+    "createAndStart((bytes32,address[],bytes32[],address,uint256,uint256,uint32,uint32))": FunctionFragment;
+    "createTable((bytes32,address[],bytes32[],address,uint256,uint256,uint32,uint32))": FunctionFragment;
     "destinations(bytes32,uint256,uint256)": FunctionFragment;
     "destinationsForRoll(bytes32,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -61,11 +61,33 @@ interface DelphsTableInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createAndStart",
-    values: [BytesLike, string[], BytesLike[], BigNumberish, string]
+    values: [
+      {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "createTable",
-    values: [BytesLike, string[], BytesLike[], BigNumberish, string]
+    values: [
+      {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "destinations",
@@ -291,20 +313,30 @@ export class DelphsTable extends BaseContract {
     ): Promise<[BigNumber]>;
 
     createAndStart(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     createTable(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -415,11 +447,13 @@ export class DelphsTable extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, BigNumber, BigNumber] & {
+      [string, string, BigNumber, BigNumber, number, number] & {
         id: string;
         owner: string;
         startedAt: BigNumber;
         gameLength: BigNumber;
+        tableSize: number;
+        wootgumpMultiplier: number;
       }
     >;
   };
@@ -434,20 +468,30 @@ export class DelphsTable extends BaseContract {
   ): Promise<BigNumber>;
 
   createAndStart(
-    id: BytesLike,
-    playerAddresses: string[],
-    statSeeds: BytesLike[],
-    length: BigNumberish,
-    owner: string,
+    newTable: {
+      id: BytesLike;
+      players: string[];
+      seeds: BytesLike[];
+      owner: string;
+      startedAt: BigNumberish;
+      gameLength: BigNumberish;
+      tableSize: BigNumberish;
+      wootgumpMultiplier: BigNumberish;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   createTable(
-    id: BytesLike,
-    playerAddresses: string[],
-    statSeeds: BytesLike[],
-    length: BigNumberish,
-    owner: string,
+    newTable: {
+      id: BytesLike;
+      players: string[];
+      seeds: BytesLike[];
+      owner: string;
+      startedAt: BigNumberish;
+      gameLength: BigNumberish;
+      tableSize: BigNumberish;
+      wootgumpMultiplier: BigNumberish;
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -554,11 +598,13 @@ export class DelphsTable extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, BigNumber, BigNumber] & {
+    [string, string, BigNumber, BigNumber, number, number] & {
       id: string;
       owner: string;
       startedAt: BigNumber;
       gameLength: BigNumber;
+      tableSize: number;
+      wootgumpMultiplier: number;
     }
   >;
 
@@ -573,20 +619,30 @@ export class DelphsTable extends BaseContract {
     ): Promise<BigNumber>;
 
     createAndStart(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
     createTable(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -688,11 +744,13 @@ export class DelphsTable extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, BigNumber, BigNumber] & {
+      [string, string, BigNumber, BigNumber, number, number] & {
         id: string;
         owner: string;
         startedAt: BigNumber;
         gameLength: BigNumber;
+        tableSize: number;
+        wootgumpMultiplier: number;
       }
     >;
   };
@@ -800,20 +858,30 @@ export class DelphsTable extends BaseContract {
     ): Promise<BigNumber>;
 
     createAndStart(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     createTable(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -917,20 +985,30 @@ export class DelphsTable extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createAndStart(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     createTable(
-      id: BytesLike,
-      playerAddresses: string[],
-      statSeeds: BytesLike[],
-      length: BigNumberish,
-      owner: string,
+      newTable: {
+        id: BytesLike;
+        players: string[];
+        seeds: BytesLike[];
+        owner: string;
+        startedAt: BigNumberish;
+        gameLength: BigNumberish;
+        tableSize: BigNumberish;
+        wootgumpMultiplier: BigNumberish;
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

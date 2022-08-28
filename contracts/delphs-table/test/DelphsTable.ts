@@ -5,13 +5,13 @@ import { ethers } from "hardhat";
 import { DelphsTable, DiceRoller } from "../typechain";
 import { deployForwarderAndRoller } from "./fixtures";
 
-function hashString(msg:string) {
- return ethers.utils.keccak256(ethers.utils.solidityPack(['string'], [msg]))
+function hashString(msg: string) {
+  return ethers.utils.keccak256(ethers.utils.solidityPack(['string'], [msg]))
 }
 
 describe("DelphsTable", function () {
-  let delphsTable:DelphsTable
-  let deployer:SignerWithAddress
+  let delphsTable: DelphsTable
+  let deployer: SignerWithAddress
 
   beforeEach(async () => {
     const signers = await ethers.getSigners()
@@ -32,7 +32,16 @@ describe("DelphsTable", function () {
   describe('game', () => {
     const id = hashString('testgame')
     beforeEach(async () => {
-      await expect(delphsTable.createTable(id, [deployer.address], [hashString('test')], 2, deployer.address)).to.not.be.reverted
+      await expect(delphsTable.createTable({
+          id,
+          players: [deployer.address],
+          seeds: [hashString("test")],
+          gameLength: 2,
+          owner: deployer.address,
+          startedAt: 0,
+          tableSize: 10,
+          wootgumpMultiplier: 5,
+      })).to.not.be.reverted
     })
 
     it('can start', async () => {
@@ -61,7 +70,7 @@ describe("DelphsTable", function () {
       await delphsTable.start(id)
       await delphsTable.rollTheDice()
       await delphsTable.setDestination(id, -1, 2);
-      const startedAt = (await delphsTable.tables(id)).startedAt
+      // const startedAt = (await delphsTable.tables(id)).startedAt
       const dests = await delphsTable.destinationsForRoll(id, await delphsTable.latestRoll())
       expect(dests).to.have.lengthOf(1)
       expect(dests[0].x).to.equal(-1)
