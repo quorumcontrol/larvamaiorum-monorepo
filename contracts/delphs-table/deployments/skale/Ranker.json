@@ -1,0 +1,318 @@
+{
+  "address": "0x63F63e7De9b8f41F86daCf5F371dCC651148bF0D",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "wootgumpContractAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "FourOhOneUnauthorized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_RANKINGS",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "max",
+          "type": "uint256"
+        }
+      ],
+      "name": "clearRankingQueue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "max",
+          "type": "uint256"
+        }
+      ],
+      "name": "pendingRankings",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "balance",
+          "type": "uint256"
+        }
+      ],
+      "name": "queueRanking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "userMax",
+          "type": "uint256"
+        }
+      ],
+      "name": "ranked",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x8a1a06982746908d4d2eb2d8a3cb08e45d71208a8f59ae180b1e1b4be3f9f4d1",
+  "receipt": {
+    "to": "0x0000000000000000000000000000000000000000",
+    "from": "0x8341a26366e49359673EE331967be66F91f1f351",
+    "contractAddress": "0x63F63e7De9b8f41F86daCf5F371dCC651148bF0D",
+    "transactionIndex": 0,
+    "gasUsed": "704534",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x06ee335bbd9c20022c16214b4a0af23ed01e9a1c2b1e3666e990e63dfa22e29a",
+    "transactionHash": "0x8a1a06982746908d4d2eb2d8a3cb08e45d71208a8f59ae180b1e1b4be3f9f4d1",
+    "logs": [],
+    "blockNumber": 615269,
+    "cumulativeGasUsed": "704534",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x3aE57359041f6b59E42C87F021Cf99758ABca528"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "819c0529c737801b85ba6268c7240cd2",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"wootgumpContractAddress\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"FourOhOneUnauthorized\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"MAX_RANKINGS\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"max\",\"type\":\"uint256\"}],\"name\":\"clearRankingQueue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"max\",\"type\":\"uint256\"}],\"name\":\"pendingRankings\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"name\":\"queueRanking\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"userMax\",\"type\":\"uint256\"}],\"name\":\"ranked\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Ranker.sol\":\"Ranker\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (utils/structs/EnumerableSet.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Library for managing\\n * https://en.wikipedia.org/wiki/Set_(abstract_data_type)[sets] of primitive\\n * types.\\n *\\n * Sets have the following properties:\\n *\\n * - Elements are added, removed, and checked for existence in constant time\\n * (O(1)).\\n * - Elements are enumerated in O(n). No guarantees are made on the ordering.\\n *\\n * ```\\n * contract Example {\\n *     // Add the library methods\\n *     using EnumerableSet for EnumerableSet.AddressSet;\\n *\\n *     // Declare a set state variable\\n *     EnumerableSet.AddressSet private mySet;\\n * }\\n * ```\\n *\\n * As of v3.3.0, sets of type `bytes32` (`Bytes32Set`), `address` (`AddressSet`)\\n * and `uint256` (`UintSet`) are supported.\\n */\\nlibrary EnumerableSet {\\n    // To implement this library for multiple types with as little code\\n    // repetition as possible, we write it in terms of a generic Set type with\\n    // bytes32 values.\\n    // The Set implementation uses private functions, and user-facing\\n    // implementations (such as AddressSet) are just wrappers around the\\n    // underlying Set.\\n    // This means that we can only create new EnumerableSets for types that fit\\n    // in bytes32.\\n\\n    struct Set {\\n        // Storage of set values\\n        bytes32[] _values;\\n        // Position of the value in the `values` array, plus 1 because index 0\\n        // means a value is not in the set.\\n        mapping(bytes32 => uint256) _indexes;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function _add(Set storage set, bytes32 value) private returns (bool) {\\n        if (!_contains(set, value)) {\\n            set._values.push(value);\\n            // The value is stored at length-1, but we add 1 to all indexes\\n            // and use 0 as a sentinel value\\n            set._indexes[value] = set._values.length;\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function _remove(Set storage set, bytes32 value) private returns (bool) {\\n        // We read and store the value's index to prevent multiple reads from the same storage slot\\n        uint256 valueIndex = set._indexes[value];\\n\\n        if (valueIndex != 0) {\\n            // Equivalent to contains(set, value)\\n            // To delete an element from the _values array in O(1), we swap the element to delete with the last one in\\n            // the array, and then remove the last element (sometimes called as 'swap and pop').\\n            // This modifies the order of the array, as noted in {at}.\\n\\n            uint256 toDeleteIndex = valueIndex - 1;\\n            uint256 lastIndex = set._values.length - 1;\\n\\n            if (lastIndex != toDeleteIndex) {\\n                bytes32 lastValue = set._values[lastIndex];\\n\\n                // Move the last value to the index where the value to delete is\\n                set._values[toDeleteIndex] = lastValue;\\n                // Update the index for the moved value\\n                set._indexes[lastValue] = valueIndex; // Replace lastValue's index to valueIndex\\n            }\\n\\n            // Delete the slot where the moved value was stored\\n            set._values.pop();\\n\\n            // Delete the index for the deleted slot\\n            delete set._indexes[value];\\n\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function _contains(Set storage set, bytes32 value) private view returns (bool) {\\n        return set._indexes[value] != 0;\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function _length(Set storage set) private view returns (uint256) {\\n        return set._values.length;\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function _at(Set storage set, uint256 index) private view returns (bytes32) {\\n        return set._values[index];\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function _values(Set storage set) private view returns (bytes32[] memory) {\\n        return set._values;\\n    }\\n\\n    // Bytes32Set\\n\\n    struct Bytes32Set {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _add(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _remove(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {\\n        return _contains(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(Bytes32Set storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {\\n        return _at(set._inner, index);\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(Bytes32Set storage set) internal view returns (bytes32[] memory) {\\n        return _values(set._inner);\\n    }\\n\\n    // AddressSet\\n\\n    struct AddressSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(AddressSet storage set, address value) internal returns (bool) {\\n        return _add(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(AddressSet storage set, address value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(AddressSet storage set, address value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(AddressSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(AddressSet storage set, uint256 index) internal view returns (address) {\\n        return address(uint160(uint256(_at(set._inner, index))));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(AddressSet storage set) internal view returns (address[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        address[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n\\n    // UintSet\\n\\n    struct UintSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _add(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(UintSet storage set, uint256 value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function length(UintSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(UintSet storage set, uint256 index) internal view returns (uint256) {\\n        return uint256(_at(set._inner, index));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(UintSet storage set) internal view returns (uint256[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        uint256[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n}\\n\",\"keccak256\":\"0xacac2065b3ed1facff1163435890d4a6bcdc474e857e8e2c91ae5fb50418f723\",\"license\":\"MIT\"},\"contracts/Ranker.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.4;\\n\\nimport \\\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\\\";\\nimport \\\"./interfaces/IRanker.sol\\\";\\n// import \\\"hardhat/console.sol\\\";\\n\\ncontract Ranker is IRanker\\n{\\n    error FourOhOneUnauthorized();\\n\\n    using EnumerableSet for EnumerableSet.AddressSet;\\n\\n    struct Node {\\n      address user;\\n      uint256 balance;\\n      \\n      uint256 next;\\n      uint256 prev;\\n    }\\n\\n    uint256 public constant MAX_RANKINGS = 500;\\n\\n    mapping(uint256 => Node) private _nodes;\\n    \\n    uint256 private _nextId = 0;\\n\\n    uint256 private constant _HEAD = 0;\\n    uint256 private _tail = 0;\\n    uint256 private _count = 1;\\n\\n    address immutable _wootgumpContract;\\n\\n    mapping(address => uint256) private _queuedBalances;\\n    EnumerableSet.AddressSet private _queuedAddresses;\\n\\n    mapping(address => uint256) private _nodeForAddress;\\n\\n    constructor(address wootgumpContractAddress) {\\n      _wootgumpContract = wootgumpContractAddress;\\n    }\\n\\n    function queueRanking(address user, uint256 balance) override public {\\n      if (msg.sender != _wootgumpContract) {\\n        revert FourOhOneUnauthorized();\\n      }\\n      _queuedAddresses.add(user);\\n      _queuedBalances[user] = balance;\\n    }\\n\\n    function clearRankingQueue(uint256 max) public {\\n      address[] memory queuedUsers = new address[](max);\\n      for (uint256 i = 0; i < max; i++) {\\n        // console.log('get queued at ', i);\\n        queuedUsers[i] = _queuedAddresses.at(i);\\n      }\\n      uint256 len = queuedUsers.length;\\n      for (uint256 i = 0; i < len; i++) {\\n        address addr = queuedUsers[i];\\n        // console.log(\\\"ranking\\\", addr);\\n        rank(addr, _queuedBalances[addr]);\\n        _queuedAddresses.remove(addr);\\n      }\\n      possiblyTrimTail();\\n    }\\n\\n    function ranked(uint256 userMax) public view returns (address[] memory) {\\n      uint256 max = userMax > 0 ? userMax : _count - 1;\\n\\n      address[] memory rankedUsers = new address[](max);\\n      (uint256 id, Node storage node) = getNext(_nodes[_HEAD]);\\n      for (uint256 i = 0; i < max; i++) {\\n        rankedUsers[i] = node.user;\\n        // console.log(\\\"get next for\\\", id);\\n        (id,node) = getNext(node);\\n        // console.log(\\\"next\\\", id);\\n      }\\n      return rankedUsers;\\n    }\\n\\n    function pendingRankings(uint256 max) public view returns (address[] memory) {\\n      if (max == 0) {\\n        return _queuedAddresses.values();\\n      }\\n      address[] memory queuedUsers = new address[](max);\\n      for (uint256 i = 0; i < max; i++) {\\n        queuedUsers[i] = _queuedAddresses.at(i);\\n      }\\n      return queuedUsers;\\n    }\\n\\n    //TODO: protect caller\\n    function rank(address user, uint256 balance) internal {\\n      removeNode(_nodeForAddress[user]); // #removeNode handles the no node returned case.\\n      if (balance == 0) {\\n        // console.log(\\\"zero balance return\\\");\\n        return;\\n      }\\n      if (_count >= MAX_RANKINGS && balance < _nodes[_tail].balance) {\\n        // console.log(\\\"_count or lower balance return\\\");\\n        return; // nothing to do here\\n      }\\n      (uint256 id, Node storage node) = findPosition(balance);\\n      // console.log(\\\"insert after\\\", id);\\n      _nodeForAddress[user] = insertAfter(id, node, user, balance);\\n    }\\n\\n    function possiblyTrimTail() internal {\\n      uint256 count = _count;\\n      if (count <= MAX_RANKINGS) {\\n        return; // no trim until big\\n      }\\n      uint256 amountToTrim = count - MAX_RANKINGS;\\n      uint256 id = _tail;\\n      Node storage tailNode = _nodes[id];\\n\\n      for (uint256 i = 0; i < amountToTrim; i++) {\\n        (id, tailNode) = getPrev(tailNode);\\n      }\\n      tailNode.next = _HEAD;\\n      _tail = id;\\n      _count = count - amountToTrim;\\n    }\\n\\n    function insertAfter(uint256 existingId, Node storage existingNode, address user, uint256 balance) internal returns (uint256 id) {\\n      id = _nextId++;\\n      Node memory newNode = Node({\\n        user: user,\\n        balance: balance,\\n        prev: existingId,\\n        next: existingNode.next\\n      });\\n      existingNode.next = id;\\n      _nodes[id] = newNode;\\n      if (existingNode.prev == _HEAD) {\\n        _tail = id;\\n      }\\n      _count++;\\n      return id;\\n    }\\n\\n    function findPosition(uint256 balance) internal view returns (uint256 id, Node storage) {\\n      Node storage currentNode = _nodes[_tail];\\n      id = _tail;\\n      // console.log(\\\"before while\\\");\\n      while (currentNode.balance < balance) {\\n        (id, currentNode) = getPrev(currentNode);\\n        // console.log('currentNode', id, currentNode.next);\\n        // console.log(currentNode.balance < balance);\\n        if (id == _HEAD) {\\n          break;\\n        }\\n      }\\n      // console.log('after while', id);\\n      return (id, currentNode);\\n    }\\n\\n    function removeNode(uint256 id) internal {\\n      if (id == 0) {\\n        return;\\n      }\\n      Node storage node = _nodes[id];\\n      (uint256 prevId, Node storage prev) = getPrev(node);\\n      (uint256 nextId, Node storage next) = getNext(node);\\n      prev.next = nextId;\\n      next.prev = prevId;\\n      if (id == _tail) {\\n        _tail = prevId;\\n      }\\n      _count--;\\n    }\\n\\n    function getPrev(Node storage node) internal view returns (uint256 id, Node storage) {\\n      id = node.prev;\\n      return (id, _nodes[id]);\\n    }\\n\\n    function getNext(Node memory node) internal view returns (uint256 id, Node storage) {\\n      id = node.next;\\n      return (id, _nodes[id]);\\n    }\\n\\n}\\n\",\"keccak256\":\"0x09abbef19a3b608f1dc42aac29b9669fd9252bfa5ec94b4a7e7c96c8c8153854\",\"license\":\"MIT\"},\"contracts/interfaces/IRanker.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\ninterface IRanker {\\n  \\n  function queueRanking(address user, uint256 balance) external;\\n  \\n}\",\"keccak256\":\"0xeab6845b42d6e4a92caf37011029692ed8585115fbfae06cefa4285f8ff70152\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405260006001556000600255600160035534801561001f57600080fd5b50604051610bcf380380610bcf83398101604081905261003e9161004f565b6001600160a01b031660805261007f565b60006020828403121561006157600080fd5b81516001600160a01b038116811461007857600080fd5b9392505050565b608051610b3561009a60003960006102040152610b356000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80630f3d724d1461005c57806361b1da8614610071578063a05837ca14610084578063b2bfce2c146100ad578063f5228433146100c0575b600080fd5b61006f61006a3660046109c2565b6100d7565b005b61006f61007f3660046109db565b6101f9565b6100976100923660046109c2565b61026a565b6040516100a49190610a13565b60405180910390f35b6100976100bb3660046109c2565b61043b565b6100c96101f481565b6040519081526020016100a4565b60008167ffffffffffffffff8111156100f2576100f2610a60565b60405190808252806020026020018201604052801561011b578160200160208202803683370190505b50905060005b82811015610170576101346005826104f5565b82828151811061014657610146610a76565b6001600160a01b03909216602092830291909101909101528061016881610aa2565b915050610121565b50805160005b818110156101eb57600083828151811061019257610192610a76565b602002602001015190506101cb8160046000846001600160a01b03166001600160a01b0316815260200190815260200160002054610508565b6101d66005826105a4565b505080806101e390610aa2565b915050610176565b506101f46105b9565b505050565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461024257604051634312da9f60e01b815260040160405180910390fd5b61024d600583610642565b506001600160a01b03909116600090815260046020526040902055565b606060008083116102895760016003546102849190610abb565b61028b565b825b905060008167ffffffffffffffff8111156102a8576102a8610a60565b6040519080825280602002602001820160405280156102d1578160200160208202803683370190505b50604080516080810182527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb5546001600160a01b031681527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb6546020808301919091527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb7548284018190527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb85460609093019290925260008281529081905291822092935091905b8481101561043057815484516001600160a01b03909116908590839081106103c3576103c3610a76565b6001600160a01b0392831660209182029290920181019190915260408051608081018252855490931683526001850154838301526002850154838201819052600390950154606090930192909252600084815290819052209192508061042881610aa2565b915050610399565b509195945050505050565b6060816000036104555761044f6005610657565b92915050565b60008267ffffffffffffffff81111561047057610470610a60565b604051908082528060200260200182016040528015610499578160200160208202803683370190505b50905060005b838110156104ee576104b26005826104f5565b8282815181106104c4576104c4610a76565b6001600160a01b0390921660209283029190910190910152806104e681610aa2565b91505061049f565b5092915050565b60006105018383610664565b9392505050565b6001600160a01b03821660009081526007602052604090205461052a9061068e565b80600003610536575050565b6101f46003541015801561055d575060025460009081526020819052604090206001015481105b15610566575050565b6000806105728361072c565b915091506105828282868661076d565b6001600160a01b03909416600090815260076020526040902093909355505050565b6000610501836001600160a01b038416610824565b6003546101f481116105c85750565b60006105d66101f483610abb565b60025460008181526020819052604081209293509091905b83811015610620576003820154600081815260208190526040902090935091508061061881610aa2565b9150506105ee565b5060006002808301919091558290556106398385610abb565b60035550505050565b6000610501836001600160a01b038416610917565b6060600061050183610966565b600082600001828154811061067b5761067b610a76565b9060005260206000200154905092915050565b806000036106995750565b600081815260208181526040808320600380820154808652838620845160808101865284546001600160a01b0316815260018501548188015260028086015482880181905260609092018490528189529688905294909620858701859055918201819055935491949291860361070f5760028490555b6003805490600061071f83610ad2565b9190505550505050505050565b60025460008181526020819052604081205b8381600101541015610765576003015460008181526020819052604090209092508261073e575b919391925050565b600180546000918261077e83610aa2565b90915550604080516080810182526001600160a01b038681168252602080830187815260028a81018054868801908152606087018e81529189905560008981529485905296909320855181546001600160a01b031916951694909417845590516001840155935193820193909355915160039283015590860154919250906108065760028290555b6003805490600061081683610aa2565b919050555050949350505050565b6000818152600183016020526040812054801561090d576000610848600183610abb565b855490915060009061085c90600190610abb565b90508181146108c157600086600001828154811061087c5761087c610a76565b906000526020600020015490508087600001848154811061089f5761089f610a76565b6000918252602080832090910192909255918252600188019052604090208390555b85548690806108d2576108d2610ae9565b60019003818190600052602060002001600090559055856001016000868152602001908152602001600020600090556001935050505061044f565b600091505061044f565b600081815260018301602052604081205461095e5750815460018181018455600084815260208082209093018490558454848252828601909352604090209190915561044f565b50600061044f565b6060816000018054806020026020016040519081016040528092919081815260200182805480156109b657602002820191906000526020600020905b8154815260200190600101908083116109a2575b50505050509050919050565b6000602082840312156109d457600080fd5b5035919050565b600080604083850312156109ee57600080fd5b82356001600160a01b0381168114610a0557600080fd5b946020939093013593505050565b6020808252825182820181905260009190848201906040850190845b81811015610a545783516001600160a01b031683529284019291840191600101610a2f565b50909695505050505050565b634e487b7160e01b600052604160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052601160045260246000fd5b600060018201610ab457610ab4610a8c565b5060010190565b600082821015610acd57610acd610a8c565b500390565b600081610ae157610ae1610a8c565b506000190190565b634e487b7160e01b600052603160045260246000fdfea264697066735822122034d54eef18d97b679a78965a43b3be35678d7b3c379768be44f33a9610f241ea64736f6c634300080e0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100575760003560e01c80630f3d724d1461005c57806361b1da8614610071578063a05837ca14610084578063b2bfce2c146100ad578063f5228433146100c0575b600080fd5b61006f61006a3660046109c2565b6100d7565b005b61006f61007f3660046109db565b6101f9565b6100976100923660046109c2565b61026a565b6040516100a49190610a13565b60405180910390f35b6100976100bb3660046109c2565b61043b565b6100c96101f481565b6040519081526020016100a4565b60008167ffffffffffffffff8111156100f2576100f2610a60565b60405190808252806020026020018201604052801561011b578160200160208202803683370190505b50905060005b82811015610170576101346005826104f5565b82828151811061014657610146610a76565b6001600160a01b03909216602092830291909101909101528061016881610aa2565b915050610121565b50805160005b818110156101eb57600083828151811061019257610192610a76565b602002602001015190506101cb8160046000846001600160a01b03166001600160a01b0316815260200190815260200160002054610508565b6101d66005826105a4565b505080806101e390610aa2565b915050610176565b506101f46105b9565b505050565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461024257604051634312da9f60e01b815260040160405180910390fd5b61024d600583610642565b506001600160a01b03909116600090815260046020526040902055565b606060008083116102895760016003546102849190610abb565b61028b565b825b905060008167ffffffffffffffff8111156102a8576102a8610a60565b6040519080825280602002602001820160405280156102d1578160200160208202803683370190505b50604080516080810182527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb5546001600160a01b031681527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb6546020808301919091527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb7548284018190527fad3228b676f7d3cd4284a5443f17f1962b36e491b30a40b2405849e597ba5fb85460609093019290925260008281529081905291822092935091905b8481101561043057815484516001600160a01b03909116908590839081106103c3576103c3610a76565b6001600160a01b0392831660209182029290920181019190915260408051608081018252855490931683526001850154838301526002850154838201819052600390950154606090930192909252600084815290819052209192508061042881610aa2565b915050610399565b509195945050505050565b6060816000036104555761044f6005610657565b92915050565b60008267ffffffffffffffff81111561047057610470610a60565b604051908082528060200260200182016040528015610499578160200160208202803683370190505b50905060005b838110156104ee576104b26005826104f5565b8282815181106104c4576104c4610a76565b6001600160a01b0390921660209283029190910190910152806104e681610aa2565b91505061049f565b5092915050565b60006105018383610664565b9392505050565b6001600160a01b03821660009081526007602052604090205461052a9061068e565b80600003610536575050565b6101f46003541015801561055d575060025460009081526020819052604090206001015481105b15610566575050565b6000806105728361072c565b915091506105828282868661076d565b6001600160a01b03909416600090815260076020526040902093909355505050565b6000610501836001600160a01b038416610824565b6003546101f481116105c85750565b60006105d66101f483610abb565b60025460008181526020819052604081209293509091905b83811015610620576003820154600081815260208190526040902090935091508061061881610aa2565b9150506105ee565b5060006002808301919091558290556106398385610abb565b60035550505050565b6000610501836001600160a01b038416610917565b6060600061050183610966565b600082600001828154811061067b5761067b610a76565b9060005260206000200154905092915050565b806000036106995750565b600081815260208181526040808320600380820154808652838620845160808101865284546001600160a01b0316815260018501548188015260028086015482880181905260609092018490528189529688905294909620858701859055918201819055935491949291860361070f5760028490555b6003805490600061071f83610ad2565b9190505550505050505050565b60025460008181526020819052604081205b8381600101541015610765576003015460008181526020819052604090209092508261073e575b919391925050565b600180546000918261077e83610aa2565b90915550604080516080810182526001600160a01b038681168252602080830187815260028a81018054868801908152606087018e81529189905560008981529485905296909320855181546001600160a01b031916951694909417845590516001840155935193820193909355915160039283015590860154919250906108065760028290555b6003805490600061081683610aa2565b919050555050949350505050565b6000818152600183016020526040812054801561090d576000610848600183610abb565b855490915060009061085c90600190610abb565b90508181146108c157600086600001828154811061087c5761087c610a76565b906000526020600020015490508087600001848154811061089f5761089f610a76565b6000918252602080832090910192909255918252600188019052604090208390555b85548690806108d2576108d2610ae9565b60019003818190600052602060002001600090559055856001016000868152602001908152602001600020600090556001935050505061044f565b600091505061044f565b600081815260018301602052604081205461095e5750815460018181018455600084815260208082209093018490558454848252828601909352604090209190915561044f565b50600061044f565b6060816000018054806020026020016040519081016040528092919081815260200182805480156109b657602002820191906000526020600020905b8154815260200190600101908083116109a2575b50505050509050919050565b6000602082840312156109d457600080fd5b5035919050565b600080604083850312156109ee57600080fd5b82356001600160a01b0381168114610a0557600080fd5b946020939093013593505050565b6020808252825182820181905260009190848201906040850190845b81811015610a545783516001600160a01b031683529284019291840191600101610a2f565b50909695505050505050565b634e487b7160e01b600052604160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052601160045260246000fd5b600060018201610ab457610ab4610a8c565b5060010190565b600082821015610acd57610acd610a8c565b500390565b600081610ae157610ae1610a8c565b506000190190565b634e487b7160e01b600052603160045260246000fdfea264697066735822122034d54eef18d97b679a78965a43b3be35678d7b3c379768be44f33a9610f241ea64736f6c634300080e0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 3304,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_nodes",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_uint256,t_struct(Node)3296_storage)"
+      },
+      {
+        "astId": 3307,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_nextId",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 3313,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_tail",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 3316,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_count",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 3322,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_queuedBalances",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 3325,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_queuedAddresses",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_struct(AddressSet)1869_storage"
+      },
+      {
+        "astId": 3329,
+        "contract": "contracts/Ranker.sol:Ranker",
+        "label": "_nodeForAddress",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_mapping(t_address,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes32)dyn_storage": {
+        "base": "t_bytes32",
+        "encoding": "dynamic_array",
+        "label": "bytes32[]",
+        "numberOfBytes": "32"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_bytes32,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_uint256,t_struct(Node)3296_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => struct Ranker.Node)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Node)3296_storage"
+      },
+      "t_struct(AddressSet)1869_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.AddressSet",
+        "members": [
+          {
+            "astId": 1868,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "_inner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(Set)1568_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Node)3296_storage": {
+        "encoding": "inplace",
+        "label": "struct Ranker.Node",
+        "members": [
+          {
+            "astId": 3289,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "user",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 3291,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "balance",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 3293,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "next",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 3295,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "prev",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "128"
+      },
+      "t_struct(Set)1568_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Set",
+        "members": [
+          {
+            "astId": 1563,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "_values",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_array(t_bytes32)dyn_storage"
+          },
+          {
+            "astId": 1567,
+            "contract": "contracts/Ranker.sol:Ranker",
+            "label": "_indexes",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_bytes32,t_uint256)"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
