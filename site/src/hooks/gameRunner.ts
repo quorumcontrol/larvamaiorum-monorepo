@@ -31,8 +31,14 @@ function bigNumMin(a: BigNumber, b: BigNumber) {
   return b
 }
 
-interface SetupMessage { tableId: string, warriors: WarriorStats[], gameLength: number, firstRoll: IFrameRoll }
-
+interface SetupMessage {
+  tableId: string,
+  warriors: WarriorStats[],
+  gameLength: number,
+  firstRoll: IFrameRoll,
+  wootgumpMultipler: number,
+  tableSize: number, 
+}
 
 class GameRunner {
   tableId: string
@@ -134,6 +140,8 @@ class GameRunner {
       firstRoll,
       warriors,
       gameLength: this.tableInfo.gameLength.toNumber(),
+      tableSize: this.tableInfo.tableSize,
+      wootgumpMultipler: this.tableInfo.wootgumpMultiplier,
     }
     log('shipping setup')
     this.ship('setup', { setup: msg })

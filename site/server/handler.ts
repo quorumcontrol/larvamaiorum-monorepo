@@ -119,14 +119,25 @@ class TableMaker {
             seed: hashString(`${id}-${player!.name}-${player!.address}`)
           }
         })
-
       const tx = await txSingleton.push(async () => {
-        const startTx = await delphs.createAndStart(id, playersWithNamesAndSeeds.map((p) => p.address!), playersWithNamesAndSeeds.map((p) => p.seed), rounds, await wallet.getAddress(), { gasLimit: 1500000 })
+        this.log('doing create and start tx')
+        const startTx = await delphs.createAndStart({
+          id,
+          players: playersWithNamesAndSeeds.map((p) => p.address!),
+          seeds: playersWithNamesAndSeeds.map((p) => p.seed),
+          gameLength: rounds,
+          owner: await wallet.getAddress(),
+          startedAt: 0,
+          tableSize: 10,
+          wootgumpMultiplier: 10,
+        }, { gasLimit: 3_000_000 })
+        this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
+        this.log('taking addresses')
         await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
         return startTx
       }) 
-      // on staging we do not have mtm
+      this.log('waiting for create and start')
       await tx.wait()
 
       this.log('done')
@@ -193,6 +204,7 @@ class TablePlayer {
         return
       }
       const active = await Promise.all((ids).map(async (tableId) => {
+        console.log('active: ', tableId)
         const metadata = await delphs.tables(tableId)
         return {
           id: tableId,

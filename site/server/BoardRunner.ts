@@ -61,8 +61,9 @@ class BoardRunner {
     const grid = new Grid({
       warriors,
       seed: rolls[0].random,
-      sizeX: 10,
-      sizeY: 10,
+      sizeX: table.tableSize,
+      sizeY: table.tableSize,
+      wootgumpMultipler: table.wootgumpMultiplier,
       gameLength: table.gameLength.toNumber(),
     })
 

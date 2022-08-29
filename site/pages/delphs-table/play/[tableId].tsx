@@ -222,7 +222,7 @@ const Play: NextPage = () => {
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/yKeHCcpU/?tableId=${tableId}&player=${address}`}
+                src={`https://playcanv.as/e/b/QzeAfls8/?tableId=${tableId}&player=${address}`}
                 // src={`https://playcanv.as/e/p/wQEQB1Cp/?tableId=${tableId}&player=${address}`}
                 ref={iframe}
                 top="0"
