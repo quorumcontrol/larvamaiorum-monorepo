@@ -17,7 +17,14 @@ interface IFrameRoll {
   destinations: { id: string, x: number, y: number }[]
 }
 
-interface SetupMessage { tableId: string, warriors: WarriorStats[], gameLength: number, firstRoll: IFrameRoll }
+interface SetupMessage {
+  tableId: string,
+  warriors: WarriorStats[],
+  gameLength: number,
+  firstRoll: IFrameRoll,
+  wootgumpMultipler: number,
+  tableSize: number, 
+}
 
 @createScript("chainConnector")
 class ChainConnector extends ScriptTypeBase {
@@ -83,7 +90,7 @@ class ChainConnector extends ScriptTypeBase {
     }
   }
 
-  handleIframeSetup({ warriors: warriorStats, firstRoll, gameLength }: SetupMessage) {
+  handleIframeSetup({ warriors: warriorStats, firstRoll, gameLength, tableSize, wootgumpMultipler }: SetupMessage) {
     try {
       if (this.settingUp) {
         console.error('setting up called twice')
@@ -103,9 +110,10 @@ class ChainConnector extends ScriptTypeBase {
       const grid = new Grid({
         warriors,
         seed: firstRoll.random.toString(),
-        sizeX: 10,
-        sizeY: 10,
+        sizeX: tableSize,
+        sizeY: tableSize,
         gameLength,
+        wootgumpMultipler,
       });
       this.grid = grid;
 

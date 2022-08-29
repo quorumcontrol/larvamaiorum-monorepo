@@ -27,7 +27,6 @@ class PlayerMarker extends ScriptTypeBase {
 
   dead = false
 
-
   initialize() {
     this.threeDNameEntity = mustFindByName(this.entity, "3DName")
     this.threeDNameScript = this.getScript(this.threeDNameEntity, "textMesh")!

@@ -16,9 +16,10 @@ export interface TickOutput {
 interface GridOptions {
   warriors: Warrior[]
   seed:string
-  sizeX?: number
-  sizeY?: number
-  gameLength: number
+  sizeX: number
+  sizeY: number
+  gameLength: number,
+  wootgumpMultipler: number,
 }
 
 class Grid {
@@ -26,7 +27,7 @@ class Grid {
 
   sizeX: number
   sizeY: number
-  chanceOfSpawningWootGumpIn1000 = 10
+  chanceOfSpawningWootGumpIn1000: number
   currentSeed:string
 
   warriors: Warrior[]
@@ -43,9 +44,10 @@ class Grid {
     this.gameLength = opts.gameLength
     this.currentSeed = opts.seed
     this.id = `grid-${this.currentSeed}`
-    this.sizeX = opts.sizeX || 20
-    this.sizeY = opts.sizeY || 20
+    this.sizeX = opts.sizeX
+    this.sizeY = opts.sizeY
     this.warriors = opts.warriors
+    this.chanceOfSpawningWootGumpIn1000 = opts.wootgumpMultipler
     for (let y = 0; y < this.sizeY; y++) {
       for (let x = 0; x < this.sizeX; x++) {
         this.grid[x] = this.grid[x] || []

@@ -24,7 +24,7 @@ describe("Grid", () => {
   it("sets up correctly", () => {
     const seed = "setsUpCorrectly";
     const warriors = generateFakeWarriors(10, seed);
-    const grid = new Grid({ warriors, seed, gameLength: 100, sizeX: 10, sizeY: 10 });
+    const grid = new Grid({ warriors, seed, gameLength: 100, sizeX: 10, sizeY: 10, wootgumpMultipler: 10 });
     grid.start(seed)
     expect(grid).toBeDefined();
   });
@@ -32,7 +32,7 @@ describe("Grid", () => {
   it("ticks", () => {
     const seed = "test2";
     const warriors = generateFakeWarriors(10, seed);
-    const grid = new Grid({ warriors, seed, gameLength: 100, sizeX: 10, sizeY: 10 });
+    const grid = new Grid({ warriors, seed, gameLength: 100, sizeX: 10, sizeY: 10, wootgumpMultipler: 10 });
     grid.start(seed)
     for (let i = 0; i < 100; i++) {
       expect(grid.doDevTick()).toBeTruthy();
