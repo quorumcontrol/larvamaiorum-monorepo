@@ -30,7 +30,6 @@ functions:
     handler: serverless/goodGhostingEligible.handle
     memoryLimit: 512
     maxScale: 10
-    # Local environment variables - used only in given function
     env:
       NEXT_PUBLIC_MAINNET: "true"
 
@@ -38,9 +37,24 @@ functions:
     handler: serverless/goodGhostingClaim.handle
     memoryLimit: 1024
     maxScale: 1
-    # Local environment variables - used only in given function
     env:
       NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
+  nft-club-berlin-claim-mainnet: 
+    handler: serverless/mintNftClubBerlin.handle
+    memoryLimit: 1024
+    maxScale: 1
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
+  nft-club-berlin-claim-testnet: 
+    handler: serverless/mintNftClubBerlin.handle
+    memoryLimit: 1024
+    maxScale: 1
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
 
@@ -48,7 +62,6 @@ functions:
     handler: serverless/faucet.handle
     memoryLimit: 2048
     maxScale: 1
-    # Local environment variables - used only in given function
     env:
       NEXT_PUBLIC_MAINNET: "true"
     secret:
@@ -58,6 +71,5 @@ functions:
     handler: serverless/faucet.handle
     memoryLimit: 2048
     maxScale: 1
-    # Local environment variables - used only in given function
     secret:
       FAUCET_PRIVATE_KEY: ${env:FAUCET_PRIVATE_KEY}

@@ -144,7 +144,7 @@ const rainbowTheme = merge(darkTheme(), {
   },
 } as Theme);
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={wagmiClient}>
