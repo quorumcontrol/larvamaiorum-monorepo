@@ -50,7 +50,7 @@ const ClaimButton: React.FC<{
   );
 
   const txStatus = useWaitForTransaction({
-    hash: transactionId,
+    hash: 'transactionId',
     enabled: !!transactionId,
     chainId: defaultNetwork().id,
     onSettled: (data) => {
@@ -168,7 +168,7 @@ const ClaimGoodGhosting: NextPage = () => {
           </Box>
           <Text>
             Your badge is in your wallet. See it on{" "}
-            {isDomReady && isFetched && address && (
+            {isDomReady && address && (
               <Link href={`/browse/${address}`} textDecoration="underline">
                 your personal page.
               </Link>
