@@ -85,6 +85,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IRanker__factory>;
     getContractFactory(
+      name: "ListKeeper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ListKeeper__factory>;
+    getContractFactory(
       name: "Lobby",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Lobby__factory>;
@@ -203,6 +207,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IRanker>;
+    getContractAt(
+      name: "ListKeeper",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ListKeeper>;
     getContractAt(
       name: "Lobby",
       address: string,

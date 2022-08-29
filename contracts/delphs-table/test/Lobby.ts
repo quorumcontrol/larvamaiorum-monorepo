@@ -1,7 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { loadFixture } from "ethereum-waffle";
-import { utils, Wallet } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import { ethers } from "hardhat";
 import { Lobby, Player } from "../typechain";
