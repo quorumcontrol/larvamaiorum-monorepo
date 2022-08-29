@@ -149,7 +149,7 @@ const ClaimEnjoyooor: NextPage = () => {
           <Text>
             Your badge is in your wallet. See it on{" "}
             {isDomReady && isFetched && address && (
-              <Link href={`/browse/${address}`} textDecoration="underline">
+              <Link href={`/profile/${address}`} textDecoration="underline">
                 your personal page.
               </Link>
             )}
