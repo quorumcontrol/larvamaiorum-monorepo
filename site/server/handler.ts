@@ -22,7 +22,10 @@ dotenv.config({
   path: '.env.local'
 })
 
-const NUMBER_OF_ROUNDS = 20
+const NUMBER_OF_ROUNDS = 15
+const TABLE_SIZE = 7
+const WOOTGUMP_MULTIPLIER = 12
+
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
 
@@ -96,7 +99,6 @@ class TableMaker {
         this.log('no one is waiting')
         return
       }
-      const rounds = NUMBER_OF_ROUNDS
 
       const botNumber = Math.max(10 - waiting.length, 0)
       const id = hashString(`${faker.company.companyName()}: ${faker.company.bs()}}`)
@@ -125,11 +127,11 @@ class TableMaker {
           id,
           players: playersWithNamesAndSeeds.map((p) => p.address!),
           seeds: playersWithNamesAndSeeds.map((p) => p.seed),
-          gameLength: rounds,
+          gameLength: NUMBER_OF_ROUNDS,
           owner: await wallet.getAddress(),
           startedAt: 0,
-          tableSize: 10,
-          wootgumpMultiplier: 10,
+          tableSize: TABLE_SIZE,
+          wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
         }, { gasLimit: 3_000_000 })
         this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
