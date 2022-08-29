@@ -20,6 +20,7 @@ import Video from "../../../src/components/Video";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import useSKLBalance from "../../../src/hooks/badgeOfAssembly/useSKLBalance";
 import humanFormatted from "../../../src/utils/humanFormatted";
+import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
 const threshold = parseEther("1000");
 
@@ -53,6 +54,7 @@ const ClaimButton: React.FC<{
   const txStatus = useWaitForTransaction({
     hash: transactionId,
     enabled: !!transactionId,
+    chainId: defaultNetwork().id,
     onSettled: (data) => {
       console.log("settled", data);
       if (data?.status === 0) {

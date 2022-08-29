@@ -11,12 +11,14 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useAccount, useWaitForTransaction } from "wagmi";
 import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
+import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
 const ClaimButton: React.FC<{
   address: string;
@@ -50,6 +52,7 @@ const ClaimButton: React.FC<{
   const txStatus = useWaitForTransaction({
     hash: transactionId,
     enabled: !!transactionId,
+    chainId: defaultNetwork().id,
     onSettled: (data) => {
       console.log("settled", data);
       if (data?.status === 0) {
@@ -125,8 +128,18 @@ const ClaimGoodGhosting: NextPage = () => {
     })
 
   const [didMint, setDidMint] = useState(false);
+  const { data:badgeList, isLoading: badgesLoading } = useUserBadges(address)
 
-  if (!isDomReady) {
+  useEffect(() => {
+    if (!badgeList) {
+      return
+    }
+    if (badgeList.map((t) => t.id.toNumber()).includes(4)) {
+      setDidMint(true)
+    }
+  }, [setDidMint, badgeList])
+
+  if (!isDomReady || badgesLoading) {
     return (
       <>
         <Head>
@@ -149,6 +162,7 @@ const ClaimGoodGhosting: NextPage = () => {
               borderRadius="lg"
               autoPlay
               controls
+              playsInline
               animationUrl="ipfs://bafybeiga753hvhewysosiv3yb2nwo65tcxj46sq5gb5ownb7a7fulzuw5e"
             />
           </Box>

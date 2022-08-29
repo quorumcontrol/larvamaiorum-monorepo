@@ -19,6 +19,7 @@ import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
 import { useHasBoughtSkale } from "../../../src/hooks/badgeOfAssembly/europaChain";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
 const ClaimButton: React.FC<{
   address: string;
@@ -53,6 +54,7 @@ const ClaimButton: React.FC<{
   const txStatus = useWaitForTransaction({
     hash: transactionId,
     enabled: !!transactionId,
+    chainId: defaultNetwork().id,
     onSettled: (data) => {
       console.log("settled", data);
       if (data?.status === 0) {
