@@ -1,0 +1,18 @@
+{
+  "extends": "ts-node/node16/tsconfig.json",
+  "compilerOptions": {
+    "module": "Node16",
+    "resolveJsonModule": true,
+    "strictNullChecks": true,
+    "preserveSymlinks": true,
+    "allowJs": true,
+    "rootDir": ".",
+    "target": "es6",
+    "sourceMap": false,
+    "outDir": "dist",
+    "lib": ["es2015"],
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -26,6 +26,24 @@ package:
     - '!.git/**'
 
 functions:
+  goodghosting-eligible: 
+    handler: serverless/goodGhostingEligible.handle
+    memoryLimit: 512
+    maxScale: 10
+    # Local environment variables - used only in given function
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+
+  goodghosting-claim: 
+    handler: serverless/goodGhostingClaim.handle
+    memoryLimit: 1024
+    maxScale: 1
+    # Local environment variables - used only in given function
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
   mainnet-faucet:
     handler: serverless/faucet.handle
     memoryLimit: 2048
@@ -35,6 +53,7 @@ functions:
       NEXT_PUBLIC_MAINNET: "true"
     secret:
       FAUCET_PRIVATE_KEY: ${env:FAUCET_PRIVATE_KEY}
+      
   testnet-faucet:
     handler: serverless/faucet.handle
     memoryLimit: 2048

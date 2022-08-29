@@ -26,7 +26,7 @@ const BadgeOfAssemblyHome: NextPage = () => {
           <BadgeClaimCard
             animationUrl="ipfs://bafybeihikpbbu27n5mwvbhp6h7kbxkly2lyg3omhpeth6sigzzbq7qtcqa"
             name="GoodGhosting Genesis Badge"
-            description="Claimable by having interacted with the GoodGhosting smart contracts."
+            description="Claimable if you participated in a finalised GoodGhosting game."
           />
           <BadgeClaimCard
             animationUrl="ipfs://bafybeignwce32es4mllodltf6jvdtr44pxxoqe7ysbf4ozoumhpd6d26iu"
