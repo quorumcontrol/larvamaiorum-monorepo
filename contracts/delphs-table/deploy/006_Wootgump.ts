@@ -24,7 +24,7 @@ const func: DeployFunction = async function ({
   })
 
   if (ranker.newlyDeployed) {
-    execute(
+    await execute(
       "Wootgump",
       {
         log: true,
