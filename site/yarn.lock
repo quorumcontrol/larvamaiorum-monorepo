@@ -6291,7 +6291,7 @@ node-fetch-native@^0.1.3:
   resolved "https://registry.npmjs.org/node-fetch-native/-/node-fetch-native-0.1.3.tgz"
   integrity sha512-Jf1IQZdovUIv9E+5avmN6Sf+bND+rnMlODnBQhdE2VRyuWP9WgqZb/KEgPekh19DAN1X2C4vbS1VCOaz2OH19g==
 
-node-fetch@2.6.7, node-fetch@^2.0.0, node-fetch@^2.6.1, node-fetch@^2.6.6, node-fetch@^2.6.7:
+node-fetch@2, node-fetch@2.6.7, node-fetch@^2.0.0, node-fetch@^2.6.1, node-fetch@^2.6.6, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==

@@ -7,6 +7,7 @@ import multicallWrapper from "../src/utils/multicallWrapper";
 import { memoize } from "../src/utils/memoize";
 import { ListKeeper, ListKeeper__factory } from "../contracts/typechain";
 import { keccak256 } from "ethers/lib/utils";
+import fetch from 'node-fetch';
 
 const API_ENDPOINT = 'https://discord.com/api/v10'
 const NFT_BERLIN_GUILD_ID = "910069601046523914"
@@ -35,6 +36,11 @@ const redirectUrl = isTestnet ?
   "http://localhost:3000/badge-of-assembly/claim/nft-club-berlin" :
   "https://cryptocolosseum.com/badge-of-assembly/claim/nft-club-berlin"
 
+const discordRedirectUri = isTestnet ?
+  "https://larvammaiorumfaucetgjxd8a5h-nft-club-berlin-claim-testnet.functions.fnc.fr-par.scw.cloud" :
+  "https://larvammaiorumfaucetgjxd8a5h-nft-club-berlin-claim-mainnet.functions.fnc.fr-par.scw.cloud"
+
+
 export async function handle(event: any, _context: any, callback: any) {  
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET) {
     throw new Error('missing env variables')
@@ -48,7 +54,7 @@ export async function handle(event: any, _context: any, callback: any) {
       'client_secret': process.env.DISCORD_CLIENT_SECRET,
       'grant_type': 'authorization_code',
       'code': code as string,
-      'redirect_uri': "http://localhost:3000/api/auth/discord"
+      'redirect_uri': discordRedirectUri
     }
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded'
