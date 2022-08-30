@@ -12,9 +12,8 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-import { useMutation, useQuery } from "react-query";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
 import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
@@ -38,8 +37,8 @@ const ClaimButton: React.FC<{
   const onClaimClick = () => {
     setLoading(true);
     const redirectUri = isTestnet
-      ? encodeURIComponent("http://localhost:3000/api/auth/discord")
-      : encodeURIComponent("MAINNET_PARAM");
+      ? encodeURIComponent("https://larvammaiorumfaucetgjxd8a5h-nft-club-berlin-claim-testnet.functions.fnc.fr-par.scw.cloud")
+      : encodeURIComponent("https://larvammaiorumfaucetgjxd8a5h-nft-club-berlin-claim-mainnet.functions.fnc.fr-par.scw.cloud");
     router.push(
       `https://discord.com/api/oauth2/authorize?client_id=1013803595759616080&redirect_uri=${redirectUri}&prompt=none&response_type=code&scope=guilds%20identify&state=${address}`
     );
