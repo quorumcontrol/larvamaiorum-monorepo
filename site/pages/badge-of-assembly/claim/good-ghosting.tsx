@@ -185,14 +185,15 @@ const ClaimGoodGhosting: NextPage = () => {
         <title>Badge of Assembly: Claim</title>
         <meta name="description" content="Claim your GoodGhosting Genesis" />
       </Head>
+      <Video
+        animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
+        loop
+        muted
+        autoPlay
+        playsInline
+        id="jungle-video-background"
+      />
       <Layout>
-        <Video
-          animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
-          loop
-          muted
-          autoPlay
-          id="video-background"
-        />
         <Stack direction={['column', 'row']} spacing='10'>
           <Box
             borderRadius="lg"

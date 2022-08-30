@@ -19,127 +19,69 @@ import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
 import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
-import { defaultNetwork } from "../../../src/utils/SkaleChains";
+import { isTestnet } from "../../../src/utils/networks";
 
-// const ClaimButton: React.FC<{
-//   address: string;
-//   onSuccess?: (txId?: string) => any;
-// }> = ({ address, onSuccess }) => {
-//   const [transactionId, setTransactionId] = useState("");
-//   const [err, setErr] = useState<string | undefined>(undefined);
-  
-//   const mutation = useMutation<Response, unknown, { address: string }, unknown>(
-//     "claim-goodghosting-badge",
-//     ({ address  }) => {
-//       console.log("claiming nft club berlin ", address)
-//       return fetch("", {
-//         body: JSON.stringify({ address }),
-//         method: "post",
-//       });
-//     },
-//     {
-//       onSuccess: async (resp) => {
-//         console.log(resp);
-//         if (resp.status !== 201) {
-//           setErr("Something went wrong");
-//           return;
-//         }
-//         const parsedResponse = await resp.json();
-//         setTransactionId(parsedResponse.transactionId);
-//       },
-//     }
-//   );
+const ClaimButton: React.FC<{
+  address: string;
+  onSuccess?: (txId?: string) => any;
+}> = ({ address, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { error: err, transactionHash } = router.query;
 
-//   const txStatus = useWaitForTransaction({
-//     hash: 'transactionId',
-//     enabled: !!transactionId,
-//     chainId: defaultNetwork().id,
-//     onSettled: (data) => {
-//       console.log("settled", data);
-//       if (data?.status === 0) {
-//         setErr('transaction failed')
-//         return
-//       }
-//       if (onSuccess) {
-//         onSuccess(transactionId);
-//       }
-//     },
-//   });
+  useEffect(() => {
+    if (transactionHash && onSuccess) {
+      onSuccess(transactionHash as string);
+    }
+  }, [transactionHash, onSuccess]);
 
-//   if (mutation.isLoading) {
-//     return (
-//       <Box>
-//         <Spinner />
-//       </Box>
-//     );
-//   }
+  const onClaimClick = () => {
+    setLoading(true);
+    const redirectUri = isTestnet
+      ? encodeURIComponent("http://localhost:3000/api/auth/discord")
+      : encodeURIComponent("MAINNET_PARAM");
+    router.push(
+      `https://discord.com/api/oauth2/authorize?client_id=1013803595759616080&redirect_uri=${redirectUri}&prompt=none&response_type=code&scope=guilds%20identify&state=${address}`
+    );
+  };
 
-//   if (mutation.isError || txStatus.isError || err) {
-//     return (
-//       <Box>
-//         <Text>something went wrong.</Text>
-//       </Box>
-//     );
-//   }
+  if (loading) {
+    return (
+      <Box>
+        <Spinner />
+      </Box>
+    );
+  }
 
-//   if (mutation.isSuccess) {
-//     if (txStatus.isLoading) {
-//       return (
-//         <Box>
-//           <Spinner />
-//           <Text fontSize="sm">Transaction: {transactionId}</Text>
-//         </Box>
-//       );
-//     }
-//     if (txStatus.isSuccess) {
-//       return (
-//         <Box>
-//           <Text>Done!</Text>
-//         </Box>
-//       );
-//     }
-//   }
-
-//   return (
-//     <Button
-//       variant="primary"
-//       size="lg"
-//       onClick={() => mutation.mutate({ address })}
-//     >
-//       Claim Badge
-//     </Button>
-//   );
-// };
+  return (
+    <>
+      <Button variant="primary" size="lg" onClick={onClaimClick}>
+        Login to Discord to Claim
+      </Button>
+      {err && (
+        <Box>
+          <Text>Something went wrong. {err}</Text>
+        </Box>
+      )}
+    </>
+  );
+};
 
 const ClaimNftClubBerlin: NextPage = () => {
   const { address } = useAccount();
   const isDomReady = useIsClientSide();
 
-  // const { data: eligible, isFetched } = useQuery(
-  //   ['isNFTClubBerlinEligible', address], 
-  //   async () => {
-  //     const resp = await fetch('https://larvammaiorumfaucetgjxd8a5h-goodghosting-eligible.functions.fnc.fr-par.scw.cloud', {
-  //       method: 'POST',
-  //       body: JSON.stringify({ address })
-  //     })
-  //     const parsed = await resp.json()
-  //     return parsed.eligible
-  //   }, {
-  //     enabled: !!address,
-  //   })
-
   const [didMint, setDidMint] = useState(false);
-  const { data:badgeList, isLoading: badgesLoading } = useUserBadges(address)
-  const router = useRouter()
+  const { data: badgeList, isLoading: badgesLoading } = useUserBadges(address);
 
   useEffect(() => {
     if (!badgeList) {
-      return
+      return;
     }
     if (badgeList.map((t) => t.id.toNumber()).includes(5)) {
-      setDidMint(true)
+      setDidMint(true);
     }
-  }, [setDidMint, badgeList])
+  }, [setDidMint, badgeList]);
 
   if (!isDomReady || badgesLoading) {
     return (
@@ -187,21 +129,17 @@ const ClaimNftClubBerlin: NextPage = () => {
         <title>Badge of Assembly: Claim</title>
         <meta name="description" content="Claim your NFT Club Berlin Genesis" />
       </Head>
+      <Video
+        animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
+        loop
+        muted
+        autoPlay
+        playsInline
+        id="jungle-video-background"
+      />
       <Layout>
-        <Video
-          animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
-          loop
-          muted
-          autoPlay
-          id="video-background"
-        />
-        <Stack direction={['column', 'row']} spacing='10'>
-          <Box
-            borderRadius="lg"
-            borderWidth="1px"
-            maxW="md"
-            p="5"
-          >
+        <Stack direction={["column", "row"]} spacing="10">
+          <Box borderRadius="lg" borderWidth="1px" maxW="md" p="5">
             <VStack align="left" spacing="10">
               <Box>
                 <Heading fontSize="3xl">Cost</Heading>
@@ -209,18 +147,21 @@ const ClaimNftClubBerlin: NextPage = () => {
               </Box>
               <Box>
                 <Heading fontSize="3xl">Required to claim</Heading>
-                <Text fontSize="md">You are a member of the NFT Club Berlin discord.</Text>
-                  <Button variant="primary" onClick={() => router.push(`https://discord.com/api/oauth2/authorize?client_id=1013803595759616080&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fdiscord&prompt=none&response_type=code&scope=guilds%20identify&state=${address}`)}>Login to Discord</Button>
+                <Text fontSize="md">
+                  You are a member of the NFT Club Berlin discord.
+                </Text>
               </Box>
-              {/* <Box>
+              <Box>
                 <Heading fontSize="3xl">Qualified?</Heading>
-                {!isFetched && <Spinner />}
-                {isFetched && <Text fontSize="md">{eligible ? "Yes" : "No"}</Text>}
+                <Text>Login to confirm membership.</Text>
               </Box>
-
-              {eligible && isFetched && address && (
-                <ClaimButton address={address} onSuccess={() => setDidMint(true)} />
-              )} */}
+              {!address && <Text>Connect wallet.</Text>}
+              {address && (
+                <ClaimButton
+                  address={address}
+                  onSuccess={() => setDidMint(true)}
+                />
+              )}
               <Box>
                 <Text fontSize="sm">
                   Trouble connecting your wallet?{" "}
@@ -231,15 +172,10 @@ const ClaimNftClubBerlin: NextPage = () => {
               </Box>
             </VStack>
           </Box>
-          <Box
-            borderRadius="lg"
-            borderWidth="1px"
-            maxW="md"
-            p="5"
-          >
+          <Box borderRadius="lg" borderWidth="1px" maxW="md" p="5">
             <VStack align="left" spacing="10">
               <Box>
-                <Heading fontSize="3xl">GoodGhosting Genesis Badge</Heading>
+                <Heading fontSize="3xl">NFT Club Berlin Genesis Badge</Heading>
               </Box>
               <Box>
                 <Video
@@ -247,7 +183,7 @@ const ClaimNftClubBerlin: NextPage = () => {
                   autoPlay
                   loop
                   controls={false}
-                  animationUrl="ipfs://bafybeihikpbbu27n5mwvbhp6h7kbxkly2lyg3omhpeth6sigzzbq7qtcqa"
+                  animationUrl="ipfs://bafybeignwce32es4mllodltf6jvdtr44pxxoqe7ysbf4ozoumhpd6d26iu"
                 />
               </Box>
             </VStack>

@@ -41,6 +41,8 @@ functions:
       NEXT_PUBLIC_MAINNET: "true"
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${env:DISCORD_CLIENT_SECRET}
 
   nft-club-berlin-claim-mainnet: 
     handler: serverless/mintNftClubBerlin.handle
@@ -50,6 +52,8 @@ functions:
       NEXT_PUBLIC_MAINNET: "true"
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${env:DISCORD_CLIENT_SECRET}
 
   nft-club-berlin-claim-testnet: 
     handler: serverless/mintNftClubBerlin.handle

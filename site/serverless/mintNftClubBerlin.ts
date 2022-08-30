@@ -11,6 +11,8 @@ import { keccak256 } from "ethers/lib/utils";
 const API_ENDPOINT = 'https://discord.com/api/v10'
 const NFT_BERLIN_GUILD_ID = "910069601046523914"
 
+const TOKEN_ID = isTestnet ? 4 : 5
+
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
 }
@@ -29,7 +31,9 @@ const LIST = keccak256(Buffer.from('nft-club-berlin-minted'))
 
 const singleton = new SimpleSyncher('nftClubBerlin')
 
-const redirectUrl = isTestnet ? "http://localhost:3000/badge-of-assembly/claim/nft-club-berlin" : "https://cryptocolosseum.com/badge-of-assembly/claim/nft-club-berlin"
+const redirectUrl = isTestnet ?
+  "http://localhost:3000/badge-of-assembly/claim/nft-club-berlin" :
+  "https://cryptocolosseum.com/badge-of-assembly/claim/nft-club-berlin"
 
 export async function handle(event: any, _context: any, callback: any) {  
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET) {
@@ -68,6 +72,7 @@ export async function handle(event: any, _context: any, callback: any) {
     }
     console.log('rest of response: ', restOfResponse)
   
+
     const [userResponse, guildsResponse] = await Promise.all([
       fetch('https://discord.com/api/users/@me', {
         headers: {
@@ -80,12 +85,26 @@ export async function handle(event: any, _context: any, callback: any) {
         },
       })
     ])
+
   
     const [guilds, user] = await Promise.all([
       guildsResponse.json(),
       userResponse.json(),
     ])
-  
+
+    const listIdentifier = keccak256(Buffer.from(`id:${user.id}`))
+    
+    if (await listKeeper.contains(LIST, listIdentifier)) {
+      const query = new URLSearchParams()
+      query.append('error', 'Already minted this badge')
+      return callback(null, {
+        statusCode: 302,
+        headers: {
+          Location: `${redirectUrl}?${query}`
+        }
+      }) 
+    }
+
     const isNFTBerlinMember = guilds.some((g:any) => g.id === NFT_BERLIN_GUILD_ID)
   
     console.log('user: ', user, 'isMember', isNFTBerlinMember)
@@ -103,10 +122,12 @@ export async function handle(event: any, _context: any, callback: any) {
   
     const tx = await singleton.push(async () => {
       try {
-        console.log('minting')
-        const mint = await boa.mint(state, 5, 1)
+        console.log('minting', TOKEN_ID, 'to', state)
+        const mint = await boa.mint(state, TOKEN_ID, 1, { gasLimit: 1_000_000 })
         await mint.wait()
-        await listKeeper.add(LIST, keccak256(Buffer.from(user.id)))
+        console.log('mint succeeded')
+        await listKeeper.add(LIST, listIdentifier)
+        console.log("list keeper succeeded")
         return mint
       } catch (err) {
         console.error('error with transactions')
@@ -125,7 +146,7 @@ export async function handle(event: any, _context: any, callback: any) {
     })
   } catch (err) {
     const query = new URLSearchParams()
-    query.append('error', `Something went wrong: ${err}`)
+    query.append('error', `${err}`)
 
     return callback(null, {
       statusCode: 302,
