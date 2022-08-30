@@ -1,6 +1,5 @@
 import { expect } from "chai"
 import { loadFixture } from "ethereum-waffle"
-import { utils, Wallet } from "ethers"
 import { keccak256 } from "ethers/lib/utils"
 import { ethers } from "hardhat"
 import { ListKeeper } from "../typechain"
@@ -33,5 +32,15 @@ describe("ListKeeper", function () {
     await expect(listKeeper.add(list, item)).to.not.be.reverted
     await expect(listKeeper.add(list, item)).to.be.reverted
     await expect(listKeeper.add(list, keccak256(Buffer.from('id:12345')))).to.not.be.reverted
+  })
+
+  it("supports maximum sizes", async () => {
+    const { listKeeper } = await loadFixture(deployListKeeper)
+    const list = keccak256(Buffer.from('sizedList'))
+    await (await listKeeper.setMaxListSize(list, 3)).wait()
+    for (let i = 0; i < 3; i++) {
+      await expect(listKeeper.add(list, keccak256(Buffer.from(`id:${i}-fake`)))).to.not.be.reverted
+    }
+    await expect(listKeeper.add(list, keccak256(Buffer.from(`id:3-fake`)))).to.be.reverted
   })
 })

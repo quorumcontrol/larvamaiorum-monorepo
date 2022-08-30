@@ -25,13 +25,16 @@ interface ListKeeperInterface extends ethers.utils.Interface {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "add(bytes32,bytes32)": FunctionFragment;
     "contains(bytes32,bytes32)": FunctionFragment;
+    "count(bytes32)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "isTrustedForwarder(address)": FunctionFragment;
+    "listSize(bytes32)": FunctionFragment;
     "remove(bytes32,bytes32)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
+    "setMaxListSize(bytes32,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
   };
 
@@ -51,6 +54,7 @@ interface ListKeeperInterface extends ethers.utils.Interface {
     functionFragment: "contains",
     values: [BytesLike, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "count", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
     values: [BytesLike]
@@ -67,6 +71,7 @@ interface ListKeeperInterface extends ethers.utils.Interface {
     functionFragment: "isTrustedForwarder",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "listSize", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "remove",
     values: [BytesLike, BytesLike]
@@ -80,6 +85,10 @@ interface ListKeeperInterface extends ethers.utils.Interface {
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMaxListSize",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
@@ -91,6 +100,7 @@ interface ListKeeperInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "add", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "contains", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "count", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRoleAdmin",
     data: BytesLike
@@ -101,12 +111,17 @@ interface ListKeeperInterface extends ethers.utils.Interface {
     functionFragment: "isTrustedForwarder",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "listSize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "remove", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxListSize",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -194,7 +209,7 @@ export class ListKeeper extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     add(
-      list: BytesLike,
+      listName: BytesLike,
       entry: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -204,6 +219,8 @@ export class ListKeeper extends BaseContract {
       entry: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    count(list: BytesLike, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
@@ -224,6 +241,8 @@ export class ListKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    listSize(arg0: BytesLike, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     remove(
       list: BytesLike,
       tableId: BytesLike,
@@ -242,6 +261,12 @@ export class ListKeeper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setMaxListSize(
+      list: BytesLike,
+      maxSize: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -253,7 +278,7 @@ export class ListKeeper extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   add(
-    list: BytesLike,
+    listName: BytesLike,
     entry: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -263,6 +288,8 @@ export class ListKeeper extends BaseContract {
     entry: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  count(list: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -283,6 +310,8 @@ export class ListKeeper extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  listSize(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
   remove(
     list: BytesLike,
     tableId: BytesLike,
@@ -301,6 +330,12 @@ export class ListKeeper extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setMaxListSize(
+    list: BytesLike,
+    maxSize: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -312,7 +347,7 @@ export class ListKeeper extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     add(
-      list: BytesLike,
+      listName: BytesLike,
       entry: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
@@ -322,6 +357,8 @@ export class ListKeeper extends BaseContract {
       entry: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    count(list: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -342,6 +379,8 @@ export class ListKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    listSize(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     remove(
       list: BytesLike,
       tableId: BytesLike,
@@ -357,6 +396,12 @@ export class ListKeeper extends BaseContract {
     revokeRole(
       role: BytesLike,
       account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMaxListSize(
+      list: BytesLike,
+      maxSize: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -438,7 +483,7 @@ export class ListKeeper extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     add(
-      list: BytesLike,
+      listName: BytesLike,
       entry: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -448,6 +493,8 @@ export class ListKeeper extends BaseContract {
       entry: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    count(list: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
     getRoleAdmin(
       role: BytesLike,
@@ -471,6 +518,8 @@ export class ListKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    listSize(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     remove(
       list: BytesLike,
       tableId: BytesLike,
@@ -486,6 +535,12 @@ export class ListKeeper extends BaseContract {
     revokeRole(
       role: BytesLike,
       account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setMaxListSize(
+      list: BytesLike,
+      maxSize: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -503,7 +558,7 @@ export class ListKeeper extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     add(
-      list: BytesLike,
+      listName: BytesLike,
       entry: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -511,6 +566,11 @@ export class ListKeeper extends BaseContract {
     contains(
       list: BytesLike,
       entry: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    count(
+      list: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -536,6 +596,11 @@ export class ListKeeper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    listSize(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     remove(
       list: BytesLike,
       tableId: BytesLike,
@@ -551,6 +616,12 @@ export class ListKeeper extends BaseContract {
     revokeRole(
       role: BytesLike,
       account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMaxListSize(
+      list: BytesLike,
+      maxSize: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
