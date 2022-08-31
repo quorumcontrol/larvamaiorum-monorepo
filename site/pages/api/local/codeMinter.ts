@@ -7,6 +7,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 
   serverlessHandler({ body }, {}, (err:any, resp:any) => {
     if (err) {
+      console.error('throwing error', err)
       throw err
     }
     res.status(resp.statusCode).json(JSON.parse(resp.body))

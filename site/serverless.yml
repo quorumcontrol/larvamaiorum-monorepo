@@ -34,6 +34,7 @@ functions:
       NEXT_PUBLIC_MAINNET: "true"
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
 
   codeminter-testnet:
     handler: serverless/codeMinter.handle
@@ -41,6 +42,7 @@ functions:
     maxScale: 1
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
 
   goodghosting-eligible: 
     handler: serverless/goodGhostingEligible.handle
@@ -68,7 +70,8 @@ functions:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
       DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}
       DISCORD_CLIENT_SECRET: ${env:DISCORD_CLIENT_SECRET}
-
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
+      
   nft-club-berlin-claim-testnet: 
     handler: serverless/mintNftClubBerlin.handle
     memoryLimit: 1024
@@ -77,6 +80,7 @@ functions:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
       DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}
       DISCORD_CLIENT_SECRET: ${env:DISCORD_CLIENT_SECRET}
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
 
   mainnet-faucet:
     handler: serverless/faucet.handle

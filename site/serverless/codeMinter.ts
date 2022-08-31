@@ -7,11 +7,15 @@ import { keccak256 } from 'ethers/lib/utils';
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
 }
+if (!process.env.DELPHS_PRIVATE_KEY) {
+  throw new Error("missing delph's private key")
+}
 
-const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY!).connect(skaleProvider)
+const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY).connect(skaleProvider)
+const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
 
 const boa = badgeOfAssemblyContract().connect(schainSigner)
-const listKeeper = listKeeperContract().connect(schainSigner)
+const listKeeper = listKeeperContract().connect(delphSigner)
 
 const singleton = new SimpleSyncher('codeMinter')
 
@@ -19,9 +23,10 @@ export async function handle(event: any, _context: any, callback: any) {
   const { address, code, tokenId }:{address: string, code: string, tokenId: number} = JSON.parse(event.body)
 
   const list = keccak256(Buffer.from(`boa-${code}-${tokenId}`))
+  const entry = keccak256(Buffer.from(address.toLowerCase()))
 
   const [alreadyMinted, maxSize, currentCount] = await Promise.all([
-    listKeeper.contains(list, keccak256(Buffer.from(address.toLowerCase()))),
+    listKeeper.contains(list, entry),
     listKeeper.listSize(list),
     listKeeper.count(list),
   ])
@@ -53,8 +58,10 @@ export async function handle(event: any, _context: any, callback: any) {
   try {
     const tx = await singleton.push(async () => {
       try {
-        await (await listKeeper.add(list, address)).wait()
-        const tx = await boa.mint(address, tokenId, 1)
+        console.log('adding to list')
+        await (await listKeeper.add(list, entry, { gasLimit: 350_000 })).wait()
+        console.log('minting')
+        const tx = await boa.mint(address, tokenId, 1, { gasLimit: 1_000_000 })
         console.log('coded badge', tokenId, 'to', address,'txid: ', tx.hash)
         return tx
       } catch (err) {

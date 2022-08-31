@@ -1,11 +1,8 @@
 import { Wallet } from "ethers";
-import { badgeOfAssemblyContract } from "../src/utils/contracts";
+import { badgeOfAssemblyContract, listKeeperContract } from "../src/utils/contracts";
 import { skaleProvider } from "../src/utils/skaleProvider";
 import SimpleSyncher from '../src/utils/singletonQueue';
-import { addresses, isTestnet } from "../src/utils/networks";
-import multicallWrapper from "../src/utils/multicallWrapper";
-import { memoize } from "../src/utils/memoize";
-import { ListKeeper, ListKeeper__factory } from "../contracts/typechain";
+import { isTestnet } from "../src/utils/networks";
 import { keccak256 } from "ethers/lib/utils";
 import fetch from 'node-fetch';
 
@@ -17,16 +14,15 @@ const TOKEN_ID = isTestnet ? 4 : 5
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
 }
+if (!process.env.DELPHS_PRIVATE_KEY) {
+  throw new Error("missing delph's private key")
+}
 
-const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY!).connect(skaleProvider)
-
-const listKeeperContract = memoize(() => {
-  const multiCall = multicallWrapper(skaleProvider)
-  return multiCall.syncWrap<ListKeeper>(ListKeeper__factory.connect(addresses().ListKeeper, schainSigner))
-})
+const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY).connect(skaleProvider)
+const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
 
 const boa = badgeOfAssemblyContract().connect(schainSigner)
-const listKeeper = listKeeperContract()
+const listKeeper = listKeeperContract().connect(delphSigner)
 
 const LIST = keccak256(Buffer.from('nft-club-berlin-minted'))
 
@@ -129,11 +125,9 @@ export async function handle(event: any, _context: any, callback: any) {
     const tx = await singleton.push(async () => {
       try {
         console.log('minting', TOKEN_ID, 'to', state)
+        await (await listKeeper.add(LIST, listIdentifier)).wait()
+
         const mint = await boa.mint(state, TOKEN_ID, 1, { gasLimit: 1_000_000 })
-        await mint.wait()
-        console.log('mint succeeded')
-        await listKeeper.add(LIST, listIdentifier)
-        console.log("list keeper succeeded")
         return mint
       } catch (err) {
         console.error('error with transactions')

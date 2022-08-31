@@ -27,9 +27,12 @@ import {
   useUserBadges,
 } from "../../../../src/hooks/BadgeOfAssembly";
 import useIsClientSide from "../../../../src/hooks/useIsClientSide";
+import { isTestnet } from "../../../../src/utils/networks";
 
 //TODO: fix
-const mintAPI = '/api/local/codeMinter'
+const mintAPI = isTestnet ? 
+  "https://larvammaiorumfaucetgjxd8a5h-codeminter-testnet.functions.fnc.fr-par.scw.cloud" : 
+  "https://larvammaiorumfaucetgjxd8a5h-codeminter-mainnet.functions.fnc.fr-par.scw.cloud"
 
 const CodeClaimer: NextPage = () => {
   const { address } = useAccount();
