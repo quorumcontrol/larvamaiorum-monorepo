@@ -4,7 +4,6 @@ import { loreContract, loreTokens } from "../src/hooks/useLore";
 import { skaleProvider } from "../src/utils/skaleProvider";
 import SimpleSyncher from '../src/utils/singletonQueue';
 import { keccak256 } from 'ethers/lib/utils';
-import { DateTime } from 'luxon'
 
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
@@ -40,7 +39,7 @@ export async function handle(event: any, _context: any, callback: any) {
     })
   }
 
-  if (token.available) {
+  if (!token.available) {
     return callback(null, {
       statusCode: 400,
       body: JSON.stringify({
@@ -84,7 +83,7 @@ export async function handle(event: any, _context: any, callback: any) {
         console.log('adding to list')
         await (await listKeeper.add(list, entry, { gasLimit: 350_000 })).wait()
         console.log('minting')
-        const tx = await lore.mint(address, tokenId, 1, '', { gasLimit: 1_000_000 })
+        const tx = await lore.mint(address, tokenId, 1, [], { gasLimit: 1_000_000 })
         console.log('lore', tokenId, 'to', address,'txid: ', tx.hash)
         return tx
       } catch (err) {

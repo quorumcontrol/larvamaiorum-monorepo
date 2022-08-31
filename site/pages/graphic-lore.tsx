@@ -19,27 +19,60 @@ import { useState } from "react";
 
 const boxPadding = ["0", "50px"];
 
+//TODO: hacky - fix
+const mintUrl = '/api/local/loreMinter'
+
 const GraphicLore: NextPage = () => {
   const { address } = useAccount();
   const {
-    userLore: { data: userBalance, isLoading },
+    userLore: { data: userBalance },
     loreTokens,
     todays,
   } = useLore(address);
 
   const [currentToken, setCurrentToken] = useState(todays.id);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
   const token = loreTokens[currentToken];
 
+  const onMint = async () => {
+    try {
+      setLoading(true);
+      const resp = await fetch(mintUrl, {
+        method: 'post',
+        body: JSON.stringify({
+          address,
+          tokenId: token.id,
+        })
+      })
+      if (resp.status !== 201) {
+        const { error } = await resp.json()
+        return setErr(`Something went wrong: ${error}`)
+      }
+    } catch (err: any) {
+      console.error(err);
+      setErr(err.toString());
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const MintButton = () => {
-    if (!userBalance) {
+    if (!userBalance || loading) {
       return <Spinner />;
     }
-    console.log("user balance: ", userBalance);
+
     if (userBalance[currentToken].gt(0)) {
       return <Text>Already minted.</Text>;
     }
     if (token.available) {
-      return <Button variant="primary">Mint</Button>;
+      return (
+        <Box>
+          <Button variant="primary" onClick={onMint}>Mint</Button>
+          <Text>{err}</Text>
+        </Box>
+      );
     }
     return <Text>Minting {token.startDate.toLocaleString()} </Text>;
   };
@@ -82,8 +115,21 @@ const GraphicLore: NextPage = () => {
                   return (
                     <Slide key={`lore-careousel-token-${token.id}`}>
                       {token.viewable && (
-                        <Box backgroundImage="/frame.png" backgroundRepeat={"no-repeat"} p="4" h="398px" w="300px" onClick={() => setCurrentToken(token.id)}>
-                          <Image src={token.image} alt={`${token.name}`} height="390px" width="255px" objectFit="contain" />
+                        <Box
+                          backgroundImage="/frame.png"
+                          backgroundRepeat={"no-repeat"}
+                          p="4"
+                          h="398px"
+                          w="300px"
+                          onClick={() => setCurrentToken(token.id)}
+                        >
+                          <Image
+                            src={token.image}
+                            alt={`${token.name}`}
+                            height="390px"
+                            width="255px"
+                            objectFit="contain"
+                          />
                         </Box>
                       )}
                       {!token.viewable && (
@@ -93,7 +139,7 @@ const GraphicLore: NextPage = () => {
                         />
                       )}
                     </Slide>
-                  )
+                  );
                 })}
               </Carousel>
             </Box>
