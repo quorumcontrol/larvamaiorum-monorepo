@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
 contract GraphicLore is ERC1155, AccessControl, ERC1155Supply, ERC2771Context {
+    uint64 public constant version = 2;
+
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
