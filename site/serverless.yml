@@ -26,6 +26,22 @@ package:
     - '!.git/**'
 
 functions:
+  codeminter-mainnet:
+    handler: serverless/codeMinter.handle
+    memoryLimit: 1024
+    maxScale: 1
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
+  codeminter-testnet:
+    handler: serverless/codeMinter.handle
+    memoryLimit: 1024
+    maxScale: 1
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
   goodghosting-eligible: 
     handler: serverless/goodGhostingEligible.handle
     memoryLimit: 512
