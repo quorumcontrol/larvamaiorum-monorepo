@@ -17,10 +17,26 @@ import { useAccount } from "wagmi";
 import { useLore } from "../src/hooks/useLore";
 import { useState } from "react";
 
+import cover from "../assets/images/lore/000_lore.jpg";
+import page1 from "../assets/images/lore/001_lore.jpg";
+import page2 from "../assets/images/lore/002_lore.jpg";
+import page3 from "../assets/images/lore/003_lore.jpg";
+import page4 from "../assets/images/lore/004_lore.jpg";
+import page5 from "../assets/images/lore/005_lore.jpg";
+
 const boxPadding = ["0", "50px"];
 
 //TODO: hacky - fix
 const mintUrl = '/api/local/loreMinter'
+
+const images:Record<string, typeof cover> = {
+  '0': cover,
+  '1': page1,
+  '2': page2,
+  '3': page3,
+  '4': page4,
+  '5': page5,
+}
 
 const GraphicLore: NextPage = () => {
   const { address } = useAccount();
@@ -97,7 +113,7 @@ const GraphicLore: NextPage = () => {
               direction={["column", "row"]}
             >
               <Image
-                src={token.image}
+                src={images[currentToken]}
                 width="373px"
                 height="478px"
                 alt="cover photo"
@@ -124,7 +140,7 @@ const GraphicLore: NextPage = () => {
                           onClick={() => setCurrentToken(token.id)}
                         >
                           <Image
-                            src={token.image}
+                            src={images[currentToken]}
                             alt={`${token.name}`}
                             height="390px"
                             width="255px"

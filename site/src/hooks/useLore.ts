@@ -9,13 +9,6 @@ import { useQuery } from 'react-query'
 import { BigNumber } from 'ethers'
 // import mainnetAddresses from '../../lore-books/deployments/skale/addresses.json'
 
-import cover from "../../assets/images/lore/000_lore.jpg";
-import page1 from "../../assets/images/lore/001_lore.jpg";
-import page2 from "../../assets/images/lore/002_lore.jpg";
-import page3 from "../../assets/images/lore/003_lore.jpg";
-import page4 from "../../assets/images/lore/004_lore.jpg";
-import page5 from "../../assets/images/lore/005_lore.jpg";
-
 export const isTestnet = !process.env.NEXT_PUBLIC_MAINNET
 
 export const addresses = () => {
@@ -38,27 +31,21 @@ export const loreTokens = (): Record<string, { id: string, image: typeof cover, 
   const tokens = [
     {
       name: "Historia Colossei I: Cover",
-      image: cover,
     },
     {
       name: "Historia Colossei I: Page 1",
-      image: page1,
     },
     {
       name: "Historia Colossei I: Page 2",
-      image: page2,
     },
     {
       name: "Historia Colossei I: Page 3",
-      image: page3,
     },
     {
       name: "Historia Colossei I: Page 4",
-      image: page4,
     },
     {
       name: "Historia Colossei I: Page 5",
-      image: page5,
     },
   ]
   return tokens.reduce((memo, tok, i) => {
