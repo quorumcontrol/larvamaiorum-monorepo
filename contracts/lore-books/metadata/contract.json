@@ -1,0 +1,8 @@
+{
+  "name": "Crypto Colosseum: Graphic Lore",
+  "description": "Historia Colossei. The history of the colosseum and Crypto Rome. Minted in many parts.",
+  "image": "ipfs://bafybeidslqsjq5gzhtesln6jdepenvdlvuhj7zo3m3bcrltlb6wu4sm2wi/000_lore.jpg",
+  "external_link": "https://cryptocolosseum.com",
+  "seller_fee_basis_points": 750,
+  "fee_recipient": "0x9FFC7E523A0C9f633dac1DF662FC284B1b668e0b"
+}
