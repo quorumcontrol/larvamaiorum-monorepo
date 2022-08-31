@@ -9,7 +9,7 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
 }: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const { deployer, delph } = await getNamedAccounts();
 
   const trustedForwarderAddress = network.tags['test'] ? testnetAddrs.TrustedForwarder : mainnetAddrs.TrustedForwarder
 
@@ -17,7 +17,7 @@ const func: DeployFunction = async function ({
     from: deployer,
     gasLimit: 4000000,
     log: true,
-    args: [trustedForwarderAddress, deployer],
+    args: [trustedForwarderAddress, delph],
   });
 };
 export default func;
