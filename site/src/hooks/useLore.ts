@@ -7,7 +7,7 @@ import { GraphicLore, GraphicLore__factory } from '../../lore-books/typechain-ty
 import testnetAddresses from '../../lore-books/deployments/skaletest/addresses.json'
 import { useQuery } from 'react-query'
 import { BigNumber } from 'ethers'
-// import mainnetAddresses from '../../lore-books/deployments/skale/addresses.json'
+import mainnetAddresses from '../../lore-books/deployments/skale/addresses.json'
 
 export const isTestnet = !process.env.NEXT_PUBLIC_MAINNET
 
@@ -15,8 +15,7 @@ export const addresses = () => {
   if (isTestnet) {
     return testnetAddresses
   }
-  throw new Error('mainnet not supported yet')
-  // return mainnetAddresses
+  return mainnetAddresses
 }
 
 const startDate = DateTime.utc(2022, 9, 1)
