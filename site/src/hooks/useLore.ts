@@ -26,7 +26,7 @@ export const loreContract = memoize(() => {
   return multiCall.syncWrap<GraphicLore>(GraphicLore__factory.connect(addresses().GraphicLore, skaleProvider))
 })
 
-export const loreTokens = (): Record<string, { id: string, image: typeof cover, name: string, startDate: DateTime, available: boolean, viewable: boolean }> => {
+export const loreTokens = (): Record<string, { id: string, name: string, startDate: DateTime, available: boolean, viewable: boolean }> => {
   const today = DateTime.utc()
   const tokens = [
     {
