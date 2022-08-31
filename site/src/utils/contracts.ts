@@ -1,6 +1,6 @@
 import { TrustedForwarder, TrustedForwarder__factory } from 'skale-relayer-contracts/lib/typechain-types'
 import { BadgeOfAssembly, BadgeOfAssembly__factory } from "../../badge-of-assembly-types";
-import { DelphsTable, DelphsTable__factory, Lobby, Lobby__factory, Player, Player__factory, Wootgump, Wootgump__factory } from "../../contracts/typechain";
+import { DelphsTable, DelphsTable__factory, ListKeeper, ListKeeper__factory, Lobby, Lobby__factory, Player, Player__factory, Wootgump, Wootgump__factory } from "../../contracts/typechain";
 import { memoize } from "../utils/memoize";
 import multicallWrapper from "../utils/multicallWrapper";
 import { addresses, isTestnet } from "../utils/networks";
@@ -43,4 +43,9 @@ export const trustedForwarderContract = memoize(() => {
 export const wootgumpContract = memoize(() => {
   const multiCall = multicallWrapper(skaleProvider)
   return multiCall.syncWrap<Wootgump>(Wootgump__factory.connect(addresses().Wootgump, skaleProvider))
+})
+
+export const listKeeperContract = memoize(() => {
+  const multiCall = multicallWrapper(skaleProvider)
+  return multiCall.syncWrap<ListKeeper>(ListKeeper__factory.connect(addresses().ListKeeper, skaleProvider))
 })
