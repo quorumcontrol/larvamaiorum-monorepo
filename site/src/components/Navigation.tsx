@@ -77,6 +77,7 @@ const Navigation = () => {
           <NavItem isMobile href="/">Home</NavItem>
           <NavItem isMobile href="/delphs-table">Delph&apos;s Table</NavItem>
           <NavItem isMobile href="/badge-of-assembly">Badge of Assembly</NavItem>
+          <NavItem isMobile href="/graphic-lore">Graphic Lore</NavItem>
           <NavItem isMobile href="/classic">Classic</NavItem>
           <NavItem isMobile href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
         </VStack>
@@ -104,6 +105,7 @@ const Navigation = () => {
 
         <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
         <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
+        <NavItem href="/graphic-lore">Graphic Lore</NavItem>
         <NavItem href="/classic">Classic</NavItem>
         <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
 
