@@ -26,6 +26,24 @@ package:
     - '!.git/**'
 
 functions:
+  loreminter-mainnet:
+    handler: serverless/loreMinter.handle
+    memoryLimit: 1024
+    maxScale: 1
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
+
+  loreminter-testnet:
+    handler: serverless/loreMinter.handle
+    memoryLimit: 1024
+    maxScale: 1
+    secret:
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
+  
   codeminter-mainnet:
     handler: serverless/codeMinter.handle
     memoryLimit: 1024
