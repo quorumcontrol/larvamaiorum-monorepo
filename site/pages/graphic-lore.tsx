@@ -23,11 +23,14 @@ import page2 from "../assets/images/lore/002_lore.jpg";
 import page3 from "../assets/images/lore/003_lore.jpg";
 import page4 from "../assets/images/lore/004_lore.jpg";
 import page5 from "../assets/images/lore/005_lore.jpg";
+import { isTestnet } from "../src/utils/networks";
 
 const boxPadding = ["0", "50px"];
 
 //TODO: hacky - fix
-const mintUrl = '/api/local/loreMinter'
+const mintUrl = isTestnet ? 
+  "https://larvammaiorumfaucetgjxd8a5h-loreminter-testnet.functions.fnc.fr-par.scw.cloud" :
+  "https://larvammaiorumfaucetgjxd8a5h-loreminter-mainnet.functions.fnc.fr-par.scw.cloud"
 
 const images:Record<string, typeof cover> = {
   '0': cover,

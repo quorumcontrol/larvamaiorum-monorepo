@@ -61,7 +61,7 @@ export async function handle(event: any, _context: any, callback: any) {
       body: JSON.stringify({
         address,
         eligible: false,
-        error: 'You must have a badge to mint the lore.',
+        error: 'You must have a Badge of Assembly to mint the lore.',
       }),
     })
   }
