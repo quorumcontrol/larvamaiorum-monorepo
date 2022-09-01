@@ -5,9 +5,6 @@ import { skaleProvider } from "../src/utils/skaleProvider";
 import SimpleSyncher from '../src/utils/singletonQueue';
 import { keccak256 } from 'ethers/lib/utils';
 
-if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
-  throw new Error("must have a badge minter private key")
-}
 if (!process.env.DELPHS_PRIVATE_KEY) {
   throw new Error("missing delph's private key")
 }
