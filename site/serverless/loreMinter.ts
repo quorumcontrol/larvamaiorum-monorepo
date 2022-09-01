@@ -12,10 +12,9 @@ if (!process.env.DELPHS_PRIVATE_KEY) {
   throw new Error("missing delph's private key")
 }
 
-const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY).connect(skaleProvider)
 const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
 
-const lore = loreContract().connect(schainSigner)
+const lore = loreContract().connect(delphSigner)
 const listKeeper = listKeeperContract().connect(delphSigner)
 const boa = badgeOfAssemblyContract()
 

@@ -48,6 +48,7 @@ const GraphicLore: NextPage = () => {
     loreTokens,
     todays,
   } = useLore(address);
+  console.log("user balance: ", userBalance)
 
   const [currentToken, setCurrentToken] = useState(todays.id);
   const [loading, setLoading] = useState(false);
