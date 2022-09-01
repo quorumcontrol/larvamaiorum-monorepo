@@ -143,7 +143,7 @@ const GraphicLore: NextPage = () => {
                           onClick={() => setCurrentToken(token.id)}
                         >
                           <Image
-                            src={images[currentToken]}
+                            src={images[token.id]}
                             alt={`${token.name}`}
                             height="390px"
                             width="255px"
