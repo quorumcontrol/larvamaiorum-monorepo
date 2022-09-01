@@ -13,7 +13,6 @@ import Image from "next/image";
 import Layout from "../src/components/Layout";
 import BadgeClaimCard from "../src/components/BadgeClaimCard";
 import historiaTitle from "../assets/images/historiaTitle.png";
-import historiaLocked from "../assets/images/historiaLocked.png";
 import Carousel, { Slide } from "../src/components/Carousel";
 import Link from "next/link";
 import border from "../src/utils/dashedBorder";
@@ -73,6 +72,99 @@ const Home: NextPage = () => {
 
           <Flex
             w="100%"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", "none"]}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="10"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
+                <Text>
+                  The story of how the alien, Ima, first discovered large
+                  $SKL deposits in the arctic regions of Earth. Part I of this
+                  graphic novella is minting page by page.
+                </Text>
+                <Box>
+                  <Link href="/graphic-lore">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                      Mint Now
+                    </Button>
+                  </Link>
+                </Box>
+              </VStack>
+
+              <Spacer />
+              <Box mt="10">
+                <Link href="/graphic-lore">
+                  <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
+                </Link>
+              </Box>
+            </Stack>
+          </Flex>
+
+          <Flex
+            w="100%"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", "none"]}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="10"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
+                <Text>
+                  The Oracle of Delphi is worried you are not prepared to
+                  support your warriors in the Arctic Jungle. He released a
+                  mini-game to teach you about the dangers and the spoils of
+                  warbanding.
+                </Text>
+                <Box>
+                  <Link href="/delphs-table">
+                    <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
+                      LEARN MORE
+                    </Button>
+                  </Link>
+                </Box>
+              </VStack>
+
+              <Spacer />
+              <Box>
+                <video
+                  id="full-video"
+                  controls
+                  preload="auto"
+                  width="100%"
+                  height="100%"
+                  data-setup="{}"
+                >
+                  <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
+
+                  <p className="vjs-no-js">
+                    To view this video please enable JavaScript, and consider
+                    upgrading to a web browser that supports HTML5 video
+                  </p>
+                </video>
+              </Box>
+            </Stack>
+          </Flex>
+
+          <Flex
+            w="100%"
             overflow="hidden"
             backgroundImage={["none", border]}
             borderBottom={["1px dashed", "none"]}
@@ -116,96 +208,6 @@ const Home: NextPage = () => {
                     src="/video/teaser-noComingSoon.webm"
                     type="video/webm"
                   />
-
-                  <p className="vjs-no-js">
-                    To view this video please enable JavaScript, and consider
-                    upgrading to a web browser that supports HTML5 video
-                  </p>
-                </video>
-              </Box>
-            </Stack>
-          </Flex>
-
-          <Box
-            w="full"
-            backgroundImage={["none", border]}
-            borderBottom={["1px dashed", "none"]}
-            borderBottomColor={"brand.orange"}
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-            <VStack maxW="22em" alignItems="left">
-              <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
-              <Text>
-                The story of how the ancient aliens first discovered the large
-                $SKL deposits in the arctic regions of earth. Part I of this
-                graphic novella mints page-by-page starting September 1.
-              </Text>
-            </VStack>
-            <Box mt="10">
-              <Carousel slideCount={6}>
-                <Slide>
-                  <Image
-                    src={historiaTitle}
-                    alt="placeholder image for when the novel mints"
-                  />
-                </Slide>
-                {new Array(5).fill(true).map((_, i) => {
-                  return (
-                    <Slide key={`historia-locked-${i}`}>
-                      <Image
-                        src={historiaLocked}
-                        alt="placeholder image for when the novel mints"
-                      />
-                    </Slide>
-                  );
-                })}
-              </Carousel>
-            </Box>
-          </Box>
-
-          <Flex
-            w="100%"
-            backgroundImage={["none", border]}
-            borderBottom={["1px dashed", "none"]}
-            borderBottomColor={"brand.orange"}
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-            <Stack
-              direction={["column", "row"]}
-              spacing="10"
-              w="100%"
-              alignItems="center"
-            >
-              <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
-                <Text>
-                  The Oracle of Delphi is worried you are not prepared to
-                  support your warriors in the Arctic Jungle. He released a
-                  mini-game to teach you about the dangers and the spoils of
-                  warbanding.
-                </Text>
-                <Box>
-                  <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                    LEARN MORE
-                  </Button>
-                </Box>
-              </VStack>
-
-              <Spacer />
-              <Box>
-                <video
-                  id="full-video"
-                  controls
-                  preload="auto"
-                  width="100%"
-                  height="100%"
-                  data-setup="{}"
-                >
-                  <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
 
                   <p className="vjs-no-js">
                     To view this video please enable JavaScript, and consider
