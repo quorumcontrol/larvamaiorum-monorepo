@@ -58,7 +58,7 @@ const CodeClaimer: NextPage = () => {
         method: "POST",
         body: JSON.stringify({
           address,
-          code,
+          code: code.trim(),
           tokenId: BigNumber.from(tokenId).toNumber(),
         })
       })
