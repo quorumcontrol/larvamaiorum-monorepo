@@ -11,5 +11,5 @@ task("count")
     const filtered = res.filter((res) => {
       return res.args.id.eq(tokenId)
     })
-    console.log("res: ", filtered.length, filtered)
+    console.log("res: ", filtered.length)
   })
