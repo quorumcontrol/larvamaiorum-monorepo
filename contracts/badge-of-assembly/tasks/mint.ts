@@ -1,7 +1,22 @@
 import "@nomiclabs/hardhat-ethers";
-import { constants } from "ethers";
+import { constants, utils, Wallet } from "ethers";
 import { task } from "hardhat/config";
 import { getBadgeOfAssemblyContract } from "./helpers";
+
+// task("gleam")
+//   .setAction(async (_, hre) => {
+//     const gleamPrinter = new Wallet(process.env.GLEAM_MINTER, hre.ethers.provider)
+//     const boa = (await getBadgeOfAssemblyContract(hre)).connect(gleamPrinter);
+
+//     const TOKEN_ID = 7
+
+//     for (let i = 0; i < wallets.length; i++) {
+//       console.log("minting to: ", wallets[i])
+//       const tx = await boa.mint(wallets[i], TOKEN_ID, 1, { gasLimit: 500_000})
+//       await tx.wait()
+//       console.log("done. ", tx.hash)
+//     }
+//   })
 
 task("setup")
   .addParam("name", "name of the badge")
