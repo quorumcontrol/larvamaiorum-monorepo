@@ -53,6 +53,7 @@ const GraphicLore: NextPage = () => {
   const [currentToken, setCurrentToken] = useState(todays.id);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
+  const [didMint, setDidMint] = useState(false)
   const token = loreTokens[currentToken];
 
   const onMint = async () => {
@@ -69,6 +70,7 @@ const GraphicLore: NextPage = () => {
         const { error } = await resp.json()
         return setErr(`Something went wrong: ${error}`)
       }
+      setDidMint(true)
     } catch (err: any) {
       console.error(err);
       setErr(err.toString());
@@ -79,6 +81,9 @@ const GraphicLore: NextPage = () => {
   };
 
   const MintButton = () => {
+    if (didMint) {
+      return <Text>Nice.</Text>
+    }
     if (!userBalance || loading) {
       return <Spinner />;
     }
