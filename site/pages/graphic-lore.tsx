@@ -146,8 +146,10 @@ const GraphicLore: NextPage = () => {
                           p="4"
                           h="398px"
                           w="300px"
-                          onClick={() => setCurrentToken(token.id)}
-                        >
+                          onClick={() => {
+                            setDidMint(false)
+                            setCurrentToken(token.id)
+                          }}>
                           <Image
                             src={images[token.id]}
                             alt={`${token.name}`}
