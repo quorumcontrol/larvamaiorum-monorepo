@@ -8,22 +8,21 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import { useState } from "react";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 import Layout from "../src/components/Layout";
 import Carousel, { Slide } from "../src/components/Carousel";
 import border from "../src/utils/dashedBorder";
 import historiaLocked from "../assets/images/historiaLocked.png";
-import { useAccount } from "wagmi";
 import { useLore } from "../src/hooks/useLore";
-import { useState } from "react";
-
+import { isTestnet } from "../src/utils/networks";
 import cover from "../assets/images/lore/000_lore.jpg";
 import page1 from "../assets/images/lore/001_lore.jpg";
 import page2 from "../assets/images/lore/002_lore.jpg";
 import page3 from "../assets/images/lore/003_lore.jpg";
 import page4 from "../assets/images/lore/004_lore.jpg";
 import page5 from "../assets/images/lore/005_lore.jpg";
-import { isTestnet } from "../src/utils/networks";
 
 const boxPadding = ["0", "50px"];
 

@@ -246,6 +246,7 @@ const Home: NextPage = () => {
                     animationUrl="ipfs://bafybeignwce32es4mllodltf6jvdtr44pxxoqe7ysbf4ozoumhpd6d26iu"
                     name="NFT Club Berlin Genesis Badge"
                     description="Claimable by being a member of the NFT Club Berlin discord server."
+                    url="/badge-of-assembly/claim/nft-club-berlin"
                   />
                 </Slide>
                 <Slide>
