@@ -6,6 +6,11 @@ import {
   Stack,
   Button,
   Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  ModalBody,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useState } from "react";
@@ -27,18 +32,18 @@ import page5 from "../assets/images/lore/005_lore.jpg";
 const boxPadding = ["0", "50px"];
 
 //TODO: hacky - fix
-const mintUrl = isTestnet ? 
-  "https://larvammaiorumfaucetgjxd8a5h-loreminter-testnet.functions.fnc.fr-par.scw.cloud" :
-  "https://larvammaiorumfaucetgjxd8a5h-loreminter-mainnet.functions.fnc.fr-par.scw.cloud"
+const mintUrl = isTestnet
+  ? "https://larvammaiorumfaucetgjxd8a5h-loreminter-testnet.functions.fnc.fr-par.scw.cloud"
+  : "https://larvammaiorumfaucetgjxd8a5h-loreminter-mainnet.functions.fnc.fr-par.scw.cloud";
 
-const images:Record<string, typeof cover> = {
-  '0': cover,
-  '1': page1,
-  '2': page2,
-  '3': page3,
-  '4': page4,
-  '5': page5,
-}
+const images: Record<string, typeof cover> = {
+  "0": cover,
+  "1": page1,
+  "2": page2,
+  "3": page3,
+  "4": page4,
+  "5": page5,
+};
 
 const GraphicLore: NextPage = () => {
   const { address } = useAccount();
@@ -47,29 +52,30 @@ const GraphicLore: NextPage = () => {
     loreTokens,
     todays,
   } = useLore(address);
-  console.log("user balance: ", userBalance)
+  console.log("user balance: ", userBalance);
 
   const [currentToken, setCurrentToken] = useState(todays.id);
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState('');
-  const [didMint, setDidMint] = useState(false)
+  const [err, setErr] = useState("");
+  const [didMint, setDidMint] = useState(false);
+  const [modalOpen, setModalOpen] = useState(true);
   const token = loreTokens[currentToken];
 
   const onMint = async () => {
     try {
       setLoading(true);
       const resp = await fetch(mintUrl, {
-        method: 'post',
+        method: "post",
         body: JSON.stringify({
           address,
           tokenId: token.id,
-        })
-      })
+        }),
+      });
       if (resp.status !== 201) {
-        const { error } = await resp.json()
-        return setErr(`Something went wrong: ${error}`)
+        const { error } = await resp.json();
+        return setErr(`Something went wrong: ${error}`);
       }
-      setDidMint(true)
+      setDidMint(true);
     } catch (err: any) {
       console.error(err);
       setErr(err.toString());
@@ -81,7 +87,7 @@ const GraphicLore: NextPage = () => {
 
   const MintButton = () => {
     if (didMint) {
-      return <Text>Nice.</Text>
+      return <Text>Nice.</Text>;
     }
     if (!userBalance || loading) {
       return <Spinner />;
@@ -93,7 +99,9 @@ const GraphicLore: NextPage = () => {
     if (token.available) {
       return (
         <Box>
-          <Button variant="primary" onClick={onMint}>Mint</Button>
+          <Button variant="primary" onClick={onMint}>
+            Mint
+          </Button>
           <Text>{err}</Text>
         </Box>
       );
@@ -103,6 +111,20 @@ const GraphicLore: NextPage = () => {
 
   return (
     <>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} scrollBehavior="outside" size="full">
+        <ModalOverlay />
+        <ModalContent alignItems="center" onClick={() => setModalOpen(false)}>
+          <ModalCloseButton />
+          <ModalBody w="940px" h="1220px">
+            <Image
+              src={images[currentToken]}
+              alt={`${token.name}`}
+              width="900px"
+              objectFit="contain"
+            />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       <Layout>
         <VStack w="full" spacing="10">
           <Box
@@ -120,12 +142,14 @@ const GraphicLore: NextPage = () => {
               alignItems="center"
               direction={["column", "row"]}
             >
-              <Image
-                src={images[currentToken]}
-                width="373px"
-                height="478px"
-                alt="cover photo"
-              />
+              <Box cursor="zoom-in" onClick={() => setModalOpen(true)}>
+                <Image
+                  src={images[currentToken]}
+                  width="373px"
+                  height="478px"
+                  alt={token.name}
+                />
+              </Box>
               <Box>
                 <Heading size={["lg", "xl"]}>
                   {loreTokens[currentToken].name}
@@ -142,13 +166,15 @@ const GraphicLore: NextPage = () => {
                         <Box
                           backgroundImage="/frame.png"
                           backgroundRepeat={"no-repeat"}
+                          cursor="pointer"
                           p="4"
                           h="398px"
                           w="300px"
                           onClick={() => {
-                            setDidMint(false)
-                            setCurrentToken(token.id)
-                          }}>
+                            setDidMint(false);
+                            setCurrentToken(token.id);
+                          }}
+                        >
                           <Image
                             src={images[token.id]}
                             alt={`${token.name}`}
