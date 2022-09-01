@@ -58,7 +58,7 @@ const GraphicLore: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [didMint, setDidMint] = useState(false);
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const token = loreTokens[currentToken];
 
   const onMint = async () => {
