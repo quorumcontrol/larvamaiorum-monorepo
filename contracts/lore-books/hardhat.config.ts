@@ -5,6 +5,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
 
 dotenv.config()
+require("./tasks")
 
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
