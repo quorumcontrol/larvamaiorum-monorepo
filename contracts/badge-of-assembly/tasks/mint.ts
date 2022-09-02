@@ -1,22 +1,39 @@
 import "@nomiclabs/hardhat-ethers";
-import { constants, utils, Wallet } from "ethers";
+import { Wallet } from "ethers";
 import { task } from "hardhat/config";
 import { getBadgeOfAssemblyContract } from "./helpers";
 
-// task("gleam")
-//   .setAction(async (_, hre) => {
-//     const gleamPrinter = new Wallet(process.env.GLEAM_MINTER, hre.ethers.provider)
-//     const boa = (await getBadgeOfAssemblyContract(hre)).connect(gleamPrinter);
-
-//     const TOKEN_ID = 7
-
-//     for (let i = 0; i < wallets.length; i++) {
-//       console.log("minting to: ", wallets[i])
-//       const tx = await boa.mint(wallets[i], TOKEN_ID, 1, { gasLimit: 500_000})
-//       await tx.wait()
-//       console.log("done. ", tx.hash)
-//     }
-//   })
+task("gleam")
+  .addParam("path", "the path to the wallets, expects a typescript file exporting { wallets }")
+  .setAction(async ({ path }, hre) => {
+    if (!process.env.GLEAM_MINTER) {
+      throw new Error('must have the gleam minter key')
+    }
+    const { wallets }:{wallets: string[]} = await import(path)
+    const gleamPrinter = new Wallet(
+      process.env.GLEAM_MINTER,
+      hre.ethers.provider
+    );
+    const boa = (await getBadgeOfAssemblyContract(hre)).connect(gleamPrinter);
+    const TOKEN_ID = 7
+    for (let i = 0; i < wallets.length; i++) {
+      const address = wallets[i];
+      try {
+        console.log("minting to: ", address)
+        const tx = await boa.mint(address, TOKEN_ID, 1, { gasLimit: 500_000 })
+        await tx.wait()
+        console.log("done. ", tx.hash)
+      } catch (err) {
+        // get the balance
+        const bal = await boa.balanceOf(address, TOKEN_ID)
+        if (bal.gt(0)) {
+          console.log('err on trans, but no problem - already minted')
+          continue
+        }
+        throw err
+      }
+    }
+  });
 
 task("setup")
   .addParam("name", "name of the badge")
