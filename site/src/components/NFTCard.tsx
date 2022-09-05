@@ -9,7 +9,6 @@ const NFTCard: React.FC<{ metadata: MetadataWithId }> = ({
 }) => {
   return (
     <Box
-      borderRadius="lg"
       borderWidth="1px"
       w="sm"
       h="md"

@@ -2,11 +2,12 @@ import {
   Text,
   Spinner,
   VStack,
-  Stack,
   Heading,
   Box,
   Flex,
   Button,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -148,12 +149,18 @@ const Profile: NextPage = () => {
             mt="10"
           >
             <Heading>BADGES</Heading>
-            <Stack direction={["column", "row"]} spacing="10">
+            <Wrap spacing="10">
               {isLoading && <Spinner />}
-              {badges?.map((metadata: MetadataWithId, i) => {
+              {badges?.map((metadata, i) => {
+                return <WrapItem key={`nftcard-${i}`}><NFTCard metadata={metadata} /></WrapItem>;
+              })}
+            </Wrap>
+            {/* <Stack direction={["column", "row"]} spacing="10" wrap="wrap">
+              {isLoading && <Spinner />}
+              {badges?.map((metadata, i) => {
                 return <NFTCard metadata={metadata} key={`nftcard-${i}`} />;
               })}
-            </Stack>
+            </Stack> */}
           </Box>
       </Layout>
     </>
