@@ -41,7 +41,7 @@ export const useLogin = () => {
 
   }, [relayer, setCanCreateToken])
 
-  const login = useCallback(async (username: string, team?:BigNumberish) => {
+  const login = useCallback(async (username?: string, team?:BigNumberish) => {
     try {
       setIsLoggingIn(true)
       if (!canCreateToken || !relayer) {
