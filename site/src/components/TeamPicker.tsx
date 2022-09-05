@@ -44,23 +44,34 @@ const TeamPicker: React.FC<{
 }> = ({ address, onSelect }) => {
   const { data: userBadges, isLoading } = useUserBadges(address);
   const { data: team, isLoading: isTeamLoading } = useTeam(address);
-  const [selectedTeam, setSelectedTeam] = useState('0')
+  const [selectedTeam, setSelectedTeam] = useState("0");
 
-  const handleTeamClick = useCallback((val:string) => {
-    setSelectedTeam(val)
-    onSelect(val)
-  }, [setSelectedTeam, onSelect])
+  const handleTeamClick = useCallback(
+    (val: string) => {
+      setSelectedTeam(val);
+      onSelect(val);
+    },
+    [setSelectedTeam, onSelect]
+  );
 
   useEffect(() => {
-    if (isLoading || isTeamLoading || (selectedTeam !== '0')) {
-      return
+    if (isLoading || isTeamLoading || selectedTeam !== "0") {
+      return;
     }
     if (team) {
-      return handleTeamClick(team.toString())
+      return handleTeamClick(team.toString());
     }
-    
-    return handleTeamClick((userBadges || [])[0].id.toString())
-  }, [userBadges, onSelect, team, isLoading, isTeamLoading, handleTeamClick, selectedTeam])
+
+    return handleTeamClick((userBadges || [])[0].id.toString());
+  }, [
+    userBadges,
+    onSelect,
+    team,
+    isLoading,
+    isTeamLoading,
+    handleTeamClick,
+    selectedTeam,
+  ]);
 
   const isClientSide = useIsClientSide();
 
@@ -75,10 +86,10 @@ const TeamPicker: React.FC<{
   if (userBadges?.length === 0) {
     return (
       <Box mt="10">
-      <Text mb="5">Pick Team</Text>
-      <Text>No badges</Text>
-    </Box>
-    )
+        <Text mb="5">Pick Team</Text>
+        <Text>No badges</Text>
+      </Box>
+    );
   }
 
   return (

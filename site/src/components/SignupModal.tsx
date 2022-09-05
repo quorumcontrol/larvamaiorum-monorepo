@@ -75,7 +75,7 @@ const SignupModal: React.FC<{
         <ModalBody backgroundImage={border} p="6">
           <Heading>Your Profile</Heading>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <VStack spacing="10">
+            <VStack spacing="10" alignItems="left">
               <FormControl
                 isRequired
                 isInvalid={!!errors.username}
