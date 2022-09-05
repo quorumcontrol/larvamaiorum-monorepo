@@ -88,8 +88,8 @@ const Home: NextPage = () => {
               <VStack maxW="22em" alignItems="left">
                 <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
                 <Text>
-                  The story of how the alien, Ima, first discovered large
-                  $SKL deposits in the arctic regions of Earth. Part I of this
+                  The story of how the alien, Ima, first discovered large $SKL
+                  deposits in the arctic regions of Earth. Part I of this
                   graphic novella is minting page by page.
                 </Text>
                 <Box>
@@ -103,9 +103,7 @@ const Home: NextPage = () => {
 
               <Spacer />
               <Box mt="10">
-                <Link href="/graphic-lore">
-                  <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
-                </Link>
+                <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
               </Box>
             </Stack>
           </Flex>

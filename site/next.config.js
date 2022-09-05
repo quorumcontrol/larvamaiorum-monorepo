@@ -6,7 +6,7 @@ const nextConfig = {
         return config
     },
     images: {
-        domains: ['nftstorage.link']
+        domains: ['nftstorage.link', 'openailabsprodscus.blob.core.windows.net']
     }
 }
 
