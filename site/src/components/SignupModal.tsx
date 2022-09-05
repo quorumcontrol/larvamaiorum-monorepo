@@ -49,7 +49,7 @@ const SignupModal: React.FC<{
   const [newTeam, setTeam] = useState<BigNumberish | undefined>();
   const { data: username } = useUsername(address);
 
-  const [isSkipped, setIsSkipped] = useState(!!!ignoreSkip);
+  const [isSkipped, setIsSkipped] = useState(false);
 
   const onSubmit = async ({ username }: FormData) => {
     const queryKey = ["/player/username/", address];
