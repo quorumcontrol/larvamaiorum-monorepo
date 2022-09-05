@@ -16,13 +16,13 @@ import Layout from "../../src/components/Layout";
 import NFTCard from "../../src/components/NFTCard";
 import { MetadataWithId, useUserBadges } from "../../src/hooks/BadgeOfAssembly";
 import { useTeam, useUsername } from "../../src/hooks/Player";
-import { emojiAvatarForAddress } from "./emojiAvatarForAddress";
+import { emojiAvatarForAddress } from "../../src/utils/emojiAvatarForAddress";
 import profileBackground from "../../assets/images/profileBackground.png";
 import { useWootgumpBalance } from "../../src/hooks/useWootgump";
 import border from "../../src/utils/dashedBorder";
 import SignupModal from "../../src/components/SignupModal";
 
-const Browse: NextPage = () => {
+const Profile: NextPage = () => {
   const router = useRouter();
   const { address } = router.query;
   const { data: badges, isLoading } = useUserBadges(
@@ -160,4 +160,4 @@ const Browse: NextPage = () => {
   );
 };
 
-export default Browse;
+export default Profile;
