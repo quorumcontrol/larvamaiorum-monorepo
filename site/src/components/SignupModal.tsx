@@ -3,7 +3,6 @@ import {
   ModalContent,
   ModalOverlay,
   ModalBody,
-  Text,
   Heading,
   FormControl,
   FormLabel,
@@ -13,8 +12,6 @@ import {
   Button,
   VStack,
   Spinner,
-  Box,
-  HStack,
   ModalFooter,
   Link,
 } from "@chakra-ui/react";
@@ -25,15 +22,20 @@ import { useQueryClient } from "react-query";
 import { useAccount } from "wagmi";
 import { useLogin, UserData } from "../hooks/useUser";
 import border from "../utils/dashedBorder";
+import { useUserBadges } from "../hooks/BadgeOfAssembly";
+import TeamPicker from "./TeamPicker";
+import { useUsername } from "../hooks/Player";
+import { BigNumberish } from "ethers";
 
 const log = debug("SignupModal");
 
 type FormData = UserData;
 
-const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
-  isOpen,
-  onClose,
-}) => {
+const SignupModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => any;
+  ignoreSkip?: boolean;
+}> = ({ isOpen, onClose, ignoreSkip = false }) => {
   const {
     handleSubmit,
     register,
@@ -43,15 +45,18 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
   const [loading, setLoading] = useState(false);
   const { login } = useLogin();
   const queryClient = useQueryClient();
+  const { data: userBadges } = useUserBadges(address);
+  const [newTeam, setTeam] = useState<BigNumberish | undefined>();
+  const { data: username } = useUsername(address);
 
-  const [isSkipped, setIsSkipped] = useState(false);
+  const [isSkipped, setIsSkipped] = useState(!!!ignoreSkip);
 
   const onSubmit = async ({ username }: FormData) => {
     const queryKey = ["/player/username/", address];
     try {
       setLoading(true);
       log("creating new user");
-      await login(username);
+      await login(username, newTeam);
       queryClient.cancelQueries(queryKey);
       queryClient.setQueryData(["/player/username/", address], () => {
         return username;
@@ -64,11 +69,11 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
   };
 
   return (
-    <Modal isOpen={!isSkipped && isOpen} onClose={onClose}>
+    <Modal isOpen={(!isSkipped || ignoreSkip) && isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent p="6" bg="brand.background" maxW="600px">
         <ModalBody backgroundImage={border} p="6">
-          <Heading>Your Name</Heading>
+          <Heading>Your Profile</Heading>
           <form onSubmit={handleSubmit(onSubmit)}>
             <VStack spacing="10">
               <FormControl
@@ -83,10 +88,15 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
                   id="username"
                   type="text"
                   {...register("username", { required: true })}
+                  defaultValue={username || ""}
                 />
                 <FormHelperText>You can change this later.</FormHelperText>
                 <FormErrorMessage>Username is required.</FormErrorMessage>
               </FormControl>
+              {(userBadges || []).length > 0 && (
+                <TeamPicker address={address} onSelect={setTeam} />
+              )}
+
               <FormControl>
                 <Button variant="primary" disabled={loading} type="submit">
                   {!loading && "Save"}
@@ -95,16 +105,19 @@ const SignupModal: React.FC<{ isOpen: boolean; onClose: () => any }> = ({
                 {loading && (
                   <FormHelperText>Confirm in your wallet.</FormHelperText>
                 )}
+                <Button variant="link" ml="4" onClick={onClose}>Cancel</Button>
               </FormControl>
             </VStack>
           </form>
         </ModalBody>
 
-        <ModalFooter>
-          <Link fontSize="md" onClick={() => setIsSkipped(true)}>
-            Skip
-          </Link>
-        </ModalFooter>
+        {!ignoreSkip && (
+          <ModalFooter>
+            <Link fontSize="md" onClick={() => setIsSkipped(true)}>
+              Skip
+            </Link>
+          </ModalFooter>
+        )}
       </ModalContent>
     </Modal>
   );

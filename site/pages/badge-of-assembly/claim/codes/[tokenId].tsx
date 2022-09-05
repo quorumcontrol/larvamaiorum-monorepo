@@ -23,7 +23,7 @@ import { useAccount } from "wagmi";
 import Layout from "../../../../src/components/Layout";
 import Video from "../../../../src/components/Video";
 import {
-  useAllTokens,
+  useBadgeMetadata,
   useUserBadges,
 } from "../../../../src/hooks/BadgeOfAssembly";
 import useIsClientSide from "../../../../src/hooks/useIsClientSide";
@@ -38,9 +38,9 @@ const CodeClaimer: NextPage = () => {
   const { address } = useAccount();
   const isDomReady = useIsClientSide();
   const router = useRouter();
-  const { data: allTokens, isLoading } = useAllTokens();
   const { tokenId: untypedTokenId } = router.query;
   const tokenId: string | undefined = untypedTokenId as string | undefined;
+  const { data: metadata, isLoading } = useBadgeMetadata(tokenId);
   const [code, setCode] = useState('')
   const [err, setErr] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -78,20 +78,10 @@ const CodeClaimer: NextPage = () => {
 
   }
 
-  const token = useMemo(() => {
-    if (!allTokens && !tokenId) {
-      return undefined;
-    }
-    //TODO: (hack) to only look at first page
-    return allTokens?.pages[0].metadata.find(
-      (meta) => meta.id.toString() === tokenId
-    );
-  }, [allTokens, tokenId]);
-
   const [didMint, setDidMint] = useState(false);
   const { data: badgeList, isLoading: badgesLoading } = useUserBadges(address);
 
-  const loading = isLoading || !token || badgesLoading
+  const loading = isLoading || !metadata || badgesLoading
 
   useEffect(() => {
     if (!badgeList || !tokenId) {
@@ -195,7 +185,7 @@ const CodeClaimer: NextPage = () => {
           <Box borderRadius="lg" borderWidth="1px" maxW="md" p="5">
             <VStack align="left" spacing="10">
               <Box>
-                <Heading fontSize="3xl">{token.name}</Heading>
+                <Heading fontSize="3xl">{metadata.name}</Heading>
               </Box>
               <Box>
                 <Video
@@ -203,7 +193,7 @@ const CodeClaimer: NextPage = () => {
                   autoPlay
                   loop
                   controls={false}
-                  animationUrl={token.animationUrl}
+                  animationUrl={metadata.animationUrl}
                 />
               </Box>
             </VStack>

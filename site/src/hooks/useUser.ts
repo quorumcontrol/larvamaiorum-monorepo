@@ -1,7 +1,9 @@
 import { useAccount, useSigner } from "wagmi";
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { useCallback, useEffect, useState } from "react";
 import RelayManager from "../utils/relayer";
+import { BigNumberish } from "ethers";
+import { playerContract } from "../utils/contracts";
 
 export const useRelayer = () => {
   const { data:signer } = useSigner()
@@ -24,6 +26,7 @@ export const useLogin = () => {
   const [isLoggedIn, setLoggedIn] = useState(signer && relayer?.ready())
   const [canCreateToken, setCanCreateToken] = useState(relayer?.canCreateToken())
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (!relayer) {
@@ -38,7 +41,7 @@ export const useLogin = () => {
 
   }, [relayer, setCanCreateToken])
 
-  const login = useCallback(async (username?: string) => {
+  const login = useCallback(async (username: string, team?:BigNumberish) => {
     try {
       setIsLoggingIn(true)
       if (!canCreateToken || !relayer) {
@@ -47,9 +50,18 @@ export const useLogin = () => {
       }
       await relayer.createToken()
       if (username) {
-        const tx = await relayer.wrapped.player().setUsername(username, { gasLimit: 500_000 })
-        console.log("tx: ", tx.hash)
-        await tx.wait()
+        console.log('setting username, team to: ', username, team)
+        if (team) {
+          const userNameSet = await playerContract().populateTransaction.setUsername(username)
+          const teamSet = await playerContract().populateTransaction.setTeam(team)
+          const tx = await relayer.multisend([userNameSet, teamSet])
+          console.log("tx: ", tx.hash)
+          await tx.wait()
+        } else {
+          const tx = await relayer.wrapped.player().setUsername(username)
+          console.log("tx: ", tx.hash)
+          await tx.wait()
+        }
       }
       setLoggedIn(true)
     } catch (err) {
@@ -57,9 +69,12 @@ export const useLogin = () => {
       throw err
     } finally {
       setIsLoggingIn(false)
+      const addr = await signer?.getAddress()
+      queryClient.invalidateQueries(["/player/username/", addr], { refetchInactive: true })
+      queryClient.invalidateQueries(["/player/team/", addr], { refetchInactive: true })
     }
 
-  }, [canCreateToken, setIsLoggingIn, setLoggedIn, relayer]);
+  }, [canCreateToken, setIsLoggingIn, setLoggedIn, relayer, signer, queryClient]);
 
 
   return { relayer, isLoggingIn, isLoggedIn, login, readyToLogin: canCreateToken };

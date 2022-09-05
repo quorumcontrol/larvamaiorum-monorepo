@@ -1,4 +1,4 @@
-import { Contract, Signer, utils, Wallet } from 'ethers'
+import { Contract, PayableOverrides, PopulatedTransaction, Signer, utils, Wallet } from 'ethers'
 import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
 import { TrustedForwarder } from 'skale-relayer-contracts/lib/typechain-types'
 import { delphsContract, lobbyContract, playerContract, trustedForwarderContract } from './contracts'
@@ -68,6 +68,13 @@ class RelayManager extends EventEmitter {
 
   waitForReady() {
     return this.setupForTokenCreationPromise
+  }
+
+  multisend(txs:PopulatedTransaction[], opts?:PayableOverrides) {
+    if (!this.relayer) {
+      throw new Error('no relayer')
+    }
+    return this.relayer.multisend(txs, opts || { gasLimit: 5_000_000 })
   }
 
   async setupForTokenCreation() {

@@ -4,6 +4,9 @@ const nextConfig = {
     webpack: (config, { buildId, dev }) => {
         config.resolve.symlinks = false
         return config
+    },
+    images: {
+        domains: ['nftstorage.link']
     }
 }
 
