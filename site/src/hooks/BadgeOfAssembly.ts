@@ -8,7 +8,7 @@ export const fetchQueryAppropriateMetadata = async (tokenId:BigNumberish) => {
   const metadata = await badgeOfAssemblyContract().metadata(tokenId)
   return {
     ...metadata,
-    id: tokenId,
+    id: BigNumber.from(tokenId),
   }
 }
 
@@ -34,7 +34,7 @@ export const useBadgeMetadata = (tokenId?:BigNumberish) => {
     })
 }
 
-export type MetadataWithId = ThenArg<ReturnType<BadgeOfAssembly['metadata']>> & { id: BigNumberish }
+export type MetadataWithId = ThenArg<ReturnType<BadgeOfAssembly['metadata']>> & { id: BigNumber }
 
 // const PAGE_SIZE = 50
 // export const useAllTokens = () => {
