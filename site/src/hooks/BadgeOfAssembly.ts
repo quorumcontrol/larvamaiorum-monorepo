@@ -4,7 +4,7 @@ import { BadgeOfAssembly } from "../../badge-of-assembly-types"
 import ThenArg from "../utils/ThenArg"
 import { badgeOfAssemblyContract } from "../utils/contracts"
 
-export const fetchQueryAppropriateMetadata = async (tokenId:BigNumberish) => {
+export const fetchQueryAppropriateMetadata = async (tokenId: BigNumberish) => {
   const metadata = await badgeOfAssemblyContract().metadata(tokenId)
   return {
     ...metadata,
@@ -12,7 +12,7 @@ export const fetchQueryAppropriateMetadata = async (tokenId:BigNumberish) => {
   }
 }
 
-export const useUserBadges = (address?:string) => {
+export const useUserBadges = (address?: string) => {
   const badgeOfAssembly = badgeOfAssemblyContract()
   const fetchUserTokens = async () => {
     const userTokenIds = await badgeOfAssembly.userTokens(address!)
@@ -24,14 +24,14 @@ export const useUserBadges = (address?:string) => {
   })
 }
 
-export const useBadgeMetadata = (tokenId?:BigNumberish) => {
+export const useBadgeMetadata = (tokenId?: BigNumberish) => {
   return useQuery(
     ['badge-metadata', tokenId],
-    async () => {
-      return badgeOfAssemblyContract().metadata(tokenId!)
+    () => {
+      return fetchQueryAppropriateMetadata(tokenId!)
     }, {
-      enabled: !!tokenId
-    })
+    enabled: !!tokenId
+  })
 }
 
 export type MetadataWithId = ThenArg<ReturnType<BadgeOfAssembly['metadata']>> & { id: BigNumber }
