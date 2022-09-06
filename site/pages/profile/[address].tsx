@@ -22,6 +22,7 @@ import profileBackground from "../../assets/images/profileBackground.png";
 import { useWootgumpBalance } from "../../src/hooks/useWootgump";
 import border from "../../src/utils/dashedBorder";
 import SignupModal from "../../src/components/SignupModal";
+import humanFormatted from "../../src/utils/humanFormatted";
 
 const Profile: NextPage = () => {
   const router = useRouter();
@@ -123,7 +124,7 @@ const Profile: NextPage = () => {
             <Box position="relative" pb="40px" pt="30px">
               <VStack left="0" position={["relative", "absolute"]} py={["2", "40px"]} px={["0", "60px"]}>
                 <Text fontSize="md">$WOOTGUMP</Text>
-                <Text fontWeight="600">{gumpBalance?.toString()}</Text>
+                <Text fontWeight="600">{ humanFormatted(gumpBalance) }</Text>
               </VStack>
               <VStack right="0" position={["relative", "absolute"]} py={["2", "40px"]} px={["0", "60px"]}>
                 <Text fontSize="md">TEAM</Text>

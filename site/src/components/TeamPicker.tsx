@@ -16,6 +16,7 @@ import { MetadataWithId, useUserBadges } from "../hooks/BadgeOfAssembly";
 import { useTeam } from "../hooks/Player";
 import useIsClientSide from "../hooks/useIsClientSide";
 import ipfsToWeb from "../utils/ipfsToWeb";
+import AppLink from "./AppLink";
 
 const size = "48px";
 
@@ -87,7 +88,7 @@ const TeamPicker: React.FC<{
     return (
       <Box mt="10">
         <Text mb="5">Pick Team</Text>
-        <Text>No badges</Text>
+        <Text>You have no <AppLink href="/badge-of-assembly">Badge of Assembly badges</AppLink>. Grab one to play.</Text>
       </Box>
     );
   }

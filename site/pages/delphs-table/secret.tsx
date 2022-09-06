@@ -9,16 +9,17 @@ import {
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import NextLink from "next/link";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
+import { BigNumberish } from "ethers";
 import AppLink from "../../src/components/AppLink";
 import Layout from "../../src/components/Layout";
-import { useUsername } from "../../src/hooks/Player";
+import TeamPicker from "../../src/components/TeamPicker";
+import { useTeam, useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
-import useMqttMessages from "../../src/hooks/useMqttMessages";
 import { useLogin } from "../../src/hooks/useUser";
 
-const Home: NextPage = () => {
+const Lobby: NextPage = () => {
   const { address } = useAccount();
   const { data: username, isLoading } = useUsername(address);
   const {
@@ -27,17 +28,61 @@ const Home: NextPage = () => {
     readyToLogin,
     isLoggingIn: relayerLoading,
   } = useLogin();
+  const { data: team, isFetched: teamFetched } = useTeam(address);
+
   const isClient = useIsClientSide();
-  const handler = useCallback((topic: string, msg: Buffer) => {
-    console.log("mqtt: ", topic, msg.toString());
-  }, []);
-  useMqttMessages(handler);
+
+  const [pickedTeam, setPickedTeam] = useState<BigNumberish | undefined>();
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onTeamPick = useCallback(async () => {
+    try {
+      setErr("");
+      setLoading(true);
+      await login(undefined, pickedTeam);
+    } catch (err) {
+      console.error("error saving team: ", err);
+      setErr("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }, [pickedTeam, login, setLoading, setErr]);
 
   if (isClient && !isLoading && address && !username) {
     return (
       <Layout>
         <Heading>Delph&apos;s Table</Heading>
         <Text>You need an account to play</Text>
+      </Layout>
+    );
+  }
+
+  if (isClient && (isLoading || loading)) {
+    return (
+      <Layout>
+        <Heading>Delph&apos;s Table</Heading>
+        <Spinner />
+      </Layout>
+    );
+  }
+
+  if (isClient && teamFetched && !team) {
+    return (
+      <Layout>
+        <Heading>Delph&apos;s Table</Heading>
+        <Text>
+          Pick your team to play. You only have to do this once. You can change
+          your team in your{" "}
+          <AppLink href={`/profile/${address}`}>profile</AppLink>.
+        </Text>
+        <TeamPicker address={address} onSelect={setPickedTeam} />
+        <Box>
+          <Button variant="primary" onClick={() => onTeamPick()}>
+            Save
+          </Button>
+          {err && <Text colorScheme="red">{err}</Text>}
+        </Box>
       </Layout>
     );
   }
@@ -81,10 +126,24 @@ const Home: NextPage = () => {
               </VStack>
             )}
           </Box>
+          <video
+            id="full-video"
+            controls
+            preload="auto"
+            width="800"
+            height="450"
+            data-setup="{}"
+          >
+            <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
+            <p className="vjs-no-js">
+              To view this video please enable JavaScript, and consider
+              upgrading to a web browser that supports HTML5 video
+            </p>
+          </video>
         </VStack>
       </Layout>
     </>
   );
 };
 
-export default Home;
+export default Lobby;

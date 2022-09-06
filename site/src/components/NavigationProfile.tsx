@@ -13,6 +13,7 @@ import NextLink from "next/link";
 import { useUsername } from "../hooks/Player";
 import useIsClientSide from "../hooks/useIsClientSide";
 import { useWootgumpBalance } from "../hooks/useWootgump";
+import humanFormatted from "../utils/humanFormatted";
 
 const NavigationProfile: React.FC = () => {
   const { address, isConnected } = useAccount();
@@ -39,7 +40,7 @@ const NavigationProfile: React.FC = () => {
               <Heading size="md">{username}</Heading>
             </LinkOverlay>
           </NextLink>
-          <Text fontSize="md">{balance?.toString()} $GUMP</Text>
+          <Text fontSize="md">{humanFormatted(balance)} $GUMP</Text>
         </VStack>
         <Box>
           <ConnectButton

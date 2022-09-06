@@ -49,20 +49,29 @@ export const useLogin = () => {
         throw new Error('not ready to create token')
       }
       await relayer.createToken()
-      if (username) {
-        console.log('setting username, team to: ', username, team)
-        if (team) {
+
+      const setUserNameAndOrTeam = async () => {
+        if (username && team) {
           const userNameSet = await playerContract().populateTransaction.setUsername(username)
           const teamSet = await playerContract().populateTransaction.setTeam(team)
           const tx = await relayer.multisend([userNameSet, teamSet])
-          console.log("tx: ", tx.hash)
-          await tx.wait()
-        } else {
+          console.log("username and team set tx: ", tx.hash)
+          return tx.wait()
+        }
+        if (username) {
           const tx = await relayer.wrapped.player().setUsername(username)
-          console.log("tx: ", tx.hash)
-          await tx.wait()
+          console.log("username tx: ", tx.hash)
+          return tx.wait()
+        }
+        if (team) {
+          const tx = await relayer.wrapped.player().setTeam(team)
+          console.log("team tx: ", tx.hash)
+          return tx.wait()
         }
       }
+
+      await setUserNameAndOrTeam()
+
       setLoggedIn(true)
     } catch (err) {
       console.error('error login', err)
