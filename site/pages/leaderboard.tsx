@@ -24,7 +24,7 @@ const GumpRow: React.FC<{
   const { data: username } = useUsername(address);
   return (
     <Tr>
-      <Td>{rank}</Td>
+      <Td>{rank + 1}</Td>
       <Td>{username || address}</Td>
       <Td>{humanFormatted(balance)}</Td>
     </Tr>
