@@ -82,3 +82,9 @@ task('run-game')
     }
     console.log('done')
   })
+
+  task('delph', 'tell me delphs address')
+    .setAction(async (_, hre) => {
+      const accts = await hre.getNamedAccounts()
+      console.log("delph: ", accts['delph'])
+    })

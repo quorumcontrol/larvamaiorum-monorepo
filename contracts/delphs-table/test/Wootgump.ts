@@ -2,7 +2,6 @@ import { expect } from "chai"
 import { loadFixture } from "ethereum-waffle"
 import { utils, Wallet } from "ethers"
 import { ethers } from "hardhat"
-import { Wootgump } from "../typechain"
 import { deployForwarderAndRoller } from "./fixtures"
 
 describe("Wootgump", function () {
@@ -46,4 +45,5 @@ describe("Wootgump", function () {
       // console.log("gas: ", receipt.gasUsed)
     }
   }).timeout(120000)
+
 })

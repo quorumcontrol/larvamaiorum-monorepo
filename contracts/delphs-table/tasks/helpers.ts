@@ -12,6 +12,21 @@ export async function getPlayerContract(
   return Player__factory.connect(deploy.address, await getDeployer(hre));
 }
 
+export async function getWootgumpContract(
+  hre: HardhatRuntimeEnvironment
+) {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/Wootgump.json`
+  );
+
+  const { Wootgump__factory } = await import("../typechain");
+  const delph = await getDelph(hre)
+  if (!delph) {
+    throw new Error('missing delph')
+  }
+  return Wootgump__factory.connect(deploy.address, delph);
+}
+
 export async function getDelphsTableContract(
   hre: HardhatRuntimeEnvironment
 ) {
