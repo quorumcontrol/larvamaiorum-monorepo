@@ -117,11 +117,28 @@ class Grid {
     return this.tick >= this.gameLength
   }
 
-  gumpOutput() {
+  rankedWarriors() {
+    return this.warriors.sort((a, b) => {
+      return b.wootgumpBalance - a.wootgumpBalance
+    })
+  }
+
+  rewards() {
     if (!this.isOver()) {
       throw new Error("grid not finished yet")
     }
+    const ranked = this.rankedWarriors()
+    return {
+      wootgump: this.gumpOutput(),
+      ranked,
+      quests: {
+        firstBlood: this.firstBlood,
+        firstGump: this.firstGump,
+      }
+    }
+  }
 
+  private gumpOutput() {
     return this.warriors.reduce((memo, warrior) => {
       return {
         ...memo,

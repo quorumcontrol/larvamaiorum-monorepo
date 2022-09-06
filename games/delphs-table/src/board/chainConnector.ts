@@ -130,9 +130,7 @@ class ChainConnector extends ScriptTypeBase {
   }
 
   private pingParentPage() {
-    const warriors = this.grid.warriors.sort((a, b) => {
-      return b.wootgumpBalance - a.wootgumpBalance
-    }).map((w) => {
+    const warriors = this.grid.rankedWarriors().map((w) => {
       return {
         id: w.id,
         name: w.name,
