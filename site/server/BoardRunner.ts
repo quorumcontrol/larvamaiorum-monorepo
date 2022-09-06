@@ -82,17 +82,12 @@ class BoardRunner {
     return grid
   }
 
-  gumpOutput() {
+  rewards() {
     if (!this.didRun || !this.grid) {
       throw new Error("Didn't run the grid yet")
     }
 
-    return this.grid.warriors.reduce((memo, warrior) => {
-      return {
-        ...memo,
-        [warrior.id]: warrior.wootgumpBalance,
-      }
-    }, {})
+    return this.grid.rewards()
   }
 
 

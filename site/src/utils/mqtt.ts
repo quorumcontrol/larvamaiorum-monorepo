@@ -63,6 +63,12 @@ class AsyncMqtt extends EventEmitter {
     this.client.on('error', (err) => {
       console.error('mqtt err', err)
     })
+    this.client.on('disconnect', (err) => {
+      console.error('mqtt disconnect', err)
+    })
+    this.client.on('close', () => {
+      console.log('----- mqtt close')
+    })
   }
 
   async subscribe(channel:string, opts:IClientSubscribeOptions = { qos: 0 }) {
