@@ -47,6 +47,7 @@ interface AccoladesInterface extends ethers.utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "totalSupply(uint256)": FunctionFragment;
     "uri(uint256)": FunctionFragment;
+    "userTokens(address)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -147,6 +148,7 @@ interface AccoladesInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "userTokens", values: [string]): string;
 
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
@@ -222,6 +224,7 @@ interface AccoladesInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "userTokens", data: BytesLike): Result;
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
@@ -462,6 +465,11 @@ export class Accolades extends BaseContract {
     ): Promise<[BigNumber]>;
 
     uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+
+    userTokens(
+      userId: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
   };
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -590,6 +598,8 @@ export class Accolades extends BaseContract {
 
   uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  userTokens(userId: string, overrides?: CallOverrides): Promise<BigNumber[]>;
+
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -713,6 +723,8 @@ export class Accolades extends BaseContract {
     ): Promise<BigNumber>;
 
     uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    userTokens(userId: string, overrides?: CallOverrides): Promise<BigNumber[]>;
   };
 
   filters: {
@@ -999,6 +1011,8 @@ export class Accolades extends BaseContract {
     ): Promise<BigNumber>;
 
     uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    userTokens(userId: string, overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1139,6 +1153,11 @@ export class Accolades extends BaseContract {
 
     uri(
       arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    userTokens(
+      userId: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

@@ -4,15 +4,20 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
 contract Accolades is ERC1155, AccessControl, ERC1155Supply, ERC2771Context {
+    using EnumerableSet for EnumerableSet.UintSet;
+
     uint64 public constant VERSION = 1;
 
     bytes32 public constant URI_SETTER_ROLE = keccak256("URI_SETTER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     string private _contractURI;
+
+    mapping(address => EnumerableSet.UintSet) private _userTokens;
 
     struct BulkMint {
         address to;
@@ -27,6 +32,14 @@ contract Accolades is ERC1155, AccessControl, ERC1155Supply, ERC2771Context {
         _grantRole(DEFAULT_ADMIN_ROLE, initialOwner);
         _grantRole(URI_SETTER_ROLE, initialOwner);
         _grantRole(MINTER_ROLE, initialOwner);
+    }
+
+    function userTokens(address userId)
+        external
+        view
+        returns (uint256[] memory)
+    {
+        return _userTokens[userId].values();
     }
 
     function setContractURI(string memory newuri)
@@ -86,6 +99,17 @@ contract Accolades is ERC1155, AccessControl, ERC1155Supply, ERC2771Context {
         bytes memory data
     ) internal override(ERC1155, ERC1155Supply) {
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+        uint256 len = ids.length;
+        for (uint i = 0; i < len; i++) {
+            uint256 id = ids[i];
+            uint256 amount = amounts[i];
+            if (to != address(0) && amount > 0) {
+                _userTokens[to].add(id);
+            } 
+            if (from != address(0) && ((balanceOf(from, id) - amount) == 0)) {
+                _userTokens[from].remove(id);
+            }
+        }
     }
 
     function supportsInterface(bytes4 interfaceId)
