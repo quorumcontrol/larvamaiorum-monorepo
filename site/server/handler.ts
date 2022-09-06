@@ -1,5 +1,5 @@
 
-import { BigNumber, ContractReceipt, Wallet } from "ethers";
+import { BigNumber, ContractReceipt, utils, Wallet } from "ethers";
 import debug, { Debugger } from 'debug'
 import { keccak256 } from "ethers/lib/utils";
 import { faker } from '@faker-js/faker'
@@ -21,6 +21,8 @@ import BoardRunner from "./BoardRunner";
 dotenv.config({
   path: '.env.local'
 })
+
+const ONE = utils.parseEther('1')
 
 const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 7
@@ -248,16 +250,16 @@ class TablePlayer {
       }))).reduce((memo:Record<string, {to: string, amount: BigNumber}>, gumpResults) => {
         Object.keys(gumpResults).forEach((playerId) => {
           memo[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
-          memo[playerId].amount = memo[playerId].amount.add(gumpResults[playerId])
+          memo[playerId].amount = memo[playerId].amount.add(BigNumber.from(gumpResults[playerId]).mul(ONE))
         })
         return memo
       }, {})
 
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
-        const tx = await wootgump.bulkMint(Object.values(results))
+        const tx = await wootgump.bulkMint(Object.values(results), { gasLimit: 2_000_000 })
         this.log('wootgump prize tx: ', tx.hash)
-        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500000 })
+        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
       })
       this.log('rolling complete')
     } catch (err) {
