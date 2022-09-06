@@ -6,7 +6,7 @@ import { defaultNetwork } from "./SkaleChains"
 import { memoize } from "./memoize"
 import { skaleProvider } from "./skaleProvider"
 
-const TIME_ZONE="utc-12"
+const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
 const explorerUrl = memoize(() => {
@@ -17,7 +17,7 @@ const explorerUrl = memoize(() => {
   return explorerUrl
 })
 
-const MAX_RANKINGS=500
+const MAX_RANKINGS = 500
 
 type Address = string
 
@@ -31,6 +31,11 @@ interface Ranking {
   end: number,
   ranked: RankingItem[]
 }
+
+const IGNORED_ADDRESSES = [
+  constants.AddressZero,
+  '0x6de3d3747d54d0adc11e5cf678d4045b0441d332',
+].map((addr) => addr.toLowerCase())
 
 // async function getUTCTimestamp(blockNumber:number) {
 //   const body = JSON.stringify({
@@ -53,8 +58,8 @@ interface Ranking {
 //   return DateTime.fromISO(timestamp, {zone: 'utc'})
 // }
 
-async function closestBlockForTime(time:DateTime, beforeOrAfter:'before' | 'after') {
-  const resp = await fetch(`${explorerUrl()}api?module=block&action=getblocknobytime&timestamp=${Math.floor(time.toUTC().toSeconds())}&closest=${beforeOrAfter}`, { headers: {accept: "application/json"} })
+async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
+  const resp = await fetch(`${explorerUrl()}api?module=block&action=getblocknobytime&timestamp=${Math.floor(time.toUTC().toSeconds())}&closest=${beforeOrAfter}`, { headers: { accept: "application/json" } })
   // console.log("resp: ", resp)
   const parsedResp = await resp.json()
   const { result, message } = parsedResp
@@ -67,11 +72,11 @@ async function closestBlockForTime(time:DateTime, beforeOrAfter:'before' | 'afte
   if (!result || !result.blockNumber) {
     console.error('missing block number: ', parsedResp)
     throw new Error("missing block number in response")
-  } 
+  }
   return parseInt(result.blockNumber, 10)
 }
 
-export async function timeRank(time:DateTime, type: 'day' | 'week' | 'month') {
+export async function timeRank(time: DateTime, type: 'day' | 'week' | 'month') {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
   const start = cryptoRomeDay.startOf(type)
   const end = cryptoRomeDay.endOf(type)
@@ -83,29 +88,35 @@ export async function timeRank(time:DateTime, type: 'day' | 'week' | 'month') {
   return rank(startBlock, endBlock)
 }
 
-
-async function rank(from:number, to:number):Promise<Ranking> {
+async function rank(from: number, to: number): Promise<Ranking> {
   const wootgump = wootgumpContract()
-    
+
   const filter = wootgump.filters.Transfer(null, null, null)
- 
-  const accts:Record<Address,RankingItem> = {}
+
+  const accts: Record<Address, RankingItem> = {}
 
   const evts = await wootgump.queryFilter(filter, from, to)
-  console.log('from/to', from, to, 'events: ', evts)
   evts.forEach((evt) => {
-    const existingFrom = accts[evt.args.from] || { address: evt.args.from, balance: constants.Zero}
-    existingFrom.balance = existingFrom.balance.sub(evt.args.value)
-    accts[evt.args.from] = existingFrom
+    const from = evt.args.from
+    const to = evt.args.to
+    const value = evt.args.value
 
-    const existingTo = accts[evt.args.to] || { address: evt.args.to, balance: constants.Zero}
-    existingTo.balance = existingTo.balance.add(evt.args.value)
-    accts[evt.args.to] = existingTo
+    if (!IGNORED_ADDRESSES.includes(from.toLowerCase())) {
+      const existingFrom = accts[from] || { address: from, balance: constants.Zero }
+      existingFrom.balance = existingFrom.balance.sub(value)
+      accts[from] = existingFrom
+    }
+
+    if (!IGNORED_ADDRESSES.includes(to.toLowerCase())) {
+      const existingTo = accts[to] || { address: to, balance: constants.Zero }
+      existingTo.balance = existingTo.balance.add(value)
+      accts[to] = existingTo
+    }
   })
 
   return {
     start: from,
     end: to,
-    ranked: Object.values(accts).sort((a,b) => b.balance.sub(a.balance).div(ONE).toNumber() ).slice(0, MAX_RANKINGS)
+    ranked: Object.values(accts).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
   }
 }
