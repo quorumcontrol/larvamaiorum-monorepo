@@ -35,6 +35,7 @@
     "typescript": "^4.7.3"
   },
   "dependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.5",
     "@openzeppelin/contracts": "^4.6.0",
     "@types/dotenv": "^8.2.0",
     "hardhat-deploy": "^0.11.11",

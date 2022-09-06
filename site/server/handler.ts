@@ -1,5 +1,5 @@
 
-import { BigNumber, ContractReceipt, Wallet } from "ethers";
+import { BigNumber, BigNumberish, ContractReceipt, utils, Wallet } from "ethers";
 import debug, { Debugger } from 'debug'
 import { keccak256 } from "ethers/lib/utils";
 import { faker } from '@faker-js/faker'
@@ -9,7 +9,7 @@ import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
-import { delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
+import { accoladesContract, delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
@@ -21,6 +21,8 @@ import BoardRunner from "./BoardRunner";
 dotenv.config({
   path: '.env.local'
 })
+
+const ONE = utils.parseEther('1')
 
 const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 7
@@ -61,6 +63,7 @@ const delphs = delphsContract().connect(wallet)
 const player = playerContract().connect(wallet)
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
 const wootgump = wootgumpContract().connect(wallet)
+const accolades = accoladesContract().connect(wallet)
 
 class TableMaker {
   log: Debugger
@@ -244,20 +247,50 @@ class TablePlayer {
         this.log('collecting results for', table.id)
         const runner = new BoardRunner(table.id)
         await runner.run()
-        return runner.gumpOutput()
-      }))).reduce((memo:Record<string, {to: string, amount: BigNumber}>, gumpResults) => {
-        Object.keys(gumpResults).forEach((playerId) => {
-          memo[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
-          memo[playerId].amount = memo[playerId].amount.add(gumpResults[playerId])
+        return runner.rewards()
+      }))).reduce((memo:{gump: Record<string, {to: string, amount: BigNumber}>, accolades: {to: string, id: BigNumberish, amount: BigNumber}[]}, results) => {
+        Object.keys(results.wootgump).forEach((playerId) => {
+          memo.gump[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
+          memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(results.wootgump[playerId]).mul(ONE))
         })
+        memo.accolades = memo.accolades.concat(results.ranked.slice(0,3).map((w, i) => {
+          return {
+            id: i,
+            amount: BigNumber.from(1),
+            to: w.id,
+          }
+        }))
+        if (results.quests.firstGump) {
+          memo.accolades.push({
+            to: results.quests.firstGump.id,
+            amount: BigNumber.from(1),
+            id: 3
+          })
+        }
+        if (results.quests.firstBlood) {
+          memo.accolades.push({
+            to: results.quests.firstBlood.id,
+            amount: BigNumber.from(1),
+            id: 4
+          })
+        }
         return memo
-      }, {})
+      }, {gump: {}, accolades: []})
 
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
-        const tx = await wootgump.bulkMint(Object.values(results))
+        const tx = await wootgump.bulkMint(Object.values(results.gump), { gasLimit: 2_000_000 })
+        tx.wait().catch((err) => {
+          console.error('error minting wootgump: ', tx.hash, err)
+        })
         this.log('wootgump prize tx: ', tx.hash)
-        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500000 })
+        const accoladesTx = await accolades.multiUserBatchMint(results.accolades, [], { gasLimit: 2_000_000 })
+        accoladesTx.wait().catch((err) => {
+          console.error("accolades tx failed: ", accoladesTx.hash, err)
+        })
+        this.log('accoladesTx tx: ', accoladesTx.hash)
+
+        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
       })
       this.log('rolling complete')
     } catch (err) {

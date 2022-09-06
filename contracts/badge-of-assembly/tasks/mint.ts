@@ -81,6 +81,6 @@ task("metadata")
   .addParam("tokenId", "the id to fetch for metadata")
   .setAction(async ({ tokenId }, hre) => {
     const boa = await getBadgeOfAssemblyContract(hre);
-    const meta = await boa.uri(tokenId);
+    const meta = await boa.metadata(tokenId);
     console.log(meta);
   });
