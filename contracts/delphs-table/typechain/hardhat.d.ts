@@ -129,6 +129,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ranker__factory>;
     getContractFactory(
+      name: "TeamStats",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TeamStats__factory>;
+    getContractFactory(
       name: "TestDiceRoller",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TestDiceRoller__factory>;
@@ -286,6 +290,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Ranker>;
+    getContractAt(
+      name: "TeamStats",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TeamStats>;
     getContractAt(
       name: "TestDiceRoller",
       address: string,
