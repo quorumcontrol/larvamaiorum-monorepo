@@ -5,12 +5,12 @@ import { timeRank } from "../utils/rankings"
 const TIME_ZONE = "utc-12"
 const TEN_MINUTES = 10 * 60 * 1000
 
-export const useLeaderboard = () => {
+export const useLeaderboard = (timeFrame:'day'|'month') => {
   const now = DateTime.now().setZone(TIME_ZONE)
   return useQuery(
-    ["wootgump-daily-leaderboard", now.startOf('day').toSeconds()],
+    ["wootgump-daily-leaderboard", timeFrame, now.startOf('day').toSeconds()],
     async () => {
-      return timeRank(now, 'day')
+      return timeRank(now, timeFrame)
     },
     {
       refetchOnMount: false,
