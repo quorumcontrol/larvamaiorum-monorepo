@@ -79,7 +79,7 @@ class GameRunner {
   }
 
   stop() {
-    mqttClient().off('message', this.handleMqttMessage)
+    mqttClient().removeListener('message', this.handleMqttMessage)
   }
 
   private shouldStart(tick:BigNumberish) {
