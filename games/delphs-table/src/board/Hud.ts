@@ -2,6 +2,7 @@ import { Entity, SineInOut, Tween, SoundComponent } from "playcanvas";
 import HelpText from "../appWide/HelpText";
 import { CellOutComeDescriptor } from "../boardLogic/Cell";
 import { TickOutput } from "../boardLogic/Grid";
+import Warrior from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { GameConfig, getGameConfig } from "../utils/config";
 
@@ -23,13 +24,11 @@ class Hud extends ScriptTypeBase {
   miniQuestText: Entity
   miniQuestTween?: Tween
 
-  soundPlayer:SoundComponent
+  soundPlayer: SoundComponent
 
   singleton: SimpleSyncher
 
   timeToNextRound = -1;
-
-  firstGumpAlerted = false
 
   initialize() {
     this.singleton = new SimpleSyncher('hud')
@@ -130,27 +129,25 @@ class Hud extends ScriptTypeBase {
     return sorted?.indexOf(config.currentPlayer) + 1
   }
 
-  private handleFirstGump(tickOutput: TickOutput, playerId?: string) {
-    if (!playerId || this.firstGumpAlerted) {
+  private handleFirstGump(tickOutput: TickOutput, player?: Warrior) {
+    if (!player || !tickOutput.quests.firstGump) {
       return
     }
 
-    let someoneHarvested = false
+    if (tickOutput.quests.firstGump === player) {
+      this.updateMiniQuestText('first gump!')
+      this.soundPlayer.slot('firstGump')?.play()
+    }
+  }
 
-    tickOutput.outcomes.forEach((row) => {
-      row.forEach((cellOutcome) => {
-        if (Object.keys(cellOutcome.harvested).length > 0) {
-          someoneHarvested = true
-        }
-        if (cellOutcome.harvested[playerId]) {
-          this.updateMiniQuestText('first gump!')
-          this.soundPlayer.slot('firstGump')?.play()
-        }
-      })
-    })
+  private handleFirstBlood(tickOutput: TickOutput, player?: Warrior) {
+    if (!player || !tickOutput.quests.firstBlood) {
+      return
+    }
 
-    if (someoneHarvested) {
-      this.firstGumpAlerted = true
+    if (tickOutput.quests.firstBlood === player) {
+      this.updateMiniQuestText('first blood!')
+      // TODO: play first blood sound.
     }
   }
 
@@ -174,7 +171,8 @@ class Hud extends ScriptTypeBase {
     console.log('interesting: ', events)
     events.forEach(this.playEvent.bind(this))
 
-    this.handleFirstGump(tickOutput, player?.id)
+    this.handleFirstGump(tickOutput, player)
+    this.handleFirstBlood(tickOutput, player)
 
     if (config.grid?.isOver()) {
       const gameOver = mustFindByName(this.entity, "GameOver");

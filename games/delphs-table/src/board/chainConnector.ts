@@ -141,6 +141,8 @@ class ChainConnector extends ScriptTypeBase {
         wootgumpBalance: w.wootgumpBalance,
         attack: w.attack,
         defense: w.defense,
+        firstGump: (this.grid.firstGump === w),
+        firstBlood: (this.grid.firstBlood === w),
       }
     })
     parent.postMessage(JSON.stringify({
