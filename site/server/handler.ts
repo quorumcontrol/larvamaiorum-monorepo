@@ -26,7 +26,7 @@ const ONE = utils.parseEther('1')
 
 const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 7
-const WOOTGUMP_MULTIPLIER = 12
+const WOOTGUMP_MULTIPLIER = 24
 
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
