@@ -54,6 +54,21 @@ export async function getListKeeperContract(
   return ListKeeper__factory.connect(deploy.address, delph)
 }
 
+export async function getAccoladeContract(
+  hre: HardhatRuntimeEnvironment
+) {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/Accolades.json`
+  );
+  const delph = await getDelph(hre)
+  if (!delph) {
+    throw new Error('no delph')
+  }
+  const { Accolades__factory } = await import("../typechain");
+
+  return Accolades__factory.connect(deploy.address, delph)
+}
+
 export async function getLobbyContract(
   hre: HardhatRuntimeEnvironment
 ) {
