@@ -87,6 +87,7 @@ const theme = extendTheme({
     brand: {
       background: "#101010",
       orange: "#D14509",
+      accoladeBackground: "#1F1816",
     },
   },
   components: {
