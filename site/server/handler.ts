@@ -63,6 +63,7 @@ const delphs = delphsContract().connect(wallet)
 const player = playerContract().connect(wallet)
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
 const wootgump = wootgumpContract().connect(wallet)
+const accolades = accoladesContract().connect(wallet)
 
 class TableMaker {
   log: Debugger
@@ -250,7 +251,7 @@ class TablePlayer {
       }))).reduce((memo:{gump: Record<string, {to: string, amount: BigNumber}>, accolades: {to: string, id: BigNumberish, amount: BigNumber}[]}, results) => {
         Object.keys(results.wootgump).forEach((playerId) => {
           memo.gump[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
-          memo.gump[playerId].amount = memo[playerId].amount.add(BigNumber.from(results.wootgump[playerId]).mul(ONE))
+          memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(results.wootgump[playerId]).mul(ONE))
         })
         memo.accolades = memo.accolades.concat(results.ranked.slice(0,3).map((w, i) => {
           return {
@@ -283,7 +284,7 @@ class TablePlayer {
           console.error('error minting wootgump: ', tx.hash, err)
         })
         this.log('wootgump prize tx: ', tx.hash)
-        const accoladesTx = await accoladesContract().multiUserBatchMint(results.accolades, [], { gasLimit: 2_000_000 })
+        const accoladesTx = await accolades.multiUserBatchMint(results.accolades, [], { gasLimit: 2_000_000 })
         accoladesTx.wait().catch((err) => {
           console.error("accolades tx failed: ", accoladesTx.hash, err)
         })

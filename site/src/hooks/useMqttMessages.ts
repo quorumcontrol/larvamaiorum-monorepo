@@ -22,7 +22,8 @@ const useMqttMessages = (handler: (topic:string, payload:Buffer)=>any) => {
   useEffect(() => {
     mqttClient().on('message', handler)
     return () => {
-      mqttClient().off('message', handler)
+      console.log("mqtt: ", mqttClient())
+      mqttClient().removeListener('message', handler)
     }
   }, [handler])
 
