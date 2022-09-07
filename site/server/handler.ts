@@ -7,7 +7,7 @@ import { NonceManager } from '@ethersproject/experimental'
 import * as dotenv from "dotenv";
 import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
-import { OrchestratorState__factory } from "../contracts/typechain";
+import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
 import { accoladesContract, delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
@@ -61,9 +61,11 @@ const wallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).conne
 const lobby = lobbyContract().connect(wallet)
 const delphs = delphsContract().connect(wallet)
 const player = playerContract().connect(wallet)
-const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
 const wootgump = wootgumpContract().connect(wallet)
 const accolades = accoladesContract().connect(wallet)
+
+const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
+const teamStats = TeamStats__factory.connect(addresses().TeamStats, wallet)
 
 class TableMaker {
   log: Debugger
@@ -141,7 +143,7 @@ class TableMaker {
         this.log('taking addresses')
         await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
         return startTx
-      }) 
+      })
       this.log('waiting for create and start')
       await tx.wait()
 
@@ -154,7 +156,7 @@ class TableMaker {
 }
 
 const diceRolledTopic = delphs.interface.getEventTopic('DiceRolled')
-const getDiceRollFromReceipt = (receipt:ContractReceipt) => {
+const getDiceRollFromReceipt = (receipt: ContractReceipt) => {
   const evt = receipt.logs.find((l) => {
     return l.topics[0] === diceRolledTopic
   })
@@ -191,7 +193,7 @@ class TablePlayer {
 
   async handleTableStarted() {
     this.log('table started, waiting')
-    await promiseWaiter(15000)
+    await promiseWaiter(10000)
     this.instantTableStarted()
   }
 
@@ -210,15 +212,30 @@ class TablePlayer {
       }
       const active = await Promise.all((ids).map(async (tableId) => {
         console.log('active: ', tableId)
-        const metadata = await delphs.tables(tableId)
+        const [metadata, playerAddresses] = await Promise.all([
+          delphs.tables(tableId),
+          delphs.players(tableId)
+        ])
+        const teams = await Promise.all(playerAddresses.map(async (addr) => {
+          return player.team(addr)
+        }))
+
+        const players = playerAddresses.reduce((memo, addr, i) => {
+          return {
+            ...memo,
+            [addr]: teams[i],
+          }
+        }, {})
+
         return {
           id: tableId,
           metadata,
           start: metadata.startedAt,
-          end: metadata.startedAt.add(metadata.gameLength)
+          end: metadata.startedAt.add(metadata.gameLength),
+          players,
         }
       }))
-      this.log('actives: ', active.map((a) => ({id: a.id, start: a.start.toNumber(), end: a.end.toNumber()})))
+      this.log('actives: ', active.map((a) => ({ id: a.id, start: a.start.toNumber(), end: a.end.toNumber() })))
       const endings = active.map((tourn) => tourn.end).sort((a, b) => b.sub(a).toNumber()) // sort to largest first
       const currentTick = await delphs.latestRoll()
 
@@ -226,7 +243,7 @@ class TablePlayer {
 
       for (let i = 0; i < endings[0].sub(currentTick).toNumber(); i++) {
         this.log('buffer')
-        const tick = currentTick.add(i+1).toNumber()
+        const tick = currentTick.add(i + 1).toNumber()
 
         mqttClient().publish(NO_MORE_MOVES_CHANNEL, JSON.stringify({ tick }))
         await promiseWaiter(STOP_MOVES_BUFFER * 1000)
@@ -242,40 +259,45 @@ class TablePlayer {
         this.log('waiting')
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
-      
+
       const results = (await Promise.all(active.map(async (table) => {
         this.log('collecting results for', table.id)
         const runner = new BoardRunner(table.id)
         await runner.run()
-        return runner.rewards()
-      }))).reduce((memo:{gump: Record<string, {to: string, amount: BigNumber}>, accolades: {to: string, id: BigNumberish, amount: BigNumber}[]}, results) => {
-        Object.keys(results.wootgump).forEach((playerId) => {
-          memo.gump[playerId] ||= {to: playerId, amount: BigNumber.from(0)}
-          memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(results.wootgump[playerId]).mul(ONE))
+        return {
+          table,
+          rewards: runner.rewards()
+        }
+      }))).reduce((memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] }, { table, rewards }) => {
+        Object.keys(rewards.wootgump).forEach((playerId) => {
+          const team = table.players[playerId]
+          memo.gump[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
+          memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
+          memo.gump[playerId].team = team
         })
-        memo.accolades = memo.accolades.concat(results.ranked.slice(0,3).map((w, i) => {
+        memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
           return {
             id: i,
             amount: BigNumber.from(1),
             to: w.id,
           }
         }))
-        if (results.quests.firstGump) {
+        if (rewards.quests.firstGump) {
           memo.accolades.push({
-            to: results.quests.firstGump.id,
+            to: rewards.quests.firstGump.id,
             amount: BigNumber.from(1),
             id: 3
           })
         }
-        if (results.quests.firstBlood) {
+        if (rewards.quests.firstBlood) {
           memo.accolades.push({
-            to: results.quests.firstBlood.id,
+            to: rewards.quests.firstBlood.id,
             amount: BigNumber.from(1),
             id: 4
           })
         }
         return memo
-      }, {gump: {}, accolades: []})
+      }, { gump: {}, accolades: [] })
 
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
@@ -289,6 +311,12 @@ class TablePlayer {
           console.error("accolades tx failed: ", accoladesTx.hash, err)
         })
         this.log('accoladesTx tx: ', accoladesTx.hash)
+
+        const teamTx = await teamStats.register(Object.values(results.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })))
+        teamTx.wait().catch((err) => {
+          console.error('error with team tx: ', err)
+        })
+        this.log('team tx: ', teamTx.hash)
 
         return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
       })
