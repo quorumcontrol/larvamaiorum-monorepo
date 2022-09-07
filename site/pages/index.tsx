@@ -86,46 +86,10 @@ const Home: NextPage = () => {
               alignItems="center"
             >
               <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
-                <Text>
-                  The story of how the alien, Ima, first discovered large $SKL
-                  deposits in the arctic regions of Earth. Part I of this
-                  graphic novella is minting page by page.
-                </Text>
-                <Box>
-                  <Link href="/graphic-lore">
-                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                      Mint Now
-                    </Button>
-                  </Link>
-                </Box>
-              </VStack>
-
-              <Spacer />
-              <Box mt="10">
-                <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
-              </Box>
-            </Stack>
-          </Flex>
-
-          <Flex
-            w="100%"
-            backgroundImage={["none", border]}
-            borderBottom={["1px dashed", "none"]}
-            borderBottomColor={"brand.orange"}
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-            <Stack
-              direction={["column", "row"]}
-              spacing="10"
-              w="100%"
-              alignItems="center"
-            >
-              <VStack maxW="22em" alignItems="left">
                 <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
+                <Text>Week 1 Prizes: 115,000 $SKL.</Text>
                 <Text>
+                  
                   The Oracle of Delphi is worried you are not prepared to
                   support your warriors in the Arctic Jungle. He released a
                   mini-game to teach you about the dangers and the spoils of
@@ -134,7 +98,7 @@ const Home: NextPage = () => {
                 <Box>
                   <Link href="/delphs-table">
                     <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
-                      LEARN MORE
+                      PLAY NOW
                     </Button>
                   </Link>
                 </Box>
@@ -160,6 +124,46 @@ const Home: NextPage = () => {
               </Box>
             </Stack>
           </Flex>
+
+          <Flex
+            w="100%"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", "none"]}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="10"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
+                <Text>
+                  The story of how the alien, Ima, first discovered large $SKL
+                  deposits in the arctic regions of Earth. Part I of this
+                  graphic novella is minting page by page.
+                </Text>
+                <Box>
+                  <Link href="/graphic-lore">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                      Mint Now
+                    </Button>
+                  </Link>
+                </Box>
+              </VStack>
+
+              <Spacer />
+              <Box mt="10">
+                <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
+              </Box>
+            </Stack>
+          </Flex>
+
+          
 
           <Flex
             w="100%"
