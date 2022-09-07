@@ -38,6 +38,8 @@ class Grid {
 
   warriors: Warrior[]
 
+  battlesWon: Record<string, number> // warriorId to number of battle wins
+
   tick = 0
   gameLength: number
 
@@ -57,6 +59,7 @@ class Grid {
     this.sizeY = opts.sizeY
     this.warriors = opts.warriors
     this.chanceOfSpawningWootGumpIn1000 = opts.wootgumpMultipler
+    this.battlesWon = {}
     for (let y = 0; y < this.sizeY; y++) {
       for (let x = 0; x < this.sizeX; x++) {
         this.grid[x] = this.grid[x] || []
@@ -134,6 +137,7 @@ class Grid {
       quests: {
         firstBlood: this.firstBlood,
         firstGump: this.firstGump,
+        battlesWon: this.battlesWon,
       }
     }
   }
@@ -177,6 +181,11 @@ class Grid {
         quests.firstBlood = this.firstBlood
       }
     }
+    outcome.battleTicks.forEach((tick) => {
+      if (tick.isOver) {
+        this.battlesWon[tick.winner!.id]++
+      }
+    })
     return quests
   }
 
