@@ -1,17 +1,17 @@
 import { Box, Spinner, Text, VStack, Wrap, WrapItem } from "@chakra-ui/react";
 import Image from "next/image";
-
+import { TOKENS } from "../utils/accolades";
+import { useAccoladesBalance, usePlayerAccolades } from "../hooks/useAccolades";
 import gold from "../../assets/images/accolades/gold.png";
 import silver from "../../assets/images/accolades/silver.png";
 import bronze from "../../assets/images/accolades/bronze.png";
 import firstgump from "../../assets/images/accolades/firstgump.png";
 import firstblood from "../../assets/images/accolades/firstblood.png";
-import { TOKENS } from "../utils/accolades";
-import { useAccoladesBalance, usePlayerAccolades } from "../hooks/useAccolades";
-import humanFormatted from "../utils/humanFormatted";
+import battleWon from "../../assets/images/accolades/battlewon.png"
+
 
 function imageFromToken(id: number) {
-  return [gold, silver, bronze, firstgump, firstblood][id];
+  return [gold, silver, bronze, firstgump, firstblood, battleWon][id];
 }
 
 const AccoladeCard: React.FC<{ tokenId: number, address?:string }> = ({ tokenId, address }) => {

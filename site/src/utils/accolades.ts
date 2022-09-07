@@ -15,5 +15,8 @@ export const TOKENS = [
   },
   {
     name: 'First Blood'
+  },
+  {
+    name: 'Battle Won'
   }
 ]

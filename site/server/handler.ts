@@ -24,7 +24,7 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15
+const NUMBER_OF_ROUNDS = 20
 const TABLE_SIZE = 7
 const WOOTGUMP_MULTIPLIER = 24
 
@@ -296,6 +296,13 @@ class TablePlayer {
             id: 4
           })
         }
+        Object.keys(rewards.quests.battlesWon).forEach((playerAddress) => {
+          memo.accolades.push({
+            to: playerAddress,
+            id: 5,
+            amount: BigNumber.from(rewards.quests.battlesWon[playerAddress])
+          })
+        })
         return memo
       }, { gump: {}, accolades: [] })
 
