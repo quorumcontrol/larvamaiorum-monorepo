@@ -35,28 +35,14 @@ interface Ranking {
 const IGNORED_ADDRESSES = [
   constants.AddressZero,
   '0x6de3d3747d54d0adc11e5cf678d4045b0441d332',
+  '0x218cd18030A5767C6AC9AabA8E2aF84718df0242',
+  '0x18c29610E84b43c812D5CE698Dae0c150e078a74',
+  '0xb344037f0FC5ce7ebED8D473118FA15E8A24db69',
+  '0x0DE468Ca777Cb4e39eb05d227CFdb881d16f422F',
+  '0x9e40339d2F81DdefA91ACE2f95C04C897d46FF46',
+  '0x9781265d96f91007a714eD39c0CCcaf63f98f533',
+  '0xb5EF42d11b48938dDEB468Bf36C384fcefE09B43',
 ].map((addr) => addr.toLowerCase())
-
-// async function getUTCTimestamp(blockNumber:number) {
-//   const body = JSON.stringify({
-//     query: `{block(number: ${blockNumber}) { timestamp }}`,
-//     variables: null,
-//     operationName: null,
-//   })
-
-//   const block = await fetch(`${explorerUrl()}graphiql`, {
-//     method: "POST",
-//     body: body,
-//     headers: {
-//       accept: "application/json",
-//       "content-type": "application/json",
-//     }
-//   })
-//   const resp = await block.json()
-//   // console.log("resp: ", resp)
-//   const { data: { block: { timestamp }}} = resp
-//   return DateTime.fromISO(timestamp, {zone: 'utc'})
-// }
 
 async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
   const resp = await fetch(`${explorerUrl()}api?module=block&action=getblocknobytime&timestamp=${Math.floor(time.toUTC().toSeconds())}&closest=${beforeOrAfter}`, { headers: { accept: "application/json" } })
