@@ -78,9 +78,11 @@ const Lobby: NextPage = () => {
         </Text>
         <TeamPicker address={address} onSelect={setPickedTeam} />
         <Box>
-          <Button variant="primary" onClick={() => onTeamPick()}>
-            Save
-          </Button>
+          {!!pickedTeam && (
+            <Button variant="primary" onClick={() => onTeamPick()}>
+              Save
+            </Button>
+          )}
           {err && <Text colorScheme="red">{err}</Text>}
         </Box>
       </Layout>
