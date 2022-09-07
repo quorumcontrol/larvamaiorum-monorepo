@@ -72,6 +72,7 @@ const Navigation = () => {
         <VStack alignItems="left" ml="5" mt="5" spacing="5">
           <NavItem isMobile href="/">Home</NavItem>
           <NavItem isMobile href="/delphs-table">Delph&apos;s Table</NavItem>
+          <NavItem isMobile href="/leaderboard">Leaderboard</NavItem>
           <NavItem isMobile href="/badge-of-assembly">Badge of Assembly</NavItem>
           <NavItem isMobile href="/graphic-lore">Graphic Lore</NavItem>
           <NavItem isMobile href="/classic">Classic</NavItem>
@@ -100,6 +101,7 @@ const Navigation = () => {
         </LinkBox>
 
         <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
+        <NavItem href="/leaderboard">Leaderboard</NavItem>
         <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
         <NavItem href="/graphic-lore">Graphic Lore</NavItem>
         <NavItem href="/classic">Classic</NavItem>
