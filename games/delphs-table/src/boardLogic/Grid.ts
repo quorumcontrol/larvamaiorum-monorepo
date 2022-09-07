@@ -183,6 +183,7 @@ class Grid {
     }
     outcome.battleTicks.forEach((tick) => {
       if (tick.isOver) {
+        this.battlesWon[tick.winner!.id] ||= 0
         this.battlesWon[tick.winner!.id]++
       }
     })
