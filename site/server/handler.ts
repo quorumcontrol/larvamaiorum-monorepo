@@ -42,7 +42,7 @@ function hashString(msg: string) {
 
 const botSetup = isTestnet ? testnetBots : mainnetBots
 
-function shuffle(array:any[]) {
+function shuffle(array: any[]) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
 
@@ -274,15 +274,14 @@ class TablePlayer {
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
 
-      const results = (await Promise.all(active.map(async (table) => {
+      await Promise.all(active.map(async (table) => {
         this.log('collecting results for', table.id)
         const runner = new BoardRunner(table.id)
         await runner.run()
-        return {
-          table,
-          rewards: runner.rewards()
-        }
-      }))).reduce((memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] }, { table, rewards }) => {
+        const rewards = runner.rewards()
+
+        const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
+
         Object.keys(rewards.wootgump).forEach((playerId) => {
           const team = table.players[playerId]
           memo.gump[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
@@ -317,30 +316,25 @@ class TablePlayer {
             amount: BigNumber.from(rewards.quests.battlesWon[playerAddress])
           })
         })
-        return memo
-      }, { gump: {}, accolades: [] })
 
-      this.log('queuing bulk and prizes')
-      await txSingleton.push(async () => {
-        const tx = await wootgump.bulkMint(Object.values(results.gump), { gasLimit: 8_000_000 })
-        tx.wait().catch((err) => {
-          console.error('error minting wootgump: ', tx.hash, err)
-        })
-        this.log('wootgump prize tx: ', tx.hash)
-        const accoladesTx = await accolades.multiUserBatchMint(results.accolades, [], { gasLimit: 8_000_000 })
-        accoladesTx.wait().catch((err) => {
-          console.error("accolades tx failed: ", accoladesTx.hash, err)
-        })
-        this.log('accoladesTx tx: ', accoladesTx.hash)
+        this.log('queuing bulk and prizes')
+        await txSingleton.push(async () => {
+          const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
+          await tx.wait()
+          this.log('wootgump prize tx: ', tx.hash)
 
-        const teamTx = await teamStats.register(Object.values(results.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000})
-        teamTx.wait().catch((err) => {
-          console.error('error with team tx: ', err)
-        })
-        this.log('team tx: ', teamTx.hash)
+          const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
+          await accoladesTx.wait()
+          this.log('accoladesTx tx: ', accoladesTx.hash)
 
-        return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
-      })
+          const teamTx = await teamStats.register(Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000 })
+          await teamTx.wait()
+          this.log('team tx: ', teamTx.hash)
+
+          return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
+        })
+      }))
+
       this.log('rolling complete')
     } catch (err) {
       console.error('error rolling: ', err)
