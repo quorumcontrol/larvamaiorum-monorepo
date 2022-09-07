@@ -56,14 +56,14 @@ const TeamPicker: React.FC<{
   );
 
   useEffect(() => {
-    if (isLoading || isTeamLoading || selectedTeam !== "0") {
+    if (isLoading || isTeamLoading || selectedTeam !== "0" || !userBadges || userBadges.length === 0) {
       return;
     }
     if (team) {
       return handleTeamClick(team.toString());
     }
 
-    return handleTeamClick((userBadges || [])[0].id.toString());
+    return handleTeamClick(userBadges[0].id.toString());
   }, [
     userBadges,
     onSelect,
