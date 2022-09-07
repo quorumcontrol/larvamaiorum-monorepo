@@ -31,13 +31,17 @@ const LeaderboardPage: NextPage = () => {
         <TabList>
           <Tab>Daily</Tab>
           <Tab>Weekly</Tab>
+          <Tab>Team</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Leaderboard timeframe="day" />
+            <Leaderboard type="gump" timeframe="day" />
           </TabPanel>
           <TabPanel>
-            <Leaderboard timeframe="month" />
+            <Leaderboard type="gump" timeframe="week" />
+          </TabPanel>
+          <TabPanel>
+            <Leaderboard type="team" timeframe="week" />
           </TabPanel>
         </TabPanels>
       </Tabs>

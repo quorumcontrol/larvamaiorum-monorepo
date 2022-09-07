@@ -5,6 +5,9 @@ import { wootgumpContract } from "./contracts"
 import { defaultNetwork } from "./SkaleChains"
 import { memoize } from "./memoize"
 import { skaleProvider } from "./skaleProvider"
+import multicallWrapper from "./multicallWrapper"
+import { TeamStats, TeamStats__factory } from "../../contracts/typechain"
+import { addresses } from "./networks"
 
 const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
@@ -21,8 +24,17 @@ const MAX_RANKINGS = 500
 
 type Address = string
 
-interface RankingItem {
+type RankingItem = GumpRankingItem | TeamRankingItem
+
+interface GumpRankingItem {
   address: Address
+  team: never
+  balance: BigNumber
+}
+
+interface TeamRankingItem {
+  team: number
+  address: never
   balance: BigNumber
 }
 
@@ -44,6 +56,12 @@ const IGNORED_ADDRESSES = [
   '0xb5EF42d11b48938dDEB468Bf36C384fcefE09B43',
 ].map((addr) => addr.toLowerCase())
 
+export const teamStatsContract = memoize(() => {
+  const multiCall = multicallWrapper(skaleProvider);
+  const unwrapped = TeamStats__factory.connect(addresses().TeamStats, skaleProvider);
+  return multiCall.syncWrap<TeamStats>(unwrapped);
+});
+
 async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
   const resp = await fetch(`${explorerUrl()}api?module=block&action=getblocknobytime&timestamp=${Math.floor(time.toUTC().toSeconds())}&closest=${beforeOrAfter}`, { headers: { accept: "application/json" } })
   // console.log("resp: ", resp)
@@ -62,16 +80,41 @@ async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'af
   return parseInt(result.blockNumber, 10)
 }
 
-export async function timeRank(time: DateTime, type: 'day' | 'week' | 'month') {
+export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: 'day' | 'week' | 'month') {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
-  const start = cryptoRomeDay.startOf(type)
-  const end = cryptoRomeDay.endOf(type)
+  const start = cryptoRomeDay.startOf(timePeriod)
+  const end = cryptoRomeDay.endOf(timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
     closestBlockForTime(end, 'before'),
   ])
-  return rank(startBlock, endBlock)
+  switch(type) {
+    case 'gump':
+      return rank(startBlock, endBlock)
+    case 'team':
+      return teamRank(startBlock, endBlock)
+  }
+}
+
+async function teamRank(from: number, to: number): Promise<Ranking> {
+  const teamStats = teamStatsContract()
+  const filter = teamStats.filters.TeamWin(null, null, null, null)
+  const evts = await teamStats.queryFilter(filter, from, to)
+  const teams:Record<number,TeamRankingItem> = {}
+  evts.forEach((evt) => {
+    if (evt.args.team.eq(constants.Zero)) {
+      return
+    }
+    const existingTeam = teams[evt.args.team.toNumber()] || {team: evt.args.team.toNumber(), balance: constants.Zero}
+    existingTeam.balance = existingTeam.balance.add(evt.args.value)
+    teams[evt.args.team.toNumber()] = existingTeam
+  })
+  return {
+    start: from,
+    end: to,
+    ranked: Object.values(teams).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+  }
 }
 
 async function rank(from: number, to: number): Promise<Ranking> {

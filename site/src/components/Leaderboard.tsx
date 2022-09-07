@@ -10,6 +10,7 @@ import {
   Tbody,
 } from "@chakra-ui/react";
 import { BigNumber } from "ethers";
+import { useBadgeMetadata } from "../hooks/BadgeOfAssembly";
 import { useUsername } from "../hooks/Player";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import humanFormatted from "../utils/humanFormatted";
@@ -29,12 +30,30 @@ const GumpRow: React.FC<{
   );
 };
 
-const Leaderboard: React.FC<{ timeframe: "day" | "month" }> = ({
-  timeframe,
-}) => {
-  const { data: leaderboard, isLoading } = useLeaderboard(timeframe);
+const TeamRow: React.FC<{
+  team: number;
+  balance: BigNumber;
+  rank: number;
+}> = ({ team, balance, rank }) => {
+  const { data: meta } = useBadgeMetadata(team);
+  return (
+    <Tr>
+      <Td>{rank + 1}</Td>
+      <Td>{meta?.name || <Spinner />}</Td>
+      <Td>{humanFormatted(balance)}</Td>
+    </Tr>
+  );
+};
 
-  const label = timeframe === 'day' ? "Day's" : "Month's"
+const Leaderboard: React.FC<{
+  timeframe: "day" | "month" | 'week';
+  type: "gump" | "team";
+}> = ({ timeframe, type }) => {
+  const { data: leaderboard, isLoading } = useLeaderboard(type, timeframe);
+
+  const label = timeframe === "day" ? "Day's" : "Week's";
+
+  const entityLabel = type === "team" ? "Team" : "Player";
 
   if (isLoading) {
     return (
@@ -45,29 +64,39 @@ const Leaderboard: React.FC<{ timeframe: "day" | "month" }> = ({
   }
 
   return (
-      <TableContainer>
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>Rank</Th>
-              <Th>Player</Th>
-              <Th>{label} Gump</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {(leaderboard?.ranked || []).map((ranking, i) => {
+    <TableContainer>
+      <Table>
+        <Thead>
+          <Tr>
+            <Th>Rank</Th>
+            <Th>{entityLabel}</Th>
+            <Th>{label} Gump</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {(leaderboard?.ranked || []).map((ranking, i) => {
+            if (type === "team") {
               return (
-                <GumpRow
-                  address={ranking.address}
+                <TeamRow
+                  team={ranking.team}
                   balance={ranking.balance}
                   rank={i}
-                  key={`leaderboard-${ranking.address}`}
+                  key={`leaderboard-team-${ranking.team}`}
                 />
               );
-            })}
-          </Tbody>
-        </Table>
-      </TableContainer>
+            }
+            return (
+              <GumpRow
+                address={ranking.address}
+                balance={ranking.balance}
+                rank={i}
+                key={`leaderboard-${ranking.address}`}
+              />
+            );
+          })}
+        </Tbody>
+      </Table>
+    </TableContainer>
   );
 };
 
