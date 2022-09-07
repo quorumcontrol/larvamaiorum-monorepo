@@ -14,6 +14,18 @@ task('tick')
     console.log('time: ', (new Date().getTime() - start.getTime()) / 1000)
   })
 
+task('sfuel-replenish')
+  .addParam('address')
+  .setAction(async ({ address }, hre) => {
+    const deployer = await getDeployer(hre)
+    const tx = await deployer.sendTransaction({
+      to: address,
+      value: utils.parseEther('1')
+    })
+    console.log('tx: ', tx.hash)
+    await tx.wait()
+  })
+
 task('setup-bots', 'setup a number of bots')
   .addParam('amount', 'the number of bots to create')
   .setAction(async ({ amount }, hre) => {
