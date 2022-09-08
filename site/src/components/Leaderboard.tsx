@@ -48,8 +48,9 @@ const TeamRow: React.FC<{
 const Leaderboard: React.FC<{
   timeframe: "day" | "month" | 'week';
   type: "gump" | "team";
-}> = ({ timeframe, type }) => {
-  const { data: leaderboard, isLoading } = useLeaderboard(type, timeframe);
+  diff?:string
+}> = ({ timeframe, type, diff }) => {
+  const { data: leaderboard, isLoading } = useLeaderboard(type, timeframe, diff as string|undefined);
 
   const label = timeframe === "day" ? "Day's" : "Week's";
 
