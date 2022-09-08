@@ -2,7 +2,7 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 
 import { createScript } from "../utils/createScriptDecorator";
 import Warrior, { WarriorStats } from "../boardLogic/Warrior";
-import Grid from "../boardLogic/Grid";
+import Grid, { TickOutput } from "../boardLogic/Grid";
 import BoardGenerate from "./BoardGenerate";
 import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
@@ -129,7 +129,7 @@ class ChainConnector extends ScriptTypeBase {
     }
   }
 
-  private pingParentPage() {
+  private pingParentPage(tick: TickOutput) {
     const warriors = this.grid.rankedWarriors().map((w) => {
       return {
         id: w.id,
@@ -141,6 +141,7 @@ class ChainConnector extends ScriptTypeBase {
         defense: w.defense,
         firstGump: (this.grid.firstGump === w),
         firstBlood: (this.grid.firstBlood === w),
+        battlesWon: this.grid.battlesWon[w.id] || 0,
       }
     })
     parent.postMessage(JSON.stringify({
@@ -182,12 +183,13 @@ class ChainConnector extends ScriptTypeBase {
         }
         warrior.setDestination(dest.x, dest.y)
       })
-      this.entity.fire(TICK_EVT, this.grid.handleTick(random));
+      const tickOutput = this.grid.handleTick(random)
+      this.entity.fire(TICK_EVT, tickOutput);
       this.latest = index;
       if (this.grid.isOver()) {
         this.entity.fire(GAME_OVER_EVT)
       }
-      this.pingParentPage()
+      this.pingParentPage(tickOutput)
     } catch (err) {
       console.error('error handling async tick: ', err)
       return
