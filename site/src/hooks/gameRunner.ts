@@ -3,10 +3,10 @@ import { DelphsTable } from "../../contracts/typechain"
 import { delphsContract, playerContract } from "../utils/contracts"
 import mqttClient, { ROLLS_CHANNEL } from '../utils/mqtt'
 import ThenArg from "../utils/ThenArg"
-import debug from 'debug'
 import SingletonQueue from "../utils/singletonQueue"
 import { BigNumber, BigNumberish } from "ethers"
 import { memoize } from "../utils/memoize"
+import { EventEmitter } from "events"
 
 const log = console.log //debug('gameRunner')
 
@@ -40,7 +40,7 @@ interface SetupMessage {
   tableSize: number, 
 }
 
-class GameRunner {
+class GameRunner extends EventEmitter {
   tableId: string
   iframe: HTMLIFrameElement
 
@@ -48,12 +48,15 @@ class GameRunner {
 
   latest = BigNumber.from(0)
 
+  over = false
+
   singleton: SingletonQueue
 
   private tableInfo?: ThenArg<ReturnType<DelphsTable['tables']>>
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
 
   constructor(tableId: string, iframe: HTMLIFrameElement) {
+    super()
     this.handleMqttMessage = this.handleMqttMessage.bind(this)
     log('--------------- new game runnner')
     this.singleton = new SingletonQueue(`game-runner-${tableId}`)
@@ -93,6 +96,16 @@ class GameRunner {
     const delphs = delphsContract()
 
     this.tableInfo = await delphs.tables(this.tableId)
+  }
+
+  private checkForEnd() {
+    if (!this.tableInfo) {
+      throw new Error('no table')
+    }
+    if (this.tableInfo.startedAt.add(this.tableInfo.gameLength).gte(this.latest)) {
+      console.log('game over')
+      this.emit('END')
+    }
   }
 
   private async go(latest: BigNumber) {
@@ -230,6 +243,7 @@ class GameRunner {
       }
     })
     this.latest = BigNumber.from(tick)
+    this.checkForEnd()
   }
 
   private async handleOrchestratorRoll({ tick, random }: { txHash?: string, tick: number, random: string, blockNumber?: number }) {
