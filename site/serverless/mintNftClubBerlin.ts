@@ -9,7 +9,7 @@ import 'cross-fetch/polyfill';
 const API_ENDPOINT = 'https://discord.com/api/v10'
 const NFT_BERLIN_GUILD_ID = "910069601046523914"
 
-const TOKEN_ID = isTestnet ? 4 : 5
+const TOKEN_ID = 5
 
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")

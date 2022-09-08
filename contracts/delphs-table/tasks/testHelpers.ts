@@ -16,11 +16,12 @@ task('tick')
 
 task('sfuel-replenish')
   .addParam('address')
-  .setAction(async ({ address }, hre) => {
+  .addOptionalParam('amount')
+  .setAction(async ({ address, amount }, hre) => {
     const deployer = await getDeployer(hre)
     const tx = await deployer.sendTransaction({
       to: address,
-      value: utils.parseEther('1')
+      value: amount ? utils.parseEther(amount) : utils.parseEther('1'),
     })
     console.log('tx: ', tx.hash)
     await tx.wait()

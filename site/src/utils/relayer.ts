@@ -13,7 +13,7 @@ import { isTestnet } from './networks'
 const SESSION_EXPIRY = 43200
 
 const FAUCET_URL = isTestnet ? 
-  "https://larvammaiorumfaucetgjxd8a5h-testnet-faucet.functions.fnc.fr-par.scw.cloud" :
+  "/api/local/faucet" :
   "https://larvammaiorumfaucetgjxd8a5h-mainnet-faucet.functions.fnc.fr-par.scw.cloud"
 
 const thresholdForFaucet = utils.parseEther("0.25");
@@ -146,6 +146,9 @@ class RelayManager extends EventEmitter {
           async () => {
             const tx = await skaleProvider.getTransaction(hash);
             console.log('tx inside backof: ', tx)
+            if (!tx) {
+              throw new Error('no tx yet')
+            }
             return tx
           },
           {

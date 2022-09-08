@@ -1,7 +1,6 @@
 import { DateTime } from "luxon"
 import { useQuery } from "react-query"
 import { wootgumpContract } from "../utils/contracts"
-import { isTestnet } from "./useLore"
 
 export const EPOCH = DateTime.fromSQL('2022-09-07', { zone: 'utc-12'})
 

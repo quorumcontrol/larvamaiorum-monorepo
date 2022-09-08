@@ -33,7 +33,7 @@ const boxPadding = ["0", "50px"];
 
 //TODO: hacky - fix
 const mintUrl = isTestnet
-  ? "https://larvammaiorumfaucetgjxd8a5h-loreminter-testnet.functions.fnc.fr-par.scw.cloud"
+  ? "/api/local/lore-minter"
   : "https://larvammaiorumfaucetgjxd8a5h-loreminter-mainnet.functions.fnc.fr-par.scw.cloud";
 
 const images: Record<string, typeof cover> = {

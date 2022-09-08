@@ -4,6 +4,9 @@ import { isTestnet } from "./networks";
 import { memoize } from "./memoize";
 import { skaleMainnet, skaleTestnet } from "./SkaleChains";
 
+// valid address for roasted-thankful-unukalhai testnet
+MulticallWrapper.setMulticallAddress(499161117, '0xFB586e5A793279f81180d01d68AEd4932BCE2589')
+
 export default memoize((provider: providers.Provider) => {
   const chainId = isTestnet ? skaleTestnet.id : skaleMainnet.id
   return new MulticallWrapper(provider, chainId)

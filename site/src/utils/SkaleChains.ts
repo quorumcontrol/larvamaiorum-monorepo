@@ -2,7 +2,7 @@ import { Chain } from "@rainbow-me/rainbowkit";
 import { isTestnet } from "./networks";
 
 export const skaleTestnet: Chain = {
-  id: 1305754875840118,
+  id: 499161117,
   name: 'Skale Testnet',
   network: 'skaletestnet',
   iconUrl: '/SKALE_logo.svg',
@@ -12,11 +12,11 @@ export const skaleTestnet: Chain = {
     symbol: 'sFUEL',
   },
   rpcUrls: {
-    default: 'https://staging-v2.skalenodes.com/v1/rapping-zuben-elakrab',
-    wss: 'wss://staging-v2.skalenodes.com/v1/ws/rapping-zuben-elakrab',
+    default: 'https://staging-v2.skalenodes.com/v1/roasted-thankful-unukalhai',
+    wss: 'wss://staging-v2.skalenodes.com/v1/ws/roasted-thankful-unukalhai',
   },
   blockExplorers: {
-    default: { name: 'BlockScout', url: 'https://rapping-zuben-elakrab.explorer.staging-v2.skalenodes.com/' },
+    default: { name: 'BlockScout', url: 'https://roasted-thankful-unukalhai.explorer.staging-v2.skalenodes.com/' },
   },
   testnet: true,
 };

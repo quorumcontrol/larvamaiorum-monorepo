@@ -6,7 +6,7 @@ import multicallWrapper from "../utils/multicallWrapper";
 import { addresses, isTestnet } from "../utils/networks";
 import { skaleProvider } from "./skaleProvider";
 
-const TESTNET_BOA = "0x881256ada5dD7CcB2457226C4bC978B067daF70B";
+const TESTNET_BOA = "0x6201CCc4842db6148df04A4b2d155FdC86E23b95";
 const MAINNET_BOA = "0x2C6FD25071Fd516947682f710f6e9F5eD610207F";
 
 export const BOA_ADDRESS = isTestnet ? TESTNET_BOA : MAINNET_BOA
