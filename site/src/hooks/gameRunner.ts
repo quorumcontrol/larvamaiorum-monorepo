@@ -105,7 +105,7 @@ class GameRunner extends EventEmitter {
     if (!this.tableInfo) {
       throw new Error('no table')
     }
-    if (this.latest.gte(this.tableInfo.startedAt.add(this.tableInfo.gameLength))) {
+    if (this.latest.gte(this.tableInfo.startedAt.add(this.tableInfo.gameLength).sub(1))) {
       console.log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
       this.over = true
       this.emit('END')
