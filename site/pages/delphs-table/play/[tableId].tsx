@@ -6,6 +6,7 @@ import {
   HStack,
   Spacer,
   Flex,
+  Heading,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -21,22 +22,13 @@ import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
 import Video from "../../../src/components/Video";
 import useGameRunner from "../../../src/hooks/gameRunner";
+import GameOverScreen, { GameWarrior } from "../../../src/components/GameOverScreen";
 
 const txQueue = new SingletonQueue();
 
 interface AppEvent {
   type: string;
   data: any[];
-}
-
-interface GameWarrior {
-  id: string;
-  name: string;
-  wootgumpBalance: number;
-  attack: number;
-  defense: number;
-  currentHealth: number;
-  initialHealth: number;
 }
 
 const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
@@ -76,27 +68,27 @@ const Play: NextPage = () => {
   const [fullScreen, setFullScreen] = useState(false);
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
   const [ready, setReady] = useState(false)
-  const { data:gameRunner } = useGameRunner(tableId, iframe.current || undefined, ready)
+  const { data:gameRunner, over } = useGameRunner(tableId, iframe.current || undefined, ready)
 
-  const mqttHandler = useCallback((topic: string, msg: Buffer) => {
-    console.log('mqtt handler: ', topic, msg.toString())
-    switch (topic) {
-      case NO_MORE_MOVES_CHANNEL: {
-        const { tick } = JSON.parse(msg.toString());
-        return iframe.current?.contentWindow?.postMessage(
-          JSON.stringify({
-            type: "noMoreMoves",
-            tick,
-          }),
-          "*"
-        );
-      }
-      default:
-        console.log("mqtt: ", topic);
-    }
-  }, []);
+  // const mqttHandler = useCallback((topic: string, msg: Buffer) => {
+  //   console.log('mqtt handler: ', topic, msg.toString())
+  //   switch (topic) {
+  //     case NO_MORE_MOVES_CHANNEL: {
+  //       const { tick } = JSON.parse(msg.toString());
+  //       return iframe.current?.contentWindow?.postMessage(
+  //         JSON.stringify({
+  //           type: "noMoreMoves",
+  //           tick,
+  //         }),
+  //         "*"
+  //       );
+  //     }
+  //     default:
+  //       console.log("mqtt: ", topic);
+  //   }
+  // }, []);
 
-  useMqttMessages(mqttHandler);
+  // useMqttMessages(mqttHandler);
 
   useEffect(() => {
     return () => {
@@ -218,7 +210,7 @@ const Play: NextPage = () => {
           <Box
             minW="75%"
           >
-            {isClient && (
+            {isClient && !over && (
               <Box
                 id="game"
                 as="iframe"
@@ -232,6 +224,9 @@ const Play: NextPage = () => {
                 zIndex={4_000_000}
               />
             )}
+          {isClient && over && (
+            <GameOverScreen player={address} warriors={warriors} />
+          )}
           </Box>
           <Spacer />
           <Box

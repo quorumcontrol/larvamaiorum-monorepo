@@ -1,12 +1,13 @@
 import { useQuery } from "react-query"
 import { DelphsTable } from "../../contracts/typechain"
 import { delphsContract, playerContract } from "../utils/contracts"
-import mqttClient, { ROLLS_CHANNEL } from '../utils/mqtt'
+import mqttClient, { ROLLS_CHANNEL, NO_MORE_MOVES_CHANNEL } from '../utils/mqtt'
 import ThenArg from "../utils/ThenArg"
 import SingletonQueue from "../utils/singletonQueue"
 import { BigNumber, BigNumberish } from "ethers"
 import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
+import { useEffect, useState } from "react"
 
 const log = console.log //debug('gameRunner')
 
@@ -104,8 +105,11 @@ class GameRunner extends EventEmitter {
     }
     if (this.tableInfo.startedAt.add(this.tableInfo.gameLength).gte(this.latest)) {
       console.log('game over')
+      this.over = true
       this.emit('END')
+      return
     }
+    console.log('not over: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber(), this.latest.toNumber())
   }
 
   private async go(latest: BigNumber) {
@@ -178,6 +182,7 @@ class GameRunner extends EventEmitter {
       this.ship('orchestratorRoll', { roll: roll })
     });
     this.latest = end
+    this.checkForEnd()
   }
 
   private handleMqttMessage(topic: string, msg: Buffer) {
@@ -187,6 +192,17 @@ class GameRunner extends EventEmitter {
         const parsedMsg = JSON.parse(msg.toString());
         this.singleton.push(() => this.handleOrchestratorRoll(parsedMsg))
       }
+      case NO_MORE_MOVES_CHANNEL:
+        const { tick } = JSON.parse(msg.toString());
+        this.ship('noMoreMoves', { tick });
+        break;
+        // return iframe.current?.contentWindow?.postMessage(
+        //   JSON.stringify({
+        //     type: "noMoreMoves",
+        //     tick,
+        //   }),
+        //   "*"
+        // );
       default:
         log("mqtt unknown topic: ", topic);
     }
@@ -274,7 +290,7 @@ const getGameRunnerFor = memoize((tableId:string, iframe?: HTMLIFrameElement) =>
 })
 
 const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boolean) => {
-  return useQuery(['/game-runner', tableId], async () => {
+  const query = useQuery(['/game-runner', tableId], async () => {
     log("----------------------- useQuery refetched")
     return getGameRunnerFor(tableId!, iframe!)
   }, {
@@ -283,6 +299,22 @@ const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boo
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   })
+  const [over,setOver] = useState(query.data ? query.data.over : false)
+
+  useEffect(() => {
+    if (!query.data) {
+      return
+    }
+    const handler = () => {
+      setOver(true)
+    }
+    query.data.on('END', handler)
+    return () => {
+      query.data.removeListener('END', handler)
+    }
+  }, [setOver, query.data])
+
+  return {...query, over }
 }
 
 export default useGameRunner

@@ -97,6 +97,30 @@ export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod
   }
 }
 
+export const playerCount = async (time: DateTime, timePeriod: 'day' | 'week' | 'month') => {
+  const cryptoRomeDay = time.setZone(TIME_ZONE)
+  const start = cryptoRomeDay.startOf(timePeriod)
+  const end = cryptoRomeDay.endOf(timePeriod)
+
+  const [startBlock, endBlock] = await Promise.all([
+    closestBlockForTime(start, 'after'),
+    closestBlockForTime(end, 'before'),
+  ])
+  const teamStats = teamStatsContract()
+  const filter = teamStats.filters.TeamWin(null, null, null, null)
+  const evts = await teamStats.queryFilter(filter, startBlock, endBlock)
+  const uniquePlayers = evts.reduce((memo, evt) => {
+    if (evt.args.team.eq(constants.Zero)) {
+      return memo
+    }
+    return {
+      ...memo,
+      [evt.args.player]: true
+    }
+  },{})
+  return Object.keys(uniquePlayers).length
+}
+
 async function teamRank(from: number, to: number): Promise<Ranking> {
   const teamStats = teamStatsContract()
   const filter = teamStats.filters.TeamWin(null, null, null, null)
