@@ -24,9 +24,9 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15
-const TABLE_SIZE = 6
-const WOOTGUMP_MULTIPLIER = 18
+const NUMBER_OF_ROUNDS = 20
+const TABLE_SIZE = 7
+const WOOTGUMP_MULTIPLIER = 15
 
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
