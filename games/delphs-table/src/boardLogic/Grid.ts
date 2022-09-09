@@ -148,7 +148,7 @@ class Grid {
         ...memo,
         [warrior.id]: warrior.wootgumpBalance,
       }
-    }, {})
+    }, {} as Record<string,number>)
   }
 
   private newRandomSeed() {

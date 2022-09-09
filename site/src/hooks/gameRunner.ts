@@ -198,13 +198,6 @@ class GameRunner extends EventEmitter {
         const { tick } = JSON.parse(msg.toString());
         this.ship('noMoreMoves', { tick });
         break;
-        // return iframe.current?.contentWindow?.postMessage(
-        //   JSON.stringify({
-        //     type: "noMoreMoves",
-        //     tick,
-        //   }),
-        //   "*"
-        // );
       default:
         log("mqtt unknown topic: ", topic);
     }

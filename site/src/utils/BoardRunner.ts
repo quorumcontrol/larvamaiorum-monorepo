@@ -1,8 +1,7 @@
-import { DelphsTable } from "../contracts/typechain"
-import { delphsContract, playerContract } from "../src/utils/contracts"
-import Grid from '../src/boardLogic/Grid'
-import Warrior from "../src/boardLogic/Warrior"
-
+import { DelphsTable } from "../../contracts/typechain"
+import { delphsContract, playerContract } from "./contracts"
+import Grid from '../boardLogic/Grid'
+import Warrior from "../boardLogic/Warrior"
 
 class BoardRunner {
   delphs:DelphsTable
@@ -37,7 +36,6 @@ class BoardRunner {
         initialHealth: stats.health.toNumber(),
       })
     }))
-
 
     const started = table.startedAt
     const ended = started.add(table.gameLength)
@@ -89,9 +87,6 @@ class BoardRunner {
 
     return this.grid.rewards()
   }
-
-
 }
-
 
 export default BoardRunner

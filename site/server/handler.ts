@@ -16,7 +16,7 @@ import { skaleProvider } from "../src/utils/skaleProvider";
 import mqttClient, { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from '../src/utils/mqtt'
 import Pinger from "./pinger";
 import { DiceRolledEvent } from "../contracts/typechain/DelphsTable";
-import BoardRunner from "./BoardRunner";
+import BoardRunner from "../src/utils/BoardRunner";
 
 dotenv.config({
   path: '.env.local'

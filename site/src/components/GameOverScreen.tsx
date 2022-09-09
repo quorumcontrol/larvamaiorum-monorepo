@@ -1,7 +1,8 @@
-import { Box, Button, Heading, VStack, Wrap, WrapItem } from "@chakra-ui/react";
+import { Box, Button, Heading, Spinner, VStack, Wrap, WrapItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { useMemo } from "react";
 import { SocialIcon } from "react-social-icons";
+import useTableOutcome from "../hooks/useTableOutcome";
 import { ACCOLADES_WITH_IMAGES } from "../utils/accoladesWithImages";
 import AccoladeCard from "./AccoladeCard";
 
@@ -21,41 +22,50 @@ export interface GameWarrior {
 }
 
 const GameOverScreen: React.FC<{
-  player?: string;
-  warriors: GameWarrior[];
-}> = ({ player, warriors }) => {
-  const playersWarrior = warriors.find((w) => w.id === player);
+  player?: string
+  tableId?: string
+}> = ({ player, tableId }) => {
+  const { data:rewards, isLoading } = useTableOutcome(tableId) 
 
   const accolades = useMemo(() => {
     let accolades: Accolade[] = [];
-    if (!playersWarrior) {
+
+    if (!rewards || !player) {
       return accolades;
     }
-    if (playersWarrior && warriors.slice(0, 3).includes(playersWarrior)) {
+    const playersWarrior = rewards.ranked.find((w) => w.id === player);
+    if (!playersWarrior) {
+      return accolades
+    }
+
+    if (rewards.ranked.slice(0, 3).includes(playersWarrior)) {
       accolades.push(
-        ACCOLADES_WITH_IMAGES[warriors.slice(0, 3).indexOf(playersWarrior)]
+        ACCOLADES_WITH_IMAGES[rewards.ranked.slice(0, 3).indexOf(playersWarrior)]
       );
     }
-    if (playersWarrior.firstGump) {
+    if (rewards.quests.firstGump === playersWarrior) {
       accolades.push(ACCOLADES_WITH_IMAGES[3]);
     }
-    if (playersWarrior.firstGump) {
-      accolades.push(ACCOLADES_WITH_IMAGES[3]);
-    }
-    if (playersWarrior.firstGump) {
-      accolades.push(ACCOLADES_WITH_IMAGES[3]);
-    }
-    if (playersWarrior.firstBlood) {
+    if (rewards.quests.firstBlood === playersWarrior) {
       accolades.push(ACCOLADES_WITH_IMAGES[4]);
     }
-    if (playersWarrior.battlesWon > 0) {
+    if ((rewards.quests.battlesWon[playersWarrior.id] || 0) > 0) {
       accolades.push(ACCOLADES_WITH_IMAGES[5]);
     }
 
     return accolades;
-  }, [playersWarrior, warriors]);
+  }, [rewards, player]);
 
-  if (!playersWarrior) {
+  if (isLoading || !rewards) {
+    return (
+      <VStack>
+        <Heading>Game Over.</Heading>
+        <Spinner />
+      </VStack>
+    );
+  }
+
+  if (rewards && !rewards.ranked.some((w) => w.id === player)) {
     return (
       <VStack>
         <Heading>Game Over.</Heading>
@@ -64,7 +74,7 @@ const GameOverScreen: React.FC<{
   }
 
   const intent = encodeURIComponent(
-    `I just harvested ${playersWarrior.wootgumpBalance} wootgump playing Delph's Table for a chance to win 115k $SKL in prizes! https://cryptocolosseum.com/`
+    `I just harvested ${rewards.wootgump[player!]} wootgump playing Delph's Table for a chance to win 115k $SKL in prizes! https://cryptocolosseum.com/`
   )
 
   return (
@@ -72,7 +82,7 @@ const GameOverScreen: React.FC<{
       <Heading>
         You harvested{" "}
         <Box as="span" color="brand.orange">
-          {playersWarrior.wootgumpBalance} Wootgump
+          {rewards.wootgump[player!]} Wootgump
         </Box>
       </Heading>
       {accolades.length > 0 && (

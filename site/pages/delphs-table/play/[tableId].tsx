@@ -22,7 +22,9 @@ import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
 import Video from "../../../src/components/Video";
 import useGameRunner from "../../../src/hooks/gameRunner";
-import GameOverScreen, { GameWarrior } from "../../../src/components/GameOverScreen";
+import GameOverScreen, {
+  GameWarrior,
+} from "../../../src/components/GameOverScreen";
 
 const txQueue = new SingletonQueue();
 
@@ -50,7 +52,9 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
       </HStack>
       <HStack spacing="4">
         <Text>ATK:{attack}</Text>
-        <Text>HP:{Math.floor(currentHealth)}/{initialHealth}</Text>
+        <Text>
+          HP:{Math.floor(currentHealth)}/{initialHealth}
+        </Text>
         <Text>DEF:{defense}</Text>
       </HStack>
     </ListItem>
@@ -67,8 +71,12 @@ const Play: NextPage = () => {
   const iframe = useRef<HTMLIFrameElement>(null);
   const [fullScreen, setFullScreen] = useState(false);
   const [warriors, setWarriors] = useState<GameWarrior[]>([]);
-  const [ready, setReady] = useState(false)
-  const { data:gameRunner, over } = useGameRunner(tableId, iframe.current || undefined, ready)
+  const [ready, setReady] = useState(false);
+  const { data: gameRunner, over } = useGameRunner(
+    tableId,
+    iframe.current || undefined,
+    ready
+  );
 
   // const mqttHandler = useCallback((topic: string, msg: Buffer) => {
   //   console.log('mqtt handler: ', topic, msg.toString())
@@ -92,16 +100,16 @@ const Play: NextPage = () => {
 
   useEffect(() => {
     return () => {
-      console.log('unmounted the play page')
+      console.log("unmounted the play page");
       if (gameRunner) {
-        gameRunner.stop()
+        gameRunner.stop();
       }
-    }
-  }, [gameRunner])
+    };
+  }, [gameRunner]);
 
   const handleGameTickMessage = useCallback(
     (evt: AppEvent) => {
-      console.log('game tick: ', evt)
+      console.log("game tick: ", evt);
       setWarriors(evt.data);
     },
     [setWarriors]
@@ -182,7 +190,7 @@ const Play: NextPage = () => {
           case "gameTick":
             return handleGameTickMessage(appEvent);
           case "gm":
-            return setReady(true)
+            return setReady(true);
           default:
             console.log("unhandled message type: ", appEvent);
         }
@@ -207,9 +215,7 @@ const Play: NextPage = () => {
       />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
-          <Box
-            minW="75%"
-          >
+          <Box minW="75%">
             {isClient && !over && (
               <Box
                 id="game"
@@ -224,24 +230,30 @@ const Play: NextPage = () => {
                 zIndex={4_000_000}
               />
             )}
-          {isClient && over && (
-            <GameOverScreen player={address} warriors={warriors} />
-          )}
+            {isClient && over && (
+              <GameOverScreen player={address} tableId={tableId} />
+            )}
           </Box>
           <Spacer />
-          <Box
-            p="6"
-            maxW={["100%", "100%", "100%", "33%"]}
-            backgroundImage={["none", "none", "none", border]}
-          >
-            <OrderedList fontSize="md" spacing={4}>
-              {warriors.map((w) => {
-                return (
-                  <WarriorListItem warrior={w} key={`warrior-stats-${w.id}`} />
-                );
-              })}
-            </OrderedList>
-          </Box>
+
+          {!over && (
+            <Box
+              p="6"
+              maxW={["100%", "100%", "100%", "33%"]}
+              backgroundImage={["none", "none", "none", border]}
+            >
+              <OrderedList fontSize="md" spacing={4}>
+                {warriors.map((w) => {
+                  return (
+                    <WarriorListItem
+                      warrior={w}
+                      key={`warrior-stats-${w.id}`}
+                    />
+                  );
+                })}
+              </OrderedList>
+            </Box>
+          )}
         </Flex>
       </LoggedInLayout>
     </>

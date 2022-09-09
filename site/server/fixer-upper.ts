@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 import { accoladesContract, delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
-import BoardRunner from "./BoardRunner";
+import BoardRunner from "../src/utils/BoardRunner";
 
 
 dotenv.config({
