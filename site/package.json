@@ -38,7 +38,7 @@
     "react-query": "^3.39.1",
     "react-social-icons": "^5.14.0",
     "react-swipeable": "^7.0.0",
-    "skale-relayer-contracts": "0.0.9",
+    "skale-relayer-contracts": "0.0.10",
     "video.js": "^7.20.1",
     "wagmi": "^0.5.3"
   },

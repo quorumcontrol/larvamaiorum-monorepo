@@ -3305,14 +3305,7 @@ croner@~4.1.92:
   resolved "https://registry.npmjs.org/croner/-/croner-4.1.97.tgz"
   integrity sha512-/f6gpQuxDaqXu+1kwQYSckUglPaOrHdbIlBAu0YuW8/Cdb45XwXYNUBXg3r/9Mo6n540Kn/smKcZWko5x99KrQ==
 
-cross-fetch@^3.1.4:
-  version "3.1.5"
-  resolved "https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.1.5.tgz"
-  integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
-  dependencies:
-    node-fetch "2.6.7"
-
-cross-fetch@^3.1.5:
+cross-fetch@^3.1.4, cross-fetch@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
@@ -7723,10 +7716,10 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-skale-relayer-contracts@0.0.9:
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/skale-relayer-contracts/-/skale-relayer-contracts-0.0.9.tgz#de345981b6eccb2f4003aa6399c132950d502c91"
-  integrity sha512-R5Wj9GYeDjup+wycgafvKbbujqKyY+do2VVua+beSC7lhpxE+GPTfRYuYc1ILIsbrHJvwJNa21mlkDVCD4ebyw==
+skale-relayer-contracts@0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/skale-relayer-contracts/-/skale-relayer-contracts-0.0.10.tgz#b2e328af120e27a2ececc72a5c56e2c11a08cf57"
+  integrity sha512-00ruA2yd21n7Dcli5TKiz2v7+IQVy/+yK4aNVZNp2AvcMhv7gy+3RCocyKL+TZK+NoHuvlnj6qEcvV4qcCDdHw==
 
 slash@^3.0.0:
   version "3.0.0"

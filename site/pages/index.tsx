@@ -20,6 +20,7 @@ import border from "../src/utils/dashedBorder";
 const boxPadding = ["0", "50px"];
 
 const Home: NextPage = () => {
+
   return (
     <>
       <Layout>
