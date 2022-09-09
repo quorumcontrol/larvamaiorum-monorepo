@@ -8,6 +8,7 @@ import { BigNumber, BigNumberish } from "ethers"
 import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
 import { useEffect, useState } from "react"
+import { subscribeOnce } from "./useMqttMessages"
 
 const log = console.log //debug('gameRunner')
 
@@ -58,6 +59,7 @@ class GameRunner extends EventEmitter {
 
   constructor(tableId: string, iframe: HTMLIFrameElement) {
     super()
+    subscribeOnce()
     this.handleMqttMessage = this.handleMqttMessage.bind(this)
     log('--------------- new game runnner')
     this.singleton = new SingletonQueue(`game-runner-${tableId}`)
