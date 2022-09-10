@@ -2,7 +2,7 @@ import { Box, Button, Heading, Spinner, VStack, Wrap, WrapItem } from "@chakra-u
 import Link from "next/link";
 import { useMemo } from "react";
 import { SocialIcon } from "react-social-icons";
-import useTableOutcome from "../hooks/useTableOutcome";
+import { GameRunner } from "../hooks/gameRunner";
 import { ACCOLADES_WITH_IMAGES } from "../utils/accoladesWithImages";
 import AccoladeCard from "./AccoladeCard";
 
@@ -23,9 +23,14 @@ export interface GameWarrior {
 
 const GameOverScreen: React.FC<{
   player?: string
-  tableId?: string
-}> = ({ player, tableId }) => {
-  const { data:rewards, isLoading } = useTableOutcome(tableId) 
+  runner?: GameRunner
+}> = ({ player, runner }) => {
+  const rewards = useMemo(() => {
+    if (!runner || !runner.grid) {
+      return undefined
+    }
+    return runner.grid.rewards()
+  }, [runner])
 
   const accolades = useMemo(() => {
     let accolades: Accolade[] = [];
@@ -56,7 +61,7 @@ const GameOverScreen: React.FC<{
     return accolades;
   }, [rewards, player]);
 
-  if (isLoading || !rewards) {
+  if (!rewards) {
     return (
       <VStack>
         <Heading>Game Over.</Heading>

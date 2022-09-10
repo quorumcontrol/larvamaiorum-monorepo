@@ -245,7 +245,7 @@ class TablePlayer {
           id: tableId,
           metadata,
           start: metadata.startedAt,
-          end: metadata.startedAt.add(metadata.gameLength),
+          end: metadata.startedAt.add(metadata.gameLength).sub(1),
           players,
         }
       }))

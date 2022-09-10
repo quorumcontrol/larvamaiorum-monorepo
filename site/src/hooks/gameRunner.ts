@@ -9,6 +9,8 @@ import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
 import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
+import Grid from "../boardLogic/Grid"
+import Warrior from "../boardLogic/Warrior"
 
 const log = console.log //debug('gameRunner')
 
@@ -39,10 +41,10 @@ interface SetupMessage {
   gameLength: number,
   firstRoll: IFrameRoll,
   wootgumpMultipler: number,
-  tableSize: number, 
+  tableSize: number,
 }
 
-class GameRunner extends EventEmitter {
+export class GameRunner extends EventEmitter {
   tableId: string
   iframe: HTMLIFrameElement
 
@@ -57,6 +59,9 @@ class GameRunner extends EventEmitter {
   private tableInfo?: ThenArg<ReturnType<DelphsTable['tables']>>
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
 
+  grid?: Grid
+  rolls: IFrameRoll[]
+
   constructor(tableId: string, iframe: HTMLIFrameElement) {
     super()
     subscribeOnce()
@@ -65,6 +70,7 @@ class GameRunner extends EventEmitter {
     this.singleton = new SingletonQueue(`game-runner-${tableId}`)
     this.tableId = tableId
     this.iframe = iframe
+    this.rolls = [] // this gets expanded out in setup
   }
 
   async setup() {
@@ -78,9 +84,12 @@ class GameRunner extends EventEmitter {
     ]);
     this.tableInfo = table
     this.players = players
+    this.rolls = new Array(table.gameLength.toNumber())
+
     if (this.shouldStart(latest)) {
       this.singleton.push(() => this.go(latest))
     }
+
     return this
   }
 
@@ -88,7 +97,7 @@ class GameRunner extends EventEmitter {
     mqttClient().removeListener('message', this.handleMqttMessage)
   }
 
-  private shouldStart(tick:BigNumberish) {
+  private shouldStart(tick: BigNumberish) {
     if (!this.tableInfo) {
       return false
     }
@@ -153,6 +162,17 @@ class GameRunner extends EventEmitter {
     }))
 
     const firstRoll = await this.getRoll(this.tableInfo.startedAt.toNumber())
+    this.grid = new Grid({
+      warriors: warriors.map((ws) => new Warrior(ws)),
+      seed: firstRoll.random,
+      sizeX: this.tableInfo.tableSize,
+      sizeY: this.tableInfo.tableSize,
+      wootgumpMultipler: this.tableInfo.wootgumpMultiplier,
+      gameLength: this.tableInfo.gameLength.toNumber(),
+    })
+    this.grid.start(firstRoll.random)
+
+
     log('gameRunner first roll', firstRoll)
     const msg: SetupMessage = {
       tableId: this.tableId,
@@ -181,7 +201,7 @@ class GameRunner extends EventEmitter {
     );
     log("missing: ", missing);
     missing.forEach((roll) => {
-      this.ship('orchestratorRoll', { roll: roll })
+      this.shipRoll(roll)
     });
     this.latest = end
     this.checkForEnd()
@@ -200,6 +220,21 @@ class GameRunner extends EventEmitter {
         break;
       default:
         log("mqtt unknown topic: ", topic);
+    }
+  }
+
+  private shipRoll(roll: IFrameRoll) {
+    // TODO: check if this is the right roll to ship
+    if (!this.grid) {
+      throw new Error('missing grid')
+    }
+    this.rolls[roll.index] = roll
+    this.ship('orchestratorRoll', { roll: roll })
+    if (!this.grid.isOver()) {
+      roll.destinations.forEach((d) => {
+        this.grid!.warriors.find((w) => w.id.toLowerCase() === d.id.toLowerCase())?.setDestination(d.x, d.y)
+      })
+      this.grid.handleTick(roll.random)
     }
   }
 
@@ -228,7 +263,7 @@ class GameRunner extends EventEmitter {
     }
   }
 
-  private async handleTick({ tick, random }:{ tick:number, random:string }) {
+  private async handleTick({ tick, random }: { tick: number, random: string }) {
     log('handling tick', tick)
     if (!this.started) {
       log('not started, refetching')
@@ -246,13 +281,14 @@ class GameRunner extends EventEmitter {
     const delphs = delphsContract()
     const destinations = await delphs.destinationsForRoll(this.tableId, tick - 1)
     log('shipping tick ', tick)
-    this.ship('orchestratorRoll', {
-      roll: {
-        index: tick,
-        random,
-        destinations: this.destinationsToIframe(destinations)
-      }
-    })
+    const roll = {
+      index: tick,
+      random,
+      destinations: this.destinationsToIframe(destinations)
+    }
+
+    this.rolls[tick] = roll
+    this.shipRoll(roll)
     this.latest = BigNumber.from(tick)
     this.checkForEnd()
   }
@@ -280,7 +316,7 @@ class GameRunner extends EventEmitter {
   }
 }
 
-const getGameRunnerFor = memoize((tableId:string, iframe?: HTMLIFrameElement) => {
+const getGameRunnerFor = memoize((tableId: string, iframe?: HTMLIFrameElement) => {
   return new GameRunner(tableId!, iframe!).setup()
 })
 
@@ -294,7 +330,7 @@ const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boo
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   })
-  const [over,setOver] = useState(query.data ? query.data.over : false)
+  const [over, setOver] = useState(query.data ? query.data.over : false)
 
   useEffect(() => {
     if (!query.data) {
@@ -309,7 +345,7 @@ const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boo
     }
   }, [setOver, query.data])
 
-  return {...query, over }
+  return { ...query, over }
 }
 
 export default useGameRunner

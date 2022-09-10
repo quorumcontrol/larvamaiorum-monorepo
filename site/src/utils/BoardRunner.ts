@@ -38,7 +38,7 @@ class BoardRunner {
     }))
 
     const started = table.startedAt
-    const ended = started.add(table.gameLength)
+    const ended = started.add(table.gameLength).sub(1)
 
     if (!latest.gte(ended)) {
       throw new Error('table not over yet')
