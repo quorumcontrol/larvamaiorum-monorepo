@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import Video from "../../../src/components/Video";
@@ -32,6 +32,10 @@ const Play: NextPage = () => {
   const registerInterestMutation = useRegisterInterest();
   const router = useRouter();
   const { data: userBadges, isLoading: badgesLoading } = useUserBadges();
+
+  const isTouch = useMemo(() => {
+    return document && !!(document as any).createTouch
+  }, [])
 
   const handleTableRunning = useCallback(
     (tableId?: string) => {
@@ -94,8 +98,7 @@ const Play: NextPage = () => {
               }
             )}
           </VStack>
-          {/* {registerInterestMutation.isLoading && <Spinner />} */}
-          {!isWaiting && !registerInterestMutation.isLoading && (
+            {!isWaiting && !registerInterestMutation.isLoading && (
             <Button onClick={onJoinClick} variant="primary">Join Table</Button>
           )}
           {isWaiting && (
@@ -104,6 +107,10 @@ const Play: NextPage = () => {
               <Spinner />
             </HStack>
           )}
+          <Box>
+            {isTouch && <Text>One finger orbits, 2 fingers scrolls about, tap and hold to select a square, pinch to zoom</Text>}
+            {!isTouch && <Text>Left mouse orbits, right mouse scrolls (2 finger, push on trackpad), tap and hold to select a square, scroll to zoom</Text>}
+          </Box>
         </VStack>
       </VStack>
     </LoggedInLayout>
