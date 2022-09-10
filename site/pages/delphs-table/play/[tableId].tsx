@@ -231,7 +231,7 @@ const Play: NextPage = () => {
               />
             )}
             {isClient && over && (
-              <GameOverScreen player={address} tableId={tableId} />
+              <GameOverScreen player={address} runner={gameRunner} />
             )}
           </Box>
           <Spacer />
