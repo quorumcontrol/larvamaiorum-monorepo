@@ -1,4 +1,4 @@
-import { useQuery } from "react-query"
+import { useQuery, useQueryClient } from "react-query"
 import { DelphsTable } from "../../contracts/typechain"
 import { delphsContract, playerContract } from "../utils/contracts"
 import mqttClient, { ROLLS_CHANNEL, NO_MORE_MOVES_CHANNEL } from '../utils/mqtt'
@@ -323,7 +323,9 @@ const getGameRunnerFor = memoize((tableId: string, iframe?: HTMLIFrameElement) =
   return new GameRunner(tableId!, iframe!).setup()
 })
 
-const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boolean) => {
+const useGameRunner = (tableId?: string, player?:string, iframe?: HTMLIFrameElement, ready?: boolean) => {
+  const queryClient = useQueryClient()
+
   const query = useQuery(['/game-runner', tableId], async () => {
     log("----------------------- useQuery refetched")
     return getGameRunnerFor(tableId!, iframe!)
@@ -340,13 +342,18 @@ const useGameRunner = (tableId?: string, iframe?: HTMLIFrameElement, ready?: boo
       return
     }
     const handler = () => {
+      setTimeout(() => {
+        queryClient.invalidateQueries(["/wootgump-balance", player])
+        queryClient.refetchQueries(["/wootgump-balance", player])
+      }, 5000)
+
       setOver(true)
     }
     query.data.on('END', handler)
     return () => {
       query.data.removeListener('END', handler)
     }
-  }, [setOver, query.data])
+  }, [setOver, query.data, player, queryClient])
 
   return { ...query, over }
 }

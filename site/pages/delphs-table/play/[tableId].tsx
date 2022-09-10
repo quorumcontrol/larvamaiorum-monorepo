@@ -6,7 +6,6 @@ import {
   HStack,
   Spacer,
   Flex,
-  Heading,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -14,9 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
-import useMqttMessages from "../../../src/hooks/useMqttMessages";
 import { useRelayer } from "../../../src/hooks/useUser";
-import { NO_MORE_MOVES_CHANNEL } from "../../../src/utils/mqtt";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
@@ -74,29 +71,10 @@ const Play: NextPage = () => {
   const [ready, setReady] = useState(false);
   const { data: gameRunner, over } = useGameRunner(
     tableId,
+    address,
     iframe.current || undefined,
     ready
   );
-
-  // const mqttHandler = useCallback((topic: string, msg: Buffer) => {
-  //   console.log('mqtt handler: ', topic, msg.toString())
-  //   switch (topic) {
-  //     case NO_MORE_MOVES_CHANNEL: {
-  //       const { tick } = JSON.parse(msg.toString());
-  //       return iframe.current?.contentWindow?.postMessage(
-  //         JSON.stringify({
-  //           type: "noMoreMoves",
-  //           tick,
-  //         }),
-  //         "*"
-  //       );
-  //     }
-  //     default:
-  //       console.log("mqtt: ", topic);
-  //   }
-  // }, []);
-
-  // useMqttMessages(mqttHandler);
 
   useEffect(() => {
     return () => {
