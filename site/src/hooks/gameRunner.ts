@@ -121,6 +121,7 @@ export class GameRunner extends EventEmitter {
       return
     }
     console.log('not over: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber(), this.latest.toNumber())
+    console.log('grid over? ', this.grid?.isOver(), this.grid?.tick)
   }
 
   private async go(latest: BigNumber) {
@@ -171,8 +172,7 @@ export class GameRunner extends EventEmitter {
       gameLength: this.tableInfo.gameLength.toNumber(),
     })
     this.grid.start(firstRoll.random)
-
-
+    this.updateGrid(firstRoll)
     log('gameRunner first roll', firstRoll)
     const msg: SetupMessage = {
       tableId: this.tableId,
@@ -203,8 +203,6 @@ export class GameRunner extends EventEmitter {
     missing.forEach((roll) => {
       this.shipRoll(roll)
     });
-    this.latest = end
-    this.checkForEnd()
   }
 
   private handleMqttMessage(topic: string, msg: Buffer) {
@@ -225,11 +223,18 @@ export class GameRunner extends EventEmitter {
 
   private shipRoll(roll: IFrameRoll) {
     // TODO: check if this is the right roll to ship
+    this.rolls[roll.index] = roll
+    console.log("ship: ", roll.index)
+    this.ship('orchestratorRoll', { roll: roll })
+    this.updateGrid(roll)
+    this.latest = BigNumber.from(roll.index)
+    this.checkForEnd()
+  }
+
+  private updateGrid(roll:IFrameRoll) {
     if (!this.grid) {
       throw new Error('missing grid')
     }
-    this.rolls[roll.index] = roll
-    this.ship('orchestratorRoll', { roll: roll })
     if (!this.grid.isOver()) {
       roll.destinations.forEach((d) => {
         this.grid!.warriors.find((w) => w.id.toLowerCase() === d.id.toLowerCase())?.setDestination(d.x, d.y)
@@ -289,8 +294,6 @@ export class GameRunner extends EventEmitter {
 
     this.rolls[tick] = roll
     this.shipRoll(roll)
-    this.latest = BigNumber.from(tick)
-    this.checkForEnd()
   }
 
   private async handleOrchestratorRoll({ tick, random }: { txHash?: string, tick: number, random: string, blockNumber?: number }) {
