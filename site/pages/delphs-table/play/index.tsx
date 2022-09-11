@@ -34,7 +34,7 @@ const Play: NextPage = () => {
   const { data: userBadges, isLoading: badgesLoading } = useUserBadges();
 
   const isTouch = useMemo(() => {
-    return document && !!(document as any).createTouch
+    return (typeof document !== 'undefined') && !!(document as any).createTouch
   }, [])
 
   const handleTableRunning = useCallback(
