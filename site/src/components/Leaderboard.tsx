@@ -14,6 +14,7 @@ import { useBadgeMetadata } from "../hooks/BadgeOfAssembly";
 import { useUsername } from "../hooks/Player";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import humanFormatted from "../utils/humanFormatted";
+import { TimeFrames } from "../utils/rankings";
 
 const GumpRow: React.FC<{
   address: string;
@@ -46,7 +47,7 @@ const TeamRow: React.FC<{
 };
 
 const Leaderboard: React.FC<{
-  timeframe: "day" | "month" | 'week';
+  timeframe: TimeFrames;
   type: "gump" | "team";
   diff?:string
 }> = ({ timeframe, type, diff }) => {
