@@ -1,5 +1,14 @@
-import { Box, Button, Heading, Spinner, VStack, Wrap, WrapItem } from "@chakra-ui/react";
-import Link from "next/link";
+import {
+  Box,
+  Button,
+  Heading,
+  Link,
+  Spinner,
+  VStack,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
 import { useMemo } from "react";
 import { SocialIcon } from "react-social-icons";
 import { GameRunner } from "../hooks/gameRunner";
@@ -22,15 +31,15 @@ export interface GameWarrior {
 }
 
 const GameOverScreen: React.FC<{
-  player?: string
-  runner?: GameRunner
+  player?: string;
+  runner?: GameRunner;
 }> = ({ player, runner }) => {
   const rewards = useMemo(() => {
     if (!runner || !runner.grid) {
-      return undefined
+      return undefined;
     }
-    return runner.grid.rewards()
-  }, [runner])
+    return runner.grid.rewards();
+  }, [runner]);
 
   const accolades = useMemo(() => {
     let accolades: Accolade[] = [];
@@ -40,12 +49,14 @@ const GameOverScreen: React.FC<{
     }
     const playersWarrior = rewards.ranked.find((w) => w.id === player);
     if (!playersWarrior) {
-      return accolades
+      return accolades;
     }
 
     if (rewards.ranked.slice(0, 3).includes(playersWarrior)) {
       accolades.push(
-        ACCOLADES_WITH_IMAGES[rewards.ranked.slice(0, 3).indexOf(playersWarrior)]
+        ACCOLADES_WITH_IMAGES[
+          rewards.ranked.slice(0, 3).indexOf(playersWarrior)
+        ]
       );
     }
     if (rewards.quests.firstGump === playersWarrior) {
@@ -79,8 +90,10 @@ const GameOverScreen: React.FC<{
   }
 
   const intent = encodeURIComponent(
-    `I just harvested ${rewards.wootgump[player!]} wootgump playing Delph's Table for a chance to win 115k $SKL in prizes! https://cryptocolosseum.com/`
-  )
+    `I just harvested ${
+      rewards.wootgump[player!]
+    } wootgump playing Delph's Table for a chance to win 115k $SKL in prizes! https://cryptocolosseum.com/`
+  );
 
   return (
     <VStack spacing="4">
@@ -97,18 +110,24 @@ const GameOverScreen: React.FC<{
             {accolades?.map((accolade) => {
               return (
                 <WrapItem key={`game-over-accolade-${accolade.id}`}>
-                  <AccoladeCard tokenId={accolade.id} address={player} hideCount />
+                  <AccoladeCard
+                    tokenId={accolade.id}
+                    address={player}
+                    hideCount
+                  />
                 </WrapItem>
               );
             })}
           </Wrap>
         </>
       )}
-      <Link href="/delphs-table/play">
-        <Button variant="primary">Play Again</Button>
-      </Link>
+      <NextLink href="/delphs-table/play/cleanSlate" passHref>
+        <Link>
+          <Button variant="primary">Play Again</Button>
+        </Link>
+      </NextLink>
       <Heading size="lg">Share your progress with your friends.</Heading>
-        
+
       <SocialIcon url={`https://twitter.com/intent/tweet?text=${intent}`} />
     </VStack>
   );
