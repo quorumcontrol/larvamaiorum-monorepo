@@ -52,6 +52,7 @@ class ChainConnector extends ScriptTypeBase {
     }
     this.boardGenerate = boardGenerate
     this.app.on(MESSAGE_EVENT, this.handleIframeEvents, this)
+    console.log('sending gm')
     parent.postMessage(JSON.stringify({
       type: 'gm',
       data: {},

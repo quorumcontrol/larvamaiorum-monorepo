@@ -56,32 +56,31 @@ export const useRegisterInterest = () => {
   const queryClient = useQueryClient();
   const { data:relayer } = useRelayer()
 
-  return useMutation(async ({ name, addr }: { name: string, addr: string }) => {
+  return useMutation(async ({ addr }: { addr: string }) => {
     if (!relayer?.ready()) {
       throw new Error("the relayer must be ready to register interest");
     }
     const tx = await relayer.wrapped.lobby().registerInterest();
     await tx.wait()
     return {
-      name,
       addr
     }
   }, {
-    onMutate: async (thisPlayer) => {
-      await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
+    // onMutate: async (thisPlayer) => {
+    //   await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
 
-      const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
+    //   const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
  
-      // Optimistically update to the new value
-      queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{name:string, addr:string}[]|undefined) => [...(old || []), thisPlayer])
+    //   // Optimistically update to the new value
+    //   queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
   
-      // Return a context object with the snapshotted value
-      return { previousPlayers }
+    //   // Return a context object with the snapshotted value
+    //   return { previousPlayers }
       
-    },
+    // },
     onError: (err, _newPlayer, context) => {
       console.error('error joinging: ', err)
-      queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])
+      // queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])
     },
     onSettled: () => {
       queryClient.invalidateQueries(WAITING_PLAYERS_KEY, {

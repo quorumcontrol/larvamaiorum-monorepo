@@ -1,119 +1,279 @@
 import {
-  VStack,
   Text,
-  Heading,
-  Button,
-  Spinner,
-  HStack,
   Box,
+  OrderedList,
+  ListItem,
+  HStack,
+  Spacer,
+  Flex,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
-import Video from "../../../src/components/Video";
-import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
-import {
-  useRegisterInterest,
-  useWaitForTable,
-  useWaitingPlayers,
-} from "../../../src/hooks/Lobby";
-import { useUsername } from "../../../src/hooks/Player";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import { useRelayer } from "../../../src/hooks/useUser";
+import promiseWaiter from "../../../src/utils/promiseWaiter";
+import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
+import Video from "../../../src/components/Video";
+import useGameRunner from "../../../src/hooks/gameRunner";
+import GameOverScreen, {
+  GameWarrior,
+} from "../../../src/components/GameOverScreen";
+import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
+
+const txQueue = new SingletonQueue();
+
+interface AppEvent {
+  type: string;
+  data: any[];
+}
+
+const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
+  warrior: {
+    name,
+    wootgumpBalance,
+    attack,
+    defense,
+    currentHealth,
+    initialHealth,
+  },
+}) => {
+  return (
+    <ListItem pl="3">
+      <HStack>
+        <Text fontWeight="800">{name}</Text>
+        <Spacer />
+        <Text>{wootgumpBalance} $GUMP</Text>
+      </HStack>
+      <HStack spacing="4">
+        <Text>ATK:{attack}</Text>
+        <Text>
+          HP:{Math.floor(currentHealth)}/{initialHealth}
+        </Text>
+        <Text>DEF:{defense}</Text>
+      </HStack>
+    </ListItem>
+  );
+};
 
 const Play: NextPage = () => {
-  const { address } = useAccount();
-  const { data: username } = useUsername();
-  const isClient = useIsClientSide();
-  const [manualWaiting, setManualWaiting] = useState(false)
-  const { data: waitingPlayers, isLoading } = useWaitingPlayers();
-  const registerInterestMutation = useRegisterInterest();
   const router = useRouter();
-  const { data: userBadges, isLoading: badgesLoading } = useUserBadges();
+  const { tableId: untypedTableId } = router.query;
 
-  const isTouch = useMemo(() => {
-    return (typeof document !== 'undefined') && !!(document as any).createTouch
-  }, [])
+  const [tableId, setTableId] = useState(untypedTableId  as string | undefined)
+
+  const { address } = useAccount();
+  const { data: relayer } = useRelayer();
+  const isClient = useIsClientSide();
+  const iframe = useRef<HTMLIFrameElement>(null);
+  const [fullScreen, setFullScreen] = useState(false);
+  const [warriors, setWarriors] = useState<GameWarrior[]>([]);
+  const [ready, setReady] = useState(false);
+  const registerInterestMutation = useRegisterInterest();
+  const { data: gameRunner, over } = useGameRunner(
+    tableId,
+    address,
+    iframe.current || undefined,
+    ready
+  );
+
+  useEffect(() => {
+    setTableId(untypedTableId as string|undefined)
+  }, [untypedTableId, setTableId])
+
+  const sendToIframe = useCallback((msg:any) => {
+    iframe.current?.contentWindow?.postMessage(
+      JSON.stringify(msg),
+      "*"
+    );
+  }, [iframe])
 
   const handleTableRunning = useCallback(
     (tableId?: string) => {
-      router.push(`/delphs-table/play/${tableId}`);
+      if (!tableId) {
+        throw new Error('received table running without tableid')
+      }
+      console.log('table ready')
+      setTableId(tableId)
+      
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.pushState(null, "Crypto Colosseum: Delph's Table", `/delphs-table/play?tableId=${tableId}`)
+      }
+      
+      sendToIframe({
+        type: 'tableReady',
+        tableId: tableId,
+      })
     },
-    [router]
+    [setTableId, sendToIframe]
   );
 
   useWaitForTable(handleTableRunning);
 
-  const isWaiting = manualWaiting || (waitingPlayers || []).some(
-    (waiting) => waiting.addr === address
+  useEffect(() => {
+    return () => {
+      console.log("unmounted the play page");
+      if (gameRunner) {
+        gameRunner.stop();
+      }
+    };
+  }, [gameRunner]);
+
+  const handleGameTickMessage = useCallback(
+    (evt: AppEvent) => {
+      console.log("game tick: ", evt);
+      setWarriors(evt.data);
+    },
+    [setWarriors]
   );
 
-  const onJoinClick = async () => {
-    console.log("join click");
-    setManualWaiting(true)
-    return registerInterestMutation.mutate({ name: username!, addr: address! });
-  };
+  const handleFullScreenMessage = useCallback(() => {
+    setFullScreen((old) => !old);
+  }, [setFullScreen]);
 
-  if (!isClient || badgesLoading) {
-    return (
-      <LoggedInLayout>
-        <Spinner />
-      </LoggedInLayout>
-    );
-  }
+  const handleMessage = useCallback(
+    async (appEvent: AppEvent) => {
+      if (!relayer?.ready()) {
+        throw new Error("no relayer");
+      }
+      if (!tableId) {
+        throw new Error('no tableId')
+      }
 
-  if (userBadges?.length === 0) {
-    return (
-      <LoggedInLayout>
-        <Text>You currently need a badge to play Delph&apos;s Table</Text>
-      </LoggedInLayout>
-    );
-  }
+      console.log("params", tableId, appEvent.data[0], appEvent.data[1]);
+      txQueue.push(async () => {
+        await promiseWaiter(500); // try to fix a broken nonce issue
+        const delphsTable = relayer.wrapped.delphsTable();
+        sendToIframe({
+          type: "destinationStarting",
+          x: appEvent.data[0],
+          y: appEvent.data[1],
+        })
+        const tx = await delphsTable.setDestination(
+          tableId,
+          appEvent.data[0],
+          appEvent.data[1],
+          { gasLimit: 250000 }
+        ); // normally around 80k
+        console.log("--------------- destination tx: ", tx);
+        return await tx
+          .wait()
+          .then((receipt) => {
+            console.log("------------ destination receipt: ", receipt);
+            sendToIframe({
+              type: "destinationComplete",
+              x: appEvent.data[0],
+              y: appEvent.data[1],
+              success: true,
+            })
+          })
+          .catch((err) => {
+            console.error("----------- error with destinationSetter", err);
+            sendToIframe({
+              type: "destinationComplete",
+              x: appEvent.data[0],
+              y: appEvent.data[1],
+              success: false,
+            })
+          });
+      });
+    },
+    [tableId, relayer, sendToIframe]
+  );
+
+  useEffect(() => {
+    const handler = async (evt: MessageEvent) => {
+      if (evt.origin === "https://playcanv.as") {
+        const appEvent: AppEvent = JSON.parse(evt.data);
+        switch (appEvent.type) {
+          case "destinationSetter":
+            console.log("set destination received");
+            await handleMessage(appEvent);
+            break;
+          case "fullScreenClick":
+            return handleFullScreenMessage();
+          case "gameTick":
+            return handleGameTickMessage(appEvent);
+          case "loaded":
+            console.log("we got a loaded!")
+            if (tableId) {
+              sendToIframe({
+                type: 'tableReady',
+                tableId: tableId,
+              })
+            } else {
+              registerInterestMutation.mutate({ addr: address! })
+            }
+          case "gm":
+            return setReady(true);
+          default:
+            console.log("unhandled message type: ", appEvent);
+        }
+      }
+    };
+    console.log("add iframe msg listener");
+    window.addEventListener("message", handler);
+    return () => {
+      console.log("removing iframe msg listener");
+      window.removeEventListener("message", handler);
+    };
+  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage, sendToIframe, address, registerInterestMutation, tableId]);
 
   return (
     <>
-      <Video
+      {/* <Video
         animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
         loop
         muted
         autoPlay
         id="jungle-video-background"
-      />
-    <LoggedInLayout>
-
-      <VStack>
-        <VStack spacing={5} backgroundImage={border} p="20">
-          <Heading>Play Delph&apos;s Table</Heading>
-          <Text>Find the Wootgump, don&apos;t get rekt.</Text>
-          <VStack p="4" spacing="2">
-            {((isClient && !isLoading && waitingPlayers) || []).map(
-              (waiting) => {
-                return (
-                  <Text fontSize="md" key={`waiting-addr-${waiting.addr}`}>
-                    {waiting.name}
-                  </Text>
-                );
-              }
+      /> */}
+      <LoggedInLayout>
+        <Flex direction={["column", "column", "column", "row"]}>
+          <Box minW="75%">
+            {isClient && !over && (
+              <Box
+                id="game"
+                as="iframe"
+                src={`https://playcanv.as/e/b/eiO9cQFr/?player=${address}`}
+                ref={iframe}
+                top="0"
+                left="0"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={4_000_000}
+              />
             )}
-          </VStack>
-            {!isWaiting && !registerInterestMutation.isLoading && (
-            <Button onClick={onJoinClick} variant="primary">Join Table</Button>
-          )}
-          {isWaiting && (
-            <HStack>
-              <Text>Waiting for a table</Text>
-              <Spinner />
-            </HStack>
-          )}
-          <Box>
-            {isTouch && <Text>One finger orbits, 2 fingers scrolls about, tap and hold to select a square, pinch to zoom</Text>}
-            {!isTouch && <Text>Left mouse orbits, right mouse scrolls (2 finger, push on trackpad), tap and hold to select a square, scroll to zoom</Text>}
+            {isClient && over && (
+              <GameOverScreen player={address} runner={gameRunner} />
+            )}
           </Box>
-        </VStack>
-      </VStack>
-    </LoggedInLayout>
+          <Spacer />
+
+          {!over && (
+            <Box
+              p="6"
+              maxW={["100%", "100%", "100%", "33%"]}
+              backgroundImage={["none", "none", "none", border]}
+            >
+              <OrderedList fontSize="md" spacing={4}>
+                {warriors.map((w) => {
+                  return (
+                    <WarriorListItem
+                      warrior={w}
+                      key={`warrior-stats-${w.id}`}
+                    />
+                  );
+                })}
+              </OrderedList>
+            </Box>
+          )}
+        </Flex>
+      </LoggedInLayout>
     </>
   );
 };

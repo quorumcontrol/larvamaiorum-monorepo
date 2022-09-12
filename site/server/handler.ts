@@ -24,7 +24,7 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 20
+const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 7
 const WOOTGUMP_MULTIPLIER = 15
 
@@ -207,7 +207,7 @@ class TablePlayer {
 
   async handleTableStarted() {
     this.log('table started, waiting')
-    await promiseWaiter(10000)
+    await promiseWaiter(2000)
     this.instantTableStarted()
   }
 
