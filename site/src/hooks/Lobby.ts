@@ -80,7 +80,7 @@ export const useRegisterInterest = () => {
     // },
     onError: (err, _newPlayer, context) => {
       console.error('error joinging: ', err)
-      queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])
+      // queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])
     },
     onSettled: () => {
       queryClient.invalidateQueries(WAITING_PLAYERS_KEY, {
