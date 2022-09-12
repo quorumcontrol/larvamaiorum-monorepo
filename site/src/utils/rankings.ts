@@ -12,6 +12,8 @@ import { addresses } from "./networks"
 const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
+export type TimeFrames = 'day' | 'week'
+
 const explorerUrl = memoize(() => {
   const explorerUrl = defaultNetwork().blockExplorers?.default.url
   if (!explorerUrl) {
@@ -80,20 +82,27 @@ async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'af
   return parseInt(result.blockNumber, 10)
 }
 
-function startAndEnd(time:DateTime, timePeriod: 'day' | 'week' | 'month') {
+function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
-  let start = cryptoRomeDay.startOf(timePeriod)
-  let end = cryptoRomeDay.endOf(timePeriod)
+  let start = cryptoRomeDay.startOf('day')
+  let end = cryptoRomeDay.endOf('day')
+  if (timePeriod === 'day') {
+    return [start,end]
+  }
 
-  if (timePeriod === 'week') {
-    start = start.plus({days: 2})
-    end = end.plus({days: 2})
+  while (start.weekday !== 3) {
+    start = start.minus({days: 1})
+  }
+
+  end = end.plus({day: 1})
+  while (end.weekday !== 3) {
+    end = end.plus({day: 1})
   }
 
   return [start,end]
 }
 
-export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: 'day' | 'week' | 'month') {
+export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: TimeFrames) {
   const [start,end] = startAndEnd(time, timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
@@ -108,7 +117,7 @@ export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod
   }
 }
 
-export const playerCount = async (time: DateTime, timePeriod: 'day' | 'week' | 'month') => {
+export const playerCount = async (time: DateTime, timePeriod: TimeFrames) => {
   const [start,end] = startAndEnd(time, timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
