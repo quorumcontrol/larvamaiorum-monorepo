@@ -103,7 +103,11 @@ function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
 }
 
 export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: TimeFrames) {
-  const [start,end] = startAndEnd(time, timePeriod)
+  let [start,end] = startAndEnd(time, timePeriod)
+
+  if (end.diffNow('seconds').seconds > 0) {
+    end = DateTime.now().setZone(TIME_ZONE).toUTC()
+  }
 
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
