@@ -7,18 +7,21 @@ import { NonceManager } from '@ethersproject/experimental'
 import * as dotenv from "dotenv";
 import { getBytesAndCreateToken } from 'skale-relayer-contracts'
 import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
+import { wrapContract } from 'kasumah-relay-wrapper'
 import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
-import { accoladesContract, delphsContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
+import { accoladesContract, delphsContract, listKeeperContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
 import mqttClient, { NO_MORE_MOVES_CHANNEL, ROLLS_CHANNEL } from '../src/utils/mqtt'
 import Pinger from "./pinger";
-import { DiceRolledEvent } from "../contracts/typechain/DelphsTable";
+import { DelphsTable, DiceRolledEvent } from "../contracts/typechain/DelphsTable";
 import BoardRunner from "../src/utils/BoardRunner";
+import { memoize } from "../src/utils/memoize";
+import ThenArg from '../src/utils/ThenArg'
 
 dotenv.config({
   path: '.env.local'
@@ -73,18 +76,49 @@ const txSingleton = new SingletonQueue()
 const provider = skaleProvider
 
 const wallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
+wallet.getAddress().then((addr) => {
+  console.log("Delph's address: ", addr)
+})
 
-const roller = Wallet.createRandom()
-
+const roller = Wallet.createRandom().connect(provider)
 
 const lobby = lobbyContract().connect(wallet)
 const delphs = delphsContract().connect(wallet)
 const player = playerContract().connect(wallet)
 const wootgump = wootgumpContract().connect(wallet)
 const accolades = accoladesContract().connect(wallet)
+const listKeeper = listKeeperContract().connect(wallet)
 
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
 const teamStats = TeamStats__factory.connect(addresses().TeamStats, wallet)
+
+const relayer = memoize(async () => {
+  console.log('sending roller sfuel')
+  console.log('sending value transfer')
+  const sendTx = await wallet.sendTransaction({
+    value: utils.parseEther('0.5'),
+    to: roller.address,
+  })
+  console.log('sending value transfer')
+  await sendTx.wait()
+
+  const token = await getBytesAndCreateToken(trustedForwarderContract(), wallet.signer, roller)
+  const kasumahRelayer = new KasumahRelayer(trustedForwarderContract().connect(roller), roller, wallet.signer, token)
+  return {
+    relayer: kasumahRelayer,
+    wrapped: {
+      delphs: wrapContract<DelphsTable>(delphs, kasumahRelayer)
+    }
+  }
+})
+
+interface ActiveTable {
+  id: string
+  metadata: ThenArg<ReturnType<DelphsTable['tables']>>
+  players: Record<string,BigNumber>
+  start: BigNumber
+  end: BigNumber
+}
 
 class TableMaker {
   log: Debugger
@@ -159,6 +193,7 @@ class TableMaker {
         }, { gasLimit: 3_000_000 })
         this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
+        await listKeeper.add(keccak256(Buffer.from('delphs-needs-payout')), id, { gasLimit: 500_000 })
         this.log('taking addresses')
         await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
         return startTx
@@ -212,12 +247,13 @@ class TablePlayer {
 
   async handleTableStarted() {
     this.log('table started, waiting')
-    await promiseWaiter(2000)
+    await promiseWaiter(5000)
     this.instantTableStarted()
   }
 
   private async playTables() {
     try {
+      const wrappedDelphs = (await relayer()).wrapped.delphs
       if (this.playing) {
         console.error('tried to run twice')
         throw new Error('tried to run twice, exiting the program')
@@ -229,7 +265,7 @@ class TablePlayer {
         this.log('no tables')
         return
       }
-      const active = await Promise.all((ids).map(async (tableId) => {
+      const active:ActiveTable[] = await Promise.all((ids).map(async (tableId) => {
         console.log('active: ', tableId)
         const [metadata, playerAddresses] = await Promise.all([
           delphs.tables(tableId),
@@ -268,9 +304,7 @@ class TablePlayer {
         await promiseWaiter(STOP_MOVES_BUFFER * 1000)
 
         this.log('rolling', tick)
-        const tx = await txSingleton.push(async () => {
-          return await delphs.rollTheDice({ gasLimit: 250000 })
-        })
+        const tx = await wrappedDelphs.rollTheDice({ gasLimit: 250000 })
         const receipt = await tx.wait()
         const diceRolledLog = getDiceRollFromReceipt(receipt)
         this.log('publish', tick)
@@ -278,68 +312,11 @@ class TablePlayer {
         this.log('waiting')
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
-
-      await Promise.all(active.map(async (table) => {
-        this.log('collecting results for', table.id)
-        const runner = new BoardRunner(table.id)
-        await runner.run()
-        const rewards = runner.rewards()
-
-        const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
-
-        Object.keys(rewards.wootgump).forEach((playerId) => {
-          const team = table.players[playerId]
-          memo.gump[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
-          memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
-          memo.gump[playerId].team = team
-        })
-        memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
-          return {
-            id: i,
-            amount: BigNumber.from(1),
-            to: w.id,
-          }
-        }))
-        if (rewards.quests.firstGump) {
-          memo.accolades.push({
-            to: rewards.quests.firstGump.id,
-            amount: BigNumber.from(1),
-            id: 3
-          })
-        }
-        if (rewards.quests.firstBlood) {
-          memo.accolades.push({
-            to: rewards.quests.firstBlood.id,
-            amount: BigNumber.from(1),
-            id: 4
-          })
-        }
-        Object.keys(rewards.quests.battlesWon).forEach((playerAddress) => {
-          memo.accolades.push({
-            to: playerAddress,
-            id: 5,
-            amount: BigNumber.from(rewards.quests.battlesWon[playerAddress])
-          })
-        })
-
-        this.log('queuing bulk and prizes')
-        await txSingleton.push(async () => {
-          const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
-          await tx.wait()
-          this.log('wootgump prize tx: ', tx.hash)
-
-          const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
-          await accoladesTx.wait()
-          this.log('accoladesTx tx: ', accoladesTx.hash)
-
-          const teamTx = await teamStats.register(Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000 })
-          await teamTx.wait()
-          this.log('team tx: ', teamTx.hash)
-
-          return orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })
-        })
-      }))
-
+      await txSingleton.push(async () => {
+        return (await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })).wait()
+      })
+      this.handlePayouts(active)
+     
       this.log('rolling complete')
     } catch (err) {
       console.error('error rolling: ', err)
@@ -348,18 +325,73 @@ class TablePlayer {
       this.playing = false
     }
   }
+
+  private async handlePayouts(active:ActiveTable[]) {
+    await Promise.all(active.map(async (table) => {
+      this.log('collecting results for', table.id)
+      const runner = new BoardRunner(table.id)
+      await runner.run()
+      const rewards = runner.rewards()
+
+      const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
+
+      Object.keys(rewards.wootgump).forEach((playerId) => {
+        const team = table.players[playerId]
+        memo.gump[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
+        memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
+        memo.gump[playerId].team = team
+      })
+      memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
+        return {
+          id: i,
+          amount: BigNumber.from(1),
+          to: w.id,
+        }
+      }))
+      if (rewards.quests.firstGump) {
+        memo.accolades.push({
+          to: rewards.quests.firstGump.id,
+          amount: BigNumber.from(1),
+          id: 3
+        })
+      }
+      if (rewards.quests.firstBlood) {
+        memo.accolades.push({
+          to: rewards.quests.firstBlood.id,
+          amount: BigNumber.from(1),
+          id: 4
+        })
+      }
+      Object.keys(rewards.quests.battlesWon).forEach((playerAddress) => {
+        memo.accolades.push({
+          to: playerAddress,
+          id: 5,
+          amount: BigNumber.from(rewards.quests.battlesWon[playerAddress])
+        })
+      })
+
+      this.log('queuing bulk and prizes')
+      await txSingleton.push(async () => {
+        const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
+        await tx.wait()
+        this.log('wootgump prize tx: ', tx.hash)
+
+        const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
+        await accoladesTx.wait()
+        this.log('accoladesTx tx: ', accoladesTx.hash)
+
+        const teamTx = await teamStats.register(Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000 })
+        await teamTx.wait()
+        this.log('team tx: ', teamTx.hash)
+        await Promise.all(active.map(async (active) => {
+          await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000})
+        }))
+      })
+    }))
+  }
 }
 
 async function main() {
-  console.log('sending roller 2 sfuel')
-  const sendTx = await wallet.sendTransaction({
-    value: utils.parseEther('2'),
-    to: roller.address,
-  })
-  await sendTx.wait()
-
-  const token = await getBytesAndCreateToken(trustedForwarderContract(), wallet, roller)
-
   return new Promise((_resolve) => {
     console.log('running')
     // call the client to just get it setup

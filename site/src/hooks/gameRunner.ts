@@ -173,6 +173,7 @@ export class GameRunner extends EventEmitter {
     })
     this.grid.start(firstRoll.random)
     this.updateGrid(firstRoll)
+    this.rolls[0] = firstRoll
     log('gameRunner first roll', firstRoll)
     const msg: SetupMessage = {
       tableId: this.tableId,
@@ -223,7 +224,8 @@ export class GameRunner extends EventEmitter {
 
   private shipRoll(roll: IFrameRoll) {
     // TODO: check if this is the right roll to ship
-    this.rolls[roll.index] = roll
+    this.rolls[this.tableInfo!.startedAt.sub(roll.index).toNumber()] = roll
+    console.log("rolls: ", this.rolls)
     console.log("ship: ", roll.index)
     this.ship('orchestratorRoll', { roll: roll })
     this.updateGrid(roll)
@@ -279,6 +281,11 @@ export class GameRunner extends EventEmitter {
       await this.go(this.tableInfo!.startedAt)
     }
 
+    if (this.latest.gte(tick)) {
+      console.error('received tick but we are already past')
+      return
+    }
+
     if (BigNumber.from(tick).gt(this.latest.add(1))) {
       await this.catchUp(this.latest.add(1), BigNumber.from(tick))
     }
@@ -292,7 +299,6 @@ export class GameRunner extends EventEmitter {
       destinations: this.destinationsToIframe(destinations)
     }
 
-    this.rolls[tick] = roll
     this.shipRoll(roll)
   }
 
