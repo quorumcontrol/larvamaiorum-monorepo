@@ -66,18 +66,18 @@ export const useRegisterInterest = () => {
       addr
     }
   }, {
-    onMutate: async (thisPlayer) => {
-      await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
+    // onMutate: async (thisPlayer) => {
+    //   await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
 
-      const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
+    //   const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
  
-      // Optimistically update to the new value
-      queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
+    //   // Optimistically update to the new value
+    //   queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
   
-      // Return a context object with the snapshotted value
-      return { previousPlayers }
+    //   // Return a context object with the snapshotted value
+    //   return { previousPlayers }
       
-    },
+    // },
     onError: (err, _newPlayer, context) => {
       console.error('error joinging: ', err)
       queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])

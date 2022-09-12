@@ -80,6 +80,17 @@ const Play: NextPage = () => {
     ready
   );
 
+  useEffect(() => {
+    setTableId(untypedTableId as string|undefined)
+  }, [untypedTableId, setTableId])
+
+  const sendToIframe = useCallback((msg:any) => {
+    iframe.current?.contentWindow?.postMessage(
+      JSON.stringify(msg),
+      "*"
+    );
+  }, [iframe])
+
   const handleTableRunning = useCallback(
     (tableId?: string) => {
       if (!tableId) {
@@ -87,10 +98,17 @@ const Play: NextPage = () => {
       }
       console.log('table ready')
       setTableId(tableId)
-      router.replace(`/delphs-table/play?tableId=${tableId}`)
-      //TODO: then send the "we have a table" wait forthe "gm"
+      
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.pushState(null, "Crypto Colosseum: Delph's Table", `/delphs-table/play?tableId=${tableId}`)
+      }
+      
+      sendToIframe({
+        type: 'tableReady',
+        tableId: tableId,
+      })
     },
-    [setTableId, router]
+    [setTableId, sendToIframe]
   );
 
   useWaitForTable(handleTableRunning);
@@ -129,15 +147,11 @@ const Play: NextPage = () => {
       txQueue.push(async () => {
         await promiseWaiter(500); // try to fix a broken nonce issue
         const delphsTable = relayer.wrapped.delphsTable();
-
-        iframe.current?.contentWindow?.postMessage(
-          JSON.stringify({
-            type: "destinationStarting",
-            x: appEvent.data[0],
-            y: appEvent.data[1],
-          }),
-          "*"
-        );
+        sendToIframe({
+          type: "destinationStarting",
+          x: appEvent.data[0],
+          y: appEvent.data[1],
+        })
         const tx = await delphsTable.setDestination(
           tableId,
           appEvent.data[0],
@@ -149,31 +163,25 @@ const Play: NextPage = () => {
           .wait()
           .then((receipt) => {
             console.log("------------ destination receipt: ", receipt);
-            iframe.current?.contentWindow?.postMessage(
-              JSON.stringify({
-                type: "destinationComplete",
-                x: appEvent.data[0],
-                y: appEvent.data[1],
-                success: true,
-              }),
-              "*"
-            );
+            sendToIframe({
+              type: "destinationComplete",
+              x: appEvent.data[0],
+              y: appEvent.data[1],
+              success: true,
+            })
           })
           .catch((err) => {
             console.error("----------- error with destinationSetter", err);
-            iframe.current?.contentWindow?.postMessage(
-              JSON.stringify({
-                type: "destinationComplete",
-                x: appEvent.data[0],
-                y: appEvent.data[1],
-                success: false,
-              }),
-              "*"
-            );
+            sendToIframe({
+              type: "destinationComplete",
+              x: appEvent.data[0],
+              y: appEvent.data[1],
+              success: false,
+            })
           });
       });
     },
-    [tableId, relayer]
+    [tableId, relayer, sendToIframe]
   );
 
   useEffect(() => {
@@ -192,7 +200,10 @@ const Play: NextPage = () => {
           case "loaded":
             console.log("we got a loaded!")
             if (tableId) {
-              // TODO: switch over the scene which will trigger the 'gm' message
+              sendToIframe({
+                type: 'tableReady',
+                tableId: tableId,
+              })
             } else {
               registerInterestMutation.mutate({ addr: address! })
             }
@@ -209,17 +220,17 @@ const Play: NextPage = () => {
       console.log("removing iframe msg listener");
       window.removeEventListener("message", handler);
     };
-  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage, address, registerInterestMutation]);
+  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage, sendToIframe, address, registerInterestMutation, tableId]);
 
   return (
     <>
-      <Video
+      {/* <Video
         animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
         loop
         muted
         autoPlay
         id="jungle-video-background"
-      />
+      /> */}
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="75%">
@@ -227,7 +238,7 @@ const Play: NextPage = () => {
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/CBUQcOHy/?player=${address}`}
+                src={`https://playcanv.as/e/b/eiO9cQFr/?player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"
