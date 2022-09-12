@@ -11,6 +11,7 @@ import "./appWide/AppConnector"
 import "./appWide/Music"
 import "./appWide/Focuser"
 import "./appWide/HelpText"
+import "./preLoader/preLoaderScreen"
 
 console.log(
   `--------------------------------------------------------------------------------

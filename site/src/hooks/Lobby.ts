@@ -56,14 +56,13 @@ export const useRegisterInterest = () => {
   const queryClient = useQueryClient();
   const { data:relayer } = useRelayer()
 
-  return useMutation(async ({ name, addr }: { name: string, addr: string }) => {
+  return useMutation(async ({ addr }: { addr: string }) => {
     if (!relayer?.ready()) {
       throw new Error("the relayer must be ready to register interest");
     }
     const tx = await relayer.wrapped.lobby().registerInterest();
     await tx.wait()
     return {
-      name,
       addr
     }
   }, {
@@ -73,7 +72,7 @@ export const useRegisterInterest = () => {
       const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
  
       // Optimistically update to the new value
-      queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{name:string, addr:string}[]|undefined) => [...(old || []), thisPlayer])
+      queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
   
       // Return a context object with the snapshotted value
       return { previousPlayers }
