@@ -80,10 +80,21 @@ async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'af
   return parseInt(result.blockNumber, 10)
 }
 
-export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: 'day' | 'week' | 'month') {
+function startAndEnd(time:DateTime, timePeriod: 'day' | 'week' | 'month') {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
-  const start = cryptoRomeDay.startOf(timePeriod)
-  const end = cryptoRomeDay.endOf(timePeriod)
+  let start = cryptoRomeDay.startOf(timePeriod)
+  let end = cryptoRomeDay.endOf(timePeriod)
+
+  if (timePeriod === 'week') {
+    start = start.plus({days: 2})
+    end = end.plus({days: 2})
+  }
+
+  return [start,end]
+}
+
+export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: 'day' | 'week' | 'month') {
+  const [start,end] = startAndEnd(time, timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
@@ -98,9 +109,7 @@ export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod
 }
 
 export const playerCount = async (time: DateTime, timePeriod: 'day' | 'week' | 'month') => {
-  const cryptoRomeDay = time.setZone(TIME_ZONE)
-  const start = cryptoRomeDay.startOf(timePeriod)
-  const end = cryptoRomeDay.endOf(timePeriod)
+  const [start,end] = startAndEnd(time, timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
