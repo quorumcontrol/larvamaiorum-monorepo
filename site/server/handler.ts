@@ -5,11 +5,13 @@ import { keccak256 } from "ethers/lib/utils";
 import { faker } from '@faker-js/faker'
 import { NonceManager } from '@ethersproject/experimental'
 import * as dotenv from "dotenv";
+import { getBytesAndCreateToken } from 'skale-relayer-contracts'
+import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
 import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
-import { accoladesContract, delphsContract, lobbyContract, playerContract, wootgumpContract } from "../src/utils/contracts";
+import { accoladesContract, delphsContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
@@ -71,6 +73,9 @@ const txSingleton = new SingletonQueue()
 const provider = skaleProvider
 
 const wallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
+
+const roller = Wallet.createRandom()
+
 
 const lobby = lobbyContract().connect(wallet)
 const delphs = delphsContract().connect(wallet)
@@ -346,10 +351,20 @@ class TablePlayer {
 }
 
 async function main() {
+  console.log('sending roller 2 sfuel')
+  const sendTx = await wallet.sendTransaction({
+    value: utils.parseEther('2'),
+    to: roller.address,
+  })
+  await sendTx.wait()
+
+  const token = await getBytesAndCreateToken(trustedForwarderContract(), wallet, roller)
+
   return new Promise((_resolve) => {
     console.log('running')
     // call the client to just get it setup
     mqttClient()
+
 
     const tableMaker = new TableMaker()
     const tablePlayer = new TablePlayer()
