@@ -13,6 +13,7 @@ import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
 import { accoladesContract, delphsContract, listKeeperContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
+import { questTrackerContract } from '../src/utils/questTracker'
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
 import { skaleProvider } from "../src/utils/skaleProvider";
@@ -75,35 +76,36 @@ const txSingleton = new SingletonQueue()
 
 const provider = skaleProvider
 
-const wallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
-wallet.getAddress().then((addr) => {
+const delphsWallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
+delphsWallet.getAddress().then((addr) => {
   console.log("Delph's address: ", addr)
 })
 
 const roller = Wallet.createRandom().connect(provider)
 
-const lobby = lobbyContract().connect(wallet)
-const delphs = delphsContract().connect(wallet)
-const player = playerContract().connect(wallet)
-const wootgump = wootgumpContract().connect(wallet)
-const accolades = accoladesContract().connect(wallet)
-const listKeeper = listKeeperContract().connect(wallet)
+const lobby = lobbyContract().connect(delphsWallet)
+const delphs = delphsContract().connect(delphsWallet)
+const player = playerContract().connect(delphsWallet)
+const wootgump = wootgumpContract().connect(delphsWallet)
+const accolades = accoladesContract().connect(delphsWallet)
+const listKeeper = listKeeperContract().connect(delphsWallet)
 
-const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, wallet)
-const teamStats = TeamStats__factory.connect(addresses().TeamStats, wallet)
+const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, delphsWallet)
+const teamStats = TeamStats__factory.connect(addresses().TeamStats, delphsWallet)
+const questTracker = questTrackerContract().connect(delphsWallet)
 
 const relayer = memoize(async () => {
   console.log('sending roller sfuel')
   console.log('sending value transfer')
-  const sendTx = await wallet.sendTransaction({
+  const sendTx = await delphsWallet.sendTransaction({
     value: utils.parseEther('0.5'),
     to: roller.address,
   })
   console.log('sending value transfer')
   await sendTx.wait()
 
-  const token = await getBytesAndCreateToken(trustedForwarderContract(), wallet.signer, roller)
-  const kasumahRelayer = new KasumahRelayer(trustedForwarderContract().connect(roller), roller, wallet.signer, token)
+  const token = await getBytesAndCreateToken(trustedForwarderContract(), delphsWallet.signer, roller)
+  const kasumahRelayer = new KasumahRelayer(trustedForwarderContract().connect(roller), roller, delphsWallet.signer, token)
   return {
     relayer: kasumahRelayer,
     wrapped: {
@@ -115,7 +117,7 @@ const relayer = memoize(async () => {
 interface ActiveTable {
   id: string
   metadata: ThenArg<ReturnType<DelphsTable['tables']>>
-  players: Record<string,BigNumber>
+  players: Record<string, BigNumber>
   start: BigNumber
   end: BigNumber
 }
@@ -186,7 +188,7 @@ class TableMaker {
           players: playersWithNamesAndSeeds.map((p) => p.address!),
           seeds: playersWithNamesAndSeeds.map((p) => p.seed),
           gameLength: NUMBER_OF_ROUNDS,
-          owner: await wallet.getAddress(),
+          owner: await delphsWallet.getAddress(),
           startedAt: 0,
           tableSize: TABLE_SIZE,
           wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
@@ -265,7 +267,7 @@ class TablePlayer {
         this.log('no tables')
         return
       }
-      const active:ActiveTable[] = await Promise.all((ids).map(async (tableId) => {
+      const active: ActiveTable[] = await Promise.all((ids).map(async (tableId) => {
         console.log('active: ', tableId)
         const [metadata, playerAddresses] = await Promise.all([
           delphs.tables(tableId),
@@ -316,7 +318,7 @@ class TablePlayer {
         return (await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })).wait()
       })
       this.handlePayouts(active)
-     
+
       this.log('rolling complete')
     } catch (err) {
       console.error('error rolling: ', err)
@@ -326,13 +328,12 @@ class TablePlayer {
     }
   }
 
-  private async handlePayouts(active:ActiveTable[]) {
+  private async handlePayouts(active: ActiveTable[]) {
     await Promise.all(active.map(async (table) => {
       this.log('collecting results for', table.id)
       const runner = new BoardRunner(table.id)
       await runner.run()
       const rewards = runner.rewards()
-
       const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
 
       Object.keys(rewards.wootgump).forEach((playerId) => {
@@ -374,20 +375,40 @@ class TablePlayer {
       await txSingleton.push(async () => {
         const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
         await tx.wait()
-        this.log('wootgump prize tx: ', tx.hash)
+        this.log('wootgump prize tx: ', tx.hash, Object.values(memo.gump))
 
         const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
         await accoladesTx.wait()
-        this.log('accoladesTx tx: ', accoladesTx.hash)
+        this.log('accoladesTx tx: ', accoladesTx.hash, memo.accolades)
 
-        const teamTx = await teamStats.register(Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000 })
+        const stats = Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: table.id }))
+        const teamTx = await teamStats.register(stats, { gasLimit: 5_000_000 })
         await teamTx.wait()
         this.log('team tx: ', teamTx.hash)
-        await Promise.all(active.map(async (active) => {
-          await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000})
-        }))
+
+        const quest = Object.keys(rewards.quests.battlesWon).map((player) => {
+          const val = rewards.quests.battlesWon[player]
+          const team = table.players[player]
+
+          return {
+            player,
+            team,
+            value: val,
+            questId: keccak256(Buffer.from('battles-won')),
+            tableId: table.id,
+          }
+        })
+        const questTrackerTx = await questTracker.register(quest, { gasLimit: 5_000_000 })
+        this.log('quest tracker tx: ', questTrackerTx.hash)
+        await questTrackerTx.wait()
       })
     }))
+
+    await txSingleton.push(async () => {
+      return Promise.all(active.map(async (active) => {
+        await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000 })
+      }))
+    })
   }
 }
 

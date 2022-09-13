@@ -13,6 +13,7 @@ const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
 export type TimeFrames = 'day' | 'week'
+export type LeaderBoardType = 'gump' | 'team' | 'mostgump'
 
 const explorerUrl = memoize(() => {
   const explorerUrl = defaultNetwork().blockExplorers?.default.url
@@ -102,7 +103,7 @@ function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
   return [start,end]
 }
 
-export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod: TimeFrames) {
+export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod: TimeFrames) {
   let [start,end] = startAndEnd(time, timePeriod)
 
   if (end.diffNow('seconds').seconds > 0) {
@@ -118,6 +119,8 @@ export async function timeRank(time: DateTime, type: 'gump' | 'team', timePeriod
       return rank(startBlock, endBlock)
     case 'team':
       return teamRank(startBlock, endBlock)
+    case 'mostgump':
+      return mostGump(startBlock, endBlock)
   }
 }
 
@@ -160,6 +163,26 @@ async function teamRank(from: number, to: number): Promise<Ranking> {
     start: from,
     end: to,
     ranked: Object.values(teams).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+  }
+}
+
+async function mostGump(from: number, to: number): Promise<Ranking> {
+  const teamStats = teamStatsContract()
+  const filter = teamStats.filters.TeamWin(null, null, null, null)
+  const evts = await teamStats.queryFilter(filter, from, to)
+  const ranked:GumpRankingItem[] = evts.map((evt) => {
+    return {
+      address: evt.args.player,
+      balance: evt.args.value, 
+    }
+  })
+    .sort((a,b) => b.balance.sub(a.balance).div(ONE).toNumber())
+    .slice(0, MAX_RANKINGS)
+
+  return {
+    start: from,
+    end: to,
+    ranked
   }
 }
 
