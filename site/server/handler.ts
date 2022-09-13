@@ -29,7 +29,7 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15
+const NUMBER_OF_ROUNDS = 5
 const TABLE_SIZE = 7
 const WOOTGUMP_MULTIPLIER = 24
 
@@ -286,7 +286,7 @@ class TablePlayer {
           id: tableId,
           metadata,
           start: metadata.startedAt,
-          end: metadata.startedAt.add(metadata.gameLength).sub(1),
+          end: metadata.startedAt.add(metadata.gameLength),
           players,
         }
       }))
@@ -332,7 +332,7 @@ class TablePlayer {
       const runner = new BoardRunner(table.id)
       await runner.run()
       const rewards = runner.rewards()
-
+      console.log("rewards: ", rewards)
       const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
 
       Object.keys(rewards.wootgump).forEach((playerId) => {
@@ -341,6 +341,7 @@ class TablePlayer {
         memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
         memo.gump[playerId].team = team
       })
+      console.log("gump", memo.gump)
       memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
         return {
           id: i,
@@ -374,15 +375,15 @@ class TablePlayer {
       await txSingleton.push(async () => {
         const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
         await tx.wait()
-        this.log('wootgump prize tx: ', tx.hash)
+        this.log('wootgump prize tx: ', tx.hash, Object.values(memo.gump))
 
         const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
         await accoladesTx.wait()
-        this.log('accoladesTx tx: ', accoladesTx.hash)
-
-        const teamTx = await teamStats.register(Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) })), { gasLimit: 5_000_000 })
+        this.log('accoladesTx tx: ', accoladesTx.hash, memo.accolades)
+        const stats = Object.values(memo.gump).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: keccak256(Buffer.from('no-table-recorded')) }))
+        const teamTx = await teamStats.register(stats, { gasLimit: 5_000_000 })
         await teamTx.wait()
-        this.log('team tx: ', teamTx.hash)
+        this.log('team tx: ', teamTx.hash, stats)
         await Promise.all(active.map(async (active) => {
           await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000})
         }))

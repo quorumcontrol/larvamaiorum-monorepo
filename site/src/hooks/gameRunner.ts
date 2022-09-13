@@ -114,7 +114,7 @@ export class GameRunner extends EventEmitter {
     if (!this.tableInfo) {
       throw new Error('no table')
     }
-    if (this.latest.gte(this.tableInfo.startedAt.add(this.tableInfo.gameLength).sub(1))) {
+    if (this.grid?.isOver()) {
       console.log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
       this.over = true
       this.emit('END')
@@ -172,7 +172,6 @@ export class GameRunner extends EventEmitter {
       gameLength: this.tableInfo.gameLength.toNumber(),
     })
     this.grid.start(firstRoll.random)
-    this.updateGrid(firstRoll)
     this.rolls[0] = firstRoll
     log('gameRunner first roll', firstRoll)
     const msg: SetupMessage = {

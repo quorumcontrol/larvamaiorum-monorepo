@@ -119,11 +119,11 @@ class ChainConnector extends ScriptTypeBase {
       this.grid = grid;
 
       this.boardGenerate.setGrid(grid);
-      this.latest = firstRoll.index - 1
+      this.latest = firstRoll.index
       this.grid.start(firstRoll.random);
       this.entity.fire("start");
 
-      this.handleTick(firstRoll)
+      // this.handleTick(firstRoll)
     } catch (err: any) {
       console.error("error", err);
       throw err;

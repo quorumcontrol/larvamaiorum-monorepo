@@ -38,19 +38,20 @@ class BoardRunner {
     }))
 
     const started = table.startedAt
-    const ended = started.add(table.gameLength).sub(1)
+    const ended = started.add(table.gameLength)
 
     if (!latest.gte(ended)) {
       throw new Error('table not over yet')
     }
 
-    const rolls = await Promise.all(new Array(table.gameLength.toNumber()).fill(true).map(async (_, i) => {
+    const rolls = await Promise.all(new Array(table.gameLength.add(1).toNumber()).fill(true).map(async (_, i) => {
+      const rollToGet = started.add(i)
       const [roll,destinations] = await Promise.all([
-        this.delphs.rolls(started.add(i)),
-        this.delphs.destinationsForRoll(this.tableId, started.add(i - 1)),
+        this.delphs.rolls(rollToGet),
+        this.delphs.destinationsForRoll(this.tableId, rollToGet.sub(1)),
       ])
       return {
-        tick: started.add(i),
+        tick: rollToGet,
         random: roll,
         destinations,
       }
@@ -67,7 +68,10 @@ class BoardRunner {
 
     grid.start(rolls[0].random)
 
-    rolls.forEach((roll) => {
+    rolls.forEach((roll, i) => {
+      if (i === 0) {
+        return // skip the first one which is just setup
+      }
       roll.destinations.forEach((d) => {
         grid.warriors.find((w) => w.id.toLowerCase() === d.player.toLowerCase())?.setDestination(d.x.toNumber(), d.y.toNumber())
       })
