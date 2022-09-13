@@ -80,7 +80,7 @@ const Leaderboard: React.FC<{
             if (type === "team") {
               return (
                 <TeamRow
-                  team={ranking.team}
+                  team={ranking.team!}
                   balance={ranking.balance}
                   rank={i}
                   key={`leaderboard-team-${timeframe}-${ranking.team}-${i}`}
@@ -89,7 +89,7 @@ const Leaderboard: React.FC<{
             }
             return (
               <GumpRow
-                address={ranking.address}
+                address={ranking.address!}
                 balance={ranking.balance}
                 rank={i}
                 key={`leaderboard-${type}-${timeframe}-${ranking.address}-${i}`}
