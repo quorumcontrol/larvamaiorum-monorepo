@@ -12,11 +12,12 @@ import {
 import type { NextPage } from "next";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useAccount, useWaitForTransaction } from "wagmi";
 import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
+import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
 import { useHasPudgy } from "../../../src/hooks/badgeOfAssembly/useHasPudgy";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import { isTestnet } from "../../../src/utils/networks";
@@ -124,10 +125,17 @@ const ClaimButton: React.FC<{
 const ClaimPenguin: NextPage = () => {
   const { address } = useAccount();
   const isDomReady = useIsClientSide();
+  const { data:userBadges } = useUserBadges(address)
 
   const { data: isPudgyHolder, isFetched } = useHasPudgy(address);
 
   const [didMint, setDidMint] = useState(false);
+
+  useEffect(() => {
+    if (userBadges && userBadges.some((b) => b.id.eq(tokenId))) {
+      setDidMint(true)
+    }
+  }, [setDidMint, userBadges])
 
   if (!isDomReady) {
     return (
