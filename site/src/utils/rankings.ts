@@ -1,7 +1,7 @@
-import { BigNumber, constants, utils } from "ethers"
+import { BigNumber, BigNumberish, constants, utils } from "ethers"
 import { DateTime } from 'luxon'
 import fetch from 'cross-fetch'
-import { wootgumpContract } from "./contracts"
+import { accoladesContract, wootgumpContract } from "./contracts"
 import { defaultNetwork } from "./SkaleChains"
 import { memoize } from "./memoize"
 import { skaleProvider } from "./skaleProvider"
@@ -13,7 +13,7 @@ const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
 export type TimeFrames = 'day' | 'week'
-export type LeaderBoardType = 'gump' | 'team' | 'mostgump'
+export type LeaderBoardType = 'gump' | 'team' | 'mostgump' | 'firstgump' | 'firstblood' | 'battleswon'
 
 const explorerUrl = memoize(() => {
   const explorerUrl = defaultNetwork().blockExplorers?.default.url
@@ -121,6 +121,12 @@ export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod
       return teamRank(startBlock, endBlock)
     case 'mostgump':
       return mostGump(startBlock, endBlock)
+    case 'firstgump':
+      return accoladesCount(startBlock, endBlock, 3)
+    case 'firstblood':
+      return accoladesCount(startBlock, endBlock, 4)
+    case 'battleswon':
+      return accoladesCount(startBlock, endBlock, 5)
   }
 }
 
@@ -163,6 +169,22 @@ async function teamRank(from: number, to: number): Promise<Ranking> {
     start: from,
     end: to,
     ranked: Object.values(teams).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+  }
+}
+
+async function accoladesCount(from: number, to: number, tokenId:BigNumberish) {
+  const accolades = accoladesContract()
+  const filter = accolades.filters.TransferSingle(null, constants.AddressZero, null, null, null)
+  const evts = await accolades.queryFilter(filter, from, to)
+  let ranked:Record<string,GumpRankingItem> = {}
+  evts.filter((evt) => evt.args.id.eq(tokenId)).forEach((evt) => {
+    ranked[evt.args.to] ||= { address: evt.args.to, balance: constants.Zero }
+    ranked[evt.args.to].balance = ranked[evt.args.to].balance.add(evt.args.value.mul(ONE))
+  })
+  return {
+    start: from,
+    end: to,
+    ranked: Object.values(ranked).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
   }
 }
 
