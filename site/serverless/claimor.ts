@@ -10,15 +10,19 @@ if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
 
 const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY!).connect(skaleProvider)
 
+console.log("badge minter: ", schainSigner.address)
+
 const boa = badgeOfAssemblyContract().connect(schainSigner)
 
 const singleton = new SimpleSyncher('claimor')
 
 export async function handle(event: any, _context: any, callback: any) {
-  const { address:reqAddr } = JSON.parse(event.body)
+  const { address:reqAddr, tokenId } = JSON.parse(event.body)
   const address:string = reqAddr
+  console.log("claimor processing", address, tokenId)
 
-  if (await hasPudgy(address)) {
+  if (!(await hasPudgy(address))) {
+    console.error('no penguins')
     return callback(null, {
       statusCode: 400,
       body: JSON.stringify({

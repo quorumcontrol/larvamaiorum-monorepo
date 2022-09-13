@@ -7,6 +7,7 @@ import {
   Heading,
   VStack,
   Link,
+  HStack,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -166,6 +167,12 @@ const ClaimPenguin: NextPage = () => {
               </Link>
             )}
           </Text>
+          <Heading>Utility</Heading>
+          <HStack>
+            <NextLink href="/delphs-table">
+              <Button>Play Delph's Table</Button>
+            </NextLink>
+          </HStack>
         </VStack>
       </Layout>
     );
@@ -200,16 +207,16 @@ const ClaimPenguin: NextPage = () => {
               <Box>
                 <Heading fontSize="xl">Qualified?</Heading>
                 {!isFetched && <Spinner />}
-                {isFetched && (
-                  <Text>{isPudgyHolder ? "Yes" : "No"}</Text>
-                )}
+                {isFetched && <Text>{isPudgyHolder ? "Yes" : "No"}</Text>}
               </Box>
 
               {isFetched && isPudgyHolder && address && (
-                <ClaimButton
-                  address={address}
-                  onSuccess={() => setDidMint(true)}
-                />
+                <Box>
+                  <ClaimButton
+                    address={address}
+                    onSuccess={() => setDidMint(true)}
+                  />
+                </Box>
               )}
               <Box>
                 <Text fontSize="sm">

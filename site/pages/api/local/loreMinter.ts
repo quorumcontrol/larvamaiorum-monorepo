@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { handle as serverlessHandler } from '../../../serverless/loreMinter'
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   
   const body = req.body
 
-  serverlessHandler({ body }, {}, (err:any, resp:any) => {
+  await serverlessHandler({ body }, {}, (err:any, resp:any) => {
     if (err) {
       console.error('throwing error', err)
       throw err
