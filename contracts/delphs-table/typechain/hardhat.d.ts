@@ -125,6 +125,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Player__factory>;
     getContractFactory(
+      name: "QuestTracker",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.QuestTracker__factory>;
+    getContractFactory(
       name: "Ranker",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ranker__factory>;
@@ -285,6 +289,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Player>;
+    getContractAt(
+      name: "QuestTracker",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.QuestTracker>;
     getContractAt(
       name: "Ranker",
       address: string,

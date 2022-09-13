@@ -14,7 +14,7 @@ import { useBadgeMetadata } from "../hooks/BadgeOfAssembly";
 import { useUsername } from "../hooks/Player";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import humanFormatted from "../utils/humanFormatted";
-import { TimeFrames } from "../utils/rankings";
+import { LeaderBoardType, TimeFrames } from "../utils/rankings";
 
 const GumpRow: React.FC<{
   address: string;
@@ -48,7 +48,7 @@ const TeamRow: React.FC<{
 
 const Leaderboard: React.FC<{
   timeframe: TimeFrames;
-  type: "gump" | "team";
+  type: LeaderBoardType;
   diff?:string
 }> = ({ timeframe, type, diff }) => {
   const { data: leaderboard, isLoading } = useLeaderboard(type, timeframe, diff as string|undefined);
@@ -83,7 +83,7 @@ const Leaderboard: React.FC<{
                   team={ranking.team}
                   balance={ranking.balance}
                   rank={i}
-                  key={`leaderboard-team-${ranking.team}`}
+                  key={`leaderboard-team-${timeframe}-${ranking.team}-${i}`}
                 />
               );
             }
@@ -92,7 +92,7 @@ const Leaderboard: React.FC<{
                 address={ranking.address}
                 balance={ranking.balance}
                 rank={i}
-                key={`leaderboard-${ranking.address}`}
+                key={`leaderboard-${type}-${timeframe}-${ranking.address}-${i}`}
               />
             );
           })}
