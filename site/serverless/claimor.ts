@@ -1,25 +1,14 @@
-import { ethers, Wallet } from "ethers";
-import { chain } from "wagmi";
-import { badgeOfAssemblyContract, listKeeperContract } from "../src/utils/contracts";
+import { Wallet } from "ethers";
+import { badgeOfAssemblyContract } from "../src/utils/contracts";
+import { hasPudgy } from '../src/hooks/badgeOfAssembly/useHasPudgy'
 import { skaleProvider } from "../src/utils/skaleProvider";
-import { IERC721__factory } from '../badge-of-assembly-types'
 import SimpleSyncher from '../src/utils/singletonQueue';
 
-if (!process.env.BADGE_MINTER_PRIVATE_KEY || !process.env.DELPHS_PRIVATE_KEY) {
+if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
 }
 
-const mainnetProvider = new ethers.providers.AlchemyProvider(
-  chain.mainnet.id,
-  process.env.NEXT_PUBLIC_ALCHEMY_KEY
-);
-
 const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY!).connect(skaleProvider)
-
-const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
-const listKeeper = listKeeperContract().connect(delphSigner)
-
-const pudgies = IERC721__factory.connect('0xbd3531da5cf5857e7cfaa92426877b022e612cf8', mainnetProvider)
 
 const boa = badgeOfAssemblyContract().connect(schainSigner)
 
@@ -29,8 +18,7 @@ export async function handle(event: any, _context: any, callback: any) {
   const { address:reqAddr } = JSON.parse(event.body)
   const address:string = reqAddr
 
-  const balance = await pudgies.balanceOf(address)
-  if (balance.eq(0)) {
+  if (await hasPudgy(address)) {
     return callback(null, {
       statusCode: 400,
       body: JSON.stringify({
