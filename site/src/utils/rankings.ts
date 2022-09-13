@@ -31,13 +31,13 @@ type RankingItem = GumpRankingItem | TeamRankingItem
 
 interface GumpRankingItem {
   address: Address
-  team: never
+  team?: never
   balance: BigNumber
 }
 
 interface TeamRankingItem {
   team: number
-  address: never
+  address?: never
   balance: BigNumber
 }
 
