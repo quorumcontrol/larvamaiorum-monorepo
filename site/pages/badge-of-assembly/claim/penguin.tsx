@@ -22,7 +22,7 @@ import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import { isTestnet } from "../../../src/utils/networks";
 import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
-const mintUrl = isTestnet ? "/api/local/badge-of-assembly/claimor" : "";
+const mintUrl = isTestnet ? "/api/local/badge-of-assembly/claimor" : "https://larvammaiorumfaucetgjxd8a5h-claimor-mainnet.functions.fnc.fr-par.scw.cloud";
 const tokenId = 11;
 
 const ClaimButton: React.FC<{
