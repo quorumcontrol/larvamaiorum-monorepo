@@ -170,7 +170,7 @@ const ClaimPenguin: NextPage = () => {
           <Heading>Utility</Heading>
           <HStack>
             <NextLink href="/delphs-table">
-              <Button>Play Delph's Table</Button>
+              <Button>Play Delph&apos;s Table</Button>
             </NextLink>
           </HStack>
         </VStack>
