@@ -83,7 +83,7 @@ const Leaderboard: React.FC<{
                   team={ranking.team}
                   balance={ranking.balance}
                   rank={i}
-                  key={`leaderboard-team-${ranking.team}`}
+                  key={`leaderboard-team-${timeframe}-${ranking.team}-${i}`}
                 />
               );
             }
@@ -92,7 +92,7 @@ const Leaderboard: React.FC<{
                 address={ranking.address}
                 balance={ranking.balance}
                 rank={i}
-                key={`leaderboard-${ranking.address}`}
+                key={`leaderboard-${type}-${timeframe}-${ranking.address}-${i}`}
               />
             );
           })}
