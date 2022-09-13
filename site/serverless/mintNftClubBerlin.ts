@@ -4,7 +4,7 @@ import { skaleProvider } from "../src/utils/skaleProvider";
 import SimpleSyncher from '../src/utils/singletonQueue';
 import { isTestnet } from "../src/utils/networks";
 import { keccak256 } from "ethers/lib/utils";
-import 'cross-fetch/polyfill';
+import fetch from 'cross-fetch'
 
 const API_ENDPOINT = 'https://discord.com/api/v10'
 const NFT_BERLIN_GUILD_ID = "910069601046523914"

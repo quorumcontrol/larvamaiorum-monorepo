@@ -26,6 +26,17 @@ package:
     - '!.git/**'
 
 functions:
+  claimor-mainnet:
+    handler: serverless/claimor.handle
+    memoryLimit: 1024
+    maxScale: 1
+    env:
+      NEXT_PUBLIC_MAINNET: "true"
+      NEXT_PUBLIC_ALCHEMY_KEY: ${env:NEXT_PUBLIC_ALCHEMY_KEY}
+    secret:
+      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
+      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
+
   loreminter-mainnet:
     handler: serverless/loreMinter.handle
     memoryLimit: 1024
@@ -35,27 +46,12 @@ functions:
     secret:
       DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
 
-  loreminter-testnet:
-    handler: serverless/loreMinter.handle
-    memoryLimit: 1024
-    maxScale: 1
-    secret:
-      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
-  
   codeminter-mainnet:
     handler: serverless/codeMinter.handle
     memoryLimit: 1024
     maxScale: 1
     env:
       NEXT_PUBLIC_MAINNET: "true"
-    secret:
-      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
-      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
-
-  codeminter-testnet:
-    handler: serverless/codeMinter.handle
-    memoryLimit: 1024
-    maxScale: 1
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
       DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
@@ -82,16 +78,6 @@ functions:
     maxScale: 1
     env:
       NEXT_PUBLIC_MAINNET: "true"
-    secret:
-      BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
-      DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}
-      DISCORD_CLIENT_SECRET: ${env:DISCORD_CLIENT_SECRET}
-      DELPHS_PRIVATE_KEY: ${env:DELPHS_PRIVATE_KEY}
-      
-  nft-club-berlin-claim-testnet: 
-    handler: serverless/mintNftClubBerlin.handle
-    memoryLimit: 1024
-    maxScale: 1
     secret:
       BADGE_MINTER_PRIVATE_KEY: ${env:BADGE_MINTER_PRIVATE_KEY}
       DISCORD_CLIENT_ID: ${env:DISCORD_CLIENT_ID}

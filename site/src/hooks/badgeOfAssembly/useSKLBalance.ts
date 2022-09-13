@@ -1,14 +1,9 @@
-import { ethers, BigNumber } from "ethers";
-import { chain } from "wagmi";
+import { BigNumber } from "ethers";
 import { useQuery } from "react-query";
+import mainnetProvider from "../../utils/mainnetProvider";
 import { Skl__factory } from "../../../skale-token-contracts";
 
 export const SKL_ADDRESS = "0x00c83aeCC790e8a4453e5dD3B0B4b3680501a7A7"
-
-const mainnetProvider = new ethers.providers.AlchemyProvider(
-  chain.mainnet.id,
-  process.env.NEXT_PUBLIC_ALCHEMY_KEY
-);
 
 const skl = Skl__factory.connect(SKL_ADDRESS, mainnetProvider);
 

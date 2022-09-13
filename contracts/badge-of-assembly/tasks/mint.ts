@@ -1,7 +1,42 @@
 import "@nomiclabs/hardhat-ethers";
-import { Wallet } from "ethers";
+import { providers, Wallet } from "ethers";
 import { task } from "hardhat/config";
+import { BadgeOfAssembly__factory } from "../typechain";
 import { getBadgeOfAssemblyContract } from "./helpers";
+
+task('catchup-testnet').setAction(async (_, hre) => {
+  const skaleMainnetProvider = new providers.StaticJsonRpcProvider('https://mainnet.skalenodes.com/v1/haunting-devoted-deneb')
+  const testnetContract = await getBadgeOfAssemblyContract(hre);
+  const mainnetContract = BadgeOfAssembly__factory.connect('0x2C6FD25071Fd516947682f710f6e9F5eD610207F', skaleMainnetProvider)
+  let tokenId = 1;
+  let metadata = await mainnetContract.metadata(tokenId);
+  while (metadata.name !== "") {
+    const testnetMeta = await testnetContract.metadata(tokenId);
+    if (testnetMeta.name !== metadata.name) {
+      console.log("minting ", metadata.name, " token id: ", tokenId);
+      await testnetContract.setup(metadata, 1);
+    }
+    tokenId++;
+    metadata = await mainnetContract.metadata(tokenId);
+  }
+});
+
+task('approve-testnets').setAction(async (_, hre) => {
+  const testnetContract = await getBadgeOfAssemblyContract(hre);
+  const accts = await hre.getNamedAccounts();
+  const minter = accts.badgeMinter;
+  if (!minter) {
+    throw new Error('no minter')
+  }
+  let tokenId = 1;
+  let metadata = await testnetContract.metadata(tokenId);
+  while (metadata.name !== "") {
+    console.log('approving: ', tokenId)
+    await testnetContract.setMinterAccess(tokenId, minter, true);
+    tokenId++;
+    metadata = await testnetContract.metadata(tokenId);
+  }
+});
 
 task("gleam")
   .addParam("path", "the path to the wallets, expects a typescript file exporting { wallets }")
@@ -9,7 +44,7 @@ task("gleam")
     if (!process.env.GLEAM_MINTER) {
       throw new Error('must have the gleam minter key')
     }
-    const { wallets }:{wallets: string[]} = await import(path)
+    const { wallets }: { wallets: string[] } = await import(path)
     const gleamPrinter = new Wallet(
       process.env.GLEAM_MINTER,
       hre.ethers.provider
