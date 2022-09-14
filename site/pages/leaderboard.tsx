@@ -27,7 +27,7 @@ const LeaderboardPage: NextPage = () => {
           <Tab>First Gump</Tab>
           <Tab>First Blood</Tab>
           <Tab>Battles Won</Tab>
-          <Tab>Most Gump</Tab>
+          <Tab>Gump per Game</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
