@@ -30,7 +30,7 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15
+const NUMBER_OF_ROUNDS = 5
 const TABLE_SIZE = 7
 const WOOTGUMP_MULTIPLIER = 24
 
@@ -288,7 +288,7 @@ class TablePlayer {
           id: tableId,
           metadata,
           start: metadata.startedAt,
-          end: metadata.startedAt.add(metadata.gameLength).sub(1),
+          end: metadata.startedAt.add(metadata.gameLength),
           players,
         }
       }))
@@ -334,6 +334,7 @@ class TablePlayer {
       const runner = new BoardRunner(table.id)
       await runner.run()
       const rewards = runner.rewards()
+      console.log("rewards: ", rewards)
       const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
 
       Object.keys(rewards.wootgump).forEach((playerId) => {
@@ -342,6 +343,7 @@ class TablePlayer {
         memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
         memo.gump[playerId].team = team
       })
+      console.log("gump", memo.gump)
       memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
         return {
           id: i,
