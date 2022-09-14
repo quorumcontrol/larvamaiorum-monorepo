@@ -1,10 +1,10 @@
 import { BigNumber, constants } from 'ethers'
 import { DateTime } from 'luxon'
 import { accoladesContract, delphsContract, playerContract } from '../src/utils/contracts'
-import { closestBlockForTime, playerCount as fetchPlayerCount, startAndEnd, teamStatsContract, TimeFrames } from '../src/utils/rankings'
+import { closestBlockForTime, startAndEnd, teamStatsContract, TimeFrames } from '../src/utils/rankings'
 
 async function main() {
-  const [start,end] = await startBlockEndBlock(DateTime.now(), 'week')
+  const [start,end] = await startBlockEndBlock(DateTime.now().minus({days: 2}), 'week')
   console.log('fetching stats')
   const stats = await fetchTeamStats(start, end)
 
@@ -50,16 +50,27 @@ async function main() {
     return (memo += stats.games)
   }, 0)
 
+  const topGames = Object.values(uniquePlayerStats).sort((a,b) => b.games - a.games).slice(0,10)
+  const names = await Promise.all(topGames.map(async (tg) => {
+    return playerContract().name(tg.player)
+  }))
   console.log({
     uniquePlayers: humanCount,
     battles: battleCount,
     playerGames: playerGames,
     games: games.length,
+    topGames: topGames.map((tg, i) => {
+      return {
+        player: tg.player,
+        games: tg.games,
+        name: names[i],
+      }
+    })
   })
 }
 
 async function startBlockEndBlock(time:DateTime, period:TimeFrames) {
-  const [start,end] = startAndEnd(DateTime.now(), 'week')
+  const [start,end] = startAndEnd(time, 'week')
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
     closestBlockForTime(end, 'before'),
