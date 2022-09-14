@@ -6,6 +6,16 @@ import {
   Spinner,
   Link,
   Button,
+  Stack,
+  Spacer,
+  TableContainer,
+  Table,
+  Thead,
+  Th,
+  Tr,
+  Tbody,
+  Td,
+  TableCaption
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import NextLink from "next/link";
@@ -18,8 +28,11 @@ import TeamPicker from "../../src/components/TeamPicker";
 import { useTeam, useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import { useLogin } from "../../src/hooks/useUser";
+import border from "../../src/utils/dashedBorder";
+import { useRouter } from "next/router";
 
 const Lobby: NextPage = () => {
+  const router = useRouter()
   const { address } = useAccount();
   const { data: username, isLoading } = useUsername(address);
   const {
@@ -49,100 +62,185 @@ const Lobby: NextPage = () => {
     }
   }, [pickedTeam, login, setLoading, setErr]);
 
-  if (isClient && !isLoading && address && !username) {
-    return (
-      <Layout>
-        <Heading>Delph&apos;s Table</Heading>
-        <Text>You need an account to play</Text>
-      </Layout>
-    );
-  }
-
-  if (isClient && (isLoading || loading)) {
-    return (
-      <Layout>
-        <Heading>Delph&apos;s Table</Heading>
-        <Spinner />
-      </Layout>
-    );
-  }
-
-  if (isClient && teamFetched && !team) {
-    return (
-      <Layout>
-        <Heading>Delph&apos;s Table</Heading>
-        <Text>
-          Pick your team to play. You only have to do this once. You can change
-          your team in your{" "}
-          <AppLink href={`/profile/${address}`}>profile</AppLink>.
-        </Text>
-        <TeamPicker address={address} onSelect={setPickedTeam} />
-        <Box>
-          {!!pickedTeam && (
-            <Button variant="primary" onClick={() => onTeamPick()}>
-              Save
-            </Button>
-          )}
-          {err && <Text colorScheme="red">{err}</Text>}
-        </Box>
-      </Layout>
-    );
-  }
-
   return (
     <>
       <Layout>
-        <VStack mt="50" spacing={5}>
-          <Heading>Delph&apos;s Table</Heading>
-          <Text>Find the Wootgump, don&apos;t get rekt.</Text>
-          <Box pt="16">
-            {isClient && isLoading && <Spinner />}
+        <Stack direction={["column", "row"]}>
+          <VStack spacing="4" alignItems="left" maxW="40%">
+            <Heading>Delph&apos;s Table</Heading>
+            <Text textColor="brand.orange">
+              115,000 $SKL rewards for this week!
+            </Text>
+            <Text>
+              Delph&apos;s Table is a multiplayer board-game. Collect Wootgump.
+              Battle other warriors. Use your wits to outsmart your
+              competitors.
+            </Text>
+            <Text>Win acolades, and tons of rewards.</Text>
+            {loading && <Spinner />}
+            {isClient && username && teamFetched && !team && !loading && (
+              <Box p="5" backgroundImage={border}>
+                <Text fontSize="md">
+                  Pick your team to play. You only have to do this once. You can
+                  change your team later.
+                </Text>
+                <TeamPicker address={address} onSelect={setPickedTeam} hideTitle />
+                <Box>
+                  {!!pickedTeam && (
+                    <Button variant="primary" onClick={() => onTeamPick()}>
+                      Save
+                    </Button>
+                  )}
+                  {err && <Text colorScheme="red">{err}</Text>}
+                </Box>
+              </Box>
+            )}
             {isClient && !isLoading && address && !username && (
-              <VStack>
+              <Box backgroundImage={border} p="10">
                 <Text>
-                  Looks like this is your first time here. Let&apos;s get you
-                  setup. You&apos;ll need to have{" "}
-                  <AppLink href="/badge-of-assembly">
-                    a Badge of Assembly
-                  </AppLink>{" "}
+                  You need a username and a{" "}
+                  <AppLink href="/badge-of-assembly">Badge of Assembly</AppLink>{" "}
                   to play.
                 </Text>
-              </VStack>
+              </Box>
             )}
-            {isClient && !isLoading && address && username && (
-              <VStack spacing="5">
-                <Text>Welcome back {username}.</Text>
+            {isClient && !isLoading && address && username && team && !loading && (
+              <VStack spacing="5" alignItems="left">
                 {!isLoggedIn && (relayerLoading || !readyToLogin) && (
                   <Spinner />
                 )}
                 {!isLoggedIn && !(relayerLoading || !readyToLogin) && (
-                  <Button onClick={() => login()}>Login</Button>
+                  <Button variant="primary" onClick={() => login()}>Login to Play</Button>
                 )}
                 {isLoggedIn && (
                   <NextLink passHref href="/delphs-table/play">
                     <Link>
-                      <Button>Play</Button>
+                      <Button variant="primary">Play Now</Button>
                     </Link>
                   </NextLink>
                 )}
               </VStack>
             )}
+            <VStack alignItems={"left"} pt="4">
+              <Heading fontSize="3xl">Current Rewards ($SKL)</Heading>
+              <TableContainer>
+                <Table>
+                  <TableCaption>Some rewards are split amongst top players. Eligibility requirements may apply.</TableCaption>
+                  <Thead>
+                    <Tr>
+                      <Th>
+                        Challenge
+                      </Th>
+                      <Th>
+                        Reward
+                      </Th>
+                      <Th>
+                        Period
+                      </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td>
+                        Most gump in a game
+                      </Td>
+                      <Td>
+                        4000
+                      </Td>
+                      <Td>
+                        daily
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Battles won in a game
+                      </Td>
+                      <Td>
+                        3000
+                      </Td>
+                      <Td>
+                        daily
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Weekly winners
+                      </Td>
+                      <Td>
+                        21000
+                      </Td>
+                      <Td>
+                        weekly
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Team wins
+                      </Td>
+                      <Td>
+                        15000
+                      </Td>
+                      <Td>
+                        weekly
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Most First Gump
+                      </Td>
+                      <Td>
+                        10000
+                      </Td>
+                      <Td>
+                        weekly
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Most First Blood
+                      </Td>
+                      <Td>
+                        10000
+                      </Td>
+                      <Td>
+                        weekly
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        Most Battles Won
+                      </Td>
+                      <Td>
+                        10000
+                      </Td>
+                      <Td>
+                        weekly
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            </VStack>
+
+          </VStack>
+          <Spacer />
+          <Box p="10">
+            <video
+              id="full-video"
+              controls
+              preload="auto"
+              width="600"
+              height="450"
+              data-setup="{}"
+            >
+              <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
+              <p className="vjs-no-js">
+                To view this video please enable JavaScript, and consider
+                upgrading to a web browser that supports HTML5 video
+              </p>
+            </video>
           </Box>
-          <video
-            id="full-video"
-            controls
-            preload="auto"
-            width="800"
-            height="450"
-            data-setup="{}"
-          >
-            <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
-            <p className="vjs-no-js">
-              To view this video please enable JavaScript, and consider
-              upgrading to a web browser that supports HTML5 video
-            </p>
-          </video>
-        </VStack>
+        </Stack>
       </Layout>
     </>
   );
