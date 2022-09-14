@@ -8,12 +8,14 @@ import { skaleProvider } from "./skaleProvider"
 import multicallWrapper from "./multicallWrapper"
 import { TeamStats, TeamStats__factory } from "../../contracts/typechain"
 import { addresses } from "./networks"
+import { questTrackerContract } from "./questTracker"
+import { keccak256 } from "ethers/lib/utils"
 
 const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
 export type TimeFrames = 'day' | 'week'
-export type LeaderBoardType = 'gump' | 'team' | 'mostgump' | 'firstgump' | 'firstblood' | 'battleswon'
+export type LeaderBoardType = 'gump' | 'team' | 'mostgump' | 'firstgump' | 'firstblood' | 'battleswon' | 'battlesPerGame'
 
 const explorerUrl = memoize(() => {
   const explorerUrl = defaultNetwork().blockExplorers?.default.url
@@ -83,28 +85,28 @@ export async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before
   return parseInt(result.blockNumber, 10)
 }
 
-export function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
+export function startAndEnd(time: DateTime, timePeriod: TimeFrames) {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
   let start = cryptoRomeDay.startOf('day')
   let end = cryptoRomeDay.endOf('day')
   if (timePeriod === 'day') {
-    return [start,end]
+    return [start, end]
   }
 
   while (start.weekday !== 3) {
-    start = start.minus({days: 1})
+    start = start.minus({ days: 1 })
   }
 
-  end = end.plus({day: 1})
+  end = end.plus({ day: 1 })
   while (end.weekday !== 3) {
-    end = end.plus({day: 1})
+    end = end.plus({ day: 1 })
   }
 
-  return [start,end]
+  return [start, end]
 }
 
 export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod: TimeFrames) {
-  let [start,end] = startAndEnd(time, timePeriod)
+  let [start, end] = startAndEnd(time, timePeriod)
 
   if (end.diffNow('seconds').seconds > 0) {
     end = DateTime.now().setZone(TIME_ZONE).toUTC()
@@ -114,7 +116,7 @@ export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod
     closestBlockForTime(start, 'after'),
     closestBlockForTime(end, 'before'),
   ])
-  switch(type) {
+  switch (type) {
     case 'gump':
       return rank(startBlock, endBlock)
     case 'team':
@@ -127,11 +129,13 @@ export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod
       return accoladesCount(startBlock, endBlock, 4)
     case 'battleswon':
       return accoladesCount(startBlock, endBlock, 5)
+    case 'battlesPerGame':
+      return battlesWonPerGame(startBlock, endBlock)
   }
 }
 
 export const playerCount = async (time: DateTime, timePeriod: TimeFrames) => {
-  const [start,end] = startAndEnd(time, timePeriod)
+  const [start, end] = startAndEnd(time, timePeriod)
 
   const [startBlock, endBlock] = await Promise.all([
     closestBlockForTime(start, 'after'),
@@ -148,7 +152,7 @@ export const playerCount = async (time: DateTime, timePeriod: TimeFrames) => {
       ...memo,
       [evt.args.player]: true
     }
-  },{})
+  }, {})
   return Object.keys(uniquePlayers).length
 }
 
@@ -156,12 +160,12 @@ async function teamRank(from: number, to: number): Promise<Ranking> {
   const teamStats = teamStatsContract()
   const filter = teamStats.filters.TeamWin(null, null, null, null)
   const evts = await teamStats.queryFilter(filter, from, to)
-  const teams:Record<number,TeamRankingItem> = {}
+  const teams: Record<number, TeamRankingItem> = {}
   evts.forEach((evt) => {
     if (evt.args.team.eq(constants.Zero)) {
       return
     }
-    const existingTeam = teams[evt.args.team.toNumber()] || {team: evt.args.team.toNumber(), balance: constants.Zero}
+    const existingTeam = teams[evt.args.team.toNumber()] || { team: evt.args.team.toNumber(), balance: constants.Zero }
     existingTeam.balance = existingTeam.balance.add(evt.args.value)
     teams[evt.args.team.toNumber()] = existingTeam
   })
@@ -172,11 +176,11 @@ async function teamRank(from: number, to: number): Promise<Ranking> {
   }
 }
 
-async function accoladesCount(from: number, to: number, tokenId:BigNumberish) {
+async function accoladesCount(from: number, to: number, tokenId: BigNumberish) {
   const accolades = accoladesContract()
   const filter = accolades.filters.TransferSingle(null, constants.AddressZero, null, null, null)
   const evts = await accolades.queryFilter(filter, from, to)
-  let ranked:Record<string,GumpRankingItem> = {}
+  let ranked: Record<string, GumpRankingItem> = {}
   evts.filter((evt) => evt.args.id.eq(tokenId)).forEach((evt) => {
     ranked[evt.args.to] ||= { address: evt.args.to, balance: constants.Zero }
     ranked[evt.args.to].balance = ranked[evt.args.to].balance.add(evt.args.value.mul(ONE))
@@ -188,17 +192,35 @@ async function accoladesCount(from: number, to: number, tokenId:BigNumberish) {
   }
 }
 
+async function battlesWonPerGame(from: number, to: number) {
+  const questTracker = questTrackerContract()
+  const filter = questTracker.filters.QuestTrack(null, null, keccak256(Buffer.from('battles-won')), null, null)
+  const evts = await questTracker.queryFilter(filter, from, to)
+  let ranked: GumpRankingItem[] = evts.map((evt) => {
+    return {
+      address: evt.args.player,
+      balance: evt.args.value.mul(ONE),
+    }
+  }).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber())
+    .slice(0, MAX_RANKINGS)
+  return {
+    start: from,
+    end: to,
+    ranked: Object.values(ranked).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+  }
+}
+
 async function mostGump(from: number, to: number): Promise<Ranking> {
   const teamStats = teamStatsContract()
   const filter = teamStats.filters.TeamWin(null, null, null, null)
   const evts = await teamStats.queryFilter(filter, from, to)
-  const ranked:GumpRankingItem[] = evts.map((evt) => {
+  const ranked: GumpRankingItem[] = evts.map((evt) => {
     return {
       address: evt.args.player,
-      balance: evt.args.value, 
+      balance: evt.args.value,
     }
   })
-    .sort((a,b) => b.balance.sub(a.balance).div(ONE).toNumber())
+    .sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber())
     .slice(0, MAX_RANKINGS)
 
   return {
