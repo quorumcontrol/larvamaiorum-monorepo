@@ -1,6 +1,5 @@
 import {
   Box,
-  Heading,
   HStack,
   Radio,
   RadioGroup,
@@ -42,7 +41,8 @@ const PickCard: React.FC<{ metadata: MetadataWithId }> = ({ metadata }) => {
 const TeamPicker: React.FC<{
   address?: string;
   onSelect: (tokenId: BigNumberish) => any;
-}> = ({ address, onSelect }) => {
+  hideTitle?: boolean;
+}> = ({ address, onSelect, hideTitle }) => {
   const { data: userBadges, isLoading } = useUserBadges(address);
   const { data: team, isLoading: isTeamLoading } = useTeam(address);
   const [selectedTeam, setSelectedTeam] = useState("0");
@@ -56,7 +56,13 @@ const TeamPicker: React.FC<{
   );
 
   useEffect(() => {
-    if (isLoading || isTeamLoading || selectedTeam !== "0" || !userBadges || userBadges.length === 0) {
+    if (
+      isLoading ||
+      isTeamLoading ||
+      selectedTeam !== "0" ||
+      !userBadges ||
+      userBadges.length === 0
+    ) {
       return;
     }
     if (team) {
@@ -87,15 +93,19 @@ const TeamPicker: React.FC<{
   if (userBadges?.length === 0) {
     return (
       <Box mt="10">
-        <Text mb="5">Pick Team</Text>
-        <Text>You have no <AppLink href="/badge-of-assembly">Badge of Assembly badges</AppLink>. Grab one to play.</Text>
+        {!hideTitle && <Text mb="5">Pick Team</Text>}
+        <Text>
+          You have no{" "}
+          <AppLink href="/badge-of-assembly">Badge of Assembly</AppLink>.
+          Grab one to play.
+        </Text>
       </Box>
     );
   }
 
   return (
     <Box mt="10">
-      <Text mb="5">Pick Team</Text>
+      {!hideTitle && <Text mb="5">Pick Team</Text>}
       <RadioGroup name="team" value={selectedTeam} onChange={handleTeamClick}>
         <Wrap spacing="32px">
           {(userBadges || []).map((badge) => {
