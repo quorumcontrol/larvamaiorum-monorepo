@@ -27,7 +27,8 @@ const LeaderboardPage: NextPage = () => {
           <Tab>First Gump</Tab>
           <Tab>First Blood</Tab>
           <Tab>Battles Won</Tab>
-          <Tab>Gump per Game</Tab>
+          <Tab>Gump Per Game</Tab>
+          <Tab>Battles Won Per Game</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -50,6 +51,9 @@ const LeaderboardPage: NextPage = () => {
           </TabPanel>
           <TabPanel>
             <Leaderboard type="mostgump" timeframe="day" diff={diff} />
+          </TabPanel>
+          <TabPanel>
+            <Leaderboard type="battlesPerGame" timeframe="day" diff={diff} />
           </TabPanel>
         </TabPanels>
       </Tabs>
