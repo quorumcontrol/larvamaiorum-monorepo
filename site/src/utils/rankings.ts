@@ -65,7 +65,7 @@ export const teamStatsContract = memoize(() => {
   return multiCall.syncWrap<TeamStats>(unwrapped);
 });
 
-async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
+export async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
   const resp = await fetch(`${explorerUrl()}api?module=block&action=getblocknobytime&timestamp=${Math.floor(time.toUTC().toSeconds())}&closest=${beforeOrAfter}`, { headers: { accept: "application/json" } })
   // console.log("resp: ", resp)
   const parsedResp = await resp.json()
@@ -83,7 +83,7 @@ async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'af
   return parseInt(result.blockNumber, 10)
 }
 
-function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
+export function startAndEnd(time:DateTime, timePeriod: TimeFrames) {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
   let start = cryptoRomeDay.startOf('day')
   let end = cryptoRomeDay.endOf('day')
