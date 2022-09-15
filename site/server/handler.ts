@@ -34,6 +34,8 @@ const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 7
 const WOOTGUMP_MULTIPLIER = 24
 
+const PAYOUT_TRACKER = keccak256(Buffer.from('delphs-needs-payout'))
+
 const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
 
@@ -195,7 +197,7 @@ class TableMaker {
         }, { gasLimit: 3_000_000 })
         this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
-        await listKeeper.add(keccak256(Buffer.from('delphs-needs-payout')), id, { gasLimit: 500_000 })
+        await listKeeper.add(PAYOUT_TRACKER, id, { gasLimit: 2_000_000 })
         this.log('taking addresses')
         await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
         return startTx
@@ -253,6 +255,32 @@ class TablePlayer {
     this.instantTableStarted()
   }
 
+  private async idToActiveTable(tableId: string): Promise<ActiveTable> {
+    console.log('active: ', tableId)
+    const [metadata, playerAddresses] = await Promise.all([
+      delphs.tables(tableId),
+      delphs.players(tableId)
+    ])
+    const teams = await Promise.all(playerAddresses.map(async (addr) => {
+      return player.team(addr)
+    }))
+
+    const players = playerAddresses.reduce((memo, addr, i) => {
+      return {
+        ...memo,
+        [addr]: teams[i],
+      }
+    }, {})
+
+    return {
+      id: tableId,
+      metadata,
+      start: metadata.startedAt,
+      end: metadata.startedAt.add(metadata.gameLength),
+      players,
+    }
+  }
+
   private async playTables() {
     try {
       const wrappedDelphs = (await relayer()).wrapped.delphs
@@ -268,29 +296,7 @@ class TablePlayer {
         return
       }
       const active: ActiveTable[] = await Promise.all((ids).map(async (tableId) => {
-        console.log('active: ', tableId)
-        const [metadata, playerAddresses] = await Promise.all([
-          delphs.tables(tableId),
-          delphs.players(tableId)
-        ])
-        const teams = await Promise.all(playerAddresses.map(async (addr) => {
-          return player.team(addr)
-        }))
-
-        const players = playerAddresses.reduce((memo, addr, i) => {
-          return {
-            ...memo,
-            [addr]: teams[i],
-          }
-        }, {})
-
-        return {
-          id: tableId,
-          metadata,
-          start: metadata.startedAt,
-          end: metadata.startedAt.add(metadata.gameLength),
-          players,
-        }
+        return this.idToActiveTable(tableId)
       }))
       this.log('actives: ', active.map((a) => ({ id: a.id, start: a.start.toNumber(), end: a.end.toNumber() })))
       const endings = active.map((tourn) => tourn.end).sort((a, b) => b.sub(a).toNumber()) // sort to largest first
@@ -315,7 +321,9 @@ class TablePlayer {
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
       await txSingleton.push(async () => {
-        return (await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })).wait()
+        await Promise.all(active.map(async (table) => {
+          return (await orchestratorState.remove(table.id, { gasLimit: 500_000 })).wait()
+        }))
       })
       this.handlePayouts(active)
 
@@ -326,6 +334,42 @@ class TablePlayer {
     } finally {
       this.playing = false
     }
+  }
+
+  async cleanupUnPaidTables() {
+    const filter = listKeeper.filters.EntryAdded(PAYOUT_TRACKER, null)
+    const latestBlock = await skaleProvider.getBlockNumber()
+    const evts = await listKeeper.queryFilter(filter, latestBlock - 4500, latestBlock)
+    console.log('evt count: ', evts.length)
+    const stillRunningIds = await orchestratorState.all()
+    const doesNeedFixup = await Promise.all(evts.map(async (evt) => {
+      const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
+      return payoutTracker && !stillRunningIds.includes(evt.args.entry)
+    }))
+
+    const stillNeedingIds = evts.filter((_evt, i) => doesNeedFixup[i])
+    this.log("still needs paying: ", stillNeedingIds.length)
+    const actives = await Promise.all(stillNeedingIds.map(async (evt) => {
+      return this.idToActiveTable(evt.args.entry)
+    }))
+    await this.handlePayouts(actives)
+    const stillRunning = await Promise.all(stillRunningIds.map((id) => {
+      return this.idToActiveTable(id)
+    }))
+    const latestRoll = await delphs.latestRoll()
+    // now find the ones that are finished
+    const needsCleanup = stillRunning.filter((table) => {
+      return table.end.lte(latestRoll)
+    })
+    console.log('removing from orchestrator state', needsCleanup.length)
+    await Promise.all(needsCleanup.map(async (table) => {
+      return txSingleton.push(() => {
+        console.log('removing, ', table.id)
+        return orchestratorState.remove(table.id, { gasLimit: 500_000 })
+      })
+    }))
+    console.log("tables that are finished count: ", needsCleanup.length)
+    await this.handlePayouts(needsCleanup)
   }
 
   private async handlePayouts(active: ActiveTable[]) {
@@ -408,24 +452,25 @@ class TablePlayer {
 
     await txSingleton.push(async () => {
       return Promise.all(active.map(async (active) => {
-        await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000 })
+        await listKeeper.remove(PAYOUT_TRACKER, active.id, { gasLimit: 5_000_000 })
       }))
     })
   }
 }
 
 async function main() {
-  return new Promise((_resolve) => {
+  return new Promise(async (_resolve) => {
     console.log('running')
     // call the client to just get it setup
     mqttClient()
-
 
     const tableMaker = new TableMaker()
     const tablePlayer = new TablePlayer()
     new Pinger().start()
 
     debug.enable('table-player,table-maker,pinger')
+    console.log('cleaning up anything we messed up during last run')
+    await tablePlayer.cleanupUnPaidTables()
 
     const lobbyRegistrationFilter = lobby.filters.RegisteredInterest(null)
     const orchestratorFilter = orchestratorState.filters.TableAdded(null)
