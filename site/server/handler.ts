@@ -195,7 +195,7 @@ class TableMaker {
         }, { gasLimit: 3_000_000 })
         this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
-        await listKeeper.add(keccak256(Buffer.from('delphs-needs-payout')), id, { gasLimit: 500_000 })
+        await listKeeper.add(keccak256(Buffer.from('delphs-needs-payout')), id, { gasLimit: 2_000_000 })
         this.log('taking addresses')
         await lobby.takeAddresses(waiting, id, { gasLimit: 1000000 })
         return startTx
@@ -315,7 +315,7 @@ class TablePlayer {
         await promiseWaiter((SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER) * 1000)
       }
       await txSingleton.push(async () => {
-        return (await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 500_000 })).wait()
+        return (await orchestratorState.bulkRemove(active.map((table) => table.id), { gasLimit: 2_000_000 })).wait()
       })
       this.handlePayouts(active)
 
@@ -408,7 +408,7 @@ class TablePlayer {
 
     await txSingleton.push(async () => {
       return Promise.all(active.map(async (active) => {
-        await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 500_000 })
+        await listKeeper.remove(keccak256(Buffer.from('delphs-needs-payout')), active.id, { gasLimit: 2_000_000 })
       }))
     })
   }
