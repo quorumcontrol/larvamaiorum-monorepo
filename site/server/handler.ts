@@ -452,6 +452,7 @@ class TablePlayer {
 
     await txSingleton.push(async () => {
       return Promise.all(active.map(async (active) => {
+        console.log('removing ', active.id)
         await listKeeper.remove(PAYOUT_TRACKER, active.id, { gasLimit: 5_000_000 })
       }))
     })

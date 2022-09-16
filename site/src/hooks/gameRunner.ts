@@ -223,7 +223,18 @@ export class GameRunner extends EventEmitter {
 
   private shipRoll(roll: IFrameRoll) {
     // TODO: check if this is the right roll to ship
-    this.rolls[this.tableInfo!.startedAt.sub(roll.index).toNumber()] = roll
+    const rollIndex = this.tableInfo!.startedAt.sub(roll.index).toNumber()
+    if (this.rolls[rollIndex]) {
+      console.error('we already shipped this roll')
+      this.checkForEnd()
+      return
+    }
+    if (!this.latest.add(1).eq(BigNumber.from(roll.index))) {
+      console.error('expected', this.latest.add(1).toNumber(), 'but got', roll.index)
+      this.checkForEnd()
+      return
+    }
+    this.rolls[rollIndex] = roll
     console.log("rolls: ", this.rolls)
     console.log("ship: ", roll.index)
     this.ship('orchestratorRoll', { roll: roll })
