@@ -93,6 +93,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Accolades__factory>;
     getContractFactory(
+      name: "DelphsGump",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DelphsGump__factory>;
+    getContractFactory(
       name: "DelphsTable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DelphsTable__factory>;
@@ -249,6 +253,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Accolades>;
+    getContractAt(
+      name: "DelphsGump",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DelphsGump>;
     getContractAt(
       name: "DelphsTable",
       address: string,
