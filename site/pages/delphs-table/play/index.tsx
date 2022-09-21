@@ -238,7 +238,8 @@ const Play: NextPage = () => {
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                src={`https://playcanv.as/e/b/QyR4qt1K/?player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"

@@ -12,6 +12,7 @@ export interface WarriorStats {
   attack: number;
   defense: number;
   initialHealth: number;
+  initialGump: number;
 }
 
 export function generateFakeWarriors(count: number, seed: string) {
@@ -23,6 +24,7 @@ export function generateFakeWarriors(count: number, seed: string) {
       attack: deterministicRandom(1000, `generateFakeWarriors-${i}-attack`, seed),
       defense: deterministicRandom(800, `generateFakeWarriors-${i}-defense`, seed),
       initialHealth: deterministicRandom(2000, `generateFakeWarriors-${i}-health`, seed),
+      initialGump: 0,
     });
   }
   return warriors;
@@ -35,6 +37,7 @@ class Warrior extends EventEmitter implements WarriorStats {
   defense: number = 100;
   initialHealth: number = 500;
   currentHealth: number = 500;
+  initialGump: number = 0;
 
   location?: Cell
 
@@ -51,7 +54,7 @@ class Warrior extends EventEmitter implements WarriorStats {
     this.defense = opts.defense;
     this.initialHealth = opts.initialHealth;
     this.currentHealth = this.initialHealth;
-    this.wootgumpBalance = 0;
+    this.wootgumpBalance = opts.initialGump;
   }
 
   isAlive() {

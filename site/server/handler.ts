@@ -12,7 +12,7 @@ import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
 import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
-import { accoladesContract, delphsContract, listKeeperContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
+import { accoladesContract, delphsContract, delphsGumpContract, listKeeperContract, lobbyContract, playerContract, trustedForwarderContract, wootgumpContract } from "../src/utils/contracts";
 import { questTrackerContract } from '../src/utils/questTracker'
 import promiseWaiter from '../src/utils/promiseWaiter'
 import SingletonQueue from '../src/utils/singletonQueue'
@@ -89,6 +89,7 @@ const lobby = lobbyContract().connect(delphsWallet)
 const delphs = delphsContract().connect(delphsWallet)
 const player = playerContract().connect(delphsWallet)
 const wootgump = wootgumpContract().connect(delphsWallet)
+const delphsGump = delphsGumpContract().connect(delphsWallet)
 const accolades = accoladesContract().connect(delphsWallet)
 const listKeeper = listKeeperContract().connect(delphsWallet)
 
@@ -419,9 +420,9 @@ class TablePlayer {
 
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
-        const tx = await wootgump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
+        const tx = await delphsGump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
         await tx.wait()
-        this.log('wootgump prize tx: ', tx.hash, Object.values(memo.gump))
+        this.log('delphsGump prize tx: ', tx.hash, Object.values(memo.gump))
 
         const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
         await accoladesTx.wait()

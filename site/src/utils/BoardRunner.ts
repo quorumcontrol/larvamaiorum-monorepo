@@ -1,7 +1,8 @@
 import { DelphsTable } from "../../contracts/typechain"
-import { delphsContract, playerContract } from "./contracts"
+import { delphsContract, delphsGumpContract, playerContract } from "./contracts"
 import Grid from '../boardLogic/Grid'
 import Warrior from "../boardLogic/Warrior"
+import { utils } from "ethers"
 
 class BoardRunner {
   delphs:DelphsTable
@@ -22,18 +23,23 @@ class BoardRunner {
       this.delphs.players(this.tableId),
     ])
 
+    const player = playerContract()
+    const delphsGump = delphsGumpContract()
+
     const warriors = await Promise.all(playerIds.map(async (id) => {
-      const player = playerContract()
-      const [stats, name] = await Promise.all([
+      const [stats, name, initialGump] = await Promise.all([
         this.delphs.statsForPlayer(this.tableId, id),
         player.name(id),
+        delphsGump.balanceOf(id)
       ])
+
       return new Warrior({
         id: id,
         name: name,
         attack: stats.attack.toNumber(),
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
+        initialGump: Math.floor(parseFloat(utils.formatEther(initialGump))),
       })
     }))
 

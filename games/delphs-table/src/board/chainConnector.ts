@@ -105,6 +105,7 @@ class ChainConnector extends ScriptTypeBase {
           attack: w.attack,
           defense: w.defense,
           initialHealth: w.initialHealth,
+          initialGump: w.initialGump,
         });
       });
       log("warriors: ", warriors);

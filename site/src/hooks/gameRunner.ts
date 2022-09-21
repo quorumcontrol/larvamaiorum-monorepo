@@ -1,26 +1,18 @@
 import { useQuery, useQueryClient } from "react-query"
 import { DelphsTable } from "../../contracts/typechain"
-import { delphsContract, playerContract } from "../utils/contracts"
+import { delphsContract, delphsGumpContract, playerContract } from "../utils/contracts"
 import mqttClient, { ROLLS_CHANNEL, NO_MORE_MOVES_CHANNEL } from '../utils/mqtt'
 import ThenArg from "../utils/ThenArg"
 import SingletonQueue from "../utils/singletonQueue"
-import { BigNumber, BigNumberish } from "ethers"
+import { BigNumber, BigNumberish, utils } from "ethers"
 import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
 import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
 import Grid from "../boardLogic/Grid"
-import Warrior from "../boardLogic/Warrior"
+import Warrior, { WarriorStats } from "../boardLogic/Warrior"
 
 const log = console.log //debug('gameRunner')
-
-interface WarriorStats {
-  id: string;
-  name: string;
-  attack: number;
-  defense: number;
-  initialHealth: number;
-}
 
 interface IFrameRoll {
   index: number,
@@ -139,16 +131,24 @@ export class GameRunner extends EventEmitter {
     }
     const player = playerContract()
     const delphs = delphsContract()
+    const delphsGump = delphsGumpContract()
 
-    const names = await Promise.all(
+    const initialStats = await Promise.all(
       (this.players || []).map(async (addr) => {
-        return player.name(addr);
+        const [name,initialGump] = await Promise.all([
+          player.name(addr),
+          delphsGump.balanceOf(addr)
+        ])
+        return {
+          name,
+          initialGump: Math.floor(parseFloat(utils.formatEther(initialGump)))
+        }
       })
     );
-    log("names", names);
+    log("names", initialStats);
 
     const warriors: WarriorStats[] = await Promise.all((this.players || []).map(async (p, i) => {
-      const name = names[i];
+      const {name, initialGump } = initialStats[i]
       if (!name) {
         throw new Error("weirdness, non matching lengths");
       }
@@ -159,6 +159,7 @@ export class GameRunner extends EventEmitter {
         attack: stats.attack.toNumber(),
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
+        initialGump: initialGump,
       }
     }))
 
