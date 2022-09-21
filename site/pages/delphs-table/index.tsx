@@ -69,7 +69,7 @@ const Lobby: NextPage = () => {
           <VStack spacing="4" alignItems="left" maxW="40%">
             <Heading>Delph&apos;s Table</Heading>
             <Text textColor="brand.orange">
-              115,000 $SKL rewards for this week!
+              12,500 $SKL rewards for this week!
             </Text>
             <Text>
               Delph&apos;s Table is a multiplayer board-game. Collect Wootgump.
@@ -121,7 +121,7 @@ const Lobby: NextPage = () => {
                 )}
               </VStack>
             )}
-            <VStack alignItems={"left"} pt="4">
+            {/* <VStack alignItems={"left"} pt="4">
               <Heading fontSize="3xl">Current Rewards ($SKL)</Heading>
               <TableContainer>
                 <Table>
@@ -220,7 +220,7 @@ const Lobby: NextPage = () => {
                   </Tbody>
                 </Table>
               </TableContainer>
-            </VStack>
+            </VStack> */}
 
           </VStack>
           <Spacer />

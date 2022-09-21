@@ -88,7 +88,7 @@ const Home: NextPage = () => {
             >
               <VStack maxW="22em" alignItems="left">
                 <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
-                <Text>Week 1 Prizes: 115,000 $SKL.</Text>
+                <Text>Weekly Prizes: 12,500 $SKL.</Text>
                 <Text>
                   
                   The Oracle of Delphi is worried you are not prepared to
@@ -98,7 +98,7 @@ const Home: NextPage = () => {
                 </Text>
                 <Box>
                   <Link href="/delphs-table">
-                    <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
                       PLAY NOW
                     </Button>
                   </Link>
@@ -150,8 +150,8 @@ const Home: NextPage = () => {
                 </Text>
                 <Box>
                   <Link href="/graphic-lore">
-                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                      Mint Now
+                    <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
+                      Read now
                     </Button>
                   </Link>
                 </Box>

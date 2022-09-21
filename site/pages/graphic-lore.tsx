@@ -1,11 +1,8 @@
 import {
   VStack,
-  Text,
   Heading,
   Box,
   Stack,
-  Button,
-  Spinner,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -55,59 +52,8 @@ const GraphicLore: NextPage = () => {
   console.log("user balance: ", userBalance);
 
   const [currentToken, setCurrentToken] = useState(todays.id);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
-  const [didMint, setDidMint] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const token = loreTokens[currentToken];
-
-  const onMint = async () => {
-    try {
-      setLoading(true);
-      const resp = await fetch(mintUrl, {
-        method: "post",
-        body: JSON.stringify({
-          address,
-          tokenId: token.id,
-        }),
-      });
-      if (resp.status !== 201) {
-        const { error } = await resp.json();
-        return setErr(`Something went wrong: ${error}`);
-      }
-      setDidMint(true);
-    } catch (err: any) {
-      console.error(err);
-      setErr(err.toString());
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const MintButton = () => {
-    if (didMint) {
-      return <Text>Nice.</Text>;
-    }
-    if (!userBalance || loading) {
-      return <Spinner />;
-    }
-
-    if (userBalance[currentToken].gt(0)) {
-      return <Text>Already minted.</Text>;
-    }
-    if (token.available) {
-      return (
-        <Box>
-          <Button variant="primary" onClick={onMint}>
-            Mint
-          </Button>
-          <Text>{err}</Text>
-        </Box>
-      );
-    }
-    return <Text>Minting {token.startDate.toLocaleString()} </Text>;
-  };
 
   return (
     <>
@@ -154,7 +100,6 @@ const GraphicLore: NextPage = () => {
                 <Heading size={["lg", "xl"]}>
                   {loreTokens[currentToken].name}
                 </Heading>
-                <MintButton />
               </Box>
             </Stack>
             <Box mt="10">
@@ -171,7 +116,6 @@ const GraphicLore: NextPage = () => {
                           h="398px"
                           w="300px"
                           onClick={() => {
-                            setDidMint(false);
                             setCurrentToken(token.id);
                           }}
                         >
