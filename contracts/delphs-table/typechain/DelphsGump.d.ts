@@ -28,6 +28,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "bulkBurn(tuple[])": FunctionFragment;
     "bulkMint(tuple[])": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnFrom(address,uint256)": FunctionFragment;
@@ -81,6 +82,10 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "bulkBurn",
+    values: [{ to: string; amount: BigNumberish }[]]
+  ): string;
   encodeFunctionData(
     functionFragment: "bulkMint",
     values: [{ to: string; amount: BigNumberish }[]]
@@ -181,6 +186,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "bulkBurn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bulkMint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
@@ -358,12 +364,23 @@ export class DelphsGump extends BaseContract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    bulkBurn(
+      burnInfo: { to: string; amount: BigNumberish }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     bulkMint(
       mintInfo: { to: string; amount: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    burn(
+    "burn(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "burn(address,uint256)"(
+      to: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -497,12 +514,23 @@ export class DelphsGump extends BaseContract {
 
   balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+  bulkBurn(
+    burnInfo: { to: string; amount: BigNumberish }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   bulkMint(
     mintInfo: { to: string; amount: BigNumberish }[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  burn(
+  "burn(uint256)"(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "burn(address,uint256)"(
+    to: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -636,12 +664,26 @@ export class DelphsGump extends BaseContract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    bulkBurn(
+      burnInfo: { to: string; amount: BigNumberish }[],
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     bulkMint(
       mintInfo: { to: string; amount: BigNumberish }[],
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    burn(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    "burn(uint256)"(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "burn(address,uint256)"(
+      to: string,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     burnFrom(
       account: string,
@@ -870,12 +912,23 @@ export class DelphsGump extends BaseContract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
+    bulkBurn(
+      burnInfo: { to: string; amount: BigNumberish }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     bulkMint(
       mintInfo: { to: string; amount: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    burn(
+    "burn(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "burn(address,uint256)"(
+      to: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1018,12 +1071,23 @@ export class DelphsGump extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    bulkBurn(
+      burnInfo: { to: string; amount: BigNumberish }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     bulkMint(
       mintInfo: { to: string; amount: BigNumberish }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    burn(
+    "burn(uint256)"(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "burn(address,uint256)"(
+      to: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

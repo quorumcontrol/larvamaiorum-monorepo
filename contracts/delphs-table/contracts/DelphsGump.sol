@@ -80,6 +80,22 @@ contract DelphsGump is
         _mint(to, amount);
     }
 
+    function bulkBurn(BulkMint[] calldata burnInfo)
+        external
+        onlyRole(MINTER_ROLE)
+        returns (bool)
+    {
+        uint256 len = burnInfo.length;
+        for (uint256 i = 0; i < len; i++) {
+            _burn(burnInfo[i].to, burnInfo[i].amount);
+        }
+        return true;
+    }
+
+    function burn(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+        _burn(to, amount);
+    }
+
     function vest(address account) public onlyRole(VESTER_ROLE) {
         require(_lastVesting[account] != 0, "no last vest");
         _vest(account);
