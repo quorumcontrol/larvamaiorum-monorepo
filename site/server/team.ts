@@ -25,7 +25,7 @@ const prizeSigner = new Wallet(process.env.PRIZE_PAYER_PRIVATE_KEY).connect(euro
 const sklContract = IERC20__factory.connect(rubySklAddress, prizeSigner)
 
 async function main() {
-  const [start,end] = await startBlockEndBlock(DateTime.now().minus({weeks: 2}), 'week')
+  const [start,end] = await startBlockEndBlock(DateTime.now().minus({weeks: 1}), 'week')
   console.log('fetching stats')
   const stats = await fetchTeamStats(start, end)
 
@@ -86,7 +86,7 @@ async function main() {
     const players = Array.from(team.players.values())
     await Promise.all(players.map((player) => {
       return txSingleton.push(async () => {
-        console.log('send: ', utils.formatEther(payout), ' to: ', player)
+        console.log('would send: ', utils.formatEther(payout), ' to: ', player)
         // const tx = await sklContract.transfer(player, payout, { gasLimit: 250_000 })
         // console.log('tx: ', tx.hash)
         // return tx.wait()
