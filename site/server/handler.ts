@@ -380,15 +380,29 @@ class TablePlayer {
       await runner.run()
       const rewards = runner.rewards()
       console.log("rewards: ", rewards)
-      const memo: { gump: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, accolades: { to: string, id: BigNumberish, amount: BigNumber }[] } = { gump: {}, accolades: [] }
+      const memo: {
+        gumpMint: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, 
+        gumpBurn: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, 
+        accolades: { to: string, id: BigNumberish, amount: BigNumber }[]
+      } = { gumpMint: {}, gumpBurn: {}, accolades: [] }
 
       Object.keys(rewards.wootgump).forEach((playerId) => {
         const team = table.players[playerId]
-        memo.gump[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
-        memo.gump[playerId].amount = memo.gump[playerId].amount.add(BigNumber.from(rewards.wootgump[playerId]).mul(ONE))
-        memo.gump[playerId].team = team
+        const reward = BigNumber.from(rewards.wootgump[playerId])
+
+        if (reward.gt(0)) {
+          memo.gumpMint[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
+          memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(reward).mul(ONE)
+          memo.gumpMint[playerId].team = team
+        }
+
+        if (reward.lt(0)) {
+          memo.gumpBurn[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
+          memo.gumpBurn[playerId].amount = memo.gumpBurn[playerId].amount.add(reward).mul(-1).mul(ONE)
+          memo.gumpBurn[playerId].team = team
+        }
       })
-      console.log("gump", memo.gump)
+      this.log("gump", memo.gumpMint, memo.gumpBurn)
       memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
         return {
           id: i,
@@ -420,9 +434,17 @@ class TablePlayer {
 
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
-        const tx = await delphsGump.bulkMint(Object.values(memo.gump), { gasLimit: 8_000_000 })
-        await tx.wait()
-        this.log('delphsGump prize tx: ', tx.hash, Object.values(memo.gump))
+        if (Object.keys(memo.gumpMint).length > 0) {
+          const tx = await delphsGump.bulkMint(Object.values(memo.gumpMint), { gasLimit: 8_000_000 })
+          await tx.wait()
+          this.log('delphsGump mint prize tx: ', tx.hash, Object.values(memo.gumpMint))
+        }
+
+        if (Object.keys(memo.gumpBurn).length > 0) {
+          const tx = await delphsGump.bulkBurn(Object.values(memo.gumpBurn), { gasLimit: 8_000_000 })
+          await tx.wait()
+          this.log('delphsGump burn prize tx: ', tx.hash, Object.values(memo.gumpBurn))
+        }
 
         const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
         await accoladesTx.wait()
@@ -453,7 +475,7 @@ class TablePlayer {
 
     await txSingleton.push(async () => {
       return Promise.all(active.map(async (active) => {
-        console.log('removing ', active.id)
+        this.log('removing ', active.id)
         await listKeeper.remove(PAYOUT_TRACKER, active.id, { gasLimit: 5_000_000 })
       }))
     })

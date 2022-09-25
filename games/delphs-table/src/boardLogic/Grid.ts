@@ -146,7 +146,7 @@ class Grid {
     return this.warriors.reduce((memo, warrior) => {
       return {
         ...memo,
-        [warrior.id]: warrior.wootgumpBalance,
+        [warrior.id]: warrior.wootgumpBalance - warrior.initialGump,
       }
     }, {} as Record<string,number>)
   }
