@@ -2,11 +2,11 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "./interfaces/IERC20Minter.sol";
 
 // import "hardhat/console.sol";
 
@@ -27,7 +27,7 @@ contract DelphsGump is
     // max out at a granularity of about 1000 units of time
     uint256 constant private GRANULARITY = 1000;
 
-    IERC20 private _wootgump;
+    IERC20Minter private _wootgump;
 
     mapping(address => uint256) private _lastVesting;
 
@@ -45,7 +45,7 @@ contract DelphsGump is
         _grantRole(PAUSER_ROLE, initialOwner);
         _grantRole(MINTER_ROLE, initialOwner);
         _grantRole(VESTER_ROLE, initialOwner);
-        _wootgump = IERC20(wootgumpAddress);
+        _wootgump = IERC20Minter(wootgumpAddress);
     }
 
     /**
@@ -103,6 +103,9 @@ contract DelphsGump is
 
     function _vest(address account) internal {
         uint256 currentBalance = balanceOf(account);
+        if (currentBalance == 0) {
+            return;
+        }
         uint256 lastVest = _lastVesting[account];
         uint256 time = block.number - lastVest;
         if (time == 0) {
@@ -113,21 +116,18 @@ contract DelphsGump is
         // console.log("remaining: ", remainingBalance);
         uint256 minting = currentBalance - remainingBalance;
         _burn(account, minting);
-        _wootgump.transfer(account, minting);
+        _wootgump.mint(account, minting);
     }
 
     // The following functions are overrides required by Solidity.
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20) {
-        super._afterTokenTransfer(from, to, amount);
-        if (from == address(0)) {
-            _vest(to);
-        }
-    }
+    // function _afterTokenTransfer(
+    //     address from,
+    //     address to,
+    //     uint256 amount
+    // ) internal override(ERC20) {
+    //     super._afterTokenTransfer(from, to, amount);
+    // }
 
     function _beforeTokenTransfer(
         address from,
@@ -138,6 +138,7 @@ contract DelphsGump is
         if (from == address(0)) {
             if (_lastVesting[to] == 0) {
                 _lastVesting[to] = block.number;
+                _vest(to);
             }
         }
     }
