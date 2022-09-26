@@ -23,14 +23,16 @@ interface DelphsTableInterface extends ethers.utils.Interface {
   functions: {
     "ADMIN_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "attributes(bytes32)": FunctionFragment;
     "blockOfRoll(uint256)": FunctionFragment;
-    "createAndStart((bytes32,address[],bytes32[],address,uint256,uint256,uint32,uint32))": FunctionFragment;
-    "createTable((bytes32,address[],bytes32[],address,uint256,uint256,uint32,uint32))": FunctionFragment;
+    "createAndStart((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[]))": FunctionFragment;
+    "createTable((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[]))": FunctionFragment;
     "destinations(bytes32,uint256,uint256)": FunctionFragment;
     "destinationsForRoll(bytes32,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
+    "initialGump(bytes32)": FunctionFragment;
     "isTrustedForwarder(address)": FunctionFragment;
     "latestRoll()": FunctionFragment;
     "players(bytes32)": FunctionFragment;
@@ -56,6 +58,10 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "attributes",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "blockOfRoll",
     values: [BigNumberish]
   ): string;
@@ -64,13 +70,15 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     values: [
       {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       }
     ]
   ): string;
@@ -79,13 +87,15 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     values: [
       {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       }
     ]
   ): string;
@@ -108,6 +118,10 @@ interface DelphsTableInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "hasRole",
     values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialGump",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isTrustedForwarder",
@@ -153,6 +167,7 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "attributes", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blockOfRoll",
     data: BytesLike
@@ -179,6 +194,10 @@ interface DelphsTableInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "initialGump",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isTrustedForwarder",
     data: BytesLike
@@ -307,6 +326,8 @@ export class DelphsTable extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    attributes(id: BytesLike, overrides?: CallOverrides): Promise<[string[]]>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -315,13 +336,15 @@ export class DelphsTable extends BaseContract {
     createAndStart(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -329,13 +352,15 @@ export class DelphsTable extends BaseContract {
     createTable(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -380,6 +405,11 @@ export class DelphsTable extends BaseContract {
       account: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    initialGump(
+      id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber[]]>;
 
     isTrustedForwarder(
       forwarder: string,
@@ -462,6 +492,8 @@ export class DelphsTable extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+  attributes(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
+
   blockOfRoll(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -470,13 +502,15 @@ export class DelphsTable extends BaseContract {
   createAndStart(
     newTable: {
       id: BytesLike;
-      players: string[];
-      seeds: BytesLike[];
       owner: string;
       startedAt: BigNumberish;
       gameLength: BigNumberish;
       tableSize: BigNumberish;
       wootgumpMultiplier: BigNumberish;
+      players: string[];
+      seeds: BytesLike[];
+      attributes: BytesLike[];
+      initialGump: BigNumberish[];
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -484,13 +518,15 @@ export class DelphsTable extends BaseContract {
   createTable(
     newTable: {
       id: BytesLike;
-      players: string[];
-      seeds: BytesLike[];
       owner: string;
       startedAt: BigNumberish;
       gameLength: BigNumberish;
       tableSize: BigNumberish;
       wootgumpMultiplier: BigNumberish;
+      players: string[];
+      seeds: BytesLike[];
+      attributes: BytesLike[];
+      initialGump: BigNumberish[];
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -533,6 +569,8 @@ export class DelphsTable extends BaseContract {
     account: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  initialGump(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber[]>;
 
   isTrustedForwarder(
     forwarder: string,
@@ -613,6 +651,8 @@ export class DelphsTable extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+    attributes(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -621,13 +661,15 @@ export class DelphsTable extends BaseContract {
     createAndStart(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: CallOverrides
     ): Promise<void>;
@@ -635,13 +677,15 @@ export class DelphsTable extends BaseContract {
     createTable(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: CallOverrides
     ): Promise<void>;
@@ -684,6 +728,8 @@ export class DelphsTable extends BaseContract {
       account: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    initialGump(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber[]>;
 
     isTrustedForwarder(
       forwarder: string,
@@ -852,6 +898,8 @@ export class DelphsTable extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    attributes(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -860,13 +908,15 @@ export class DelphsTable extends BaseContract {
     createAndStart(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -874,13 +924,15 @@ export class DelphsTable extends BaseContract {
     createTable(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -914,6 +966,8 @@ export class DelphsTable extends BaseContract {
       account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    initialGump(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
     isTrustedForwarder(
       forwarder: string,
@@ -979,6 +1033,11 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    attributes(
+      id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -987,13 +1046,15 @@ export class DelphsTable extends BaseContract {
     createAndStart(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1001,13 +1062,15 @@ export class DelphsTable extends BaseContract {
     createTable(
       newTable: {
         id: BytesLike;
-        players: string[];
-        seeds: BytesLike[];
         owner: string;
         startedAt: BigNumberish;
         gameLength: BigNumberish;
         tableSize: BigNumberish;
         wootgumpMultiplier: BigNumberish;
+        players: string[];
+        seeds: BytesLike[];
+        attributes: BytesLike[];
+        initialGump: BigNumberish[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1039,6 +1102,11 @@ export class DelphsTable extends BaseContract {
     hasRole(
       role: BytesLike,
       account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    initialGump(
+      id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

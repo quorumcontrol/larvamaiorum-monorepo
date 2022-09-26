@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./interfaces/IDiceRoller.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "./interfaces/IDiceRoller.sol";
 
 contract DelphsTable is AccessControl, ERC2771Context {
     error NoTwoRollsPerBlock();
@@ -40,13 +40,15 @@ contract DelphsTable is AccessControl, ERC2771Context {
 
     struct Table {
         bytes32 id;
-        address[] players;
-        bytes32[] seeds;
         address owner;
         uint256 startedAt; // the roll number started at
         uint256 gameLength; // number of rolls to play
         uint32 tableSize;
         uint32 wootgumpMultiplier; // base chance of spawning, per 1000 (basis points);
+        address[] players;
+        bytes32[] seeds;
+        bytes32[] attributes;
+        uint256[] initialGump;
     }
 
     struct Stats {
@@ -118,6 +120,14 @@ contract DelphsTable is AccessControl, ERC2771Context {
 
     function seeds(bytes32 id) public view returns (bytes32[] memory) {
         return tables[id].seeds;
+    }
+
+    function initialGump(bytes32 id) public view returns (uint256[] memory) {
+        return tables[id].initialGump;
+    }
+
+    function attributes(bytes32 id) public view returns (bytes32[] memory) {
+        return tables[id].attributes;
     }
 
     function statsForPlayer(bytes32 id, address playerAddress)

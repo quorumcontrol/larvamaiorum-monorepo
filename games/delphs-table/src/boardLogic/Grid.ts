@@ -143,7 +143,9 @@ class Grid {
   }
 
   private gumpOutput() {
+    console.log("gump output")
     return this.warriors.reduce((memo, warrior) => {
+      console.log("warrior: ", warrior.name, warrior.wootgumpBalance - warrior.initialGump, "initial: ", warrior.initialGump)
       return {
         ...memo,
         [warrior.id]: warrior.wootgumpBalance - warrior.initialGump,

@@ -55,6 +55,7 @@ class Warrior extends EventEmitter implements WarriorStats {
     this.initialHealth = opts.initialHealth;
     this.currentHealth = this.initialHealth;
     this.wootgumpBalance = opts.initialGump;
+    this.initialGump = opts.initialGump;
   }
 
   isAlive() {
