@@ -41,6 +41,8 @@ describe("DelphsTable", function () {
           startedAt: 0,
           tableSize: 10,
           wootgumpMultiplier: 5,
+          initialGump: [],
+          attributes: [],
       })).to.not.be.reverted
     })
 

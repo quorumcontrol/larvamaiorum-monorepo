@@ -33,7 +33,7 @@ describe("DelphsGump", function () {
     return { wootgump, delphsGump, deployer, signers }
   }
 
-  it("vests", async () => {
+  it("vests with vest function", async () => {
     const { delphsGump, wootgump, signers } = await loadFixture(deployDelphsGump)
     const alice = signers[1]
     await wootgump.grantRole(
@@ -51,5 +51,24 @@ describe("DelphsGump", function () {
     await delphsGump.vest(alice.address)
     newBalance = utils.formatEther(await delphsGump.balanceOf(alice.address))
     expect(parseFloat(newBalance)).to.equal(0)
+  })
+
+  it("vests at mint", async () => {
+    const { delphsGump, wootgump, signers } = await loadFixture(deployDelphsGump)
+    const alice = signers[1]
+    await wootgump.grantRole(
+      "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",
+      delphsGump.address
+    )
+    await delphsGump.mint(alice.address, utils.parseEther("1"))
+    // await mine((24 * 60 * 60 * 2) / 4) // about 2 days of blocks
+    // await delphsGump.vest(alice.address)
+    // const receipt = await tx.wait()
+    // let newBalance = utils.formatEther(await delphsGump.balanceOf(alice.address))
+    // expect(parseFloat(newBalance)).to.be.within(0.45, 0.55)
+    // now let's go another 3 days
+    await mine((24 * 60 * 60 * 5) / 4)
+    await delphsGump.mint(alice.address, 1)
+    expect(await delphsGump.balanceOf(alice.address)).to.equal(1)
   })
 })

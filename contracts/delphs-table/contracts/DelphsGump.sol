@@ -134,12 +134,13 @@ contract DelphsGump is
         address to,
         uint256 amount
     ) internal override(ERC20) {
+        // console.log("_before token transfer", from);
         super._beforeTokenTransfer(from, to, amount);
         if (from == address(0)) {
             if (_lastVesting[to] == 0) {
                 _lastVesting[to] = block.number;
-                _vest(to);
             }
+            _vest(to);
         }
     }
 
