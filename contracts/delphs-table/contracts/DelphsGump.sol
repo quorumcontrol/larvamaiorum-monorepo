@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "./interfaces/IERC20Minter.sol";
 
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract DelphsGump is
     ERC20,
@@ -25,11 +25,11 @@ contract DelphsGump is
     uint256 public rateOfWithdrawl = 111;
     uint256 public rateDenominator = 10**7;
     // max out at a granularity of about 1000 units of time
-    uint256 constant private GRANULARITY = 1000;
+    uint256 private constant GRANULARITY = 1000;
 
     IERC20Minter private _wootgump;
 
-    mapping(address => uint256) private _lastVesting;
+    mapping(address => uint256) public lastVesting;
 
     struct BulkMint {
         address to;
@@ -51,9 +51,12 @@ contract DelphsGump is
     /**
     @notice set the rate at which Delph's Gump can become Wootgump (this is a per-block rate)cal
      */
-    function setRateOfWithdrawl(uint256 numerator, uint256 denominator) public onlyRole(VESTER_ROLE) {
-      rateOfWithdrawl = numerator;
-      rateDenominator = denominator;
+    function setRateOfWithdrawl(uint256 numerator, uint256 denominator)
+        public
+        onlyRole(VESTER_ROLE)
+    {
+        rateOfWithdrawl = numerator;
+        rateDenominator = denominator;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
@@ -97,7 +100,7 @@ contract DelphsGump is
     }
 
     function vest(address account) public onlyRole(VESTER_ROLE) {
-        require(_lastVesting[account] != 0, "no last vest");
+        require(lastVesting[account] != 0, "no last vest");
         _vest(account);
     }
 
@@ -106,64 +109,80 @@ contract DelphsGump is
         if (currentBalance == 0) {
             return;
         }
-        uint256 lastVest = _lastVesting[account];
+        uint256 lastVest = lastVesting[account];
         uint256 time = block.number - lastVest;
         if (time == 0) {
-          return;
+            // console.log("skipping vest, because already vested");
+            return;
         }
         // uint256 remainingBalance = (currentBalance * dumbExponent(rateOfWithdrawl, rateDenominator, time)) / rateDenominator;
         uint256 remainingBalance = _remainingBalance(currentBalance, time);
         // console.log("remaining: ", remainingBalance);
         uint256 minting = currentBalance - remainingBalance;
+        lastVesting[account] = block.number;
         _burn(account, minting);
-        _wootgump.mint(account, minting);
+        _wootgump.mint(account, minting);    
     }
 
-    // The following functions are overrides required by Solidity.
-
-    // function _afterTokenTransfer(
-    //     address from,
-    //     address to,
-    //     uint256 amount
-    // ) internal override(ERC20) {
-    //     super._afterTokenTransfer(from, to, amount);
-    // }
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override(ERC20) {
+        // console.log("after token transfer", from, to);
+        super._afterTokenTransfer(from, to, amount);
+        if (to == address(0)) {
+            console.log("vesting from");
+            _vest(from);
+            return;
+        }
+    }
 
     function _beforeTokenTransfer(
         address from,
         address to,
         uint256 amount
     ) internal override(ERC20) {
-        // console.log("_before token transfer", from);
+        // console.log("_before token transfer", from, to);
         super._beforeTokenTransfer(from, to, amount);
+        // on a burn or mint, then let the player vest before giving them the new tokens
         if (from == address(0)) {
-            if (_lastVesting[to] == 0) {
-                _lastVesting[to] = block.number;
+            if (lastVesting[to] == 0) {
+                lastVesting[to] = block.number;
             }
+            console.log("vesting to");
             _vest(to);
+            return;
         }
     }
 
-    function _remainingBalance(uint256 starting, uint256 time) internal view returns (uint256) {
-      uint256 _rate = rateOfWithdrawl;
-      uint256 _denominiator = rateDenominator;
-      uint256 multiplier = 1;
-      uint256 n = time / GRANULARITY;
+    function _remainingBalance(uint256 starting, uint256 time)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 _rate = rateOfWithdrawl;
+        uint256 _denominiator = rateDenominator;
+        uint256 multiplier = 1;
+        uint256 n = time / GRANULARITY;
 
-      while (n > 0 && (time - (GRANULARITY * multiplier) > GRANULARITY)) {
-        multiplier++;
-        n = time / (GRANULARITY * multiplier);
-      }
-      // console.log("multiplier: ", multiplier);
+        while (n > 0 && (time - (GRANULARITY * multiplier) > GRANULARITY)) {
+            multiplier++;
+            n = time / (GRANULARITY * multiplier);
+        }
+        // console.log("multiplier: ", multiplier);
 
-      uint256 steps = (time < GRANULARITY) ? time : GRANULARITY;
-      uint256 toSubtract = ((starting * (_rate * multiplier * steps)) / _denominiator);
-      
-      if (toSubtract > starting) {
-        return 0;
-      }
-      return starting - toSubtract;
+        uint256 steps = (time < GRANULARITY) ? time : GRANULARITY;
+        uint256 toSubtract = ((starting * (_rate * multiplier * steps)) /
+            _denominiator);
+
+        if (toSubtract > starting) {
+            return 0;
+        }
+        return starting - toSubtract;
     }
+
+    // The following functions are overrides required by Solidity.
 
     function _msgSender()
         internal

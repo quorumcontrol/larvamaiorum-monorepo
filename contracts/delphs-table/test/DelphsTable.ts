@@ -1,6 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { loadFixture } from "ethereum-waffle";
+import { constants } from "ethers";
 import { ethers } from "hardhat";
 import { DelphsTable, DiceRoller } from "../typechain";
 import { deployForwarderAndRoller } from "./fixtures";
@@ -78,6 +79,18 @@ describe("DelphsTable", function () {
       expect(dests[0].x).to.equal(-1)
       expect(dests[0].y).to.equal(2)
       expect(dests[0].player).to.equal(deployer.address)
+    })
+
+    it('plays items', async () => {
+      await delphsTable.start(id)
+      await delphsTable.rollTheDice()
+      await delphsTable.playItem(id, deployer.address, 1)
+      // const startedAt = (await delphsTable.tables(id)).startedAt
+      const plays = await delphsTable.itemPlaysForRoll(id, await delphsTable.latestRoll())
+      expect(plays).to.have.lengthOf(1)
+      expect(plays[0].itemContract).to.equal(deployer.address)
+      expect(plays[0].id).to.equal(1)
+      expect(plays[0].player).to.equal(deployer.address)
     })
   })
 });

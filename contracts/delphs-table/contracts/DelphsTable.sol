@@ -29,6 +29,7 @@ contract DelphsTable is AccessControl, ERC2771Context {
     mapping(uint256 => uint256) public blockOfRoll;
 
     mapping(bytes32 => mapping(uint256 => Destination[])) public destinations;
+    mapping(bytes32 => mapping(uint256 => ItemPlay[])) public itemPlays;
 
     mapping(bytes32 => Table) public tables;
 
@@ -36,6 +37,12 @@ contract DelphsTable is AccessControl, ERC2771Context {
         address player;
         int64 x;
         int64 y;
+    }
+
+    struct ItemPlay {
+        address player;
+        address itemContract;
+        uint256 id;
     }
 
     struct Table {
@@ -93,9 +100,7 @@ contract DelphsTable is AccessControl, ERC2771Context {
         emit TableCreated(newTable.id);
     }
 
-    function createAndStart(
-        Table calldata newTable
-    ) external {
+    function createAndStart(Table calldata newTable) external {
         createTable(newTable);
         start(newTable.id);
     }
@@ -144,30 +149,21 @@ contract DelphsTable is AccessControl, ERC2771Context {
 
         return
             Stats({
-                attack: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "a"),
-                        1000
-                    ),
-                    400
-                ),
-                defense: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "d"),
-                        800
-                    ),
-                    200
-                ),
-                health: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "h"),
-                        700
-                    ),
-                    200
-                )
+                attack: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "a"),
+                    1000
+                ) + 500,
+                defense: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "d"),
+                    800
+                ) + 200,
+                health: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "h"),
+                    600
+                ) + 200
             });
     }
 
@@ -185,6 +181,14 @@ contract DelphsTable is AccessControl, ERC2771Context {
         returns (Destination[] memory)
     {
         return destinations[id][roll];
+    }
+
+    function itemPlaysForRoll(bytes32 id, uint256 roll)
+        public
+        view
+        returns (ItemPlay[] memory)
+    {
+        return itemPlays[id][roll];
     }
 
     function setDestination(
@@ -205,6 +209,28 @@ contract DelphsTable is AccessControl, ERC2771Context {
         return true;
     }
 
+    function playItem(
+        bytes32 tableId,
+        address itemContract,
+        uint256 itemId
+    ) public returns (bool) {
+        address sender = _msgSender();
+        Table storage table = tables[tableId];
+        if (!includes(table.players, sender)) {
+            revert Unauthorized();
+        }
+
+        itemPlays[tableId][latestRoll].push(
+            ItemPlay({
+                player: sender,
+                itemContract: itemContract,
+                id: itemId
+            })
+        );
+
+        return true;
+    }
+
     function includes(address[] storage arry, address val)
         private
         view
@@ -217,13 +243,6 @@ contract DelphsTable is AccessControl, ERC2771Context {
             }
         }
         return false;
-    }
-
-    function uintMax(uint256 a, uint256 b) private pure returns (uint256) {
-        if (a >= b) {
-            return a;
-        }
-        return b;
     }
 
     function _msgSender()

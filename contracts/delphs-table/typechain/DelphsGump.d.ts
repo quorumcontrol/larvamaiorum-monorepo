@@ -39,6 +39,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "isTrustedForwarder(address)": FunctionFragment;
+    "lastVesting(address)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "pause()": FunctionFragment;
@@ -120,6 +121,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
     functionFragment: "isTrustedForwarder",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "lastVesting", values: [string]): string;
   encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
@@ -207,6 +209,10 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "isTrustedForwarder",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastVesting",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
@@ -424,6 +430,8 @@ export class DelphsGump extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    lastVesting(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     mint(
       to: string,
       amount: BigNumberish,
@@ -574,6 +582,8 @@ export class DelphsGump extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  lastVesting(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
   mint(
     to: string,
     amount: BigNumberish,
@@ -723,6 +733,8 @@ export class DelphsGump extends BaseContract {
       forwarder: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    lastVesting(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       to: string,
@@ -975,6 +987,8 @@ export class DelphsGump extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    lastVesting(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     mint(
       to: string,
       amount: BigNumberish,
@@ -1131,6 +1145,11 @@ export class DelphsGump extends BaseContract {
 
     isTrustedForwarder(
       forwarder: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lastVesting(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

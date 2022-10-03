@@ -34,7 +34,10 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "initialGump(bytes32)": FunctionFragment;
     "isTrustedForwarder(address)": FunctionFragment;
+    "itemPlays(bytes32,uint256,uint256)": FunctionFragment;
+    "itemPlaysForRoll(bytes32,uint256)": FunctionFragment;
     "latestRoll()": FunctionFragment;
+    "playItem(bytes32,address,uint256)": FunctionFragment;
     "players(bytes32)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
@@ -128,8 +131,20 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "itemPlays",
+    values: [BytesLike, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "itemPlaysForRoll",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "latestRoll",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "playItem",
+    values: [BytesLike, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "players", values: [BytesLike]): string;
   encodeFunctionData(
@@ -202,7 +217,13 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     functionFragment: "isTrustedForwarder",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "itemPlays", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "itemPlaysForRoll",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "latestRoll", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "playItem", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "players", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
@@ -416,7 +437,41 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    itemPlays(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, BigNumber] & {
+        player: string;
+        itemContract: string;
+        id: BigNumber;
+      }
+    >;
+
+    itemPlaysForRoll(
+      id: BytesLike,
+      roll: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [
+        ([string, string, BigNumber] & {
+          player: string;
+          itemContract: string;
+          id: BigNumber;
+        })[]
+      ]
+    >;
+
     latestRoll(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    playItem(
+      tableId: BytesLike,
+      itemContract: string,
+      itemId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     players(id: BytesLike, overrides?: CallOverrides): Promise<[string[]]>;
 
@@ -577,7 +632,39 @@ export class DelphsTable extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  itemPlays(
+    arg0: BytesLike,
+    arg1: BigNumberish,
+    arg2: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, BigNumber] & {
+      player: string;
+      itemContract: string;
+      id: BigNumber;
+    }
+  >;
+
+  itemPlaysForRoll(
+    id: BytesLike,
+    roll: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    ([string, string, BigNumber] & {
+      player: string;
+      itemContract: string;
+      id: BigNumber;
+    })[]
+  >;
+
   latestRoll(overrides?: CallOverrides): Promise<BigNumber>;
+
+  playItem(
+    tableId: BytesLike,
+    itemContract: string,
+    itemId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   players(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
 
@@ -736,7 +823,39 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    itemPlays(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, BigNumber] & {
+        player: string;
+        itemContract: string;
+        id: BigNumber;
+      }
+    >;
+
+    itemPlaysForRoll(
+      id: BytesLike,
+      roll: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      ([string, string, BigNumber] & {
+        player: string;
+        itemContract: string;
+        id: BigNumber;
+      })[]
+    >;
+
     latestRoll(overrides?: CallOverrides): Promise<BigNumber>;
+
+    playItem(
+      tableId: BytesLike,
+      itemContract: string,
+      itemId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     players(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
 
@@ -974,7 +1093,27 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    itemPlays(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    itemPlaysForRoll(
+      id: BytesLike,
+      roll: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     latestRoll(overrides?: CallOverrides): Promise<BigNumber>;
+
+    playItem(
+      tableId: BytesLike,
+      itemContract: string,
+      itemId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     players(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1115,7 +1254,27 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    itemPlays(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    itemPlaysForRoll(
+      id: BytesLike,
+      roll: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     latestRoll(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    playItem(
+      tableId: BytesLike,
+      itemContract: string,
+      itemId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     players(
       id: BytesLike,

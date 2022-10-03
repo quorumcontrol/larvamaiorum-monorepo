@@ -12,6 +12,8 @@ const func: DeployFunction = async function ({
   const forwarder = await get('TrustedForwarder')
   const gump = await get('Wootgump')
 
+  console.log("delph: ", delph)
+
   const delphsGump = await deploy("DelphsGump", {
     from: deployer,
     log: true,
