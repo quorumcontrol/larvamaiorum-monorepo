@@ -51,9 +51,11 @@ describe("DelphsGump", function () {
   //   const wootgump = Wootgump__factory.connect('0x8D1E200a2C572f9738f26554AAcbC2F9a462EF2D', delph)
   //   const forwarderAddress = '0x7cC2757877Dc42F7216D3E8009cCB06f297BbAe7'
 
-  //   const DelphsGumpFactory = await ethers.getContractFactory("DelphsGump")
-  //   const delphsGump = await DelphsGumpFactory.deploy(forwarderAddress, wootgump.address, delph.address)
-  //   await delphsGump.deployed()
+  //   // const DelphsGumpFactory = await ethers.getContractFactory("DelphsGump")
+  //   // const delphsGump = await DelphsGumpFactory.deploy(forwarderAddress, wootgump.address, delph.address)
+  //   // await delphsGump.deployed()
+
+  //   const delphsGump = DelphsGump__factory.connect('0xd79a0B83B34354d62f240C7C9aA6a75fB687CDC1', delph)
 
   //   const minterRole = await wootgump.MINTER_ROLE()
   //   console.log("minter role: ", minterRole)
@@ -72,7 +74,7 @@ describe("DelphsGump", function () {
   //     amount: '0x0de0b6b3a7640000',
   //   }
   // ]
-  //   await expect(delphsGump.connect(delph).bulkMint(mints, { gasLimit: 8_000_000 })).to.be.revertedWith('booyah')
+  //   await expect(delphsGump.connect(delph).bulkMint(mints, { gasLimit: 8_000_000 })).to.not.be.reverted
   // })
 
   it("vests with vest function", async () => {
@@ -95,7 +97,7 @@ describe("DelphsGump", function () {
     expect(parseFloat(newBalance)).to.equal(0)
   })
 
-  it.only("vests at mint", async () => {
+  it("vests at mint", async () => {
     const { delphsGump, wootgump, signers } = await loadFixture(deployDelphsGump)
     const alice = signers[1]
     await wootgump.grantRole(
