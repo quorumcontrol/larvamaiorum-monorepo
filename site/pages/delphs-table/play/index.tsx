@@ -6,6 +6,8 @@ import {
   HStack,
   Spacer,
   Flex,
+  Button,
+  VStack,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -17,12 +19,12 @@ import { useRelayer } from "../../../src/hooks/useUser";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
-import Video from "../../../src/components/Video";
 import useGameRunner from "../../../src/hooks/gameRunner";
 import GameOverScreen, {
   GameWarrior,
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
+import PickCardModal from "./PickCardModal";
 
 const txQueue = new SingletonQueue();
 
@@ -63,7 +65,7 @@ const Play: NextPage = () => {
   const router = useRouter();
   const { tableId: untypedTableId } = router.query;
 
-  const [tableId, setTableId] = useState(untypedTableId  as string | undefined)
+  const [tableId, setTableId] = useState(untypedTableId as string | undefined);
 
   const { address } = useAccount();
   const { data: relayer } = useRelayer();
@@ -80,33 +82,39 @@ const Play: NextPage = () => {
     ready
   );
 
-  useEffect(() => {
-    setTableId(untypedTableId as string|undefined)
-  }, [untypedTableId, setTableId])
+  const [cardModalOpen, setCardModalOpen] = useState(true);
 
-  const sendToIframe = useCallback((msg:any) => {
-    iframe.current?.contentWindow?.postMessage(
-      JSON.stringify(msg),
-      "*"
-    );
-  }, [iframe])
+  useEffect(() => {
+    setTableId(untypedTableId as string | undefined);
+  }, [untypedTableId, setTableId]);
+
+  const sendToIframe = useCallback(
+    (msg: any) => {
+      iframe.current?.contentWindow?.postMessage(JSON.stringify(msg), "*");
+    },
+    [iframe]
+  );
 
   const handleTableRunning = useCallback(
     (tableId?: string) => {
       if (!tableId) {
-        throw new Error('received table running without tableid')
+        throw new Error("received table running without tableid");
       }
-      console.log('table ready')
-      setTableId(tableId)
-      
-      if (typeof window !== 'undefined' && window.history) {
-        window.history.pushState(null, "Crypto Colosseum: Delph's Table", `/delphs-table/play?tableId=${tableId}`)
+      console.log("table ready");
+      setTableId(tableId);
+
+      if (typeof window !== "undefined" && window.history) {
+        window.history.pushState(
+          null,
+          "Crypto Colosseum: Delph's Table",
+          `/delphs-table/play?tableId=${tableId}`
+        );
       }
-      
+
       sendToIframe({
-        type: 'tableReady',
+        type: "tableReady",
         tableId: tableId,
-      })
+      });
     },
     [setTableId, sendToIframe]
   );
@@ -140,7 +148,7 @@ const Play: NextPage = () => {
         throw new Error("no relayer");
       }
       if (!tableId) {
-        throw new Error('no tableId')
+        throw new Error("no tableId");
       }
 
       console.log("params", tableId, appEvent.data[0], appEvent.data[1]);
@@ -151,7 +159,7 @@ const Play: NextPage = () => {
           type: "destinationStarting",
           x: appEvent.data[0],
           y: appEvent.data[1],
-        })
+        });
         const tx = await delphsTable.setDestination(
           tableId,
           appEvent.data[0],
@@ -168,7 +176,7 @@ const Play: NextPage = () => {
               x: appEvent.data[0],
               y: appEvent.data[1],
               success: true,
-            })
+            });
           })
           .catch((err) => {
             console.error("----------- error with destinationSetter", err);
@@ -177,7 +185,7 @@ const Play: NextPage = () => {
               x: appEvent.data[0],
               y: appEvent.data[1],
               success: false,
-            })
+            });
           });
       });
     },
@@ -198,14 +206,14 @@ const Play: NextPage = () => {
           case "gameTick":
             return handleGameTickMessage(appEvent);
           case "loaded":
-            console.log("we got a loaded!")
+            console.log("we got a loaded!");
             if (tableId) {
               sendToIframe({
-                type: 'tableReady',
+                type: "tableReady",
                 tableId: tableId,
-              })
+              });
             } else {
-              registerInterestMutation.mutate({ addr: address! })
+              registerInterestMutation.mutate({ addr: address! });
             }
           case "gm":
             return setReady(true);
@@ -220,34 +228,49 @@ const Play: NextPage = () => {
       console.log("removing iframe msg listener");
       window.removeEventListener("message", handler);
     };
-  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage, sendToIframe, address, registerInterestMutation, tableId]);
+  }, [
+    handleMessage,
+    handleFullScreenMessage,
+    handleGameTickMessage,
+    sendToIframe,
+    address,
+    registerInterestMutation,
+    tableId,
+  ]);
 
   return (
     <>
-      {/* <Video
-        animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
-        loop
-        muted
-        autoPlay
-        id="jungle-video-background"
-      /> */}
+      <PickCardModal
+        isOpen={cardModalOpen}
+        onClose={() => setCardModalOpen(false)}
+      />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="75%">
             {isClient && !over && (
-              <Box
-                id="game"
-                as="iframe"
-                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/QyR4qt1K/?player=${address}`}
-                ref={iframe}
-                top="0"
-                left="0"
-                w={fullScreen ? "100vw" : "100%"}
-                minH={fullScreen ? "100vh" : "70vh"}
-                position={fullScreen ? "fixed" : undefined}
-                zIndex={4_000_000}
-              />
+              <Flex flexDirection="column" alignItems="center">
+                <Box
+                  id="game"
+                  as="iframe"
+                  // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                  src={`https://playcanv.as/e/b/gxZcPwst/?player=${address}`}
+                  ref={iframe}
+                  top="0"
+                  left="0"
+                  w={fullScreen ? "100vw" : "100%"}
+                  minH={fullScreen ? "100vh" : "70vh"}
+                  position={fullScreen ? "fixed" : undefined}
+                  zIndex={4_000_000}
+                />
+                <Button
+                  variant="primary"
+                  zIndex={4_000_001}
+                  mt="-80px"
+                  onClick={() => setCardModalOpen(true)}
+                >
+                  Play Card
+                </Button>
+              </Flex>
             )}
             {isClient && over && (
               <GameOverScreen player={address} runner={gameRunner} />
