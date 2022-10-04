@@ -76,6 +76,22 @@ class Warrior extends EventEmitter implements WarriorStats {
     return this.currentHealth > 0;
   }
 
+  currentAttack() {
+    const item = this.currentItemDetails()
+    if (!item) {
+      return this.attack
+    }
+    return this.attack + (item.attack || 0)
+  }
+
+  currentDefense() {
+    const item = this.currentItemDetails()
+    if (!item) {
+      return this.defense
+    }
+    return this.defense + (item.defense || 0)
+  }
+
   setLocation(cell:Cell) {
     this.location = cell
     this.emit('location', cell)

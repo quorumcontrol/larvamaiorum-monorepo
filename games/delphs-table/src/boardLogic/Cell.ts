@@ -93,6 +93,7 @@ class Cell {
      })
      this.battles = this.battles.filter((b) => !b.isOver())
     } else {
+      // there are no battles here, so we can rejuvanize on this square
       descriptor.rejuvanized = this.rejuvanize()
     }
     descriptor.harvested = this.harvest()
@@ -171,11 +172,27 @@ class Cell {
       })
       if (avoidBattle) {
         // we have avoided a battle. Do we need to steal stuff?
+        warriors.forEach((w, i) => {
+          const otherWarrior = warriors[(i+1) % 2]
+          const details = warriors[i].currentItemDetails()
+          if (!details) {
+            throw new Error('there should be details')
+          }
+          if ((details.takeGump || 0) > 0) {
+            const othersBalance = otherWarrior.wootgumpBalance
+            const toSteal = Math.floor(othersBalance * details.takeGump!)
+            otherWarrior.wootgumpBalance -= toSteal
+            w.wootgumpBalance += toSteal
+          }
+        })
+        warriors.forEach((w) => {
+          w.clearItem()
+        })
       } else {
+        // no cards avoid the battle so let' fight
         const battle = new Battle({warriors, startingTick: tick, seed: seed})
         this.battles.push(battle)
         warriors.forEach((w) => w.emit('battle', battle))
-        return
       }
     }
   }
