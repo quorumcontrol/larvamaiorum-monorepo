@@ -8,6 +8,7 @@ import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from ".
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
 import SimpleSyncher from "../utils/singletonQueue";
 import debug from 'debug'
+import { InventoryItem } from "../boardLogic/items";
 
 const log = debug('chainConnector')
 
@@ -15,6 +16,7 @@ interface IFrameRoll {
   index: number,
   random: string,
   destinations: { id: string, x: number, y: number }[]
+  items: { player: string, item: InventoryItem }[]
 }
 
 interface SetupMessage {
@@ -106,6 +108,7 @@ class ChainConnector extends ScriptTypeBase {
           defense: w.defense,
           initialHealth: w.initialHealth,
           initialGump: w.initialGump,
+          initialInventory: w.initialInventory,
         });
       });
       log("warriors: ", warriors);
@@ -144,6 +147,7 @@ class ChainConnector extends ScriptTypeBase {
         firstGump: (this.grid.firstGump === w),
         firstBlood: (this.grid.firstBlood === w),
         battlesWon: this.grid.battlesWon[w.id] || 0,
+        item: w.currentItem,
       }
     })
     parent.postMessage(JSON.stringify({
@@ -168,6 +172,7 @@ class ChainConnector extends ScriptTypeBase {
       index,
       random,
       destinations,
+      items,
     }: IFrameRoll
   ) {
     try {
@@ -184,6 +189,13 @@ class ChainConnector extends ScriptTypeBase {
           throw new Error('bad warrior id')
         }
         warrior.setDestination(dest.x, dest.y)
+      })
+      items.forEach((item) => {
+        const warrior = this.grid.warriors.find((w) => w.id.toLowerCase() === item.player.toLowerCase())
+        if (!warrior) {
+          throw new Error('bad warrior id')
+        }
+        warrior.setItem(item.item)
       })
       const tickOutput = this.grid.handleTick(random)
       this.entity.fire(TICK_EVT, tickOutput);
