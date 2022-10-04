@@ -355,9 +355,9 @@ class TablePlayer {
 
     const stillNeedingIds = evts.filter((_evt, i) => doesNeedFixup[i])
     this.log("still needs paying: ", stillNeedingIds.length)
-    const actives = await Promise.all(stillNeedingIds.map(async (evt) => {
+    const actives = (await Promise.all(stillNeedingIds.map(async (evt) => {
       return this.idToActiveTable(evt.args.entry)
-    }))
+    }))).filter((t) => t.start.gt(0))
     await this.handlePayouts(actives)
     const stillRunning = await Promise.all(stillRunningIds.map((id) => {
       return this.idToActiveTable(id)
@@ -440,7 +440,7 @@ class TablePlayer {
       this.log('queuing bulk and prizes')
       await txSingleton.push(async () => {
         if (Object.keys(memo.gumpMint).length > 0) {
-          const tx = await delphsGump.bulkMint(Object.values(memo.gumpMint), { gasLimit: 8_000_000 })
+          const tx = await delphsGump.bulkMint(Object.values(memo.gumpMint), { gasLimit: 12_000_000 })
           this.log('delphsGump mint prize tx: ', tx.hash, Object.values(memo.gumpMint))
           await tx.wait()
         }
