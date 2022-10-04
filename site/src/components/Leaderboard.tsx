@@ -15,6 +15,7 @@ import { useUsername } from "../hooks/Player";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import humanFormatted from "../utils/humanFormatted";
 import { LeaderBoardType, TimeFrames } from "../utils/rankings";
+import AppLink from "./AppLink";
 
 const GumpRow: React.FC<{
   address: string;
@@ -25,7 +26,7 @@ const GumpRow: React.FC<{
   return (
     <Tr>
       <Td>{rank + 1}</Td>
-      <Td>{username || address}</Td>
+      <Td><AppLink href={`/profile/${address}`}>{username || address}</AppLink></Td>
       <Td>{humanFormatted(balance)}</Td>
     </Tr>
   );

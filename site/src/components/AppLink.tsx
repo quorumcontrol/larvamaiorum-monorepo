@@ -5,7 +5,7 @@ const AppLink:React.FC<LinkProps> = (userProps) => {
   const { href, children, ...linkProps } = userProps
   return (
     <NextLink passHref href={href || ''}>
-      <Link {...linkProps} textDecoration="underline">
+      <Link {...linkProps}>
         { children }
       </Link>
     </NextLink>
