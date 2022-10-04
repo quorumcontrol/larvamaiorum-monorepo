@@ -3,6 +3,7 @@ import Cell from "./Cell";
 import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 import debug from 'debug'
+import items, { Inventory, InventoryItem } from './items'
 
 const log = debug('Warrior')
 
@@ -13,6 +14,7 @@ export interface WarriorStats {
   defense: number;
   initialHealth: number;
   initialGump: number;
+  initialInventory: Inventory;
 }
 
 export function generateFakeWarriors(count: number, seed: string) {
@@ -25,9 +27,14 @@ export function generateFakeWarriors(count: number, seed: string) {
       defense: deterministicRandom(800, `generateFakeWarriors-${i}-defense`, seed),
       initialHealth: deterministicRandom(2000, `generateFakeWarriors-${i}-health`, seed),
       initialGump: 0,
+      initialInventory: {},
     });
   }
   return warriors;
+}
+
+function deepClone<T>(obj:T):T {
+  return JSON.parse(JSON.stringify(obj)) as T
 }
 
 class Warrior extends EventEmitter implements WarriorStats {
@@ -38,8 +45,13 @@ class Warrior extends EventEmitter implements WarriorStats {
   initialHealth: number = 500;
   currentHealth: number = 500;
   initialGump: number = 0;
+  initialInventory: Inventory
+  inventory: Inventory
 
   location?: Cell
+
+  currentItem?: InventoryItem
+  pendingItem?: InventoryItem
 
   destination?: [number, number];
   pendingDestination?: [number, number];
@@ -56,6 +68,8 @@ class Warrior extends EventEmitter implements WarriorStats {
     this.currentHealth = this.initialHealth;
     this.wootgumpBalance = opts.initialGump;
     this.initialGump = opts.initialGump;
+    this.initialInventory = opts.initialInventory
+    this.inventory = deepClone(opts.initialInventory)
   }
 
   isAlive() {
@@ -114,6 +128,34 @@ class Warrior extends EventEmitter implements WarriorStats {
 
   clearPendingDestination() {
     this.pendingDestination = undefined
+  }
+
+  setItem(item:InventoryItem) {
+    log('setting item: ', item, ' existing: ', this.currentItem)
+    this.currentItem = item
+    if (this.pendingItem && this.pendingItem.address == item.address && this.pendingItem.id == item.id) {
+      log('clearing pending destination')
+      this.clearPendingDestination()
+    }
+  }
+
+  currentItemDetails() {
+    if (!this.currentItem) {
+      return null
+    }
+    return items.find((i) => i.address == this.currentItem!.address && i.id == this.currentItem!.id)
+  }
+
+  clearItem() {
+    this.currentItem = undefined
+  }
+
+  setPendingItem(item:InventoryItem) {
+    this.pendingItem = item
+  }
+
+  clearPendingItem(item:InventoryItem) {
+    this.pendingItem = undefined
   }
 }
 

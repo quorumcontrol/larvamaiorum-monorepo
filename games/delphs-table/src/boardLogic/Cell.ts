@@ -165,9 +165,18 @@ class Cell {
     const nonBattling = this.nonBattlingWarriors()
     if (nonBattling.length >= 2) {
       const warriors = nonBattling.slice(0,2)
-      const battle = new Battle({warriors, startingTick: tick, seed: seed})
-      this.battles.push(battle)
-      warriors.forEach((w) => w.emit('battle', battle))
+      const avoidBattle = warriors.some((w) => {
+        const item = w.currentItemDetails()
+        return item && item.avoidBattle
+      })
+      if (avoidBattle) {
+        // we have avoided a battle. Do we need to steal stuff?
+      } else {
+        const battle = new Battle({warriors, startingTick: tick, seed: seed})
+        this.battles.push(battle)
+        warriors.forEach((w) => w.emit('battle', battle))
+        return
+      }
     }
   }
 
