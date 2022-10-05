@@ -39,6 +39,7 @@ class BoardRunner {
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
         initialGump: Math.floor(parseFloat(utils.formatEther(initialGump[i]))),
+        initialInventory: {},
       })
     }))
 
@@ -51,14 +52,16 @@ class BoardRunner {
 
     const rolls = await Promise.all(new Array(table.gameLength.add(1).toNumber()).fill(true).map(async (_, i) => {
       const rollToGet = started.add(i)
-      const [roll,destinations] = await Promise.all([
+      const [roll, destinations, items] = await Promise.all([
         this.delphs.rolls(rollToGet),
         this.delphs.destinationsForRoll(this.tableId, rollToGet.sub(1)),
+        this.delphs.itemPlaysForRoll(this.tableId, rollToGet.sub(1)),
       ])
       return {
         tick: rollToGet,
         random: roll,
         destinations,
+        items,
       }
     }))
 
@@ -79,6 +82,9 @@ class BoardRunner {
       }
       roll.destinations.forEach((d) => {
         grid.warriors.find((w) => w.id.toLowerCase() === d.player.toLowerCase())?.setDestination(d.x.toNumber(), d.y.toNumber())
+      })
+      roll.items.forEach((itemPlay) => {
+        grid.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem({ address: itemPlay.itemContract, id: itemPlay.id.toNumber() })
       })
       grid.handleTick(roll.random)
     })

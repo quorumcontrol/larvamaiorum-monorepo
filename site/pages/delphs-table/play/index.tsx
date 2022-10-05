@@ -24,7 +24,7 @@ import GameOverScreen, {
   GameWarrior,
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
-import PickCardModal from "./PickCardModal";
+import PickCardModal from "../../../src/components/PickCardModal";
 
 const txQueue = new SingletonQueue();
 
@@ -82,7 +82,7 @@ const Play: NextPage = () => {
     ready
   );
 
-  const [cardModalOpen, setCardModalOpen] = useState(true);
+  const [cardModalOpen, setCardModalOpen] = useState(false);
 
   useEffect(() => {
     setTableId(untypedTableId as string | undefined);
@@ -141,6 +141,10 @@ const Play: NextPage = () => {
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => !old);
   }, [setFullScreen]);
+
+  const handlePlayCardMessage = useCallback(() => {
+    setCardModalOpen(true);
+  }, [setCardModalOpen]);
 
   const handleMessage = useCallback(
     async (appEvent: AppEvent) => {
@@ -203,6 +207,8 @@ const Play: NextPage = () => {
             break;
           case "fullScreenClick":
             return handleFullScreenMessage();
+          case "playCardClick":
+            return handlePlayCardMessage();
           case "gameTick":
             return handleGameTickMessage(appEvent);
           case "loaded":
@@ -231,6 +237,7 @@ const Play: NextPage = () => {
   }, [
     handleMessage,
     handleFullScreenMessage,
+    handlePlayCardMessage,
     handleGameTickMessage,
     sendToIframe,
     address,
@@ -248,29 +255,19 @@ const Play: NextPage = () => {
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="75%">
             {isClient && !over && (
-              <Flex flexDirection="column" alignItems="center">
-                <Box
-                  id="game"
-                  as="iframe"
-                  // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                  src={`https://playcanv.as/e/b/gxZcPwst/?player=${address}`}
-                  ref={iframe}
-                  top="0"
-                  left="0"
-                  w={fullScreen ? "100vw" : "100%"}
-                  minH={fullScreen ? "100vh" : "70vh"}
-                  position={fullScreen ? "fixed" : undefined}
-                  zIndex={4_000_000}
-                />
-                <Button
-                  variant="primary"
-                  zIndex={4_000_001}
-                  mt="-80px"
-                  onClick={() => setCardModalOpen(true)}
-                >
-                  Play Card
-                </Button>
-              </Flex>
+              <Box
+                id="game"
+                as="iframe"
+                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                src={`https://playcanv.as/e/b/w5xcJABT/?player=${address}`}
+                ref={iframe}
+                top="0"
+                left="0"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={cardModalOpen ? 0 : 4_000_000}
+              />
             )}
             {isClient && over && (
               <GameOverScreen player={address} runner={gameRunner} />

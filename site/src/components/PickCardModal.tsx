@@ -13,8 +13,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import border from "../../../src/utils/dashedBorder";
-import berserkSrc from "../../../assets/images/cards/berserk_test.png";
+import border from "../utils/dashedBorder";
+import berserkSrc from "../../assets/images/cards/berserk_test.png";
 
 interface PickCardModalProps {
   isOpen: ModalProps["isOpen"];
@@ -24,8 +24,8 @@ interface PickCardModalProps {
 const PickCardModal: React.FC<PickCardModalProps> = (props) => {
   return (
     <Modal {...props}>
-      <ModalOverlay zIndex={4_000_002}/>
-      <ModalContent p="6" bg="brand.background" maxW="1200px" zIndex={4_000_002}>
+      <ModalOverlay/>
+      <ModalContent p="6" bg="brand.background" maxW="1200px">
         <ModalBody backgroundImage={border} p="6">
           <Heading>Pick a card</Heading>
           <Stack direction={["column", "row"]} spacing="10">

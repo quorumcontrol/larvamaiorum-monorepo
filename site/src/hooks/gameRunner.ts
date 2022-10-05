@@ -11,13 +11,14 @@ import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
 import Grid from "../boardLogic/Grid"
 import Warrior, { WarriorStats } from "../boardLogic/Warrior"
+import { InventoryItem } from "../boardLogic/items"
 
 const log = console.log //debug('gameRunner')
-
 interface IFrameRoll {
   index: number,
   random: string,
   destinations: { id: string, x: number, y: number }[]
+  items: { player: string, item: InventoryItem }[]
 }
 
 function bigNumMin(a: BigNumber, b: BigNumber) {
@@ -159,6 +160,7 @@ export class GameRunner extends EventEmitter {
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
         initialGump: initialGump,
+        initialInventory: {},
       }
     })
 
@@ -268,15 +270,17 @@ export class GameRunner extends EventEmitter {
   private async getRoll(index: number): Promise<IFrameRoll> {
     log('getting roll: ', index)
     const delphs = delphsContract()
-    const [random, destinations] = await Promise.all([
+    const [random, destinations, itemPlays] = await Promise.all([
       delphs.rolls(index),
-      delphs.destinationsForRoll(this.tableId, index - 1)
+      delphs.destinationsForRoll(this.tableId, index - 1),
+      delphs.itemPlaysForRoll(this.tableId, index-1),
     ])
 
     return {
       index,
       random,
-      destinations: this.destinationsToIframe(destinations)
+      destinations: this.destinationsToIframe(destinations),
+      items: this.itemPlaysToIframe(itemPlays),
     }
   }
 
@@ -302,12 +306,16 @@ export class GameRunner extends EventEmitter {
     }
 
     const delphs = delphsContract()
-    const destinations = await delphs.destinationsForRoll(this.tableId, tick - 1)
+    const [destinations, itemPlays] = await Promise.all([
+      delphs.destinationsForRoll(this.tableId, tick - 1),
+      delphs.itemPlaysForRoll(this.tableId, tick - 1),
+    ])
     log('shipping tick ', tick)
     const roll = {
       index: tick,
       random,
-      destinations: this.destinationsToIframe(destinations)
+      destinations: this.destinationsToIframe(destinations),
+      items: this.itemPlaysToIframe(itemPlays),
     }
 
     this.shipRoll(roll)
@@ -325,12 +333,24 @@ export class GameRunner extends EventEmitter {
     })
   }
 
-  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>) {
+  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>):IFrameRoll['destinations'] {
     return destinations.map((d) => {
       return {
         id: d.player,
         x: d.x.toNumber(),
         y: d.y.toNumber(),
+      }
+    })
+  }
+
+  private itemPlaysToIframe(itemPlays: ThenArg<ReturnType<DelphsTable['itemPlaysForRoll']>>):IFrameRoll['items'] {
+    return itemPlays.map((itemPlay) => {
+      return {
+        player: itemPlay.player,
+        item: {
+          address: itemPlay.itemContract,
+          id: itemPlay.id.toNumber(),
+        }
       }
     })
   }

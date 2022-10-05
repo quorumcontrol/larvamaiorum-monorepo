@@ -9,7 +9,7 @@ import { GameConfig, getGameConfig } from "../utils/config";
 import { createScript } from "../utils/createScriptDecorator";
 
 import mustFindByName from "../utils/mustFindByName";
-import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, SECONDS_BETWEEN_ROUNDS, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
+import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, SECONDS_BETWEEN_ROUNDS, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
 import SimpleSyncher from "../utils/singletonQueue";
 
 @createScript("hud")
@@ -51,6 +51,12 @@ class Hud extends ScriptTypeBase {
     mustFindByName(this.entity, "FullScreenButton").button?.on('click', () => {
       parent.postMessage(JSON.stringify({
         type: 'fullScreenClick',
+        data: [],
+      }), '*')
+    })
+    mustFindByName(this.entity, "PlayCard").button?.on('click', () => {
+      parent.postMessage(JSON.stringify({
+        type: 'playCardClick',
         data: [],
       }), '*')
     })
