@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
 import Grid from "../boardLogic/Grid"
 import Warrior, { WarriorStats } from "../boardLogic/Warrior"
-import { InventoryItem } from "../boardLogic/items"
+import { defaultInitialInventory, InventoryItem } from "../boardLogic/items"
 
 const log = console.log //debug('gameRunner')
 interface IFrameRoll {
@@ -138,7 +138,7 @@ export class GameRunner extends EventEmitter {
 
     const initialStats = await Promise.all(
       (this.players || []).map(async (addr, i) => {
-        const [name,stats] = await Promise.all([
+        const [name, stats] = await Promise.all([
           player.name(addr),
           delphs.statsForPlayer(this.tableId, addr)
         ])
@@ -152,7 +152,7 @@ export class GameRunner extends EventEmitter {
     log("names", initialStats);
 
     const warriors: WarriorStats[] = (this.players || []).map((p, i) => {
-      const {name, initialGump, stats } = initialStats[i]
+      const { name, initialGump, stats } = initialStats[i]
       return {
         id: p,
         name: name,
@@ -160,7 +160,7 @@ export class GameRunner extends EventEmitter {
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
         initialGump: initialGump,
-        initialInventory: {},
+        initialInventory: defaultInitialInventory,
       }
     })
 
@@ -225,7 +225,7 @@ export class GameRunner extends EventEmitter {
 
   private shipRoll(roll: IFrameRoll) {
     // TODO: check if this is the right roll to ship
-    const rollIndex = this.tableInfo!.startedAt.sub(roll.index).toNumber()
+    const rollIndex = BigNumber.from(roll.index).sub(this.tableInfo!.startedAt).toNumber()
     if (this.rolls[rollIndex]) {
       console.error('we already shipped this roll')
       this.checkForEnd()
@@ -245,13 +245,16 @@ export class GameRunner extends EventEmitter {
     this.checkForEnd()
   }
 
-  private updateGrid(roll:IFrameRoll) {
+  private updateGrid(roll: IFrameRoll) {
     if (!this.grid) {
       throw new Error('missing grid')
     }
     if (!this.grid.isOver()) {
       roll.destinations.forEach((d) => {
         this.grid!.warriors.find((w) => w.id.toLowerCase() === d.id.toLowerCase())?.setDestination(d.x, d.y)
+      })
+      roll.items.forEach((itemPlay) => {
+        this.grid!.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem(itemPlay.item)
       })
       this.grid.handleTick(roll.random)
     }
@@ -273,7 +276,7 @@ export class GameRunner extends EventEmitter {
     const [random, destinations, itemPlays] = await Promise.all([
       delphs.rolls(index),
       delphs.destinationsForRoll(this.tableId, index - 1),
-      delphs.itemPlaysForRoll(this.tableId, index-1),
+      delphs.itemPlaysForRoll(this.tableId, index - 1),
     ])
 
     return {
@@ -333,7 +336,7 @@ export class GameRunner extends EventEmitter {
     })
   }
 
-  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>):IFrameRoll['destinations'] {
+  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>): IFrameRoll['destinations'] {
     return destinations.map((d) => {
       return {
         id: d.player,
@@ -343,7 +346,7 @@ export class GameRunner extends EventEmitter {
     })
   }
 
-  private itemPlaysToIframe(itemPlays: ThenArg<ReturnType<DelphsTable['itemPlaysForRoll']>>):IFrameRoll['items'] {
+  private itemPlaysToIframe(itemPlays: ThenArg<ReturnType<DelphsTable['itemPlaysForRoll']>>): IFrameRoll['items'] {
     return itemPlays.map((itemPlay) => {
       return {
         player: itemPlay.player,
@@ -360,7 +363,7 @@ const getGameRunnerFor = memoize((tableId: string, iframe?: HTMLIFrameElement) =
   return new GameRunner(tableId!, iframe!).setup()
 })
 
-const useGameRunner = (tableId?: string, player?:string, iframe?: HTMLIFrameElement, ready?: boolean) => {
+const useGameRunner = (tableId?: string, player?: string, iframe?: HTMLIFrameElement, ready?: boolean) => {
   const queryClient = useQueryClient()
 
   const query = useQuery(['/game-runner', tableId], async () => {

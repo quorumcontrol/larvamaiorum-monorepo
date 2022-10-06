@@ -3,7 +3,7 @@ import Cell from "./Cell";
 import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 import debug from 'debug'
-import items, { Inventory, InventoryItem } from './items'
+import items, { getIdentifier, Inventory, InventoryItem } from './items'
 
 const log = debug('Warrior')
 
@@ -51,7 +51,6 @@ class Warrior extends EventEmitter implements WarriorStats {
   location?: Cell
 
   currentItem?: InventoryItem
-  pendingItem?: InventoryItem
 
   destination?: [number, number];
   pendingDestination?: [number, number];
@@ -148,11 +147,14 @@ class Warrior extends EventEmitter implements WarriorStats {
 
   setItem(item:InventoryItem) {
     log('setting item: ', item, ' existing: ', this.currentItem)
-    this.currentItem = item
-    if (this.pendingItem && this.pendingItem.address == item.address && this.pendingItem.id == item.id) {
-      log('clearing pending destination')
-      this.clearPendingDestination()
+    // find it in the inventory
+    const inventoryRecord = this.inventory[getIdentifier(item)]
+    if (!inventoryRecord || inventoryRecord.quantity <= 0) {
+      console.error('no inventory left for this item, not playing')
+      return
     }
+    inventoryRecord.quantity -= 1
+    this.currentItem = item
   }
 
   currentItemDetails() {
@@ -164,14 +166,6 @@ class Warrior extends EventEmitter implements WarriorStats {
 
   clearItem() {
     this.currentItem = undefined
-  }
-
-  setPendingItem(item:InventoryItem) {
-    this.pendingItem = item
-  }
-
-  clearPendingItem(item:InventoryItem) {
-    this.pendingItem = undefined
   }
 }
 

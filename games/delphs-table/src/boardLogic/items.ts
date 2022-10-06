@@ -4,6 +4,10 @@ export interface InventoryItem {
   id: number
 }
 
+export function getIdentifier(item: InventoryItem) {
+  return `${item.address}-${item.id}`
+}
+
 // expected to be ${address}-${id}
 type InventoryIdentifier = string
 
@@ -16,6 +20,7 @@ interface ItemDescription {
   address: string
   id: number
   name: string
+  description: string
   avoidBattle?: boolean
   takeGump?: number
   attack?:number
@@ -28,13 +33,15 @@ const items:ItemDescription[] = [
     address: zeroAddr,
     id: 1,
     name: "Evade",
+    description: "No need to battle, just steal 10% of your opponent's gump.",
     avoidBattle: true,
     takeGump: 0,
   },
   {
     address: zeroAddr,
     id: 2,
-    name: "Beserk",
+    name: "Berserk",
+    description: 'Gives your warrior +2000 attack at the cost of 500 defense and 100 health points.',
     attack: 2000,
     defense: -500,
     hp: -100,
@@ -43,21 +50,29 @@ const items:ItemDescription[] = [
     address: zeroAddr,
     id: 3,
     name: "Thief",
+    description: "Escape the next battle you're in.",
     avoidBattle: true,
     takeGump: 0.10
   }
 ].map((i) => {
   return {
-    identifier: `${i.address}-${i.id}`,
+    identifier: getIdentifier(i),
     ...i
   }
 })
 
-export const itemsByName = items.reduce((memo, item) => {
+export const itemsByIdentifier = items.reduce((memo, item) => {
   return {
-    [item.name]: item,
+    [item.identifier]: item,
     ...memo
   }
-}, {} as Record<string,InventoryItem>)
+}, {} as Record<string,ItemDescription>)
+
+export const defaultInitialInventory:Inventory = items.reduce((memo, item) => {
+  return {
+    [item.identifier]: { quantity: 1, item: { address: item.address, id: item.id } },
+    ...memo
+  }
+}, {} as Inventory)
 
 export default items

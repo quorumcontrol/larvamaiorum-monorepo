@@ -134,7 +134,7 @@ class ChainConnector extends ScriptTypeBase {
     }
   }
 
-  private pingParentPage(tick: TickOutput) {
+  private pingParentPage(_tick: TickOutput) {
     const warriors = this.grid.rankedWarriors().map((w) => {
       return {
         id: w.id,
@@ -142,8 +142,8 @@ class ChainConnector extends ScriptTypeBase {
         currentHealth: w.currentHealth,
         initialHealth: w.initialHealth,
         wootgumpBalance: w.wootgumpBalance,
-        attack: w.attack,
-        defense: w.defense,
+        attack: w.currentAttack(),
+        defense: w.currentDefense(),
         firstGump: (this.grid.firstGump === w),
         firstBlood: (this.grid.firstBlood === w),
         battlesWon: this.grid.battlesWon[w.id] || 0,

@@ -171,12 +171,13 @@ class Cell {
         return item && item.avoidBattle
       })
       if (avoidBattle) {
+        console.log("avoid battle: ", warriors)
         // we have avoided a battle. Do we need to steal stuff?
         warriors.forEach((w, i) => {
           const otherWarrior = warriors[(i+1) % 2]
           const details = warriors[i].currentItemDetails()
           if (!details) {
-            throw new Error('there should be details')
+            return
           }
           if ((details.takeGump || 0) > 0) {
             const othersBalance = otherWarrior.wootgumpBalance

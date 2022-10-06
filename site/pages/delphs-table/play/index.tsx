@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
@@ -25,6 +25,7 @@ import GameOverScreen, {
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
 import PickCardModal from "../../../src/components/PickCardModal";
+import { getIdentifier, itemsByIdentifier } from "../../../src/boardLogic/items";
 
 const txQueue = new SingletonQueue();
 
@@ -41,10 +42,19 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
     defense,
     currentHealth,
     initialHealth,
+    item
   },
 }) => {
+  const description = useMemo(() => {
+    if (!item) {
+      return undefined
+    }
+    return itemsByIdentifier[getIdentifier(item)]
+  }, [item]) 
+
+
   return (
-    <ListItem pl="3">
+    <ListItem pl="3" backgroundColor={description ? "rgba(254, 67, 67, 0.09)" : undefined}>
       <HStack>
         <Text fontWeight="800">{name}</Text>
         <Spacer />
@@ -57,6 +67,9 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
         </Text>
         <Text>DEF:{defense}</Text>
       </HStack>
+      {description && (
+        <Text>{description.name} card in play</Text>
+      )}
     </ListItem>
   );
 };
@@ -250,6 +263,8 @@ const Play: NextPage = () => {
       <PickCardModal
         isOpen={cardModalOpen}
         onClose={() => setCardModalOpen(false)}
+        runner={gameRunner}
+        player={address}
       />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
@@ -259,7 +274,7 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/w5xcJABT/?player=${address}`}
+                src={`https://playcanv.as/e/b/e8AmcSFa/?player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"
