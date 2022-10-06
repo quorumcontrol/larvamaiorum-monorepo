@@ -25,7 +25,10 @@ import GameOverScreen, {
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
 import PickCardModal from "../../../src/components/PickCardModal";
-import { getIdentifier, itemsByIdentifier } from "../../../src/boardLogic/items";
+import {
+  getIdentifier,
+  itemsByIdentifier,
+} from "../../../src/boardLogic/items";
 
 const txQueue = new SingletonQueue();
 
@@ -42,19 +45,21 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
     defense,
     currentHealth,
     initialHealth,
-    item
+    item,
   },
 }) => {
   const description = useMemo(() => {
     if (!item) {
-      return undefined
+      return undefined;
     }
-    return itemsByIdentifier[getIdentifier(item)]
-  }, [item]) 
-
+    return itemsByIdentifier[getIdentifier(item)];
+  }, [item]);
 
   return (
-    <ListItem pl="3" backgroundColor={description ? "rgba(254, 67, 67, 0.09)" : undefined}>
+    <ListItem
+      pl="3"
+      backgroundColor={description ? "rgba(254, 67, 67, 0.09)" : undefined}
+    >
       <HStack>
         <Text fontWeight="800">{name}</Text>
         <Spacer />
@@ -67,9 +72,7 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
         </Text>
         <Text>DEF:{defense}</Text>
       </HStack>
-      {description && (
-        <Text>{description.name} card in play</Text>
-      )}
+      {description && <Text>{description.name} card in play</Text>}
     </ListItem>
   );
 };
@@ -268,26 +271,24 @@ const Play: NextPage = () => {
       />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
-          <Box minW="75%">
-            {isClient && !over && (
-              <Box
-                id="game"
-                as="iframe"
-                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/e8AmcSFa/?player=${address}`}
-                ref={iframe}
-                top="0"
-                left="0"
-                w={fullScreen ? "100vw" : "100%"}
-                minH={fullScreen ? "100vh" : "70vh"}
-                position={fullScreen ? "fixed" : undefined}
-                zIndex={cardModalOpen ? 0 : 4_000_000}
-              />
-            )}
-            {isClient && over && (
-              <GameOverScreen player={address} runner={gameRunner} />
-            )}
-          </Box>
+          {isClient && !over && (
+            <Box
+              id="game"
+              as="iframe"
+              // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+              src={`https://playcanv.as/e/b/e8AmcSFa/?player=${address}`}
+              ref={iframe}
+              top="0"
+              left="0"
+              w={fullScreen ? "100vw" : "100%"}
+              minH={fullScreen ? "100vh" : "70vh"}
+              position={fullScreen ? "fixed" : undefined}
+              zIndex={cardModalOpen ? 0 : 4_000_000}
+            />
+          )}
+          {isClient && over && (
+            <GameOverScreen player={address} runner={gameRunner} />
+          )}
           <Spacer />
 
           {!over && (

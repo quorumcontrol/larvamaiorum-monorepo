@@ -19,7 +19,6 @@ import berserkSrc from "../../assets/images/cards/berserk_test.png";
 import { GameRunner } from "../hooks/gameRunner";
 import { getIdentifier, itemsByIdentifier } from "../boardLogic/items";
 import { usePlayCardMutation } from "../hooks/useDelphsTable";
-import { useMemo } from "react";
 
 const images: Record<number, StaticImageData> = {
   1: berserkSrc,
@@ -42,20 +41,15 @@ const PickCardModal: React.FC<PickCardModalProps> = ({
 }) => {
   const mutation = usePlayCardMutation(runner?.tableId);
 
-  const playerWarrior = useMemo(() => {
-    if (!runner?.grid || !player) {
-      return
-    }
-    return runner.grid.warriors.find(
-      (w) => w.id.toLowerCase() === player.toLowerCase()
-    );
-  }, [runner?.grid, player]);
+  const playerWarrior = (runner?.grid && player) ? runner.grid.warriors.find(
+    (w) => w.id.toLowerCase() === player.toLowerCase()
+  ) : undefined
 
   if (!runner?.grid || !playerWarrior || mutation.isLoading) {
     return (
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent p="6" bg="brand.background" maxW="1200px">
+        <ModalContent p="6" bg="brand.background" maxW="1200px" minH="50vh">
           <Spinner />
         </ModalContent>
       </Modal>
