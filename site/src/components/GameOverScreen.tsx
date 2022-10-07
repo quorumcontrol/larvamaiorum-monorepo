@@ -22,6 +22,7 @@ export interface GameWarrior {
   id: string;
   name: string;
   wootgumpBalance: number;
+  initialGump: number;
   attack: number;
   defense: number;
   currentHealth: number;

@@ -145,6 +145,7 @@ class ChainConnector extends ScriptTypeBase {
         name: w.name,
         currentHealth: w.currentHealth,
         initialHealth: w.initialHealth,
+        initialGump: w.initialGump,
         wootgumpBalance: w.wootgumpBalance,
         attack: w.currentAttack(),
         defense: w.currentDefense(),

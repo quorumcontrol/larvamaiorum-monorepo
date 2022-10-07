@@ -41,6 +41,7 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
   warrior: {
     name,
     wootgumpBalance,
+    initialGump,
     attack,
     defense,
     currentHealth,
@@ -55,6 +56,8 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
     return itemsByIdentifier[getIdentifier(item)];
   }, [item]);
 
+  const diff = wootgumpBalance - initialGump
+
   return (
     <ListItem
       pl="3"
@@ -63,7 +66,7 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
       <HStack>
         <Text fontWeight="800">{name}</Text>
         <Spacer />
-        <Text>{wootgumpBalance} $GUMP</Text>
+        <Text>{wootgumpBalance} $GUMP ({diff > 0 ? '+' : ''}{diff})</Text>
       </HStack>
       <HStack spacing="4">
         <Text>ATK:{attack}</Text>
@@ -277,7 +280,7 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/dfPjGjph/?player=${address}`}
+                src={`https://playcanv.as/e/b/65N59jG2/?player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"
