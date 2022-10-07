@@ -30,8 +30,8 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 5 // TODO: fix
-const TABLE_SIZE = 7
+const NUMBER_OF_ROUNDS = 10 // TODO: fix
+const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
 
 const PAYOUT_TRACKER = keccak256(Buffer.from('delphs-needs-payout'))

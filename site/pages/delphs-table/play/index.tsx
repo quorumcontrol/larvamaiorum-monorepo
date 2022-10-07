@@ -271,24 +271,26 @@ const Play: NextPage = () => {
       />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
-          {isClient && !over && (
-            <Box
-              id="game"
-              as="iframe"
-              // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-              src={`https://playcanv.as/e/b/e8AmcSFa/?player=${address}`}
-              ref={iframe}
-              top="0"
-              left="0"
-              w={fullScreen ? "100vw" : "100%"}
-              minH={fullScreen ? "100vh" : "70vh"}
-              position={fullScreen ? "fixed" : undefined}
-              zIndex={cardModalOpen ? 0 : 4_000_000}
-            />
-          )}
-          {isClient && over && (
-            <GameOverScreen player={address} runner={gameRunner} />
-          )}
+          <Box minW="75%">
+            {isClient && !over && (
+              <Box
+                id="game"
+                as="iframe"
+                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                src={`https://playcanv.as/e/b/dfPjGjph/?player=${address}`}
+                ref={iframe}
+                top="0"
+                left="0"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={cardModalOpen ? 0 : 4_000_000}
+              />
+            )}
+            {isClient && over && (
+              <GameOverScreen player={address} runner={gameRunner} />
+            )}
+          </Box>
           <Spacer />
 
           {!over && (

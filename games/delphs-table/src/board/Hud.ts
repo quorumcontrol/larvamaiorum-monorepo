@@ -9,7 +9,7 @@ import { GameConfig, getGameConfig } from "../utils/config";
 import { createScript } from "../utils/createScriptDecorator";
 
 import mustFindByName from "../utils/mustFindByName";
-import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, SECONDS_BETWEEN_ROUNDS, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
+import { CARD_PLAYED_EVT, GAME_OVER_EVT, NO_MORE_MOVES_EVT, SECONDS_BETWEEN_ROUNDS, START_EVT, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
 import SimpleSyncher from "../utils/singletonQueue";
 
 @createScript("hud")
@@ -17,6 +17,7 @@ class Hud extends ScriptTypeBase {
   uiText: Entity;
   eventTemplate: Entity;
 
+  playCardButton: Entity
   roundText: Entity
   roundTimer: Entity
   roundFadeTween?: Tween
@@ -54,13 +55,20 @@ class Hud extends ScriptTypeBase {
         data: [],
       }), '*')
     })
-    mustFindByName(this.entity, "PlayCard").button?.on('click', () => {
+    
+    this.playCardButton = mustFindByName(this.entity, "PlayCard")
+    this.playCardButton.button?.on('click', () => {
       parent.postMessage(JSON.stringify({
         type: 'playCardClick',
         data: [],
       }), '*')
     })
-
+    controller.once(START_EVT, () => {
+      this.playCardButton.enabled = true
+    }, this)
+    controller.on(CARD_PLAYED_EVT, () => {
+      this.playCardButton.enabled = false
+    }, this)
 
     const component = mustFindByName(this.entity, 'Sound').findComponent('sound') as SoundComponent
     if (!component) {
@@ -159,6 +167,13 @@ class Hud extends ScriptTypeBase {
 
   handleTick(tickOutput: TickOutput) {
     const config = getGameConfig(this.app.root);
+
+    if (config.currentPlayer?.currentItem) {
+      this.playCardButton.enabled = false
+    } else {
+      this.playCardButton.enabled = true
+    }
+
     const grid = config.grid;
     this.timeToNextRound = (SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER - 2) // show the user a shorter period of time
     this.updateRoundText(`Round ${tickOutput.tick} of ${grid?.gameLength}`)

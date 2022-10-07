@@ -3,7 +3,7 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { getGameConfig } from "../utils/config";
 
 import { createScript } from "../utils/createScriptDecorator";
-import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, TICK_EVT } from "../utils/rounds";
+import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, START_EVT, TICK_EVT } from "../utils/rounds";
 import CellState from "./CellState";
 
 const TRACE_AT = 0.8 // number of seconds to start tracing
@@ -23,7 +23,8 @@ class CellSelector extends ScriptTypeBase {
     }
 
     const controller = getGameConfig(this.app.root).controller
-    controller.on(TICK_EVT, this.handleTick, this)
+    controller.once(START_EVT, this.allowSelection, this)
+    controller.on(TICK_EVT, this.allowSelection, this)
     controller.on(NO_MORE_MOVES_EVT, this.handleNoMoreMoves, this)
     controller.on(GAME_OVER_EVT, this.handleGameOver, this)
 
@@ -41,7 +42,7 @@ class CellSelector extends ScriptTypeBase {
     this.app.on(MESSAGE_EVENT, this.handleExternalEvent, this)
   }
 
-  private handleTick() {
+  private allowSelection() {
     this.canSelect = true
   }
 

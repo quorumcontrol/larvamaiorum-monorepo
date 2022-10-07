@@ -45,11 +45,23 @@ const PickCardModal: React.FC<PickCardModalProps> = ({
     (w) => w.id.toLowerCase() === player.toLowerCase()
   ) : undefined
 
-  if (!runner?.grid || !playerWarrior || mutation.isLoading) {
+  if (!runner?.grid || !playerWarrior) {
     return (
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent p="6" bg="brand.background" maxW="1200px" minH="50vh">
+          <Spinner />
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  if (mutation.isLoading) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent p="6" bg="brand.background" maxW="1200px" minH="50vh">
+          <Heading>Playing your card.</Heading>
           <Spinner />
         </ModalContent>
       </Modal>
@@ -67,8 +79,15 @@ const PickCardModal: React.FC<PickCardModalProps> = ({
       }
 
       const onClick = async () => {
-        await mutation.mutateAsync({address: description.address, id: description.id})
-        onClose()
+        const item = {address: description.address, id: description.id}
+        runner.ship('card-played', { player, item })
+        try {
+          await mutation.mutateAsync(item)
+        } catch (err) {
+          console.error('error submitting card: ', err)
+        } finally {
+          onClose()
+        }
       }
 
       return (

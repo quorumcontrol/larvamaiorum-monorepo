@@ -260,7 +260,7 @@ export class GameRunner extends EventEmitter {
     }
   }
 
-  private ship(msgType: string, msg: any) {
+  ship(msgType: string, msg: any) {
     this.iframe.contentWindow?.postMessage(
       JSON.stringify({
         type: msgType,

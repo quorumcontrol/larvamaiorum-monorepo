@@ -4,7 +4,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import Warrior, { WarriorStats } from "../boardLogic/Warrior";
 import Grid, { TickOutput } from "../boardLogic/Grid";
 import BoardGenerate from "./BoardGenerate";
-import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
+import { CARD_PLAYED_EVT, GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, START_EVT, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
 import SimpleSyncher from "../utils/singletonQueue";
 import debug from 'debug'
@@ -83,7 +83,11 @@ class ChainConnector extends ScriptTypeBase {
           return this.entity.fire(NO_MORE_MOVES_EVT)
         case 'setup':
           log('setup event fired')
-          this.handleIframeSetup(evt.setup)
+          return this.handleIframeSetup(evt.setup)
+        case CARD_PLAYED_EVT:
+          log('card played', evt)
+          this.entity.fire(CARD_PLAYED_EVT, evt.data)
+          return
         default:
           log("EXPECTED unknown msg: ", evt)
       }
@@ -125,7 +129,7 @@ class ChainConnector extends ScriptTypeBase {
       this.boardGenerate.setGrid(grid);
       this.latest = firstRoll.index
       this.grid.start(firstRoll.random);
-      this.entity.fire("start");
+      this.entity.fire(START_EVT);
 
       // this.handleTick(firstRoll)
     } catch (err: any) {
