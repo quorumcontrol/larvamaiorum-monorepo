@@ -43,7 +43,7 @@ const items:ItemDescription[] = [
     name: "Berserk",
     description: 'Gives your warrior +2000 attack at the cost of 500 defense and 100 health points.',
     attack: 2000,
-    defense: -500,
+    defense: -400,
     hp: -100,
   },
   {
