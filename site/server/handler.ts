@@ -339,13 +339,40 @@ class TablePlayer {
   async cleanupUnPaidTables() {
     const filter = listKeeper.filters.EntryAdded(PAYOUT_TRACKER, null)
     const latestBlock = await skaleProvider.getBlockNumber()
+    this.log('querying')
     const evts = await listKeeper.queryFilter(filter, latestBlock - 4500, latestBlock)
-    console.log('evt count: ', evts.length)
+    this.log('evt count: ', evts.length)
     const stillRunningIds = await orchestratorState.all()
-    const doesNeedFixup = await Promise.all(evts.map(async (evt) => {
-      const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
-      return payoutTracker && !stillRunningIds.includes(evt.args.entry)
-    }))
+    this.log("still running ids: ", stillRunningIds)
+
+    const windowSize = 40
+    let cursor = 0
+    let doesNeedFixup:boolean[] = []
+    let window = evts.slice(cursor, cursor + windowSize)
+
+    while (window && window.length > 0) {
+      const resp = await Promise.all(window.map(async (evt) => {
+        this.log("before payout tracker: ", evt.args.entry)
+        const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
+        this.log("after payout tracker: ", evt.args.entry)
+        return payoutTracker && !stillRunningIds.includes(evt.args.entry)
+      }))
+      doesNeedFixup = doesNeedFixup.concat(resp)
+      cursor += windowSize
+      window = evts.slice(cursor, cursor + windowSize)
+    }
+    this.log('got through them all: ', doesNeedFixup)
+    this.log('has fixups? ', doesNeedFixup.some((b) => b))
+
+    // const doesNeedFixup = await Promise.all(evts.map(async (evt) => {
+    //   this.log("before payout tracker: ", evt.args.entry)
+    //   const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
+    //   this.log("after payout tracker: ", evt.args.entry)
+    //   return payoutTracker && !stillRunningIds.includes(evt.args.entry)
+    // }))
+
+
+    console.log("payout tracker: ", doesNeedFixup)
 
     const stillNeedingIds = evts.filter((_evt, i) => doesNeedFixup[i])
     this.log("still needs paying: ", stillNeedingIds.length)
