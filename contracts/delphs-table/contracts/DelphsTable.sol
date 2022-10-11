@@ -56,6 +56,7 @@ contract DelphsTable is AccessControl, ERC2771Context {
         bytes32[] seeds;
         bytes32[] attributes;
         uint256[] initialGump;
+        bool[] autoPlay;
     }
 
     struct Stats {
@@ -129,6 +130,10 @@ contract DelphsTable is AccessControl, ERC2771Context {
 
     function initialGump(bytes32 id) public view returns (uint256[] memory) {
         return tables[id].initialGump;
+    }
+
+    function autoPlay(bytes32 id) public view returns (bool[] memory) {
+        return tables[id].autoPlay;
     }
 
     function attributes(bytes32 id) public view returns (bytes32[] memory) {

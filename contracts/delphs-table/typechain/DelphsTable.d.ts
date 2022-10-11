@@ -24,9 +24,10 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     "ADMIN_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "attributes(bytes32)": FunctionFragment;
+    "autoPlay(bytes32)": FunctionFragment;
     "blockOfRoll(uint256)": FunctionFragment;
-    "createAndStart((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[]))": FunctionFragment;
-    "createTable((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[]))": FunctionFragment;
+    "createAndStart((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[],bool[]))": FunctionFragment;
+    "createTable((bytes32,address,uint256,uint256,uint32,uint32,address[],bytes32[],bytes32[],uint256[],bool[]))": FunctionFragment;
     "destinations(bytes32,uint256,uint256)": FunctionFragment;
     "destinationsForRoll(bytes32,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -64,6 +65,7 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     functionFragment: "attributes",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "autoPlay", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "blockOfRoll",
     values: [BigNumberish]
@@ -82,6 +84,7 @@ interface DelphsTableInterface extends ethers.utils.Interface {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       }
     ]
   ): string;
@@ -99,6 +102,7 @@ interface DelphsTableInterface extends ethers.utils.Interface {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       }
     ]
   ): string;
@@ -183,6 +187,7 @@ interface DelphsTableInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "attributes", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "autoPlay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "blockOfRoll",
     data: BytesLike
@@ -349,6 +354,8 @@ export class DelphsTable extends BaseContract {
 
     attributes(id: BytesLike, overrides?: CallOverrides): Promise<[string[]]>;
 
+    autoPlay(id: BytesLike, overrides?: CallOverrides): Promise<[boolean[]]>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -366,6 +373,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -382,6 +390,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -549,6 +558,8 @@ export class DelphsTable extends BaseContract {
 
   attributes(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
 
+  autoPlay(id: BytesLike, overrides?: CallOverrides): Promise<boolean[]>;
+
   blockOfRoll(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -566,6 +577,7 @@ export class DelphsTable extends BaseContract {
       seeds: BytesLike[];
       attributes: BytesLike[];
       initialGump: BigNumberish[];
+      autoPlay: boolean[];
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -582,6 +594,7 @@ export class DelphsTable extends BaseContract {
       seeds: BytesLike[];
       attributes: BytesLike[];
       initialGump: BigNumberish[];
+      autoPlay: boolean[];
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -740,6 +753,8 @@ export class DelphsTable extends BaseContract {
 
     attributes(id: BytesLike, overrides?: CallOverrides): Promise<string[]>;
 
+    autoPlay(id: BytesLike, overrides?: CallOverrides): Promise<boolean[]>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -757,6 +772,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: CallOverrides
     ): Promise<void>;
@@ -773,6 +789,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1019,6 +1036,8 @@ export class DelphsTable extends BaseContract {
 
     attributes(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
+    autoPlay(id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1036,6 +1055,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1052,6 +1072,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1177,6 +1198,11 @@ export class DelphsTable extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    autoPlay(
+      id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     blockOfRoll(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1194,6 +1220,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1210,6 +1237,7 @@ export class DelphsTable extends BaseContract {
         seeds: BytesLike[];
         attributes: BytesLike[];
         initialGump: BigNumberish[];
+        autoPlay: boolean[];
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
