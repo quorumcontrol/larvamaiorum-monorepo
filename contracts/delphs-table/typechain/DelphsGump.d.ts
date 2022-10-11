@@ -261,6 +261,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
     "RoleRevoked(bytes32,address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
+    "Vest(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -270,6 +271,7 @@ interface DelphsGumpInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Vest"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -303,6 +305,10 @@ export type TransferEvent = TypedEvent<
 >;
 
 export type UnpausedEvent = TypedEvent<[string] & { account: string }>;
+
+export type VestEvent = TypedEvent<
+  [string, BigNumber] & { account: string; value: BigNumber }
+>;
 
 export class DelphsGump extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -899,6 +905,22 @@ export class DelphsGump extends BaseContract {
     ): TypedEventFilter<[string], { account: string }>;
 
     Unpaused(account?: null): TypedEventFilter<[string], { account: string }>;
+
+    "Vest(address,uint256)"(
+      account?: string | null,
+      value?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { account: string; value: BigNumber }
+    >;
+
+    Vest(
+      account?: string | null,
+      value?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { account: string; value: BigNumber }
+    >;
   };
 
   estimateGas: {

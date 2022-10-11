@@ -36,11 +36,13 @@ contract DelphsGump is
         uint256 amount;
     }
 
+    event Vest(address indexed account, uint256 value);
+
     constructor(
         address trustedForwarder,
         address wootgumpAddress,
         address initialOwner
-    ) ERC20("Wootgump", "GUMP") ERC2771Context(trustedForwarder) {
+    ) ERC20("Delphs Gump", "dGUMP") ERC2771Context(trustedForwarder) {
         _grantRole(DEFAULT_ADMIN_ROLE, initialOwner);
         _grantRole(PAUSER_ROLE, initialOwner);
         _grantRole(MINTER_ROLE, initialOwner);
@@ -126,6 +128,7 @@ contract DelphsGump is
         // console.log("remaining: ", remainingBalance);
         uint256 minting = currentBalance - remainingBalance;
         lastVesting[account] = block.number;
+        emit Vest(account, minting);
         _burn(account, minting);
         _wootgump.mint(account, minting);    
     }
