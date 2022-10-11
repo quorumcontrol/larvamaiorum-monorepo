@@ -252,6 +252,14 @@ async function rank(from: number, to: number): Promise<Ranking> {
   return {
     start: from,
     end: to,
-    ranked: Object.values(accts).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+    ranked: Object.values(accts).sort((a, b) => {
+      if (a.balance.eq(b.balance)) {
+        return 0
+      }
+      if (b.balance.gt(a.balance)) {
+        return 1
+      }
+      return -1
+    }).slice(0, MAX_RANKINGS)
   }
 }
