@@ -15,7 +15,7 @@ export type Inventory = Record<InventoryIdentifier, {quantity: number, item: Inv
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
-interface ItemDescription {
+export interface ItemDescription {
   identifier: InventoryIdentifier
   address: string
   id: number
@@ -33,7 +33,7 @@ const items:ItemDescription[] = [
     address: zeroAddr,
     id: 1,
     name: "Evade",
-    description: "No need to battle, just steal 10% of your opponent's gump.",
+    description: "Avoid the next battle you'll be in.",
     avoidBattle: true,
     takeGump: 0,
   },
@@ -49,8 +49,8 @@ const items:ItemDescription[] = [
   {
     address: zeroAddr,
     id: 3,
-    name: "Thief",
-    description: "Escape the next battle you're in.",
+    name: "Thieve",
+    description: "No need to battle, just steal 10% of your opponent's gump.",
     avoidBattle: true,
     takeGump: 0.10
   }
@@ -68,7 +68,12 @@ export const itemsByIdentifier = items.reduce((memo, item) => {
   }
 }, {} as Record<string,ItemDescription>)
 
-export const defaultInitialInventory:Inventory = items.reduce((memo, item) => {
+export const defaultInitialInventory:Inventory = {
+  [items[1].identifier]: {quantity: 1, item: { address: items[1].address, id: items[1].id }},
+  [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
+}
+
+items.reduce((memo, item) => {
   return {
     [item.identifier]: { quantity: 1, item: { address: item.address, id: item.id } },
     ...memo

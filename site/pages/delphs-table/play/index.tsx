@@ -8,6 +8,7 @@ import {
   Flex,
   Button,
   VStack,
+  Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -274,7 +275,7 @@ const Play: NextPage = () => {
       />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
-          <Box minW="75%">
+          <Box minW="66%">
             {isClient && !over && (
               <Box
                 id="game"
@@ -299,9 +300,12 @@ const Play: NextPage = () => {
           {!over && (
             <Box
               p="6"
-              maxW={["100%", "100%", "100%", "33%"]}
+              w={["100%", "100%", "100%", "33%"]}
               backgroundImage={["none", "none", "none", border]}
             >
+              {warriors.length === 0 && (
+                <Spinner />
+              )}
               <OrderedList fontSize="md" spacing={4}>
                 {warriors.map((w) => {
                   return (
