@@ -153,10 +153,8 @@ class Hud extends ScriptTypeBase {
     if (!config.currentPlayer || !config.grid) {
       return -1
     }
-    const sorted = config.grid.warriors.sort((a, b) => {
-      return b.wootgumpBalance - a.wootgumpBalance
-    })
-    return sorted?.indexOf(config.currentPlayer) + 1
+        
+    return config.grid.rankedWarriors().indexOf(config.currentPlayer) + 1
   }
 
   private handleFirstGump(tickOutput: TickOutput, player?: Warrior) {

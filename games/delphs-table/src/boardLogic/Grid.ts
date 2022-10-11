@@ -128,7 +128,15 @@ class Grid {
 
   rankedWarriors() {
     return this.warriors.sort((a, b) => {
-      return (b.wootgumpBalance - b.initialGump) - (a.wootgumpBalance - a.initialGump)
+      const aBalance = (a.wootgumpBalance - a.initialGump)
+      const bBalance = (b.wootgumpBalance - b.initialGump)
+      if (aBalance === bBalance) {
+        return 0
+      }
+      if (bBalance > aBalance) {
+        return 1
+      }
+      return -1
     })
   }
 
