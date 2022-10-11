@@ -361,6 +361,7 @@ class TablePlayer {
     while (window && window.length > 0) {
       const resp = await Promise.all(window.map(async (evt) => {
         this.log("before payout tracker: ", evt.args.entry)
+        console.log(listKeeper.contains, listKeeper.contains.toString())
         const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
         this.log("after payout tracker: ", evt.args.entry)
         return payoutTracker && !stillRunningIds.includes(evt.args.entry)
@@ -527,6 +528,7 @@ async function main() {
     const tablePlayer = new TablePlayer()
     new Pinger().start()
 
+    // debug.enable('*')
     debug.enable('table-player,table-maker,pinger')
     console.log('cleaning up anything we messed up during last run')
     await tablePlayer.cleanupUnPaidTables()
