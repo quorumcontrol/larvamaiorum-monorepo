@@ -13,6 +13,8 @@ import Grid from "../boardLogic/Grid"
 import Warrior, { WarriorStats } from "../boardLogic/Warrior"
 import { defaultInitialInventory, InventoryItem } from "../boardLogic/items"
 
+const MISSING_PING_TIMEOUT = 30 * 1000 // 30 seconds
+
 const log = console.log //debug('gameRunner')
 interface IFrameRoll {
   index: number,
@@ -52,6 +54,8 @@ export class GameRunner extends EventEmitter {
   private tableInfo?: ThenArg<ReturnType<DelphsTable['tables']>>
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
   private initialGump?: ThenArg<ReturnType<DelphsTable['initialGump']>>
+
+  private checkForMissingTimeout?: ReturnType<typeof setTimeout>
 
   grid?: Grid
   rolls: IFrameRoll[]
@@ -111,6 +115,7 @@ export class GameRunner extends EventEmitter {
       throw new Error('no table')
     }
     if (this.grid?.isOver()) {
+      this.clearMissingTimer()
       console.log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
       this.over = true
       this.emit('END')
@@ -192,6 +197,37 @@ export class GameRunner extends EventEmitter {
     }
   }
 
+  private clearMissingTimer() {
+    if (this.checkForMissingTimeout) {
+      clearTimeout(this.checkForMissingTimeout)
+      this.checkForMissingTimeout = undefined
+    }
+  }
+
+  private clearAndSetupMisingTimer() {
+    this.clearMissingTimer()
+    if (!this.grid?.isOver()) {
+      this.checkForMissingTimeout = setTimeout(() => {
+        this.checkForMissing()
+      }, MISSING_PING_TIMEOUT)
+    }
+  }
+
+  private async checkForMissing() {
+    log('checking for missing')
+    const delphs = delphsContract()
+    if (!this.tableInfo) {
+      console.error('checking for missing, but there is no table info')
+      return
+    }
+
+    const latestRoll = await delphs.latestRoll()
+    if (latestRoll.gt(this.latest)) {
+      log('there were missing rolls, catching up')
+      return this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latestRoll, this.tableInfo.startedAt.add(this.tableInfo.gameLength)).add(1))
+    }
+  }
+
   private async catchUp(start: BigNumber, end: BigNumber) {
     log("catching up", start.toString(), end.toString());
     const missing = await Promise.all(
@@ -243,6 +279,7 @@ export class GameRunner extends EventEmitter {
     this.updateGrid(roll)
     this.latest = BigNumber.from(roll.index)
     this.checkForEnd()
+    
   }
 
   private updateGrid(roll: IFrameRoll) {
@@ -320,7 +357,7 @@ export class GameRunner extends EventEmitter {
       destinations: this.destinationsToIframe(destinations),
       items: this.itemPlaysToIframe(itemPlays),
     }
-
+    this.clearAndSetupMisingTimer()
     this.shipRoll(roll)
   }
 
