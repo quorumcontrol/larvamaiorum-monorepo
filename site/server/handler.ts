@@ -492,7 +492,7 @@ async function main() {
     // call the client to just get it setup
     mqttClient()
 
-    const tableMaker = new TableMaker()
+    // const tableMaker = new TableMaker()
     const tablePlayer = new TablePlayer()
     new Pinger().start()
 
@@ -503,12 +503,12 @@ async function main() {
     const lobbyRegistrationFilter = lobby.filters.RegisteredInterest(null)
     const orchestratorFilter = orchestratorState.filters.TableAdded(null)
 
-    provider.on(lobbyRegistrationFilter, () => tableMaker.handleLobbyRegistration())
+    // provider.on(lobbyRegistrationFilter, () => tableMaker.handleLobbyRegistration())
     provider.on(orchestratorFilter, () => tablePlayer.handleTableStarted())
     // at startup, just check for any running tables
     tablePlayer.instantTableStarted()
     // and if any tables need to be created
-    tableMaker.instantLobbyRegistration()
+    // tableMaker.instantLobbyRegistration()
   })
 }
 
