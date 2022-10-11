@@ -10,7 +10,7 @@ import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
 import { wrapContract } from 'kasumah-relay-wrapper'
 import testnetBots from '../contracts/bots-testnet'
 import mainnetBots from '../contracts/bots-mainnet'
-import { OrchestratorState__factory, TeamStats__factory } from "../contracts/typechain";
+import { OrchestratorState__factory, TeamStats2__factory } from "../contracts/typechain";
 import { addresses, isTestnet } from "../src/utils/networks";
 import { accoladesContract, delphsContract, delphsGumpContract, listKeeperContract, lobbyContract, playerContract, trustedForwarderContract } from "../src/utils/contracts";
 import { questTrackerContract } from '../src/utils/questTracker'
@@ -93,7 +93,7 @@ const accolades = accoladesContract().connect(delphsWallet)
 const listKeeper = listKeeperContract().connect(delphsWallet)
 
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, delphsWallet)
-const teamStats = TeamStats__factory.connect(addresses().TeamStats, delphsWallet)
+const teamStats = TeamStats2__factory.connect(addresses().TeamStats2, delphsWallet)
 const questTracker = questTrackerContract().connect(delphsWallet)
 
 const relayer = memoize(async () => {
@@ -164,42 +164,44 @@ class TableMaker {
 
       const botNumber = Math.max(10 - waiting.length, 0)
       const id = hashString(`${faker.company.companyName()}: ${faker.company.bs()}}`)
-    
-      const playersWithNamesAndSeeds = (await Promise.all(waiting.concat((await getBots(botNumber)).map((b) => b.address)).map(async (address) => {
+
+      const addressToPlayerWithSeed = async (address:string, isBot: boolean) => {
         const [name, gump] = await Promise.all([
           player.name(address),
           delphsGump.balanceOf(address),
         ])
         if (!name) {
           this.log(`${address} has no name`)
-          return null
+          return undefined
         }
         return {
           name,
           address,
-          delphsGump: gump,
+          delphsGump: isBot ? gump.div(2) : gump,
+          seed: hashString(`${id}-${player!.name}-${player!.address}`),
+          isBot: isBot,
         }
-      })))
-        .filter((p) => !!p)
-        .map((p) => {
-          return {
-            ...p,
-            seed: hashString(`${id}-${player!.name}-${player!.address}`)
-          }
-        })
+      }
+    
+      const playersWithNamesAndSeeds = (await Promise.all([
+        ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
+        ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
+      ])).filter((p) => !!p)
+      
       const tx = await txSingleton.push(async () => {
         this.log('doing create and start tx')
         const startTx = await delphs.createAndStart({
           id,
-          players: playersWithNamesAndSeeds.map((p) => p.address!),
-          seeds: playersWithNamesAndSeeds.map((p) => p.seed),
+          players: playersWithNamesAndSeeds.map((p) => p!.address),
+          seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
           gameLength: NUMBER_OF_ROUNDS,
           owner: await delphsWallet.getAddress(),
           startedAt: 0,
           tableSize: TABLE_SIZE,
           wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
-          initialGump: playersWithNamesAndSeeds.map((p) => p.delphsGump!),
+          initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
           attributes: [],
+          autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
         }, { gasLimit: 3_000_000 })
         this.log('doing orchestrator state add')
         await orchestratorState.add(id, { gasLimit: 1000000 })
@@ -455,7 +457,8 @@ class TablePlayer {
         this.log('accoladesTx tx: ', accoladesTx.hash, memo.accolades)
         await accoladesTx.wait()
 
-        const stats = Object.values(memo.gumpMint).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: table.id }))
+        let stats = Object.values(memo.gumpMint).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: table.id }))
+        stats = stats.concat(Object.values(memo.gumpBurn).map((g) => ({ player: g.to, team: g.team, value: g.amount.mul(-1), tableId: table.id })))
         const teamTx = await teamStats.register(stats, { gasLimit: 5_000_000 })
         this.log('team tx: ', teamTx.hash)        
         await teamTx.wait()
