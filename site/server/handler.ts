@@ -85,12 +85,12 @@ delphsWallet.getAddress().then((addr) => {
 
 const roller = Wallet.createRandom().connect(provider)
 
-const lobby = lobbyContract().connect(delphsWallet)
-const delphs = delphsContract().connect(delphsWallet)
-const player = playerContract().connect(delphsWallet)
-const delphsGump = delphsGumpContract().connect(delphsWallet)
-const accolades = accoladesContract().connect(delphsWallet)
-const listKeeper = listKeeperContract().connect(delphsWallet)
+const lobby = lobbyContract("delphs", delphsWallet)
+const delphs = delphsContract("delphs", delphsWallet)
+const player = playerContract("delphs", delphsWallet)
+const delphsGump = delphsGumpContract("delphs", delphsWallet)
+const accolades = accoladesContract("delphs", delphsWallet)
+const listKeeper = listKeeperContract("delphs", delphsWallet)
 
 const orchestratorState = OrchestratorState__factory.connect(addresses().OrchestratorState, delphsWallet)
 const teamStats = TeamStats2__factory.connect(addresses().TeamStats2, delphsWallet)
@@ -361,7 +361,6 @@ class TablePlayer {
     while (window && window.length > 0) {
       const resp = await Promise.all(window.map(async (evt) => {
         this.log("before payout tracker: ", evt.args.entry)
-        console.log(listKeeper.contains, listKeeper.contains.toString())
         const payoutTracker = await listKeeper.contains(PAYOUT_TRACKER, evt.args.entry)
         this.log("after payout tracker: ", evt.args.entry)
         return payoutTracker && !stillRunningIds.includes(evt.args.entry)

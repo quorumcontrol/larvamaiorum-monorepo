@@ -12,7 +12,7 @@ if (!process.env.DELPHS_PRIVATE_KEY) {
 const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
 
 const lore = loreContract().connect(delphSigner)
-const listKeeper = listKeeperContract().connect(delphSigner)
+const listKeeper = listKeeperContract("delph", delphSigner)
 const boa = badgeOfAssemblyContract()
 
 const singleton = new SimpleSyncher('loreMinter')
