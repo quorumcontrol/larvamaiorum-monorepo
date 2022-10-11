@@ -7,6 +7,8 @@ import items, { getIdentifier, Inventory, InventoryItem } from './items'
 
 const log = debug('Warrior')
 
+export const CARD_USED_EVT = 'card-used'
+
 export interface WarriorStats {
   id: string;
   name: string;
@@ -165,6 +167,9 @@ class Warrior extends EventEmitter implements WarriorStats {
   }
 
   clearItem() {
+    if (this.currentItem) {
+      this.emit(CARD_USED_EVT, this.currentItem)
+    }
     this.currentItem = undefined
   }
 }

@@ -13,3 +13,5 @@ export const ORCHESTRATOR_TICK = 'orchestrator-tick'
 export const START_EVT = 'start'
 
 export const CARD_PLAYED_EVT = 'card-played'
+
+export const CARD_ERROR_EVT = 'card-error'

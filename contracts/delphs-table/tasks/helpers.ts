@@ -39,6 +39,21 @@ export async function getDelphsTableContract(
   return DelphsTable__factory.connect(deploy.address, await getDeployer(hre));
 }
 
+export async function getDelphsGumpContract(
+  hre: HardhatRuntimeEnvironment
+) {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/DelphsGump.json`
+  );
+  const delph = await getDelph(hre)
+  if (!delph) {
+    throw new Error('missing delph')
+  }
+  const { DelphsGump__factory } = await import("../typechain");
+
+  return DelphsGump__factory.connect(deploy.address, delph);
+}
+
 export async function getListKeeperContract(
   hre: HardhatRuntimeEnvironment
 ) {

@@ -90,8 +90,8 @@ describe("DelphsGump", function () {
     // const receipt = await tx.wait()
     let newBalance = utils.formatEther(await delphsGump.balanceOf(alice.address))
     expect(parseFloat(newBalance)).to.be.within(0.45, 0.55)
-    // now let's go another 3 days
-    await mine((24 * 60 * 60 * 3) / 4)
+    // now let's go another 4 days
+    await mine((24 * 60 * 60 * 6) / 4)
     await delphsGump.vest(alice.address)
     newBalance = utils.formatEther(await delphsGump.balanceOf(alice.address))
     expect(parseFloat(newBalance)).to.equal(0)
@@ -125,7 +125,7 @@ describe("DelphsGump", function () {
   })
 
   it('bulk mints', async () => {
-    const { delphsGump, wootgump, signers } = await loadFixture(deployDelphsGump)
+    const { delphsGump } = await loadFixture(deployDelphsGump)
 
     const mints = [{
       to: '0x51e37c31F7F12cC3aeD5ABDedc755CbD18C0aF29',
@@ -140,8 +140,21 @@ describe("DelphsGump", function () {
       amount: '0x0de0b6b3a7640000',
     }]
     const tx = delphsGump.bulkMint(mints, { gasLimit: 8_000_000 })
-   await expect(tx).to.not.be.reverted
-    const receipt = (await tx).wait()
-    console.log('gas: ', (await receipt).gasUsed)
+    await expect(tx).to.not.be.reverted
+  })
+
+  it('burns total if amount is higher', async () => {
+    const { delphsGump, wootgump, signers } = await loadFixture(deployDelphsGump)
+    const alice = signers[1]
+    await wootgump.grantRole(
+      "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",
+      delphsGump.address
+    )
+    await delphsGump.mint(alice.address, utils.parseEther("1"))
+    await expect(delphsGump.bulkBurn([{
+      to: alice.address,
+      amount: utils.parseEther('2'),
+    }])).to.not.be.reverted
+    expect(await delphsGump.balanceOf(alice.address)).to.equal(0)
   })
 })

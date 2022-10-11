@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "./interfaces/IERC20Minter.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract DelphsGump is
     ERC20,
@@ -90,7 +90,13 @@ contract DelphsGump is
     {
         uint256 len = burnInfo.length;
         for (uint256 i = 0; i < len; i++) {
-            _burn(burnInfo[i].to, burnInfo[i].amount);
+            address to = burnInfo[i].to;
+            uint256 amount = burnInfo[i].amount;
+            uint256 bal = balanceOf(to);
+            if (amount > bal) {
+                amount = bal;
+            }
+            _burn(to, amount);
         }
         return true;
     }
@@ -132,7 +138,7 @@ contract DelphsGump is
         // console.log("after token transfer", from, to);
         super._afterTokenTransfer(from, to, amount);
         if (to == address(0)) {
-            console.log("vesting from");
+            // console.log("vesting from");
             _vest(from);
             return;
         }
@@ -150,7 +156,7 @@ contract DelphsGump is
             if (lastVesting[to] == 0) {
                 lastVesting[to] = block.number;
             }
-            console.log("vesting to");
+            // console.log("vesting to");
             _vest(to);
             return;
         }

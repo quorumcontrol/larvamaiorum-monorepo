@@ -114,6 +114,7 @@ const PickCardModal: React.FC<PickCardModalProps> = ({
         try {
           await mutation.mutateAsync(item);
         } catch (err) {
+          runner.ship("card-error", { player, item });
           console.error("error submitting card: ", err);
         } finally {
           setPlayedCard(undefined);

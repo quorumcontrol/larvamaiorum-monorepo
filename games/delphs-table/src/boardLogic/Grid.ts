@@ -122,7 +122,7 @@ class Grid {
 
   rankedWarriors() {
     return this.warriors.sort((a, b) => {
-      return b.wootgumpBalance - a.wootgumpBalance
+      return (b.wootgumpBalance - b.initialGump) - (a.wootgumpBalance - a.initialGump)
     })
   }
 

@@ -2,14 +2,14 @@ import { Entity, SineInOut, Tween, SoundComponent } from "playcanvas";
 import HelpText from "../appWide/HelpText";
 import { CellOutComeDescriptor } from "../boardLogic/Cell";
 import { TickOutput } from "../boardLogic/Grid";
-import Warrior from "../boardLogic/Warrior";
+import Warrior, { CARD_USED_EVT } from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { GameConfig, getGameConfig } from "../utils/config";
 
 import { createScript } from "../utils/createScriptDecorator";
 
 import mustFindByName from "../utils/mustFindByName";
-import { CARD_PLAYED_EVT, GAME_OVER_EVT, NO_MORE_MOVES_EVT, SECONDS_BETWEEN_ROUNDS, START_EVT, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
+import { CARD_ERROR_EVT, CARD_PLAYED_EVT, GAME_OVER_EVT, NO_MORE_MOVES_EVT, SECONDS_BETWEEN_ROUNDS, START_EVT, STOP_MOVES_BUFFER, TICK_EVT } from "../utils/rounds";
 import SimpleSyncher from "../utils/singletonQueue";
 
 @createScript("hud")
@@ -55,7 +55,13 @@ class Hud extends ScriptTypeBase {
         data: [],
       }), '*')
     })
-    
+
+    const component = mustFindByName(this.entity, 'Sound').findComponent('sound') as SoundComponent
+    if (!component) {
+      throw new Error('no sound component')
+    }
+    this.soundPlayer = component
+
     this.playCardButton = mustFindByName(this.entity, "PlayCard")
     this.playCardButton.button?.on('click', () => {
       parent.postMessage(JSON.stringify({
@@ -63,18 +69,28 @@ class Hud extends ScriptTypeBase {
         data: [],
       }), '*')
     })
+
+    /*
+      The play button is disabled at launch, enabled when the game starts (before the first roll)
+      then it is diabled when the player selects a card and only re-enabled if there's an error or the card is used
+    */
     controller.once(START_EVT, () => {
       this.playCardButton.enabled = true
-    }, this)
-    controller.on(CARD_PLAYED_EVT, () => {
-      this.playCardButton.enabled = false
+      const config = getGameConfig(this.app.root)
+      config.currentPlayer?.on(CARD_USED_EVT, (_item) => {
+        this.soundPlayer.slot('cardWasUsed')?.play()
+        this.playCardButton.enabled = true
+      })
     }, this)
 
-    const component = mustFindByName(this.entity, 'Sound').findComponent('sound') as SoundComponent
-    if (!component) {
-      throw new Error('no sound component')
-    }
-    this.soundPlayer = component
+    controller.on(CARD_ERROR_EVT, () => {
+      this.playCardButton.enabled = true
+    })
+
+    controller.on(CARD_PLAYED_EVT, () => {
+      this.soundPlayer.slot('cardInUse')?.play()
+      this.playCardButton.enabled = false
+    }, this)
 
   }
 
@@ -167,12 +183,6 @@ class Hud extends ScriptTypeBase {
 
   handleTick(tickOutput: TickOutput) {
     const config = getGameConfig(this.app.root);
-
-    if (config.currentPlayer?.currentItem) {
-      this.playCardButton.enabled = false
-    } else {
-      this.playCardButton.enabled = true
-    }
 
     const grid = config.grid;
     this.timeToNextRound = (SECONDS_BETWEEN_ROUNDS - STOP_MOVES_BUFFER - 2) // show the user a shorter period of time
