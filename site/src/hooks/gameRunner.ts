@@ -54,6 +54,7 @@ export class GameRunner extends EventEmitter {
   private tableInfo?: ThenArg<ReturnType<DelphsTable['tables']>>
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
   private initialGump?: ThenArg<ReturnType<DelphsTable['initialGump']>>
+  private autoPlay?: ThenArg<ReturnType<DelphsTable['autoPlay']>>
 
   private checkForMissingTimeout?: ReturnType<typeof setTimeout>
 
@@ -75,15 +76,17 @@ export class GameRunner extends EventEmitter {
     mqttClient().on('message', this.handleMqttMessage)
     const delphs = delphsContract()
 
-    const [table, latest, players, initialGump] = await Promise.all([
+    const [table, latest, players, initialGump, autoPlay] = await Promise.all([
       delphs.tables(this.tableId),
       delphs.latestRoll(),
       delphs.players(this.tableId),
       delphs.initialGump(this.tableId),
+      delphs.autoPlay(this.tableId),
     ]);
     this.tableInfo = table
     this.players = players
     this.initialGump = initialGump
+    this.autoPlay = autoPlay
     this.rolls = new Array(table.gameLength.toNumber())
 
     if (this.shouldStart(latest)) {
@@ -151,13 +154,14 @@ export class GameRunner extends EventEmitter {
           name,
           initialGump: Math.floor(parseFloat(utils.formatEther(this.initialGump![i]))),
           stats,
+          autoPlay: this.autoPlay![i]
         }
       })
     );
     log("names", initialStats);
 
     const warriors: WarriorStats[] = (this.players || []).map((p, i) => {
-      const { name, initialGump, stats } = initialStats[i]
+      const { name, initialGump, stats, autoPlay } = initialStats[i]
       return {
         id: p,
         name: name,
@@ -166,6 +170,7 @@ export class GameRunner extends EventEmitter {
         initialHealth: stats.health.toNumber(),
         initialGump: initialGump,
         initialInventory: defaultInitialInventory,
+        autoPlay,
       }
     })
 

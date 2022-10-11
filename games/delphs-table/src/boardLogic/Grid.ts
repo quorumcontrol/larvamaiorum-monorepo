@@ -100,6 +100,12 @@ class Grid {
     let outcomes: CellOutComeDescriptor[][] = []
     let quests:QuestOutput = {}
 
+    this.warriors.filter((w) => w.autoPlay).forEach((w) => {
+      if (deterministicRandom(10, `${w.id}-autoplay`, this.currentSeed) === 1) {
+        w.randomItem(this.currentSeed)
+      }
+    })
+
     if (this.tick !== 0) {
       this.everyCell((cell) => {
         cell.doMovement(this.tick, this.currentSeed)

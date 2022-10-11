@@ -18,6 +18,7 @@ describe("Grid", () => {
         ),
         initialGump: 0,
         initialInventory: {},
+        autoPlay: true,
       });
     }
     return warriors;

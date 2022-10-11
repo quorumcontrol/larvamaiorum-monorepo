@@ -4,6 +4,7 @@ import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 import debug from 'debug'
 import items, { getIdentifier, Inventory, InventoryItem } from './items'
+import { BytesLike } from "ethers";
 
 const log = debug('Warrior')
 
@@ -17,6 +18,7 @@ export interface WarriorStats {
   initialHealth: number;
   initialGump: number;
   initialInventory: Inventory;
+  autoPlay: boolean
 }
 
 export function generateFakeWarriors(count: number, seed: string) {
@@ -30,6 +32,7 @@ export function generateFakeWarriors(count: number, seed: string) {
       initialHealth: deterministicRandom(2000, `generateFakeWarriors-${i}-health`, seed),
       initialGump: 0,
       initialInventory: {},
+      autoPlay: false,
     });
   }
   return warriors;
@@ -49,6 +52,7 @@ class Warrior extends EventEmitter implements WarriorStats {
   initialGump: number = 0;
   initialInventory: Inventory
   inventory: Inventory
+  autoPlay: boolean;
 
   location?: Cell
 
@@ -71,6 +75,7 @@ class Warrior extends EventEmitter implements WarriorStats {
     this.initialGump = opts.initialGump;
     this.initialInventory = opts.initialInventory
     this.inventory = deepClone(opts.initialInventory)
+    this.autoPlay = opts.autoPlay
   }
 
   isAlive() {
@@ -145,6 +150,15 @@ class Warrior extends EventEmitter implements WarriorStats {
 
   clearPendingDestination() {
     this.pendingDestination = undefined
+  }
+
+  randomItem(seed:string) {
+    const available = Object.values(this.inventory).filter((i) => i.quantity > 0)
+    if (available.length === 0) {
+      return
+    }
+    const i = deterministicRandom(available.length - 1 , `${this.id}-${available.length}`, seed)
+    this.setItem(available[i].item)
   }
 
   setItem(item:InventoryItem) {

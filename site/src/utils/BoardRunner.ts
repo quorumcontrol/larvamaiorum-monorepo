@@ -18,11 +18,12 @@ class BoardRunner {
   }
 
   async run() {
-    const [table, latest, playerIds, initialGump] = await Promise.all([
+    const [table, latest, playerIds, initialGump, autoPlay] = await Promise.all([
       this.delphs.tables(this.tableId),
       this.delphs.latestRoll(),
       this.delphs.players(this.tableId),
       this.delphs.initialGump(this.tableId),
+      this.delphs.autoPlay(this.tableId),
     ])
 
     const player = playerContract()
@@ -41,6 +42,7 @@ class BoardRunner {
         initialHealth: stats.health.toNumber(),
         initialGump: Math.floor(parseFloat(utils.formatEther(initialGump[i]))),
         initialInventory: defaultInitialInventory,
+        autoPlay: autoPlay[i],
       })
     }))
 

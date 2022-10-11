@@ -117,6 +117,7 @@ class ChainConnector extends ScriptTypeBase {
           initialHealth: w.initialHealth,
           initialGump: w.initialGump,
           initialInventory: w.initialInventory,
+          autoPlay: w.autoPlay,
         });
       });
       log("warriors: ", warriors);
