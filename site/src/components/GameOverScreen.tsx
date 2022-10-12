@@ -11,6 +11,7 @@ import {
 import NextLink from "next/link";
 import { useMemo } from "react";
 import { SocialIcon } from "react-social-icons";
+import { InventoryItem } from "../boardLogic/items";
 import { GameRunner } from "../hooks/gameRunner";
 import { ACCOLADES_WITH_IMAGES } from "../utils/accoladesWithImages";
 import AccoladeCard from "./AccoladeCard";
@@ -21,6 +22,7 @@ export interface GameWarrior {
   id: string;
   name: string;
   wootgumpBalance: number;
+  initialGump: number;
   attack: number;
   defense: number;
   currentHealth: number;
@@ -28,6 +30,7 @@ export interface GameWarrior {
   firstGump: boolean;
   firstBlood: boolean;
   battlesWon: number;
+  item?: InventoryItem
 }
 
 const GameOverScreen: React.FC<{

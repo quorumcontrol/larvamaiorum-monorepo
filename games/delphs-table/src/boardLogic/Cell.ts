@@ -7,6 +7,8 @@ import Battle, { BattleTickReport } from "./Battle"
 
 const log = debug('Cell')
 
+log("I'm a new version")
+
 // warriorID is the index in these next two types
 type HarvestReport = {[index: string]: Wootgump[]}
 type RejuvanizeReport = {[index: string]: number}
@@ -93,6 +95,7 @@ class Cell {
      })
      this.battles = this.battles.filter((b) => !b.isOver())
     } else {
+      // there are no battles here, so we can rejuvanize on this square
       descriptor.rejuvanized = this.rejuvanize()
     }
     descriptor.harvested = this.harvest()
@@ -165,9 +168,40 @@ class Cell {
     const nonBattling = this.nonBattlingWarriors()
     if (nonBattling.length >= 2) {
       const warriors = nonBattling.slice(0,2)
-      const battle = new Battle({warriors, startingTick: tick, seed: seed})
-      this.battles.push(battle)
-      warriors.forEach((w) => w.emit('battle', battle))
+      const avoidBattle = warriors.some((w) => {
+        const item = w.currentItemDetails()
+        if (item && item.avoidBattle) {
+          this.log(`${w.name} has avoid battle detected: `, item)
+        }
+        return item && item.avoidBattle
+      })
+      if (avoidBattle) {
+        this.log("avoid battle: ", warriors.map((w) => ({name: w.name, item: w.currentItemDetails()})))
+        // we have avoided a battle. Do we need to steal stuff?
+        warriors.forEach((w, i) => {
+          const otherWarrior = warriors[(i+1) % 2]
+          const details = w.currentItemDetails()
+          if (!details) {
+            return
+          }
+          this.log(`${w.name} has ${details.name} - takeGump: ${details.takeGump}`)
+          if ((details.takeGump || 0) > 0) {
+            const othersBalance = otherWarrior.wootgumpBalance
+            const toSteal = Math.floor(othersBalance * details.takeGump!)
+            this.log(`${w.name} stealing ${toSteal} from ${otherWarrior.name}`)
+            otherWarrior.wootgumpBalance -= toSteal
+            w.wootgumpBalance += toSteal
+          }
+        })
+        warriors.forEach((w) => {
+          w.clearItem()
+        })
+      } else {
+        // no cards avoid the battle so let's fight
+        const battle = new Battle({warriors, startingTick: tick, seed: seed})
+        this.battles.push(battle)
+        warriors.forEach((w) => w.emit('battle', battle))
+      }
     }
   }
 

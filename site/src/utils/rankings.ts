@@ -1,12 +1,12 @@
 import { BigNumber, BigNumberish, constants, utils } from "ethers"
 import { DateTime } from 'luxon'
 import fetch from 'cross-fetch'
-import { accoladesContract, wootgumpContract } from "./contracts"
+import { accoladesContract, delphsGumpContract, wootgumpContract } from "./contracts"
 import { defaultNetwork } from "./SkaleChains"
 import { memoize } from "./memoize"
 import { skaleProvider } from "./skaleProvider"
 import multicallWrapper from "./multicallWrapper"
-import { TeamStats, TeamStats__factory } from "../../contracts/typechain"
+import { TeamStats2, TeamStats2__factory } from "../../contracts/typechain"
 import { addresses } from "./networks"
 import { questTrackerContract } from "./questTracker"
 import { keccak256 } from "ethers/lib/utils"
@@ -63,8 +63,8 @@ const IGNORED_ADDRESSES = [
 
 export const teamStatsContract = memoize(() => {
   const multiCall = multicallWrapper(skaleProvider);
-  const unwrapped = TeamStats__factory.connect(addresses().TeamStats, skaleProvider);
-  return multiCall.syncWrap<TeamStats>(unwrapped);
+  const unwrapped = TeamStats2__factory.connect(addresses().TeamStats2, skaleProvider);
+  return multiCall.syncWrap<TeamStats2>(unwrapped);
 });
 
 export async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before' | 'after') {
@@ -231,34 +231,35 @@ async function mostGump(from: number, to: number): Promise<Ranking> {
 }
 
 async function rank(from: number, to: number): Promise<Ranking> {
-  const wootgump = wootgumpContract()
+  const dgump = delphsGumpContract()
 
-  const filter = wootgump.filters.Transfer(null, null, null)
+  const filter = dgump.filters.Vest(null, null)
 
   const accts: Record<Address, RankingItem> = {}
 
-  const evts = await wootgump.queryFilter(filter, from, to)
+  const evts = await dgump.queryFilter(filter, from, to)
   evts.forEach((evt) => {
-    const from = evt.args.from
-    const to = evt.args.to
+    const account = evt.args.account
     const value = evt.args.value
 
-    if (!IGNORED_ADDRESSES.includes(from.toLowerCase())) {
-      const existingFrom = accts[from] || { address: from, balance: constants.Zero }
-      existingFrom.balance = existingFrom.balance.sub(value)
-      accts[from] = existingFrom
-    }
-
-    if (!IGNORED_ADDRESSES.includes(to.toLowerCase())) {
-      const existingTo = accts[to] || { address: to, balance: constants.Zero }
-      existingTo.balance = existingTo.balance.add(value)
-      accts[to] = existingTo
+    if (!IGNORED_ADDRESSES.includes(account.toLowerCase())) {
+      const existingFrom = accts[account] || { address: account, balance: constants.Zero }
+      existingFrom.balance = existingFrom.balance.add(value)
+      accts[account] = existingFrom
     }
   })
 
   return {
     start: from,
     end: to,
-    ranked: Object.values(accts).sort((a, b) => b.balance.sub(a.balance).div(ONE).toNumber()).slice(0, MAX_RANKINGS)
+    ranked: Object.values(accts).sort((a, b) => {
+      if (a.balance.eq(b.balance)) {
+        return 0
+      }
+      if (b.balance.gt(a.balance)) {
+        return 1
+      }
+      return -1
+    }).slice(0, MAX_RANKINGS)
   }
 }

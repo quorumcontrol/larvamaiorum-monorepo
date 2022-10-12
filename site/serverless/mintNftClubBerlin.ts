@@ -21,8 +21,8 @@ if (!process.env.DELPHS_PRIVATE_KEY) {
 const schainSigner = new Wallet(process.env.BADGE_MINTER_PRIVATE_KEY).connect(skaleProvider)
 const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProvider)
 
-const boa = badgeOfAssemblyContract().connect(schainSigner)
-const listKeeper = listKeeperContract().connect(delphSigner)
+const boa = badgeOfAssemblyContract("schain", schainSigner)
+const listKeeper = listKeeperContract("delph", delphSigner)
 
 const LIST = keccak256(Buffer.from('nft-club-berlin-minted'))
 

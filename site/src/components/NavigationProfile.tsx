@@ -12,7 +12,7 @@ import { useAccount } from "wagmi";
 import NextLink from "next/link";
 import { useUsername } from "../hooks/Player";
 import useIsClientSide from "../hooks/useIsClientSide";
-import { useWootgumpBalance } from "../hooks/useWootgump";
+import { useDelphsGumpBalance, useWootgumpBalance } from "../hooks/useWootgump";
 import humanFormatted from "../utils/humanFormatted";
 
 const NavigationProfile: React.FC = () => {
@@ -20,6 +20,7 @@ const NavigationProfile: React.FC = () => {
   const { data: username } = useUsername(address);
   const isClient = useIsClientSide();
   const { data: balance } = useWootgumpBalance(address);
+  const { data: dgumpBalance } = useDelphsGumpBalance(address);
 
   if (!isClient || !username || !isConnected) {
     return (
@@ -40,7 +41,10 @@ const NavigationProfile: React.FC = () => {
               <Heading size="md">{username}</Heading>
             </LinkOverlay>
           </NextLink>
-          <Text fontSize="md">{humanFormatted(balance)} $GUMP</Text>
+          <HStack>
+            <Text fontSize="md">{humanFormatted(balance)} $GUMP</Text>
+            <Text fontSize="md">{humanFormatted(dgumpBalance)} $dGUMP</Text>
+          </HStack>
         </VStack>
         <Box>
           <ConnectButton

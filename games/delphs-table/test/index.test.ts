@@ -16,6 +16,9 @@ describe("Grid", () => {
           `generateFakeWarriors-${i}-health`,
           seed
         ),
+        initialGump: 0,
+        initialInventory: {},
+        autoPlay: true,
       });
     }
     return warriors;

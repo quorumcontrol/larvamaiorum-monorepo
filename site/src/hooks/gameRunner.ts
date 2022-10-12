@@ -4,28 +4,23 @@ import { delphsContract, playerContract } from "../utils/contracts"
 import mqttClient, { ROLLS_CHANNEL, NO_MORE_MOVES_CHANNEL } from '../utils/mqtt'
 import ThenArg from "../utils/ThenArg"
 import SingletonQueue from "../utils/singletonQueue"
-import { BigNumber, BigNumberish } from "ethers"
+import { BigNumber, BigNumberish, utils } from "ethers"
 import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
 import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
 import Grid from "../boardLogic/Grid"
-import Warrior from "../boardLogic/Warrior"
+import Warrior, { WarriorStats } from "../boardLogic/Warrior"
+import { defaultInitialInventory, InventoryItem } from "../boardLogic/items"
+
+const MISSING_PING_TIMEOUT = 30 * 1000 // 30 seconds
 
 const log = console.log //debug('gameRunner')
-
-interface WarriorStats {
-  id: string;
-  name: string;
-  attack: number;
-  defense: number;
-  initialHealth: number;
-}
-
 interface IFrameRoll {
   index: number,
   random: string,
   destinations: { id: string, x: number, y: number }[]
+  items: { player: string, item: InventoryItem }[]
 }
 
 function bigNumMin(a: BigNumber, b: BigNumber) {
@@ -58,6 +53,10 @@ export class GameRunner extends EventEmitter {
 
   private tableInfo?: ThenArg<ReturnType<DelphsTable['tables']>>
   private players?: ThenArg<ReturnType<DelphsTable['players']>>
+  private initialGump?: ThenArg<ReturnType<DelphsTable['initialGump']>>
+  private autoPlay?: ThenArg<ReturnType<DelphsTable['autoPlay']>>
+
+  private checkForMissingTimeout?: ReturnType<typeof setTimeout>
 
   grid?: Grid
   rolls: IFrameRoll[]
@@ -77,13 +76,17 @@ export class GameRunner extends EventEmitter {
     mqttClient().on('message', this.handleMqttMessage)
     const delphs = delphsContract()
 
-    const [table, latest, players] = await Promise.all([
+    const [table, latest, players, initialGump, autoPlay] = await Promise.all([
       delphs.tables(this.tableId),
       delphs.latestRoll(),
-      delphs.players(this.tableId)
+      delphs.players(this.tableId),
+      delphs.initialGump(this.tableId),
+      delphs.autoPlay(this.tableId),
     ]);
     this.tableInfo = table
     this.players = players
+    this.initialGump = initialGump
+    this.autoPlay = autoPlay
     this.rolls = new Array(table.gameLength.toNumber())
 
     if (this.shouldStart(latest)) {
@@ -115,6 +118,7 @@ export class GameRunner extends EventEmitter {
       throw new Error('no table')
     }
     if (this.grid?.isOver()) {
+      this.clearMissingTimer()
       console.log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
       this.over = true
       this.emit('END')
@@ -140,27 +144,35 @@ export class GameRunner extends EventEmitter {
     const player = playerContract()
     const delphs = delphsContract()
 
-    const names = await Promise.all(
-      (this.players || []).map(async (addr) => {
-        return player.name(addr);
+    const initialStats = await Promise.all(
+      (this.players || []).map(async (addr, i) => {
+        const [name, stats] = await Promise.all([
+          player.name(addr),
+          delphs.statsForPlayer(this.tableId, addr)
+        ])
+        return {
+          name,
+          initialGump: Math.floor(parseFloat(utils.formatEther(this.initialGump![i]))),
+          stats,
+          autoPlay: this.autoPlay![i]
+        }
       })
     );
-    log("names", names);
+    log("names", initialStats);
 
-    const warriors: WarriorStats[] = await Promise.all((this.players || []).map(async (p, i) => {
-      const name = names[i];
-      if (!name) {
-        throw new Error("weirdness, non matching lengths");
-      }
-      const stats = await delphs.statsForPlayer(this.tableId, p)
+    const warriors: WarriorStats[] = (this.players || []).map((p, i) => {
+      const { name, initialGump, stats, autoPlay } = initialStats[i]
       return {
         id: p,
         name: name,
         attack: stats.attack.toNumber(),
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
+        initialGump: initialGump,
+        initialInventory: defaultInitialInventory,
+        autoPlay,
       }
-    }))
+    })
 
     const firstRoll = await this.getRoll(this.tableInfo.startedAt.toNumber())
     this.grid = new Grid({
@@ -182,18 +194,49 @@ export class GameRunner extends EventEmitter {
       tableSize: this.tableInfo.tableSize,
       wootgumpMultipler: this.tableInfo.wootgumpMultiplier,
     }
-    log('shipping setup')
+    log('shipping setup', this.tableInfo.startedAt.toNumber(), latest.toNumber(), this.tableInfo.gameLength.toNumber())
     this.ship('setup', { setup: msg })
     this.latest = BigNumber.from(firstRoll.index)
     if (latest.gt(this.tableInfo.startedAt)) {
-      this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latest, this.tableInfo.startedAt.add(this.tableInfo.gameLength)))
+      this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latest, this.tableInfo.startedAt.add(this.tableInfo.gameLength)).add(1))
+    }
+  }
+
+  private clearMissingTimer() {
+    if (this.checkForMissingTimeout) {
+      clearTimeout(this.checkForMissingTimeout)
+      this.checkForMissingTimeout = undefined
+    }
+  }
+
+  private clearAndSetupMisingTimer() {
+    this.clearMissingTimer()
+    if (!this.grid?.isOver()) {
+      this.checkForMissingTimeout = setTimeout(() => {
+        this.checkForMissing()
+      }, MISSING_PING_TIMEOUT)
+    }
+  }
+
+  private async checkForMissing() {
+    log('checking for missing')
+    const delphs = delphsContract()
+    if (!this.tableInfo) {
+      console.error('checking for missing, but there is no table info')
+      return
+    }
+
+    const latestRoll = await delphs.latestRoll()
+    if (latestRoll.gt(this.latest)) {
+      log('there were missing rolls, catching up')
+      return this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latestRoll, this.tableInfo.startedAt.add(this.tableInfo.gameLength)).add(1))
     }
   }
 
   private async catchUp(start: BigNumber, end: BigNumber) {
     log("catching up", start.toString(), end.toString());
     const missing = await Promise.all(
-      Array(end.sub(start).toNumber() + 1)
+      Array(end.sub(start).toNumber())
         .fill(true)
         .map((_, i) => {
           return this.getRoll(start.add(i).toNumber());
@@ -223,7 +266,7 @@ export class GameRunner extends EventEmitter {
 
   private shipRoll(roll: IFrameRoll) {
     // TODO: check if this is the right roll to ship
-    const rollIndex = this.tableInfo!.startedAt.sub(roll.index).toNumber()
+    const rollIndex = BigNumber.from(roll.index).sub(this.tableInfo!.startedAt).toNumber()
     if (this.rolls[rollIndex]) {
       console.error('we already shipped this roll')
       this.checkForEnd()
@@ -241,9 +284,10 @@ export class GameRunner extends EventEmitter {
     this.updateGrid(roll)
     this.latest = BigNumber.from(roll.index)
     this.checkForEnd()
+    
   }
 
-  private updateGrid(roll:IFrameRoll) {
+  private updateGrid(roll: IFrameRoll) {
     if (!this.grid) {
       throw new Error('missing grid')
     }
@@ -251,11 +295,14 @@ export class GameRunner extends EventEmitter {
       roll.destinations.forEach((d) => {
         this.grid!.warriors.find((w) => w.id.toLowerCase() === d.id.toLowerCase())?.setDestination(d.x, d.y)
       })
+      roll.items.forEach((itemPlay) => {
+        this.grid!.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem(itemPlay.item)
+      })
       this.grid.handleTick(roll.random)
     }
   }
 
-  private ship(msgType: string, msg: any) {
+  ship(msgType: string, msg: any) {
     this.iframe.contentWindow?.postMessage(
       JSON.stringify({
         type: msgType,
@@ -268,15 +315,17 @@ export class GameRunner extends EventEmitter {
   private async getRoll(index: number): Promise<IFrameRoll> {
     log('getting roll: ', index)
     const delphs = delphsContract()
-    const [random, destinations] = await Promise.all([
+    const [random, destinations, itemPlays] = await Promise.all([
       delphs.rolls(index),
-      delphs.destinationsForRoll(this.tableId, index - 1)
+      delphs.destinationsForRoll(this.tableId, index - 1),
+      delphs.itemPlaysForRoll(this.tableId, index - 1),
     ])
 
     return {
       index,
       random,
-      destinations: this.destinationsToIframe(destinations)
+      destinations: this.destinationsToIframe(destinations),
+      items: this.itemPlaysToIframe(itemPlays),
     }
   }
 
@@ -296,19 +345,24 @@ export class GameRunner extends EventEmitter {
       return
     }
 
+    // latest is 1, roll comes in for 3, then start == 2 and end == 3
     if (BigNumber.from(tick).gt(this.latest.add(1))) {
       await this.catchUp(this.latest.add(1), BigNumber.from(tick))
     }
 
     const delphs = delphsContract()
-    const destinations = await delphs.destinationsForRoll(this.tableId, tick - 1)
+    const [destinations, itemPlays] = await Promise.all([
+      delphs.destinationsForRoll(this.tableId, tick - 1),
+      delphs.itemPlaysForRoll(this.tableId, tick - 1),
+    ])
     log('shipping tick ', tick)
     const roll = {
       index: tick,
       random,
-      destinations: this.destinationsToIframe(destinations)
+      destinations: this.destinationsToIframe(destinations),
+      items: this.itemPlaysToIframe(itemPlays),
     }
-
+    this.clearAndSetupMisingTimer()
     this.shipRoll(roll)
   }
 
@@ -324,12 +378,24 @@ export class GameRunner extends EventEmitter {
     })
   }
 
-  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>) {
+  private destinationsToIframe(destinations: ThenArg<ReturnType<DelphsTable['destinationsForRoll']>>): IFrameRoll['destinations'] {
     return destinations.map((d) => {
       return {
         id: d.player,
         x: d.x.toNumber(),
         y: d.y.toNumber(),
+      }
+    })
+  }
+
+  private itemPlaysToIframe(itemPlays: ThenArg<ReturnType<DelphsTable['itemPlaysForRoll']>>): IFrameRoll['items'] {
+    return itemPlays.map((itemPlay) => {
+      return {
+        player: itemPlay.player,
+        item: {
+          address: itemPlay.itemContract,
+          id: itemPlay.id.toNumber(),
+        }
       }
     })
   }
@@ -339,7 +405,7 @@ const getGameRunnerFor = memoize((tableId: string, iframe?: HTMLIFrameElement) =
   return new GameRunner(tableId!, iframe!).setup()
 })
 
-const useGameRunner = (tableId?: string, player?:string, iframe?: HTMLIFrameElement, ready?: boolean) => {
+const useGameRunner = (tableId?: string, player?: string, iframe?: HTMLIFrameElement, ready?: boolean) => {
   const queryClient = useQueryClient()
 
   const query = useQuery(['/game-runner', tableId], async () => {
@@ -361,6 +427,8 @@ const useGameRunner = (tableId?: string, player?:string, iframe?: HTMLIFrameElem
       setTimeout(() => {
         queryClient.invalidateQueries(["/wootgump-balance", player])
         queryClient.refetchQueries(["/wootgump-balance", player])
+        queryClient.invalidateQueries(["/delphs-gump-balance", player])
+        queryClient.refetchQueries(["/delphs-gump-balance", player])
       }, 5000)
 
       setOver(true)

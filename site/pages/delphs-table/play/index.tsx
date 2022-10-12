@@ -6,10 +6,13 @@ import {
   HStack,
   Spacer,
   Flex,
+  Button,
+  VStack,
+  Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
@@ -17,12 +20,16 @@ import { useRelayer } from "../../../src/hooks/useUser";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
 import border from "../../../src/utils/dashedBorder";
-import Video from "../../../src/components/Video";
 import useGameRunner from "../../../src/hooks/gameRunner";
 import GameOverScreen, {
   GameWarrior,
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
+import PickCardModal from "../../../src/components/PickCardModal";
+import {
+  getIdentifier,
+  itemsByIdentifier,
+} from "../../../src/boardLogic/items";
 
 const txQueue = new SingletonQueue();
 
@@ -35,18 +42,32 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
   warrior: {
     name,
     wootgumpBalance,
+    initialGump,
     attack,
     defense,
     currentHealth,
     initialHealth,
+    item,
   },
 }) => {
+  const description = useMemo(() => {
+    if (!item) {
+      return undefined;
+    }
+    return itemsByIdentifier[getIdentifier(item)];
+  }, [item]);
+
+  const diff = wootgumpBalance - initialGump
+
   return (
-    <ListItem pl="3">
+    <ListItem
+      pl="3"
+      backgroundColor={description ? "rgba(254, 67, 67, 0.09)" : undefined}
+    >
       <HStack>
         <Text fontWeight="800">{name}</Text>
         <Spacer />
-        <Text>{wootgumpBalance} $GUMP</Text>
+        <Text>{wootgumpBalance} $GUMP ({diff > 0 ? '+' : ''}{diff})</Text>
       </HStack>
       <HStack spacing="4">
         <Text>ATK:{attack}</Text>
@@ -55,6 +76,7 @@ const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
         </Text>
         <Text>DEF:{defense}</Text>
       </HStack>
+      {description && <Text>{description.name} card in play</Text>}
     </ListItem>
   );
 };
@@ -63,7 +85,7 @@ const Play: NextPage = () => {
   const router = useRouter();
   const { tableId: untypedTableId } = router.query;
 
-  const [tableId, setTableId] = useState(untypedTableId  as string | undefined)
+  const [tableId, setTableId] = useState(untypedTableId as string | undefined);
 
   const { address } = useAccount();
   const { data: relayer } = useRelayer();
@@ -80,33 +102,39 @@ const Play: NextPage = () => {
     ready
   );
 
-  useEffect(() => {
-    setTableId(untypedTableId as string|undefined)
-  }, [untypedTableId, setTableId])
+  const [cardModalOpen, setCardModalOpen] = useState(false);
 
-  const sendToIframe = useCallback((msg:any) => {
-    iframe.current?.contentWindow?.postMessage(
-      JSON.stringify(msg),
-      "*"
-    );
-  }, [iframe])
+  useEffect(() => {
+    setTableId(untypedTableId as string | undefined);
+  }, [untypedTableId, setTableId]);
+
+  const sendToIframe = useCallback(
+    (msg: any) => {
+      iframe.current?.contentWindow?.postMessage(JSON.stringify(msg), "*");
+    },
+    [iframe]
+  );
 
   const handleTableRunning = useCallback(
     (tableId?: string) => {
       if (!tableId) {
-        throw new Error('received table running without tableid')
+        throw new Error("received table running without tableid");
       }
-      console.log('table ready')
-      setTableId(tableId)
-      
-      if (typeof window !== 'undefined' && window.history) {
-        window.history.pushState(null, "Crypto Colosseum: Delph's Table", `/delphs-table/play?tableId=${tableId}`)
+      console.log("table ready");
+      setTableId(tableId);
+
+      if (typeof window !== "undefined" && window.history) {
+        window.history.pushState(
+          null,
+          "Crypto Colosseum: Delph's Table",
+          `/delphs-table/play?tableId=${tableId}`
+        );
       }
-      
+
       sendToIframe({
-        type: 'tableReady',
+        type: "tableReady",
         tableId: tableId,
-      })
+      });
     },
     [setTableId, sendToIframe]
   );
@@ -134,13 +162,17 @@ const Play: NextPage = () => {
     setFullScreen((old) => !old);
   }, [setFullScreen]);
 
+  const handlePlayCardMessage = useCallback(() => {
+    setCardModalOpen(true);
+  }, [setCardModalOpen]);
+
   const handleMessage = useCallback(
     async (appEvent: AppEvent) => {
       if (!relayer?.ready()) {
         throw new Error("no relayer");
       }
       if (!tableId) {
-        throw new Error('no tableId')
+        throw new Error("no tableId");
       }
 
       console.log("params", tableId, appEvent.data[0], appEvent.data[1]);
@@ -151,7 +183,7 @@ const Play: NextPage = () => {
           type: "destinationStarting",
           x: appEvent.data[0],
           y: appEvent.data[1],
-        })
+        });
         const tx = await delphsTable.setDestination(
           tableId,
           appEvent.data[0],
@@ -168,7 +200,7 @@ const Play: NextPage = () => {
               x: appEvent.data[0],
               y: appEvent.data[1],
               success: true,
-            })
+            });
           })
           .catch((err) => {
             console.error("----------- error with destinationSetter", err);
@@ -177,7 +209,7 @@ const Play: NextPage = () => {
               x: appEvent.data[0],
               y: appEvent.data[1],
               success: false,
-            })
+            });
           });
       });
     },
@@ -195,17 +227,19 @@ const Play: NextPage = () => {
             break;
           case "fullScreenClick":
             return handleFullScreenMessage();
+          case "playCardClick":
+            return handlePlayCardMessage();
           case "gameTick":
             return handleGameTickMessage(appEvent);
           case "loaded":
-            console.log("we got a loaded!")
+            console.log("we got a loaded!");
             if (tableId) {
               sendToIframe({
-                type: 'tableReady',
+                type: "tableReady",
                 tableId: tableId,
-              })
+              });
             } else {
-              registerInterestMutation.mutate({ addr: address! })
+              registerInterestMutation.mutate({ addr: address! });
             }
           case "gm":
             return setReady(true);
@@ -220,32 +254,41 @@ const Play: NextPage = () => {
       console.log("removing iframe msg listener");
       window.removeEventListener("message", handler);
     };
-  }, [handleMessage, handleFullScreenMessage, handleGameTickMessage, sendToIframe, address, registerInterestMutation, tableId]);
+  }, [
+    handleMessage,
+    handleFullScreenMessage,
+    handlePlayCardMessage,
+    handleGameTickMessage,
+    sendToIframe,
+    address,
+    registerInterestMutation,
+    tableId,
+  ]);
 
   return (
     <>
-      {/* <Video
-        animationUrl="ipfs://bafybeiehqfim6ut4yzbf5d32up7fq42e3unxbspez7v7fidg4hacjge5u4"
-        loop
-        muted
-        autoPlay
-        id="jungle-video-background"
-      /> */}
+      <PickCardModal
+        isOpen={cardModalOpen}
+        onClose={() => setCardModalOpen(false)}
+        runner={gameRunner}
+        player={address}
+      />
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
-          <Box minW="75%">
+          <Box minW="66%">
             {isClient && !over && (
               <Box
                 id="game"
                 as="iframe"
-                src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
+                src={`https://playcanv.as/e/b/8re6nrNY/?player=${address}`}
                 ref={iframe}
                 top="0"
                 left="0"
                 w={fullScreen ? "100vw" : "100%"}
                 minH={fullScreen ? "100vh" : "70vh"}
                 position={fullScreen ? "fixed" : undefined}
-                zIndex={4_000_000}
+                zIndex={cardModalOpen ? 0 : 4_000_000}
               />
             )}
             {isClient && over && (
@@ -257,9 +300,12 @@ const Play: NextPage = () => {
           {!over && (
             <Box
               p="6"
-              maxW={["100%", "100%", "100%", "33%"]}
+              w={["100%", "100%", "100%", "33%"]}
               backgroundImage={["none", "none", "none", border]}
             >
+              {warriors.length === 0 && (
+                <Spinner />
+              )}
               <OrderedList fontSize="md" spacing={4}>
                 {warriors.map((w) => {
                   return (

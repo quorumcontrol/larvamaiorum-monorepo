@@ -2,6 +2,8 @@ import { DelphsTable } from "../../contracts/typechain"
 import { delphsContract, playerContract } from "./contracts"
 import Grid from '../boardLogic/Grid'
 import Warrior from "../boardLogic/Warrior"
+import { utils } from "ethers"
+import { defaultInitialInventory } from "../boardLogic/items"
 
 class BoardRunner {
   delphs:DelphsTable
@@ -16,24 +18,31 @@ class BoardRunner {
   }
 
   async run() {
-    const [table, latest, playerIds] = await Promise.all([
+    const [table, latest, playerIds, initialGump, autoPlay] = await Promise.all([
       this.delphs.tables(this.tableId),
       this.delphs.latestRoll(),
       this.delphs.players(this.tableId),
+      this.delphs.initialGump(this.tableId),
+      this.delphs.autoPlay(this.tableId),
     ])
 
-    const warriors = await Promise.all(playerIds.map(async (id) => {
-      const player = playerContract()
+    const player = playerContract()
+
+    const warriors = await Promise.all(playerIds.map(async (id, i) => {
       const [stats, name] = await Promise.all([
         this.delphs.statsForPlayer(this.tableId, id),
         player.name(id),
       ])
+
       return new Warrior({
         id: id,
         name: name,
         attack: stats.attack.toNumber(),
         defense: stats.defense.toNumber(),
         initialHealth: stats.health.toNumber(),
+        initialGump: Math.floor(parseFloat(utils.formatEther(initialGump[i]))),
+        initialInventory: defaultInitialInventory,
+        autoPlay: autoPlay[i],
       })
     }))
 
@@ -44,16 +53,19 @@ class BoardRunner {
       throw new Error('table not over yet')
     }
 
-    const rolls = await Promise.all(new Array(table.gameLength.add(1).toNumber()).fill(true).map(async (_, i) => {
+    const rolls = await Promise.all(new Array(table.gameLength.toNumber() + 1).fill(true).map(async (_, i) => {
+      console.log('getting roll: ', started.add(i).toNumber())
       const rollToGet = started.add(i)
-      const [roll,destinations] = await Promise.all([
+      const [roll, destinations, items] = await Promise.all([
         this.delphs.rolls(rollToGet),
         this.delphs.destinationsForRoll(this.tableId, rollToGet.sub(1)),
+        this.delphs.itemPlaysForRoll(this.tableId, rollToGet.sub(1)),
       ])
       return {
         tick: rollToGet,
         random: roll,
         destinations,
+        items,
       }
     }))
 
@@ -74,6 +86,9 @@ class BoardRunner {
       }
       roll.destinations.forEach((d) => {
         grid.warriors.find((w) => w.id.toLowerCase() === d.player.toLowerCase())?.setDestination(d.x.toNumber(), d.y.toNumber())
+      })
+      roll.items.forEach((itemPlay) => {
+        grid.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem({ address: itemPlay.itemContract, id: itemPlay.id.toNumber() })
       })
       grid.handleTick(roll.random)
     })

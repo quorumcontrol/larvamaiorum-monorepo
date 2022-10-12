@@ -100,6 +100,12 @@ class Grid {
     let outcomes: CellOutComeDescriptor[][] = []
     let quests:QuestOutput = {}
 
+    this.warriors.filter((w) => w.autoPlay).forEach((w) => {
+      if (deterministicRandom(10, `${w.id}-autoplay`, this.currentSeed) === 1) {
+        w.randomItem(this.currentSeed)
+      }
+    })
+
     if (this.tick !== 0) {
       this.everyCell((cell) => {
         cell.doMovement(this.tick, this.currentSeed)
@@ -122,7 +128,15 @@ class Grid {
 
   rankedWarriors() {
     return this.warriors.sort((a, b) => {
-      return b.wootgumpBalance - a.wootgumpBalance
+      const aBalance = (a.wootgumpBalance - a.initialGump)
+      const bBalance = (b.wootgumpBalance - b.initialGump)
+      if (aBalance === bBalance) {
+        return 0
+      }
+      if (bBalance > aBalance) {
+        return 1
+      }
+      return -1
     })
   }
 
@@ -143,10 +157,12 @@ class Grid {
   }
 
   private gumpOutput() {
+    console.log("gump output")
     return this.warriors.reduce((memo, warrior) => {
+      console.log("warrior: ", warrior.name, warrior.wootgumpBalance - warrior.initialGump, "initial: ", warrior.initialGump)
       return {
         ...memo,
-        [warrior.id]: warrior.wootgumpBalance,
+        [warrior.id]: warrior.wootgumpBalance - warrior.initialGump,
       }
     }, {} as Record<string,number>)
   }

@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "./interfaces/IDiceRoller.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "./interfaces/IDiceRoller.sol";
 
 contract DelphsTable is AccessControl, ERC2771Context {
     error NoTwoRollsPerBlock();
@@ -29,6 +29,7 @@ contract DelphsTable is AccessControl, ERC2771Context {
     mapping(uint256 => uint256) public blockOfRoll;
 
     mapping(bytes32 => mapping(uint256 => Destination[])) public destinations;
+    mapping(bytes32 => mapping(uint256 => ItemPlay[])) public itemPlays;
 
     mapping(bytes32 => Table) public tables;
 
@@ -38,15 +39,24 @@ contract DelphsTable is AccessControl, ERC2771Context {
         int64 y;
     }
 
+    struct ItemPlay {
+        address player;
+        address itemContract;
+        uint256 id;
+    }
+
     struct Table {
         bytes32 id;
-        address[] players;
-        bytes32[] seeds;
         address owner;
         uint256 startedAt; // the roll number started at
         uint256 gameLength; // number of rolls to play
         uint32 tableSize;
         uint32 wootgumpMultiplier; // base chance of spawning, per 1000 (basis points);
+        address[] players;
+        bytes32[] seeds;
+        bytes32[] attributes;
+        uint256[] initialGump;
+        bool[] autoPlay;
     }
 
     struct Stats {
@@ -91,9 +101,7 @@ contract DelphsTable is AccessControl, ERC2771Context {
         emit TableCreated(newTable.id);
     }
 
-    function createAndStart(
-        Table calldata newTable
-    ) external {
+    function createAndStart(Table calldata newTable) external {
         createTable(newTable);
         start(newTable.id);
     }
@@ -120,6 +128,18 @@ contract DelphsTable is AccessControl, ERC2771Context {
         return tables[id].seeds;
     }
 
+    function initialGump(bytes32 id) public view returns (uint256[] memory) {
+        return tables[id].initialGump;
+    }
+
+    function autoPlay(bytes32 id) public view returns (bool[] memory) {
+        return tables[id].autoPlay;
+    }
+
+    function attributes(bytes32 id) public view returns (bytes32[] memory) {
+        return tables[id].attributes;
+    }
+
     function statsForPlayer(bytes32 id, address playerAddress)
         public
         view
@@ -134,30 +154,21 @@ contract DelphsTable is AccessControl, ERC2771Context {
 
         return
             Stats({
-                attack: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "a"),
-                        1000
-                    ),
-                    400
-                ),
-                defense: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "d"),
-                        800
-                    ),
-                    200
-                ),
-                health: uintMax(
-                    determinsticRandom(
-                        rnd,
-                        abi.encodePacked(playerAddress, "h"),
-                        700
-                    ),
-                    200
-                )
+                attack: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "a"),
+                    1000
+                ) + 500,
+                defense: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "d"),
+                    800
+                ) + 200,
+                health: determinsticRandom(
+                    rnd,
+                    abi.encodePacked(playerAddress, "h"),
+                    600
+                ) + 200
             });
     }
 
@@ -175,6 +186,14 @@ contract DelphsTable is AccessControl, ERC2771Context {
         returns (Destination[] memory)
     {
         return destinations[id][roll];
+    }
+
+    function itemPlaysForRoll(bytes32 id, uint256 roll)
+        public
+        view
+        returns (ItemPlay[] memory)
+    {
+        return itemPlays[id][roll];
     }
 
     function setDestination(
@@ -195,6 +214,28 @@ contract DelphsTable is AccessControl, ERC2771Context {
         return true;
     }
 
+    function playItem(
+        bytes32 tableId,
+        address itemContract,
+        uint256 itemId
+    ) public returns (bool) {
+        address sender = _msgSender();
+        Table storage table = tables[tableId];
+        if (!includes(table.players, sender)) {
+            revert Unauthorized();
+        }
+
+        itemPlays[tableId][latestRoll].push(
+            ItemPlay({
+                player: sender,
+                itemContract: itemContract,
+                id: itemId
+            })
+        );
+
+        return true;
+    }
+
     function includes(address[] storage arry, address val)
         private
         view
@@ -207,13 +248,6 @@ contract DelphsTable is AccessControl, ERC2771Context {
             }
         }
         return false;
-    }
-
-    function uintMax(uint256 a, uint256 b) private pure returns (uint256) {
-        if (a >= b) {
-            return a;
-        }
-        return b;
     }
 
     function _msgSender()

@@ -21,6 +21,8 @@ import "video.js/dist/video-js.css";
 
 const { chains, provider } = configureChains(
   [
+    skaleMainnet,
+    chain.polygon,
     chain.mainnet,
     chain.ropsten,
     chain.rinkeby,
@@ -28,14 +30,12 @@ const { chains, provider } = configureChains(
     chain.kovan,
     chain.optimism,
     chain.optimismKovan,
-    chain.polygon,
     chain.polygonMumbai,
     chain.arbitrum,
     chain.arbitrumRinkeby,
     chain.localhost,
     chain.hardhat,
     skaleTestnet,
-    skaleMainnet,
   ],
   [
     jsonRpcProvider({

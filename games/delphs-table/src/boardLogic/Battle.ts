@@ -45,6 +45,13 @@ class Battle extends EventEmitter {
     this.seed = opts.seed
     this.tick = opts.startingTick
     this.startingTick = opts.startingTick
+    // if the warriors have cards, then do the health stuff *now* before any ticks
+    this.warriors.forEach((w) => {
+      const item = w.currentItemDetails()
+      if (item) {
+        w.currentHealth += (item.hp || 0)
+      }
+    })
   }
 
   doBattleTick(tick: number, seed: string):BattleTickReport {
@@ -61,6 +68,9 @@ class Battle extends EventEmitter {
       const wootGumpToTake = Math.floor(loser.wootgumpBalance * WOOTGUMP_TAKE_PERCENTAGE)
       loser.wootgumpBalance -= wootGumpToTake
       winner.wootgumpBalance += wootGumpToTake
+      this.warriors.forEach((w) => {
+        w.clearItem()
+      })
     }
     const report:BattleTickReport = {
       id: this.battleId(),
@@ -103,8 +113,8 @@ class Battle extends EventEmitter {
         continue
       }
       const { attacker, defender } = this.getPositions(i)
-      const attackRoll = this.rand(attacker.attack, i.toString())
-      const defenseRoll = this.rand(defender.defense, i.toString())
+      const attackRoll = this.rand(attacker.currentAttack(), i.toString())
+      const defenseRoll = this.rand(defender.currentDefense(), i.toString())
       if (attackRoll > defenseRoll) {
         defender.currentHealth -= (attackRoll - defenseRoll)
         this.log(`${attacker.name} hits ${defender.name} for ${attackRoll - defenseRoll} ${defender.currentHealth} left`)

@@ -1,6 +1,7 @@
 import { Entity, SineIn, SineInOut, Tween, Vec3 } from "playcanvas";
 import Battle from "../boardLogic/Battle";
 import Cell from "../boardLogic/Cell";
+import { TickOutput } from "../boardLogic/Grid";
 import Warrior from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { getGameConfig } from "../utils/config";
@@ -9,6 +10,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import randomColor from "../utils/randomColor";
 import { randomBounded } from "../utils/randoms";
+import { TICK_EVT } from "../utils/rounds";
 import BattleUI from "./BattleUI";
 
 @createScript("playerMarker")
@@ -20,6 +22,9 @@ class PlayerMarker extends ScriptTypeBase {
   animationHolder: Entity
   humanoid: Entity
   threeDNameScript: any // textMesh script
+
+  cardTextScript: any //textMesh script
+
   previousPoint?: Vec3
   currentTween?: Tween
   deathTween?: Tween
@@ -30,6 +35,7 @@ class PlayerMarker extends ScriptTypeBase {
   initialize() {
     this.threeDNameEntity = mustFindByName(this.entity, "3DName")
     this.threeDNameScript = this.getScript(this.threeDNameEntity, "textMesh")!
+    this.cardTextScript = this.getScript(mustFindByName(this.threeDNameEntity, 'Card'), "textMesh")!
     this.animationHolder = mustFindByName(this.entity, 'HumanoidModel')
     this.humanoid = mustFindByName(this.entity, 'Viking')
   }
@@ -157,6 +163,15 @@ class PlayerMarker extends ScriptTypeBase {
     }
   }
 
+  handleTick(_tick:TickOutput) {
+    const currentItem = this.warrior?.currentItemDetails()
+    if (currentItem) {
+      this.cardTextScript.text = `(${currentItem.name})`
+    } else {
+      this.cardTextScript.text = ''
+    }
+  }
+
   setWarrior(warrior: Warrior) {
     this.warrior = warrior
     // this.name.element!.text = warrior.name
@@ -165,6 +180,7 @@ class PlayerMarker extends ScriptTypeBase {
     if (config.currentPlayer === warrior) {
       mustFindByName(this.entity, 'PlayerArrow').enabled = true
     }
+    config.controller.on(TICK_EVT, this.handleTick, this)
     this.setInitialLocation()
     this.warrior.on('location', (cell) => this.handleNewLocation(cell))
     this.warrior.on('battle', (battle) => this.handleBattling(battle))

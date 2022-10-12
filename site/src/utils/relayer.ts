@@ -13,7 +13,7 @@ import { isTestnet } from './networks'
 const SESSION_EXPIRY = 43200
 
 const FAUCET_URL = isTestnet ? 
-  "/api/local/faucet" :
+  "https://larvammaiorumfaucetgjxd8a5h-testnet-faucet.functions.fnc.fr-par.scw.cloud" :
   "https://larvammaiorumfaucetgjxd8a5h-mainnet-faucet.functions.fnc.fr-par.scw.cloud"
 
 const thresholdForFaucet = utils.parseEther("0.25");

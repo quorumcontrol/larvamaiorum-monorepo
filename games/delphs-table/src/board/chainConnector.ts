@@ -4,10 +4,11 @@ import { createScript } from "../utils/createScriptDecorator";
 import Warrior, { WarriorStats } from "../boardLogic/Warrior";
 import Grid, { TickOutput } from "../boardLogic/Grid";
 import BoardGenerate from "./BoardGenerate";
-import { GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, TICK_EVT } from "../utils/rounds";
+import { CARD_ERROR_EVT, CARD_PLAYED_EVT, GAME_OVER_EVT, NO_MORE_MOVES_EVT, ORCHESTRATOR_TICK, START_EVT, TICK_EVT } from "../utils/rounds";
 import { MESSAGE_EVENT } from "../appWide/AppConnector";
 import SimpleSyncher from "../utils/singletonQueue";
 import debug from 'debug'
+import { InventoryItem } from "../boardLogic/items";
 
 const log = debug('chainConnector')
 
@@ -15,6 +16,7 @@ interface IFrameRoll {
   index: number,
   random: string,
   destinations: { id: string, x: number, y: number }[]
+  items: { player: string, item: InventoryItem }[]
 }
 
 interface SetupMessage {
@@ -81,7 +83,15 @@ class ChainConnector extends ScriptTypeBase {
           return this.entity.fire(NO_MORE_MOVES_EVT)
         case 'setup':
           log('setup event fired')
-          this.handleIframeSetup(evt.setup)
+          return this.handleIframeSetup(evt.setup)
+        case CARD_PLAYED_EVT:
+          log('card played', evt)
+          this.entity.fire(CARD_PLAYED_EVT, evt.data)
+          return
+        case CARD_ERROR_EVT:
+          log('card error', evt)
+          this.entity.fire(CARD_ERROR_EVT, evt.data)
+          return
         default:
           log("EXPECTED unknown msg: ", evt)
       }
@@ -105,6 +115,9 @@ class ChainConnector extends ScriptTypeBase {
           attack: w.attack,
           defense: w.defense,
           initialHealth: w.initialHealth,
+          initialGump: w.initialGump,
+          initialInventory: w.initialInventory,
+          autoPlay: w.autoPlay,
         });
       });
       log("warriors: ", warriors);
@@ -121,7 +134,7 @@ class ChainConnector extends ScriptTypeBase {
       this.boardGenerate.setGrid(grid);
       this.latest = firstRoll.index
       this.grid.start(firstRoll.random);
-      this.entity.fire("start");
+      this.entity.fire(START_EVT);
 
       // this.handleTick(firstRoll)
     } catch (err: any) {
@@ -130,19 +143,21 @@ class ChainConnector extends ScriptTypeBase {
     }
   }
 
-  private pingParentPage(tick: TickOutput) {
+  private pingParentPage(_tick: TickOutput) {
     const warriors = this.grid.rankedWarriors().map((w) => {
       return {
         id: w.id,
         name: w.name,
         currentHealth: w.currentHealth,
         initialHealth: w.initialHealth,
+        initialGump: w.initialGump,
         wootgumpBalance: w.wootgumpBalance,
-        attack: w.attack,
-        defense: w.defense,
+        attack: w.currentAttack(),
+        defense: w.currentDefense(),
         firstGump: (this.grid.firstGump === w),
         firstBlood: (this.grid.firstBlood === w),
         battlesWon: this.grid.battlesWon[w.id] || 0,
+        item: w.currentItem,
       }
     })
     parent.postMessage(JSON.stringify({
@@ -167,6 +182,7 @@ class ChainConnector extends ScriptTypeBase {
       index,
       random,
       destinations,
+      items,
     }: IFrameRoll
   ) {
     try {
@@ -183,6 +199,13 @@ class ChainConnector extends ScriptTypeBase {
           throw new Error('bad warrior id')
         }
         warrior.setDestination(dest.x, dest.y)
+      })
+      items.forEach((item) => {
+        const warrior = this.grid.warriors.find((w) => w.id.toLowerCase() === item.player.toLowerCase())
+        if (!warrior) {
+          throw new Error('bad warrior id')
+        }
+        warrior.setItem(item.item)
       })
       const tickOutput = this.grid.handleTick(random)
       this.entity.fire(TICK_EVT, tickOutput);

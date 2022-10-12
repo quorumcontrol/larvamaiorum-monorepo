@@ -52,6 +52,7 @@ export const useLogin = () => {
 
       const setUserNameAndOrTeam = async () => {
         if (username && team) {
+          console.log('setting username and team: ', username, team)
           const userNameSet = await playerContract().populateTransaction.setUsername(username)
           const teamSet = await playerContract().populateTransaction.setTeam(team)
           const tx = await relayer.multisend([userNameSet, teamSet])
@@ -59,11 +60,13 @@ export const useLogin = () => {
           return tx.wait()
         }
         if (username) {
+          console.log('setting username: ', username)
           const tx = await relayer.wrapped.player().setUsername(username)
           console.log("username tx: ", tx.hash)
           return tx.wait()
         }
         if (team) {
+          console.log('setting team: ', team)
           const tx = await relayer.wrapped.player().setTeam(team)
           console.log("team tx: ", tx.hash)
           return tx.wait()

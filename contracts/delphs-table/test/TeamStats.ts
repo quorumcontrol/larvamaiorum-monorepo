@@ -5,7 +5,7 @@ import { loadFixture } from "ethereum-waffle"
 import { ethers } from "hardhat"
 import { deployForwarderAndRoller } from "./fixtures"
 
-describe.only("TeamStats", function () {
+describe("TeamStats", function () {
   async function getDeployer() {
     const signers = await ethers.getSigners()
     return { deployer: signers[0], signers }

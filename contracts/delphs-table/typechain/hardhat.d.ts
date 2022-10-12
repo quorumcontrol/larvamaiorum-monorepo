@@ -93,6 +93,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Accolades__factory>;
     getContractFactory(
+      name: "DelphsGump",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DelphsGump__factory>;
+    getContractFactory(
       name: "DelphsTable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DelphsTable__factory>;
@@ -104,6 +108,10 @@ declare module "hardhat/types/runtime" {
       name: "IDiceRoller",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDiceRoller__factory>;
+    getContractFactory(
+      name: "IERC20Minter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Minter__factory>;
     getContractFactory(
       name: "IRanker",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -136,6 +144,10 @@ declare module "hardhat/types/runtime" {
       name: "TeamStats",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TeamStats__factory>;
+    getContractFactory(
+      name: "TeamStats2",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TeamStats2__factory>;
     getContractFactory(
       name: "TestDiceRoller",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -250,6 +262,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Accolades>;
     getContractAt(
+      name: "DelphsGump",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DelphsGump>;
+    getContractAt(
       name: "DelphsTable",
       address: string,
       signer?: ethers.Signer
@@ -264,6 +281,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IDiceRoller>;
+    getContractAt(
+      name: "IERC20Minter",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20Minter>;
     getContractAt(
       name: "IRanker",
       address: string,
@@ -304,6 +326,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.TeamStats>;
+    getContractAt(
+      name: "TeamStats2",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TeamStats2>;
     getContractAt(
       name: "TestDiceRoller",
       address: string,
