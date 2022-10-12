@@ -113,7 +113,11 @@ const Lobby: NextPage = () => {
                   <Button variant="primary" onClick={() => login()}>Login to Play</Button>
                 )}
                 {isLoggedIn && (
-                  <Text>Delph&apos;s Table is currently unavailable. It should be available at 7pm (19:00) UTC Oct 12.</Text>
+                  <NextLink passHref href="/delphs-table/play">
+                    <Link>
+                      <Button variant="primary">Play Now</Button>
+                    </Link>
+                  </NextLink>
                 )}
               </VStack>
             )}
