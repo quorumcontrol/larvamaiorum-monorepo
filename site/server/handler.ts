@@ -177,7 +177,7 @@ class TableMaker {
         return {
           name,
           address,
-          delphsGump: isBot ? gump.div(2) : gump,
+          delphsGump: gump,
           seed: hashString(`${id}-${player!.name}-${player!.address}`),
           isBot: isBot,
         }
@@ -413,6 +413,7 @@ class TablePlayer {
       const runner = new BoardRunner(table.id)
       await runner.run()
       const rewards = runner.rewards()
+
       console.log("rewards: ", rewards)
       const memo: {
         gumpMint: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, 
@@ -425,8 +426,10 @@ class TablePlayer {
         const reward = BigNumber.from(rewards.wootgump[playerId])
 
         if (reward.gt(0)) {
+          // bots get 1/4 of their earnings
+          const calculatedReward = team.eq(0) ? reward.div(4) : reward
           memo.gumpMint[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
-          memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(reward).mul(ONE)
+          memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(calculatedReward).mul(ONE)
           memo.gumpMint[playerId].team = team
         }
 
