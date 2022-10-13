@@ -30,13 +30,13 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15 // TODO: fix
+const NUMBER_OF_ROUNDS = 15
 const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
 
 const PAYOUT_TRACKER = keccak256(Buffer.from('delphs-needs-payout'))
 
-const SECONDS_BETWEEN_ROUNDS = 10 // TODO: fix
+const SECONDS_BETWEEN_ROUNDS = 15
 const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
 
 if (!process.env.DELPHS_PRIVATE_KEY) {
