@@ -177,7 +177,7 @@ class TableMaker {
         return {
           name,
           address,
-          delphsGump: isBot ? gump.div(2) : gump,
+          delphsGump: gump,
           seed: hashString(`${id}-${player!.name}-${player!.address}`),
           isBot: isBot,
         }
@@ -413,6 +413,7 @@ class TablePlayer {
       const runner = new BoardRunner(table.id)
       await runner.run()
       const rewards = runner.rewards()
+
       console.log("rewards: ", rewards)
       const memo: {
         gumpMint: Record<string, { to: string, amount: BigNumber, team: BigNumber }>, 
@@ -422,17 +423,22 @@ class TablePlayer {
 
       Object.keys(rewards.wootgump).forEach((playerId) => {
         const team = table.players[playerId]
-        const reward = BigNumber.from(rewards.wootgump[playerId])
+        const reward = BigNumber.from(rewards.wootgump[playerId]).mul(ONE)
 
         if (reward.gt(0)) {
+          // bots get 1/4 of their earnings
+          const calculatedReward = team.eq(0) ? reward.div(4) : reward
+          if (team.eq(0)) {
+            this.log(`reduce ${playerId} from ${utils.formatEther(reward)} to ${utils.formatEther(calculatedReward)}`)
+          }
           memo.gumpMint[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
-          memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(reward).mul(ONE)
+          memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(calculatedReward)
           memo.gumpMint[playerId].team = team
         }
 
         if (reward.lt(0)) {
           memo.gumpBurn[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
-          memo.gumpBurn[playerId].amount = memo.gumpBurn[playerId].amount.add(reward).mul(-1).mul(ONE)
+          memo.gumpBurn[playerId].amount = memo.gumpBurn[playerId].amount.add(reward).mul(-1)
           memo.gumpBurn[playerId].team = team
         }
       })
