@@ -1,4 +1,4 @@
-import { BoundingBox, Entity } from "playcanvas";
+import { BoundingBox, Entity, Vec3 } from "playcanvas";
 import { deterministicRandom } from "../boardLogic/random";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 
@@ -52,12 +52,25 @@ class TileLogic extends ScriptTypeBase {
     console.log("tree position: ", tree.getLocalPosition())
     console.log(this.boundingBox.halfExtents)
     // console.log('setting up tree', randomBounded(this.boundingBox.halfExtents.x), 0, randomBounded(this.boundingBox.halfExtents.z))
-    tree.setLocalPosition(randomBounded(this.boundingBox.halfExtents.x), 0, randomBounded(this.boundingBox.halfExtents.z));
+    const random = this.randomPosition()
+    tree.setLocalPosition(random.x, 0, random.z);
     console.log("tree position: ", tree.getLocalPosition())
 
     // const clone = tree.clone()
     // this.entity.addChild(clone)
     // clone.setLocalPosition(-15,0,0)
+  }
+
+  randomPosition(): Vec3 {
+    const tileBoundingBox = this.boundingBox
+    let xSize = tileBoundingBox.halfExtents.x * 0.9;
+    let zSize = tileBoundingBox.halfExtents.z * 0.9;
+
+    return new Vec3(
+      tileBoundingBox.center.x + randomBounded(xSize * 0.5),
+      0,
+      tileBoundingBox.center.z + randomBounded(zSize * 0.5)
+    )
   }
 
 }
