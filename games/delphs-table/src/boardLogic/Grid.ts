@@ -3,7 +3,6 @@ import Cell, { CellOutComeDescriptor } from './Cell'
 import { deterministicRandom, fakeRandomSeed } from './random'
 import Warrior from './Warrior'
 import debug from 'debug'
-import { BytesLike } from 'ethers'
 
 const log = debug('Grid')
 
@@ -86,13 +85,13 @@ class Grid {
     return { tick: this.tick, seed: this.currentSeed }
   }
 
-  start(seed: BytesLike) {
+  start(seed: string) {
     this.currentSeed = seed.toString()
     this.initialCellPopulation(this.warriors)
     this.started = true
   }
 
-  handleTick(randomness: BytesLike): TickOutput {
+  handleTick(randomness: string): TickOutput {
     if (this.isOver()) {
       throw new Error('ticking when already over')
     }

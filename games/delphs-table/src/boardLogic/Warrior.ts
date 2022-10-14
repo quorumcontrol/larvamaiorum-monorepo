@@ -4,7 +4,6 @@ import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 import debug from 'debug'
 import items, { getIdentifier, Inventory, InventoryItem } from './items'
-import { BytesLike } from "ethers";
 
 const log = debug('Warrior')
 
