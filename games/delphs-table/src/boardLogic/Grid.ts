@@ -1,7 +1,7 @@
 
 import Cell, { CellOutComeDescriptor } from './Cell'
 import { deterministicRandom, fakeRandomSeed } from './random'
-import Warrior from './Warrior'
+import Warrior, { WarriorState } from './Warrior'
 import debug from 'debug'
 
 const log = debug('Grid')
@@ -16,6 +16,7 @@ export interface TickOutput {
   seed: string
   outcomes: CellOutComeDescriptor[][]
   quests: QuestOutput
+  ranked: WarriorState[]
 }
 
 interface GridOptions {
@@ -118,7 +119,7 @@ class Grid {
     })
 
     this.tick++;
-    return { tick: this.tick, seed: this.currentSeed, outcomes, quests }
+    return { tick: this.tick, seed: this.currentSeed, outcomes, quests, ranked: this.rankedWarriors().map((w) => w.toWarriorState() ) }
   }
 
   isOver() {

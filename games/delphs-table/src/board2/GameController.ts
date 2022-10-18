@@ -1,21 +1,33 @@
 import { Entity } from "playcanvas";
-import { deterministicRandom } from "../boardLogic/random";
+import { TickOutput } from "../boardLogic/Grid";
+import { WarriorState } from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
+import { SELECT_EVT } from "./CellSelector";
 import PlayerLogic from "./PlayerLogic";
+import { TestHarness } from "./test";
 import TileLogic from './TileLogic'
 
-interface WarriorSetup {
-  tile: [number,number]
-  name: string
+interface BoardSetup {
+  currentPlayer: string
+  seed:string
+  tableSize: number
+  gameLength: number
 }
 
-interface BoardSetup {
-  tiles: [number,number]
-  seed: string
-  warriors: WarriorSetup[]
+export const TICK_EVT = 'tick'
+export const PENDING_DESTINATION = 'pending_dest'
+export const CARD_CLICK_EVT = 'card_click'
+export const WARRIOR_SETUP_EVT = 'warrior-setup'
+export const CARD_ERROR_EVT = 'card-error'
+
+export interface TickEvent {
+  tick: TickOutput
+  currentPlayer: string
+  gameLength: number
+  controller: GameController
 }
 
 @createScript("gameController")
@@ -24,11 +36,25 @@ class GameController extends ScriptTypeBase {
   templates: Entity
   board:Entity
   playerTemplate: Entity
+  destinationMarker: Entity
+
+  tiles:TileLogic[][]
+  players:Record<string, PlayerLogic>
+  gameLength: number
+  currentPlayer: string
+
+  harness?:TestHarness
+
+  canSelect = true
 
   initialize() {
     console.log(' game controller ')
+    this.tiles = []
+    this.players = {}
     this.templates = mustFindByName(this.app.root, 'Templates')
     this.templates.enabled = false
+
+    this.destinationMarker = mustFindByName(this.templates, 'DestinationMarker')
 
     const tile = mustFindByName(this.templates, 'Tile')
     const player = mustFindByName(tile, 'Player')
@@ -36,31 +62,121 @@ class GameController extends ScriptTypeBase {
     player.destroy()
 
     this.board = mustFindByName(this.app.root, 'Board')
-    console.log('found templates -hi')
-    const boardSize = 8
-    this.setupBoard({
-      tiles: [boardSize,boardSize],
-      seed: 'test',
-      warriors: Array(boardSize).fill(true).map((_,i) => {
-        return {
-          tile: [deterministicRandom(boardSize, `${i}-warrior-x`, 'test'), deterministicRandom(boardSize, `${i}-warrior-y`, 'test')],
-          name: `warrior ${i}`
-        }
-      })
-    })
+    console.log('-------------- starting test')
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const debug = urlParams.get("debug")
+
+    this.app.on(CARD_CLICK_EVT, this.handleCardClick, this)
+
+    if (debug) {
+      const testHarness = new TestHarness(this)
+      this.harness = testHarness
+      testHarness.go()
+      this.app.on(SELECT_EVT, this.handleSelect, this)
+    }
+    this.pingExternal('gm', {})
   }
 
-  setupBoard(board:BoardSetup) {
-    this.setupTiles(board)
-    this.setupWarriors(board)
+  handleExternalMessage(msg:{type:string, data:any}) {
+    switch(msg.type) {
+      case 'setupBoard':
+        return this.setupBoard(msg.data)
+      case 'setupWarriors':
+        return this.setupWarriors(msg.data)
+      case 'tick':
+        return this.handleTick(msg.data)
+      case 'cardError':
+        return this.handleCardError(msg.data)
+      default:
+        console.log('msg: ', msg)
+    }
   }
 
-  private setupWarriors(board:BoardSetup) {
-    board.warriors.forEach((w) => {
+  pingExternal(type:string, data:any) {
+    parent.postMessage(JSON.stringify({
+      type,
+      data,
+    }), '*')
+  }
+
+  handleCardClick(name:string) {
+    this.pingExternal(CARD_CLICK_EVT, { name })
+  }
+
+  handleCardError(_data:any) {
+    this.app.fire(CARD_ERROR_EVT)
+  }
+
+  handleSelect(entity:Entity) {
+    console.log('game controller select: ', entity)
+    if (this.canSelect) {
+      const tileLogic = this.getScript<TileLogic>(entity, 'tileLogic')
+      if (!tileLogic) {
+        throw new Error('missing tile logic on selected entity')
+      }
+      this.app.fire(PENDING_DESTINATION, tileLogic)
+      this.pingExternal(PENDING_DESTINATION, { destination: [tileLogic.x, tileLogic.y] })
+    }
+  }
+
+  update() {
+    if (this.app.keyboard.wasPressed(pc.KEY_SPACE)) {
+      if (this.harness) {
+        this.harness.tick()
+      }
+    }
+  }
+
+  setupBoard(setupMessage:BoardSetup) {
+    this.gameLength = setupMessage.gameLength
+    this.currentPlayer = setupMessage.currentPlayer
+    
+    this.destinationMarker.enabled = !!this.currentPlayer
+
+    this.setupTiles(setupMessage)
+  }
+
+  setupWarriors(warriors:WarriorState[]) {
+    warriors.forEach((w, i) => {
       const player = this.playerTemplate.clone() as Entity
+      player.name = `warrior-${w.id}`
       this.board.addChild(player)
       const script = this.getScript<PlayerLogic>(player, 'playerLogic')!
-      script.initialSetup(w)
+      this.players[w.id] = script
+      script.initialSetup(w, this.currentPlayer)
+    })
+    this.app.fire(WARRIOR_SETUP_EVT, warriors)
+  }
+
+  handleTick(tick:TickOutput) {
+    this.app.fire(TICK_EVT, {
+      tick,
+      gameLength: this.gameLength,
+      currentPlayer: this.currentPlayer,
+      controller: this
+    } as TickEvent)
+
+    tick.outcomes.forEach((row, x) => {
+      row.forEach((outcome, y) => {
+        const tile = this.tiles[x][y]
+        tile.handleCellOutcome(outcome)
+        outcome.incoming.forEach((w) => {
+          this.players[w.id].moveTo(this.tiles[x][y])
+        })
+        outcome.battleTicks.forEach((battleTick) => {
+          tile.handleBattle(battleTick)
+          const warriorElements = battleTick.warriors.reduce((memo, warrior) => {
+            return {
+              ...memo,
+              [warrior.id]: this.players[warrior.id]!
+            }
+          }, {} as Record<string,PlayerLogic>)
+          battleTick.warriors.forEach((w) => {
+            warriorElements[w.id].handleBattle(battleTick, tile, warriorElements)
+          })
+        })
+      })
     })
   }
 
@@ -69,27 +185,30 @@ class GameController extends ScriptTypeBase {
     console.log("tile template: ", tileTemplate)
     const { x:sizeX, z:sizeY } = mustFindByName(tileTemplate, 'BaseTile').render!.meshInstances[0].aabb.halfExtents;
 
-    for (let y = 0; y < board.tiles[1]; y++) {
-      for (let x = 0; x < board.tiles[0]; x++) {
+    for (let y = 0; y < board.tableSize; y++) {
+      for (let x = 0; x < board.tableSize; x++) {
         const tile = tileTemplate.clone() as Entity
         tile.name = `${x},${y}`
-        console.log('size x: ', sizeX)
-        const xOffset = (y % 2 === 1) ? (sizeX - 0.2) : 0.15
-        // const xOffset = -0.5;
+        // const xOffset = (y % 2 === 1) ? (sizeX - 0.2) : 0.15
+        const xOffset = 0
         tile.setPosition(
           (x * sizeX * 2) - xOffset,
           0,
-          y * (sizeY * 1.5),
+          y * (sizeY * 2),
         )
         this.board.addChild(tile)
-        const tileLogic = this.getScript<TileLogic>(tile, 'tileLogic')
-        tileLogic?.initialSetup({
+        const tileLogic = this.getScript<TileLogic>(tile, 'tileLogic')!
+
+        this.tiles[x] ||= []
+        this.tiles[x][y] = tileLogic
+        tileLogic.initialSetup({
           tile: [x,y],
           seed: board.seed,
         })
       }
     }
-    this.board.setLocalPosition((-1 * (sizeX - 0.15) * (board.tiles[0] - 1)) + (sizeX/2 * board.tiles[1] / 4),0, -0.75 * sizeY * (board.tiles[1] - 1))
+    // this.board.setLocalPosition((-1 * (sizeX - 0.15) * (board.tiles[0] - 1)) + (sizeX/2 * board.tiles[1] / 4),0, -0.75 * sizeY * (board.tiles[1] - 1))
+    this.board.setLocalPosition((-1 * (sizeX) * (board.tableSize)),0, -1 * sizeY * (board.tableSize))
   }
 }
 
