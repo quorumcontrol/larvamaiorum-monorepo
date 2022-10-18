@@ -7,8 +7,8 @@ import debug from 'debug'
 const log = debug('Grid')
 
 interface QuestOutput {
-  firstBlood?: Warrior
-  firstGump?: Warrior
+  firstBlood?: WarriorState
+  firstGump?: WarriorState
 }
 
 export interface TickOutput {
@@ -180,21 +180,25 @@ class Grid {
     }
   }
 
+  private warriorStateToWarrior(ws:WarriorState) {
+    return this.warriors.find((w) => w.id === ws.id)!
+  }
+
   private handleMiniQuests(outcome: CellOutComeDescriptor):QuestOutput {
     const quests:QuestOutput = {}
     if (!this.firstGump) {
       const harvestingPlayers = Object.keys(outcome.harvested)
       if (harvestingPlayers.length > 0) {
         this.firstGump = this.warriorFromId(harvestingPlayers[0])
-        quests.firstGump = this.firstGump
+        quests.firstGump = this.firstGump.toWarriorState()
       }
     }
     if (!this.firstBlood) {
       const ticks = outcome.battleTicks
       const firstOver = ticks.find((t) => t.isOver)
       if (firstOver) {
-        this.firstBlood = firstOver.winner!
-        quests.firstBlood = this.firstBlood
+        this.firstBlood = this.warriorStateToWarrior(firstOver.winner!)
+        quests.firstBlood = this.firstBlood.toWarriorState()
       }
     }
     outcome.battleTicks.forEach((tick) => {

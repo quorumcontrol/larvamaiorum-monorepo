@@ -1,6 +1,6 @@
 import Grid from "./Grid"
 import { deterministicRandom } from "./random"
-import Warrior from "./Warrior"
+import Warrior, { WarriorState } from "./Warrior"
 import Wootgump from './Wootgump'
 import debug from 'debug'
 import Battle, { BattleTickReport } from "./Battle"
@@ -14,8 +14,8 @@ type HarvestReport = {[index: string]: Wootgump[]}
 type RejuvanizeReport = {[index: string]: number}
 
 export interface CellOutComeDescriptor {
-  incoming: Warrior[]
-  outgoing: Warrior[]
+  incoming: WarriorState[]
+  outgoing: WarriorState[]
   spawned: Wootgump[]
   harvested: HarvestReport
   battleTicks: BattleTickReport[]
@@ -62,8 +62,8 @@ class Cell {
 
   handleOutcomes(tick:number, seed:string):CellOutComeDescriptor {
     const descriptor:CellOutComeDescriptor = {
-      incoming: this.incoming,
-      outgoing: this.outgoing,
+      incoming: this.incoming.map((w) => w.toWarriorState()),
+      outgoing: this.outgoing.map((w) => w.toWarriorState()),
       spawned: [],
       harvested: {},
       battleTicks: [],

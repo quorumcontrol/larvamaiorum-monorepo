@@ -4,7 +4,7 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import pulser from "../utils/pulser";
-import { TickEvent, TICK_EVT, CARD_CLICK_EVT, CARD_ERROR_EVT } from "./GameController";
+import { TickEvent, TICK_EVT, CARD_CLICK_EVT, CARD_ERROR_EVT, WARRIOR_SETUP_EVT } from "./GameController";
 
 
 @createScript("cardHandler")
@@ -13,6 +13,7 @@ class CardHandler extends ScriptTypeBase {
   thieve: Entity
   berserk: Entity
 
+  started = false
   pending?: Entity
   currentCard?:Entity
 
@@ -33,6 +34,9 @@ class CardHandler extends ScriptTypeBase {
     }
     console.log('click! ', cardName)
     this.app.fire(CARD_CLICK_EVT, cardName)
+    this.app.once(WARRIOR_SETUP_EVT, () => {
+      this.started = true
+    })
     const card = this.cardFromName(cardName)
     this.pending = card
     if (this.pendingTween) {
@@ -77,7 +81,7 @@ class CardHandler extends ScriptTypeBase {
   }
 
   private canSelect() {
-    return !this.pending && !this.currentCard
+    return this.started && !this.pending && !this.currentCard
   }
 
   private cardFromName(card:'thieve'|'berserk') {

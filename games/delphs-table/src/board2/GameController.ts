@@ -1,4 +1,5 @@
 import { Entity } from "playcanvas";
+import { MESSAGE_EVENT } from "../appWide/AppConnector";
 import { TickOutput } from "../boardLogic/Grid";
 import { WarriorState } from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
@@ -15,6 +16,7 @@ interface BoardSetup {
   seed:string
   tableSize: number
   gameLength: number
+  warriors?: WarriorState[]
 }
 
 export const TICK_EVT = 'tick'
@@ -22,6 +24,7 @@ export const PENDING_DESTINATION = 'pending_dest'
 export const CARD_CLICK_EVT = 'card_click'
 export const WARRIOR_SETUP_EVT = 'warrior-setup'
 export const CARD_ERROR_EVT = 'card-error'
+export const NO_MORE_MOVES_EVT = 'noMoreMoves'
 
 export interface TickEvent {
   tick: TickOutput
@@ -68,12 +71,13 @@ class GameController extends ScriptTypeBase {
     const debug = urlParams.get("debug")
 
     this.app.on(CARD_CLICK_EVT, this.handleCardClick, this)
+    this.app.on(SELECT_EVT, this.handleSelect, this)
+    this.app.on(MESSAGE_EVENT, this.handleExternalMessage, this)
 
     if (debug) {
       const testHarness = new TestHarness(this)
       this.harness = testHarness
       testHarness.go()
-      this.app.on(SELECT_EVT, this.handleSelect, this)
     }
     this.pingExternal('gm', {})
   }
@@ -88,6 +92,8 @@ class GameController extends ScriptTypeBase {
         return this.handleTick(msg.data)
       case 'cardError':
         return this.handleCardError(msg.data)
+      case NO_MORE_MOVES_EVT:
+        return this.app.fire(NO_MORE_MOVES_EVT)
       default:
         console.log('msg: ', msg)
     }
@@ -135,6 +141,9 @@ class GameController extends ScriptTypeBase {
     this.destinationMarker.enabled = !!this.currentPlayer
 
     this.setupTiles(setupMessage)
+    if (setupMessage.warriors) {
+      this.setupWarriors(setupMessage.warriors)
+    }
   }
 
   setupWarriors(warriors:WarriorState[]) {
