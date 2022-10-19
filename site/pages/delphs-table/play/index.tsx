@@ -1,36 +1,21 @@
 import {
-  Text,
   Box,
-  OrderedList,
-  ListItem,
-  HStack,
-  Spacer,
   Flex,
-  Button,
-  VStack,
-  Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import { useRelayer } from "../../../src/hooks/useUser";
 import promiseWaiter from "../../../src/utils/promiseWaiter";
 import SingletonQueue from "../../../src/utils/singletonQueue";
-import border from "../../../src/utils/dashedBorder";
 import useGameRunner from "../../../src/hooks/gameRunner";
-import GameOverScreen, {
-  GameWarrior,
-} from "../../../src/components/GameOverScreen";
+import GameOverScreen from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
-import PickCardModal from "../../../src/components/PickCardModal";
-import items, {
-  getIdentifier,
-  itemsByIdentifier,
-} from "../../../src/boardLogic/items";
 import { usePlayCardMutation } from "../../../src/hooks/useDelphsTable";
+import items from "../../../src/boardLogic/items";
 
 const txQueue = new SingletonQueue();
 
@@ -38,49 +23,6 @@ interface GameEvent {
   type: string;
   data: any
 }
-
-// const WarriorListItem: React.FC<{ warrior: GameWarrior }> = ({
-//   warrior: {
-//     name,
-//     wootgumpBalance,
-//     initialGump,
-//     attack,
-//     defense,
-//     currentHealth,
-//     initialHealth,
-//     item,
-//   },
-// }) => {
-//   const description = useMemo(() => {
-//     if (!item) {
-//       return undefined;
-//     }
-//     return itemsByIdentifier[getIdentifier(item)];
-//   }, [item]);
-
-//   const diff = wootgumpBalance - initialGump
-
-//   return (
-//     <ListItem
-//       pl="3"
-//       backgroundColor={description ? "rgba(254, 67, 67, 0.09)" : undefined}
-//     >
-//       <HStack>
-//         <Text fontWeight="800">{name}</Text>
-//         <Spacer />
-//         <Text>{wootgumpBalance} $GUMP ({diff > 0 ? '+' : ''}{diff})</Text>
-//       </HStack>
-//       <HStack spacing="4">
-//         <Text>ATK:{attack}</Text>
-//         <Text>
-//           HP:{Math.floor(currentHealth)}/{initialHealth}
-//         </Text>
-//         <Text>DEF:{defense}</Text>
-//       </HStack>
-//       {description && <Text>{description.name} card in play</Text>}
-//     </ListItem>
-//   );
-// };
 
 const Play: NextPage = () => {
   const router = useRouter();
@@ -94,7 +36,6 @@ const Play: NextPage = () => {
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
   const [fullScreen, setFullScreen] = useState(false);
-  // const [warriors, setWarriors] = useState<GameWarrior[]>([]);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
   const { data: gameRunner, over } = useGameRunner(
@@ -103,8 +44,6 @@ const Play: NextPage = () => {
     iframe.current || undefined,
     ready
   );
-
-  // const [cardModalOpen, setCardModalOpen] = useState(false);
 
   useEffect(() => {
     setTableId(untypedTableId as string | undefined);
@@ -147,14 +86,6 @@ const Play: NextPage = () => {
     };
   }, [gameRunner]);
 
-  // const handleGameTickMessage = useCallback(
-  //   (evt: AppEvent) => {
-  //     console.log("game tick: ", evt);
-  //     setWarriors(evt.data);
-  //   },
-  //   [setWarriors]
-  // );
-
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => !old);
   }, [setFullScreen]);
@@ -182,11 +113,6 @@ const Play: NextPage = () => {
       txQueue.push(async () => {
         await promiseWaiter(500); // try to fix a broken nonce issue
         const delphsTable = relayer.wrapped.delphsTable();
-        // sendToIframe({
-        //   type: "destinationStarting",
-        //   x: appEvent.data[0],
-        //   y: appEvent.data[1],
-        // });
         const tx = await delphsTable.setDestination(
           tableId,
           appEvent.data.destination[0],
@@ -196,24 +122,12 @@ const Play: NextPage = () => {
         console.log("--------------- destination tx: ", tx);
         return await tx
           .wait()
-          // .then((receipt) => {
-          //   console.log("------------ destination receipt: ", receipt);
-          //   sendToIframe({
-          //     type: "destinationComplete",
-          //     x: appEvent.data[0],
-          //     y: appEvent.data[1],
-          //     success: true,
-          //   });
-          // })
-          // .catch((err) => {
-          //   console.error("----------- error with destinationSetter", err);
-          //   sendToIframe({
-          //     type: "destinationComplete",
-          //     x: appEvent.data[0],
-          //     y: appEvent.data[1],
-          //     success: false,
-          //   });
-          // });
+          .then((receipt) => {
+            console.log("------------ destination receipt: ", receipt);
+          })
+          .catch((err) => {
+            console.error("----------- error with destinationSetter", err);
+          });
       });
     },
     [tableId, relayer]
@@ -232,16 +146,12 @@ const Play: NextPage = () => {
             return handleFullScreenMessage();
           case "card_click":
             return handlePlayCardMessage(appEvent);
-          // case "gameTick":
-          //   return handleGameTickMessage(appEvent);
           case "loaded":
             console.log("we got a loaded!");
             if (!tableId) {
               registerInterestMutation.mutate({ addr: address! });
             }
             return setReady(true);
-          // case "gm":
-          //   return setReady(true);
           default:
             console.log("unhandled message from iframe: ", appEvent);
         }
@@ -265,12 +175,6 @@ const Play: NextPage = () => {
 
   return (
     <>
-      {/* <PickCardModal
-        isOpen={cardModalOpen}
-        onClose={() => setCardModalOpen(false)}
-        runner={gameRunner}
-        player={address}
-      /> */}
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="100%">

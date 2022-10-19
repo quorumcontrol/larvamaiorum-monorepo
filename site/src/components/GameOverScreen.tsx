@@ -103,7 +103,7 @@ const GameOverScreen: React.FC<{
       <Heading>
         You harvested{" "}
         <Box as="span" color="brand.orange">
-          {rewards.wootgump[player!]} Wootgump
+          {rewards.wootgump[player!]} Delph&apos;s Gump.
         </Box>
       </Heading>
       {accolades.length > 0 && (
