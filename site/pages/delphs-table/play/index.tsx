@@ -279,7 +279,7 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/9c3dd3ea`}
+                src={`https://playcanv.as/e/b/21701962`}
                 ref={iframe}
                 top="0"
                 left="0"
