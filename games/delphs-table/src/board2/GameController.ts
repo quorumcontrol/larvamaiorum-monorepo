@@ -50,8 +50,14 @@ class GameController extends ScriptTypeBase {
 
   canSelect = true
 
+  isBoardSetup = false
+  areWarriorsSetup = false
+
+  handledTicks: Record<number, boolean>
+
   initialize() {
     console.log(' game controller ')
+    this.handledTicks = {}
     this.tiles = []
     this.players = {}
     this.templates = mustFindByName(this.app.root, 'Templates')
@@ -65,21 +71,20 @@ class GameController extends ScriptTypeBase {
     player.destroy()
 
     this.board = mustFindByName(this.app.root, 'Board')
-    console.log('-------------- starting test')
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const debug = urlParams.get("debug")
 
     this.app.on(CARD_CLICK_EVT, this.handleCardClick, this)
     this.app.on(SELECT_EVT, this.handleSelect, this)
     this.app.on(MESSAGE_EVENT, this.handleExternalMessage, this)
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const debug = urlParams.get("debug")
+    
     if (debug) {
+      console.log('-------------- starting test')
       const testHarness = new TestHarness(this)
       this.harness = testHarness
       testHarness.go()
     }
-    // this.pingExternal('gm', {})
   }
 
   handleExternalMessage(msg:{type:string, data:any}) {
@@ -136,6 +141,11 @@ class GameController extends ScriptTypeBase {
   }
 
   setupBoard(setupMessage:BoardSetup) {
+    if (this.isBoardSetup) {
+      console.error('already setup')
+      return
+    }
+    this.isBoardSetup = true
     this.gameLength = setupMessage.gameLength
     this.currentPlayer = setupMessage.currentPlayer
     
@@ -148,6 +158,12 @@ class GameController extends ScriptTypeBase {
   }
 
   setupWarriors(warriors:WarriorState[]) {
+    if (this.areWarriorsSetup) {
+      console.error("already setup warriors.")
+      return
+    }
+    this.areWarriorsSetup = true
+
     warriors.forEach((w, i) => {
       const player = this.playerTemplate.clone() as Entity
       player.name = `warrior-${w.id}`
@@ -167,6 +183,12 @@ class GameController extends ScriptTypeBase {
       currentPlayer: this.currentPlayer,
       controller: this
     } as TickEvent)
+
+    if (this.handledTicks[tick.tick]) {
+      console.error('already handled tick ', tick)
+      return
+    }
+    this.handledTicks[tick.tick] = true
 
     tick.ranked.forEach((warriorState) => {
       this.players[warriorState.id].handleStateUpdate(warriorState)
