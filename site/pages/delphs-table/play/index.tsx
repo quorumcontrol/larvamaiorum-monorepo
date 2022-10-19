@@ -26,10 +26,11 @@ import GameOverScreen, {
 } from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
 import PickCardModal from "../../../src/components/PickCardModal";
-import {
+import items, {
   getIdentifier,
   itemsByIdentifier,
 } from "../../../src/boardLogic/items";
+import { usePlayCardMutation } from "../../../src/hooks/useDelphsTable";
 
 const txQueue = new SingletonQueue();
 
@@ -86,6 +87,7 @@ const Play: NextPage = () => {
   const { tableId: untypedTableId } = router.query;
 
   const [tableId, setTableId] = useState(untypedTableId as string | undefined);
+  const mutation = usePlayCardMutation(tableId);
 
   const { address } = useAccount();
   const { data: relayer } = useRelayer();
@@ -157,9 +159,15 @@ const Play: NextPage = () => {
     setFullScreen((old) => !old);
   }, [setFullScreen]);
 
-  // const handlePlayCardMessage = useCallback(() => {
-  //   setCardModalOpen(true);
-  // }, [setCardModalOpen]);
+  const handlePlayCardMessage = useCallback(async (evt:GameEvent) => {
+    console.log('handle play card: ', evt)
+    const name:'theieve'|'berserk' = evt.data.name
+    const item = items.find((i) => i.name.toLowerCase() === name.toLowerCase())
+    if (!item) {
+      throw new Error('item not found in the UI layer')
+    }
+    mutation.mutateAsync({address: item.address, id: item.id})
+  }, [mutation]);
 
   const handleMessage = useCallback(
     async (appEvent: GameEvent) => {
@@ -220,25 +228,20 @@ const Play: NextPage = () => {
             console.log("set destination received", appEvent);
             await handleMessage(appEvent);
             break;
-          // case "fullScreenClick":
-          //   return handleFullScreenMessage();
-          // case "playCardClick":
-          //   return handlePlayCardMessage();
+          case "fullScreenClick":
+            return handleFullScreenMessage();
+          case "card_click":
+            return handlePlayCardMessage(appEvent);
           // case "gameTick":
           //   return handleGameTickMessage(appEvent);
-          // case "loaded":
-          //   console.log("we got a loaded!");
-          //   if (tableId) {
-          //     sendToIframe({
-          //       type: "tableReady",
-          //       tableId: tableId,
-          //     });
-          //   } else {
-              
-          //   }
-          case "gm":
-            registerInterestMutation.mutate({ addr: address! });
+          case "loaded":
+            console.log("we got a loaded!");
+            if (!tableId) {
+              registerInterestMutation.mutate({ addr: address! });
+            }
             return setReady(true);
+          // case "gm":
+          //   return setReady(true);
           default:
             console.log("unhandled message from iframe: ", appEvent);
         }
@@ -253,6 +256,7 @@ const Play: NextPage = () => {
   }, [
     handleMessage,
     handleFullScreenMessage,
+    handlePlayCardMessage,
     sendToIframe,
     address,
     registerInterestMutation,
@@ -275,7 +279,7 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/3a613c6d/`}
+                src={`https://playcanv.as/e/b/9c3dd3ea`}
                 ref={iframe}
                 top="0"
                 left="0"

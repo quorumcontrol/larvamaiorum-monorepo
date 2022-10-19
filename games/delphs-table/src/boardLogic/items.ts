@@ -73,11 +73,9 @@ export const defaultInitialInventory:Inventory = {
   [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
 }
 
-items.reduce((memo, item) => {
-  return {
-    [item.identifier]: { quantity: 1, item: { address: item.address, id: item.id } },
-    ...memo
-  }
-}, {} as Inventory)
+export function itemFromInventoryItem(inventoryItem:InventoryItem) {
+  const identifier = getIdentifier(inventoryItem)
+  return itemsByIdentifier[identifier]
+}
 
 export default items

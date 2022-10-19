@@ -95,7 +95,7 @@ const GameOverScreen: React.FC<{
   const intent = encodeURIComponent(
     `I just harvested ${
       rewards.wootgump[player!]
-    } wootgump playing Delph's Table for a chance to win 115k $SKL in prizes! https://cryptocolosseum.com/`
+    } wootgump playing Delph's Table! $SKL in prizes here I come. https://cryptocolosseum.com/`
   );
 
   return (
@@ -131,7 +131,7 @@ const GameOverScreen: React.FC<{
       </NextLink>
       <Heading size="lg">Share your progress with your friends.</Heading>
 
-      <SocialIcon url={`https://twitter.com/intent/tweet?text=${intent}`} />
+      <SocialIcon url={`https://twitter.com/intent/tweet?text=${intent}`} target="_blank" />
     </VStack>
   );
 };

@@ -52,7 +52,7 @@ export const setupMessage: SetupMessage = {
           }
         }
       },
-      "autoPlay": false
+      "autoPlay": true
     },
     {
       "id": "0x6dBf5f4AF008001f9289cA3C318A23F0d021b1c9",
@@ -328,7 +328,7 @@ export class TestHarness {
 
   tick() {
     console.log("test harness tick")
-    const output = grid.handleTick('rnd')
+    const output = grid.handleTick(`${Date.now()}-random-for-tick`)
     this.controller.handleTick(output)
   }
 

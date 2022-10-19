@@ -79,7 +79,7 @@ class GameController extends ScriptTypeBase {
       this.harness = testHarness
       testHarness.go()
     }
-    this.pingExternal('gm', {})
+    // this.pingExternal('gm', {})
   }
 
   handleExternalMessage(msg:{type:string, data:any}) {
@@ -93,6 +93,7 @@ class GameController extends ScriptTypeBase {
       case 'cardError':
         return this.handleCardError(msg.data)
       case NO_MORE_MOVES_EVT:
+        this.canSelect = false
         return this.app.fire(NO_MORE_MOVES_EVT)
       default:
         console.log('msg: ', msg)
@@ -159,12 +160,17 @@ class GameController extends ScriptTypeBase {
   }
 
   handleTick(tick:TickOutput) {
+    this.canSelect = true
     this.app.fire(TICK_EVT, {
       tick,
       gameLength: this.gameLength,
       currentPlayer: this.currentPlayer,
       controller: this
     } as TickEvent)
+
+    tick.ranked.forEach((warriorState) => {
+      this.players[warriorState.id].handleStateUpdate(warriorState)
+    })
 
     tick.outcomes.forEach((row, x) => {
       row.forEach((outcome, y) => {

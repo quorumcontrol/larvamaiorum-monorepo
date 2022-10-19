@@ -1,5 +1,6 @@
 import { Entity, SineInOut, Tween, Vec3 } from "playcanvas";
 import { BattleTickReport } from "../boardLogic/Battle";
+import { itemFromInventoryItem } from "../boardLogic/items";
 import { deterministicBounded } from "../boardLogic/random";
 import { WarriorState } from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
@@ -16,6 +17,7 @@ class PlayerLogic extends ScriptTypeBase {
   name: string
 
   nameEntity: Entity
+  cardEntity: Entity
   animationHolder: Entity
   playerModel: Entity
   playerArrow: Entity
@@ -30,6 +32,7 @@ class PlayerLogic extends ScriptTypeBase {
     this.camera = mustFindByName(this.app.root, "Camera")
     this.playerModel = mustFindByName(this.entity, "Viking")
     this.playerArrow = mustFindByName(this.entity, 'PlayerArrow')
+    this.cardEntity = mustFindByName(this.nameEntity, "Card")
   }
 
   update() {
@@ -62,8 +65,18 @@ class PlayerLogic extends ScriptTypeBase {
     }
   }
 
-  handleBattle(battleTick: BattleTickReport, tile: TileLogic, warriorElements: Record<string, PlayerLogic>) {
+  handleStateUpdate(warriorState:WarriorState) {
+    const cardScript: any = this.getScript(this.cardEntity, 'textMesh')
 
+    if (warriorState.currentItem) {
+      const itemDescription = itemFromInventoryItem(warriorState.currentItem)
+      cardScript.text = `(${itemDescription.name})`
+    } else {
+      cardScript.text = ""
+    }
+  }
+
+  handleBattle(battleTick: BattleTickReport, tile: TileLogic, warriorElements: Record<string, PlayerLogic>) {
     if (battleTick.isOver) {
       this.setBattlingAnimation(false)
       if (this.currentTween) {

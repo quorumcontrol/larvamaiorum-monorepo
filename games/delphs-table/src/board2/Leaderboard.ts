@@ -1,4 +1,5 @@
 import { Entity } from "playcanvas";
+import { itemFromInventoryItem } from "../boardLogic/items";
 import { WarriorState } from "../boardLogic/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 
@@ -17,23 +18,24 @@ class Leaderboard extends ScriptTypeBase {
 
   initialize() {
     this.app.on(TICK_EVT, this.handleTick, this)
-    this.app.once(WARRIOR_SETUP_EVT, this.handleWarriorSetup, this)
+    this.app.once(WARRIOR_SETUP_EVT, this.updateLeaderboard, this)
     this.warriors = mustFindByName(this.entity, 'Warriors')
   }
 
-  handleWarriorSetup(warriors:WarriorState[]) {
+  updateLeaderboard(warriors:WarriorState[]) {
     const txt = warriors.map((w) => {
       const diff = w.initialGump - w.wootgumpBalance
-      return `
-${w.name}: $dGUMP ${w.wootgumpBalance} (${diff > 0 ? '+' : ''}${diff})
+      const item = w.currentItem ? itemFromInventoryItem(w.currentItem) : undefined
+      const cardText = item ? `${item.name} in play.` : ""
+      return `${w.name}: $dGUMP ${w.wootgumpBalance} (${diff > 0 ? '+' : ''}${diff})
 ATK: ${w.attack} HP: ${Math.floor(w.currentHealth)}/${w.initialHealth} DEF: ${w.defense}
-      `.trim()
+${cardText}`
     }).reverse().join("\n\n")
     this.warriors.element!.text = txt
   }
 
   handleTick(evt: TickEvent) {
-    this.handleWarriorSetup(evt.tick.ranked)
+    this.updateLeaderboard(evt.tick.ranked)
   }
 
 }

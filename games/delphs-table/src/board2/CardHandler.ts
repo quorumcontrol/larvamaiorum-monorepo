@@ -22,6 +22,9 @@ class CardHandler extends ScriptTypeBase {
   initialize() {
     this.app.on(TICK_EVT, this.handleTick, this)
     this.app.on(CARD_ERROR_EVT, this.handleCardError, this)
+    this.app.once(WARRIOR_SETUP_EVT, () => {
+      this.started = true
+    })
     this.thieve = mustFindByName(this.entity, "Thieve")
     this.berserk = mustFindByName(this.entity, "Berserk")
     this.thieve.element?.on('click', () => this.handleClick('thieve'))
@@ -34,9 +37,6 @@ class CardHandler extends ScriptTypeBase {
     }
     console.log('click! ', cardName)
     this.app.fire(CARD_CLICK_EVT, cardName)
-    this.app.once(WARRIOR_SETUP_EVT, () => {
-      this.started = true
-    })
     const card = this.cardFromName(cardName)
     this.pending = card
     if (this.pendingTween) {
@@ -59,12 +59,12 @@ class CardHandler extends ScriptTypeBase {
 
     if (warrior.currentItem) {
       const card = this.cardFromId(warrior.currentItem.id)
+      console.log("currentPlayer has card", warrior.currentItem.id)
       this.currentCard = card
     } else {
       this.currentCard = undefined
     }
 
-    // TODO: allow arbitrary inventory
     Object.values(warrior.inventory).forEach((i) => {
       if (i.quantity === 0) {
         this.cardFromId(i.item.id).enabled = false
@@ -84,6 +84,7 @@ class CardHandler extends ScriptTypeBase {
     return this.started && !this.pending && !this.currentCard
   }
 
+      // TODO: allow arbitrary inventory
   private cardFromName(card:'thieve'|'berserk') {
     switch(card) {
       case 'thieve':

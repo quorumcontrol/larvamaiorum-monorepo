@@ -95,7 +95,6 @@ class TileLogic extends ScriptTypeBase {
 
     this.wootgumpLight.enabled = true
     const intensity = (Math.log(numWootgump + 1))
-    console.log('setting intensity to ', intensity)
     this.wootgumpLight.light!.intensity = intensity
   }
 
@@ -106,7 +105,6 @@ class TileLogic extends ScriptTypeBase {
     gumpEntity.enabled = true
     this.entity.addChild(gumpEntity)
     const random = this.randomPosition()
-    console.log("setting gump position: ", this.entity.name, random)
     gumpEntity.setPosition(random.x, 0, random.z);
     const local = gumpEntity.getLocalPosition()
     gumpEntity.setLocalPosition(local.x, 0, local.z)

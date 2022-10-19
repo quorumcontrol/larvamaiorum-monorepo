@@ -22,6 +22,7 @@ import "./board2/reverseOrbitCamera"
 import "./board2/DestinationMarker"
 import "./board2/CellSelector"
 import "./board2/CardHandler"
+import "./board2/Hud"
 
 console.log(
   `--------------------------------------------------------------------------------
