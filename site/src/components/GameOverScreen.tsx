@@ -95,7 +95,7 @@ const GameOverScreen: React.FC<{
   const intent = encodeURIComponent(
     `I just harvested ${
       rewards.wootgump[player!]
-    } wootgump playing Delph's Table! $SKL in prizes here I come. https://cryptocolosseum.com/`
+    } wootgump playing Delph's Table! $SKL prizes here I come. https://cryptocolosseum.com/`
   );
 
   return (
