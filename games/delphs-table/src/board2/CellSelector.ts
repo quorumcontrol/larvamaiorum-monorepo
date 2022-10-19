@@ -43,12 +43,13 @@ class CellSelector extends ScriptTypeBase {
   touchStart(e: pc.TouchEvent) {
     // Only perform the raycast if there is one finger on the screen
     if (e.touches.length === 1) {
+      console.log('touch start')
       this.startEvent = { x: e.touches[0].x, y: e.touches[0].y, time: Date.now() }
     }
-    e.event.preventDefault();
   }
 
   touchEnd(e: pc.TouchEvent) {
+    console.log('touch end')
     this.calculateShouldRay(e.touches[0].x, e.touches[1].y)
   }
 

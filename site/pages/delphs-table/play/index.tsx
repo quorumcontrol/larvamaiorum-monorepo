@@ -1,7 +1,4 @@
-import {
-  Box,
-  Flex,
-} from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -21,7 +18,7 @@ const txQueue = new SingletonQueue();
 
 interface GameEvent {
   type: string;
-  data: any
+  data: any;
 }
 
 const Play: NextPage = () => {
@@ -87,18 +84,31 @@ const Play: NextPage = () => {
   }, [gameRunner]);
 
   const handleFullScreenMessage = useCallback(() => {
-    setFullScreen((old) => !old);
+    setFullScreen((old) => {
+      const newState = !old;
+      if (newState) {
+        iframe.current?.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+      return !old;
+    });
   }, [setFullScreen]);
 
-  const handlePlayCardMessage = useCallback(async (evt:GameEvent) => {
-    console.log('handle play card: ', evt)
-    const name:'theieve'|'berserk' = evt.data.name
-    const item = items.find((i) => i.name.toLowerCase() === name.toLowerCase())
-    if (!item) {
-      throw new Error('item not found in the UI layer')
-    }
-    mutation.mutateAsync({address: item.address, id: item.id})
-  }, [mutation]);
+  const handlePlayCardMessage = useCallback(
+    async (evt: GameEvent) => {
+      console.log("handle play card: ", evt);
+      const name: "theieve" | "berserk" = evt.data.name;
+      const item = items.find(
+        (i) => i.name.toLowerCase() === name.toLowerCase()
+      );
+      if (!item) {
+        throw new Error("item not found in the UI layer");
+      }
+      mutation.mutateAsync({ address: item.address, id: item.id });
+    },
+    [mutation]
+  );
 
   const handleMessage = useCallback(
     async (appEvent: GameEvent) => {
@@ -183,13 +193,16 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/14026e49`}
+                src={`https://playcanv.as/e/b/33949233`}
                 ref={iframe}
                 top="0"
                 left="0"
-                w={fullScreen ? "100vw" : "100%"}
-                minH={fullScreen ? "100vh" : "70vh"}
-                position={fullScreen ? "fixed" : undefined}
+                w="100%"
+                minH= "70vh"
+
+                // w={fullScreen ? "100vw" : "100%"}
+                // minH={fullScreen ? "100vh" : "70vh"}
+                // position={fullScreen ? "fixed" : undefined}
               />
             )}
             {isClient && over && (
