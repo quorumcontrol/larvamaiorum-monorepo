@@ -61,6 +61,7 @@ class CardHandler extends ScriptTypeBase {
       const card = this.cardFromId(warrior.currentItem.id)
       console.log("currentPlayer has card", warrior.currentItem.id)
       this.currentCard = card
+      this.pending = undefined
     } else {
       this.currentCard = undefined
     }
