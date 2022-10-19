@@ -86,12 +86,17 @@ const Play: NextPage = () => {
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => {
       const newState = !old;
-      if (newState) {
-        iframe.current?.requestFullscreen();
-      } else {
-        document.exitFullscreen();
+      try {
+        if (newState) {
+          iframe.current?.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      } catch (err) {
+        console.error('full screen error: ', err)
       }
-      return !old;
+
+      return newState;
     });
   }, [setFullScreen]);
 
