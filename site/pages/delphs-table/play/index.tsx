@@ -86,6 +86,7 @@ const Play: NextPage = () => {
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => {
       const newState = !old;
+      console.log('moving full screen to: ', newState)
       try {
         if (newState) {
           iframe.current?.requestFullscreen();
