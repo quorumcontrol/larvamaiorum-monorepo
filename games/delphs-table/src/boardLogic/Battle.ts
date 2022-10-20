@@ -104,14 +104,14 @@ class Battle extends EventEmitter {
     if (!this.isOver()) {
       return undefined
     }
-    return this.warriors.find((w) => w.isAlive())
+    return this.warriors[0].currentHealth >= this.warriors[1].currentHealth ? this.warriors[0] : this.warriors[1]
   }
 
   loser() {
     if (!this.isOver()) {
       return undefined
     }
-    return this.warriors.find((w) => !w.isAlive())
+    return this.warriors[0].currentHealth < this.warriors[1].currentHealth ? this.warriors[0] : this.warriors[1]
   }
 
   isOver() {
