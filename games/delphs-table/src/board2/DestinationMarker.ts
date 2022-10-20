@@ -33,8 +33,6 @@ class DestinationMarker extends ScriptTypeBase {
         return
       }
 
-      console.log("currentplayer destinationMarker: ", warrior)
-
       if (warrior.destination) {
         const [x,y] = warrior.destination
         this.moveTo(controller.tiles[x][y], false)

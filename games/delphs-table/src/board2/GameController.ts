@@ -166,7 +166,7 @@ class GameController extends ScriptTypeBase {
 
     warriors.forEach((w, i) => {
       const player = this.playerTemplate.clone() as Entity
-      player.name = `warrior-${w.id}`
+      player.name = `warrior-${w.id}-${w.name.replaceAll(/\s\//g, '_')}`
       this.board.addChild(player)
       const script = this.getScript<PlayerLogic>(player, 'playerLogic')!
       this.players[w.id] = script
@@ -190,10 +190,6 @@ class GameController extends ScriptTypeBase {
     }
     this.handledTicks[tick.tick] = true
 
-    tick.ranked.forEach((warriorState) => {
-      this.players[warriorState.id].handleStateUpdate(warriorState)
-    })
-
     tick.outcomes.forEach((row, x) => {
       row.forEach((outcome, y) => {
         const tile = this.tiles[x][y]
@@ -214,6 +210,9 @@ class GameController extends ScriptTypeBase {
           })
         })
       })
+    })
+    tick.ranked.forEach((warriorState) => {
+      this.players[warriorState.id].handleStateUpdate(warriorState)
     })
   }
 

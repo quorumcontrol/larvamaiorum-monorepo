@@ -33,12 +33,14 @@ class CardHandler extends ScriptTypeBase {
 
   handleClick(cardName:'thieve'|'berserk') {
     if (!this.canSelect()) {
+      console.log("cannot select: ", this.started, 'p:', this.pending, 'current:', this.currentCard)
       return
     }
     console.log('click! ', cardName)
-    this.app.fire(CARD_CLICK_EVT, cardName)
     const card = this.cardFromName(cardName)
+    console.log("setting pending to: ", card)
     this.pending = card
+    this.app.fire(CARD_CLICK_EVT, cardName)
     if (this.pendingTween) {
       this.pendingTween.stop()
     }
@@ -50,11 +52,16 @@ class CardHandler extends ScriptTypeBase {
   handleTick(evt: TickEvent) {
     const { tick, currentPlayer } = evt
     if (!currentPlayer) {
+      console.log("no current player")
       return
     }
     const warrior = tick.ranked.find((w) => w.id === currentPlayer)
     if (!warrior) {
       throw new Error('missing warrior')
+    }
+
+    if (evt.tick.itemPlays[currentPlayer]) {
+      this.pending = undefined
     }
 
     if (warrior.currentItem) {

@@ -15,6 +15,7 @@ import TileLogic, { cellNameFromCoordinates } from "./TileLogic";
 class PlayerLogic extends ScriptTypeBase {
 
   name: string
+  isDead = false
 
   nameEntity: Entity
   cardEntity: Entity
@@ -38,8 +39,8 @@ class PlayerLogic extends ScriptTypeBase {
   update() {
     this.nameEntity.lookAt(this.camera.getPosition())
     this.nameEntity.rotateLocal(0, 180, 0)
-    // if (this.app.keyboard.wasPressed(pc.KEY_1)) {
-    //   this.entity.translateLocal(0, 0, -1)
+    // if (this.app.keyboard.wasPressed(pc.KEY_B) && this.name === '0xe546b43E7fF912FEf7ED75D69c1d1319595F6080') {
+    //   this.setBattlingAnimation(true)
     // }
   }
 
@@ -47,11 +48,11 @@ class PlayerLogic extends ScriptTypeBase {
     if (!setup.location) {
       throw new Error("need a location to setup a warrior")
     }
+    console.log("creating entity for", setup)
     const nameScript: any = this.getScript(this.nameEntity, 'textMesh')
     nameScript.text = setup.name
     this.name = setup.id
     const position = this.localPositionFromCell(setup.location[0], setup.location[1])
-    console.log("setup warrior ", position)
     this.entity.setLocalScale(0.04, 0.04, 0.04)
     this.entity.setPosition(position.x, 0, position.z)
     const newMaterial = this.animationHolder.render!.meshInstances[0].material.clone();
@@ -74,9 +75,30 @@ class PlayerLogic extends ScriptTypeBase {
     } else {
       cardScript.text = ""
     }
+    if (warriorState.currentHealth <= 0 && !this.isDead) {
+      this.isDead = true
+      this.setBattlingAnimation(false)
+
+      this.playerModel.rotateLocal(0,90,90)
+      this.playerModel.setLocalPosition(0,2.5,0)
+    }
+
+    if (warriorState.currentHealth >= 0 && this.isDead) {
+      this.isDead = false
+      this.setIsDeadAnimation(false)
+      this.playerModel.setEulerAngles(0,0,0)
+      this.playerModel.setLocalPosition(0,-1,0)
+    }
   }
 
   handleBattle(battleTick: BattleTickReport, tile: TileLogic, warriorElements: Record<string, PlayerLogic>) {
+    const relativeTick = battleTick.tick - battleTick.startingTick
+
+    if (battleTick.isOver && relativeTick === 0) {
+      // do nothing
+      return
+    }
+
     if (battleTick.isOver) {
       this.setBattlingAnimation(false)
       if (this.currentTween) {
@@ -88,15 +110,11 @@ class PlayerLogic extends ScriptTypeBase {
         this.moveToPosition(tile.randomPosition(), 0.25)
         this.entity.setEulerAngles(0, 0, 0)
       }
-      if (battleTick.loser && this.entity.name === `warrior-${battleTick.loser.id}`) {
-        this.animationHolder.anim!.setBoolean('isDead', true)
-        this.playerModel.rotateLocal(0,90,90)
-        this.playerModel.setLocalPosition(0,2.5,0)
-      }
       return
     }
 
-    if (battleTick.tick - battleTick.startingTick === 0) {
+    // handle the very first battle tick
+    if (relativeTick === 0) {
       const randomBattleLocation = tile.battlePosition(battleTick)
       let offset = deterministicBounded(1, `${battleTick.id}-${this.name}-offset`, `${battleTick.id}-offset`)
       const place = new Vec3(randomBattleLocation.x + offset, 0, randomBattleLocation.z + offset)
@@ -105,11 +123,9 @@ class PlayerLogic extends ScriptTypeBase {
         const myPosition = this.entity.getPosition()
         const other = Object.values(warriorElements).find((we) => we !== this)!
         const otherPosition = other.entity.getPosition()
-        console.log(this.entity.name, 'looking at ', other.entity.name, 'at', otherPosition, ':: this is at:', this.entity.getPosition())
         this.entity.lookAt(otherPosition.x, otherPosition.y, otherPosition.z)
         this.entity.rotateLocal(0, 180, 0)
         const length = new Vec3().sub2(myPosition, otherPosition).length()
-        console.log("distance between ", this.entity.name, other.entity.name, ' is ', length)
         if (length < 0.5) {
           console.log(this.entity.name, "translating -0.5")
           this.entity.translateLocal(0, 0, -0.7)
@@ -120,9 +136,6 @@ class PlayerLogic extends ScriptTypeBase {
 
   moveTo(tile: TileLogic) {
     const random = tile.randomPosition()
-    this.animationHolder.anim!.setBoolean('isDead', false)
-    this.playerModel.setEulerAngles(0,0,0)
-    this.playerModel.setLocalPosition(0,-1,0)
     return this.moveToPosition(random, 1.5)
   }
 
@@ -147,11 +160,23 @@ class PlayerLogic extends ScriptTypeBase {
 
   private setBattlingAnimation(isBattling: boolean) {
     try {
+      console.log(`${this.name} setting battling animation`, isBattling)
       this.animationHolder.anim?.setBoolean('isBattling', isBattling)
     } catch (err) {
       // sometimes during replay this item is destroyed before there is a chance foor the isBattling
       // to be set by the battleUI. This just ignores that error
       console.log('error setBattling: ', err)
+    }
+  }
+
+  private setIsDeadAnimation(isDead: boolean) {
+    try {
+      console.log(`${this.name} setting isDead animation`, isDead)
+      this.animationHolder.anim?.setBoolean('isDead', isDead)
+    } catch (err) {
+      // sometimes during replay this item is destroyed before there is a chance foor the isBattling
+      // to be set by the battleUI. This just ignores that error
+      console.log('error setDead: ', err)
     }
   }
 

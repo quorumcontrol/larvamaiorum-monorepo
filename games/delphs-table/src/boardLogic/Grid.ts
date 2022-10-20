@@ -3,6 +3,7 @@ import Cell, { CellOutComeDescriptor } from './Cell'
 import { deterministicRandom, fakeRandomSeed } from './random'
 import Warrior, { WarriorState } from './Warrior'
 import debug from 'debug'
+import { InventoryItem } from './items'
 
 const log = debug('Grid')
 
@@ -11,12 +12,16 @@ interface QuestOutput {
   firstGump?: WarriorState
 }
 
+export type DestinationSettings = Record<string,{x:number, y:number}>
+export type ItemPlays = Record<string, InventoryItem>
+
 export interface TickOutput {
   tick: number
   seed: string
   outcomes: CellOutComeDescriptor[][]
   quests: QuestOutput
   ranked: WarriorState[]
+  itemPlays: ItemPlays
 }
 
 interface GridOptions {
@@ -92,10 +97,28 @@ class Grid {
     this.started = true
   }
 
-  handleTick(randomness: string): TickOutput {
+  handleTick(randomness: string, destinationSets:DestinationSettings, itemPlays:ItemPlays): TickOutput {
     if (this.isOver()) {
       throw new Error('ticking when already over')
     }
+
+    Object.keys(destinationSets).forEach((player) => {
+      const warrior = this.warriors.find((w) => w.id.toLowerCase() === player.toLowerCase())
+      if (!warrior) {
+        return
+      }
+      warrior.setDestination(destinationSets[player].x, destinationSets[player].y)
+    })
+
+    Object.keys(itemPlays).forEach((player) => {
+      const warrior = this.warriors.find((w) => w.id.toLowerCase() === player.toLowerCase())
+      if (!warrior) {
+        return
+      }
+      const itemPlay = itemPlays[player]
+      warrior.setItem({ address: itemPlay.address, id: itemPlay.id })
+    })
+
     this.currentSeed = randomness.toString()
     let outcomes: CellOutComeDescriptor[][] = []
     let quests:QuestOutput = {}
@@ -119,7 +142,7 @@ class Grid {
     })
 
     this.tick++;
-    return { tick: this.tick, seed: this.currentSeed, outcomes, quests, ranked: this.rankedWarriors().map((w) => w.toWarriorState() ) }
+    return { tick: this.tick, seed: this.currentSeed, outcomes, quests, itemPlays, ranked: this.rankedWarriors().map((w) => w.toWarriorState() ) }
   }
 
   isOver() {

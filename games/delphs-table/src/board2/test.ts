@@ -328,7 +328,7 @@ export class TestHarness {
 
   tick() {
     console.log("test harness tick")
-    const output = grid.handleTick(`${Date.now()}-random-for-tick`)
+    const output = grid.handleTick(`${Date.now()}-random-for-tick`, {}, {})
     this.controller.handleTick(output)
   }
 

@@ -24,13 +24,13 @@ class Leaderboard extends ScriptTypeBase {
 
   updateLeaderboard(warriors:WarriorState[]) {
     const txt = warriors.map((w) => {
-      const diff = w.initialGump - w.wootgumpBalance
+      const diff = w.wootgumpBalance - w.initialGump
       const item = w.currentItem ? itemFromInventoryItem(w.currentItem) : undefined
       const cardText = item ? `${item.name} in play.` : ""
       return `${w.name}: $dGUMP ${w.wootgumpBalance} (${diff > 0 ? '+' : ''}${diff})
 ATK: ${w.attack} HP: ${Math.floor(w.currentHealth)}/${w.initialHealth} DEF: ${w.defense}
 ${cardText}`
-    }).reverse().join("\n\n")
+    }).join("\n\n")
     this.warriors.element!.text = txt
   }
 
