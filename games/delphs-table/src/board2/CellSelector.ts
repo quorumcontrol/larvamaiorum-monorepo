@@ -50,7 +50,7 @@ class CellSelector extends ScriptTypeBase {
 
   touchEnd(e: pc.TouchEvent) {
     console.log('touch end')
-    this.calculateShouldRay(e.touches[0].x, e.touches[1].y)
+    this.calculateShouldRay(e.touches[0].x, e.touches[0].y)
   }
 
   private calculateShouldRay(x:number, y:number) {

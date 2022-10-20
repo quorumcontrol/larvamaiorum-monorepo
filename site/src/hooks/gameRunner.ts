@@ -75,7 +75,7 @@ export class GameRunner extends EventEmitter {
   }
 
   async setup() {
-    console.log('------------ game runner setup')
+    log('------------ game runner setup')
     mqttClient().on('message', this.handleMqttMessage)
     const delphs = delphsContract()
 
@@ -122,13 +122,14 @@ export class GameRunner extends EventEmitter {
     }
     if (this.grid?.isOver()) {
       this.clearMissingTimer()
-      console.log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
+      log('game over', this.tableInfo.startedAt.toNumber(), this.tableInfo.gameLength.toNumber(), this.latest.toNumber())
       this.over = true
       this.emit('END')
+      this.stop()
       return
     }
-    console.log('not over: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber(), this.latest.toNumber())
-    console.log('grid over? ', this.grid?.isOver(), this.grid?.tick)
+    log('not over: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber(), this.latest.toNumber())
+    log('grid over? ', this.grid?.isOver(), this.grid?.tick)
   }
 
   private async go(latest: BigNumber) {
@@ -264,15 +265,26 @@ export class GameRunner extends EventEmitter {
     switch (topic) {
       case ROLLS_CHANNEL: {
         const parsedMsg = JSON.parse(msg.toString());
-        this.singleton.push(() => this.handleOrchestratorRoll(parsedMsg))
+        this.handleOrchestratorRoll(parsedMsg)
       }
       case NO_MORE_MOVES_CHANNEL:
         const { tick } = JSON.parse(msg.toString());
-        this.ship('noMoreMoves', { tick });
+        this.handleNoMoreMoves(tick)
         break;
       default:
         log("mqtt unknown topic: ", topic);
     }
+  }
+
+  // this needs to be async so it can be easily put into the singleton
+  private async handleNoMoreMoves(tick:number) {
+    this.singleton.push(async () => {
+      if (!this.latest.add(1).eq(tick)) {
+        log("this is not a no more moves for the next tick, it is", tick, "when we are at ", this.latest.toNumber())
+        return
+      }
+      return this.ship('noMoreMoves', { tick });
+    })
   }
 
   private shipRoll(roll: IFrameRoll) {
@@ -289,9 +301,9 @@ export class GameRunner extends EventEmitter {
       return
     }
     this.rolls[rollIndex] = roll
-    console.log("rolls: ", this.rolls)
+    log("rolls: ", this.rolls)
     const tickReport = this.updateGrid(roll)
-    console.log("ship: ", tickReport)
+    log("ship: ", tickReport)
     this.latest = BigNumber.from(roll.index)
     this.ship('tick', tickReport)
     this.checkForEnd()
@@ -381,12 +393,11 @@ export class GameRunner extends EventEmitter {
 
   private async handleOrchestratorRoll({ tick, random }: { txHash?: string, tick: number, random: string, blockNumber?: number }) {
     log('mqtt tick incoming: ', tick)
-    if (BigNumber.from(tick).lte(this.latest)) {
-      console.error("do not know, but tick is less than latest")
-      return
-    }
-
-    this.singleton.push(() => {
+    this.singleton.push(async () => {
+      if (BigNumber.from(tick).lte(this.latest)) {
+        console.error("do not know, but tick is less than latest")
+        return
+      }
       return this.handleTick({ tick, random })
     })
   }

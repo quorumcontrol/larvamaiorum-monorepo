@@ -44,7 +44,6 @@ class TileLogic extends ScriptTypeBase {
     this.wootgumpLight = mustFindByName(this.entity, 'WootgumpLight')
     const templates = mustFindByName(this.app.root, "Templates")
     const alternativeMaterialHolder = mustFindByName(templates, "alternativeTileMaterial0")
-    console.log("alternativeMaterialHolder.render", alternativeMaterialHolder.render)
     this.alternativeMaterial = alternativeMaterialHolder.render!.meshInstances[0].material
     this.battleSound = mustFindByName(this.entity, "BattleSound").findComponent('sound') as SoundComponent
   }
