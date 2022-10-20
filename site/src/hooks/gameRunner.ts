@@ -9,7 +9,7 @@ import { memoize } from "../utils/memoize"
 import { EventEmitter } from "events"
 import { useEffect, useState } from "react"
 import { subscribeOnce } from "./useMqttMessages"
-import Grid from "../boardLogic/Grid"
+import Grid, { DestinationSettings, ItemPlays } from "../boardLogic/Grid"
 import Warrior, { WarriorState, WarriorStats } from "../boardLogic/Warrior"
 import { defaultInitialInventory, InventoryItem } from "../boardLogic/items"
 
@@ -128,7 +128,7 @@ export class GameRunner extends EventEmitter {
       this.stop()
       return
     }
-    log('not over: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber(), this.latest.toNumber())
+    log('not over: current', this.latest.toNumber(), ' end: ', this.tableInfo.startedAt.add(this.tableInfo.gameLength).toNumber())
     log('grid over? ', this.grid?.isOver(), this.grid?.tick)
   }
 
@@ -191,14 +191,6 @@ export class GameRunner extends EventEmitter {
     this.rolls[0] = firstRoll
     log('gameRunner first roll', firstRoll)
     
-    // const msg: BoardSetup = {
-    //   tableId: this.tableId,
-    //   firstRoll,
-    //   warriors,
-    //   gameLength: this.tableInfo.gameLength.toNumber(),
-    //   tableSize: this.tableInfo.tableSize,
-    //   wootgumpMultipler: this.tableInfo.wootgumpMultiplier,
-    // }
     const msg:BoardSetup = {
       currentPlayer: this.player,
       seed: firstRoll.random,
@@ -221,7 +213,7 @@ export class GameRunner extends EventEmitter {
     }
   }
 
-  private clearAndSetupMisingTimer() {
+  private clearAndSetupMissingTimer() {
     this.clearMissingTimer()
     if (!this.grid?.isOver()) {
       this.checkForMissingTimeout = setTimeout(() => {
@@ -231,18 +223,21 @@ export class GameRunner extends EventEmitter {
   }
 
   private async checkForMissing() {
-    log('checking for missing')
-    const delphs = delphsContract()
-    if (!this.tableInfo) {
-      console.error('checking for missing, but there is no table info')
-      return
-    }
-
-    const latestRoll = await delphs.latestRoll()
-    if (latestRoll.gt(this.latest)) {
-      log('there were missing rolls, catching up')
-      return this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latestRoll, this.tableInfo.startedAt.add(this.tableInfo.gameLength)).add(1))
-    }
+    this.singleton.push(async () => {
+      log('checking for missing')
+      const delphs = delphsContract()
+      if (!this.tableInfo) {
+        console.error('checking for missing, but there is no table info')
+        return
+      }
+  
+      const latestRoll = await delphs.latestRoll()
+      const lastRoll = this.tableInfo.startedAt.add(this.tableInfo.gameLength).add(1)
+      if (latestRoll.gt(this.latest) && !this.grid?.isOver() && this.latest.lt(lastRoll)) {
+        log('there were missing rolls, catching up')
+        return this.catchUp(this.tableInfo.startedAt.add(1), bigNumMin(latestRoll, lastRoll))
+      }
+    })
   }
 
   private async catchUp(start: BigNumber, end: BigNumber) {
@@ -266,6 +261,7 @@ export class GameRunner extends EventEmitter {
       case ROLLS_CHANNEL: {
         const parsedMsg = JSON.parse(msg.toString());
         this.handleOrchestratorRoll(parsedMsg)
+        this.clearAndSetupMissingTimer()
       }
       case NO_MORE_MOVES_CHANNEL:
         const { tick } = JSON.parse(msg.toString());
@@ -307,7 +303,6 @@ export class GameRunner extends EventEmitter {
     this.latest = BigNumber.from(roll.index)
     this.ship('tick', tickReport)
     this.checkForEnd()
-    
   }
 
   private updateGrid(roll: IFrameRoll) {
@@ -315,13 +310,21 @@ export class GameRunner extends EventEmitter {
       throw new Error('missing grid')
     }
     if (!this.grid.isOver()) {
-      roll.destinations.forEach((d) => {
-        this.grid!.warriors.find((w) => w.id.toLowerCase() === d.id.toLowerCase())?.setDestination(d.x, d.y)
-      })
-      roll.items.forEach((itemPlay) => {
-        this.grid!.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem(itemPlay.item)
-      })
-      return this.grid.handleTick(roll.random)
+      const destinations = roll.destinations.reduce((memo, destination) => {
+        return {
+          ...memo,
+          [destination.id]: {x: destination.x, y: destination.y}
+        }
+      }, {} as DestinationSettings)
+
+      const itemPlays = roll.items.reduce((memo, play) => {
+        return {
+          ...memo,
+          [play.player]: play.item
+        }
+      }, {} as ItemPlays)
+
+      return this.grid.handleTick(roll.random, destinations, itemPlays)
     }
   }
 
@@ -387,7 +390,6 @@ export class GameRunner extends EventEmitter {
       destinations: this.destinationsToIframe(destinations),
       items: this.itemPlaysToIframe(itemPlays),
     }
-    this.clearAndSetupMisingTimer()
     this.shipRoll(roll)
   }
 
