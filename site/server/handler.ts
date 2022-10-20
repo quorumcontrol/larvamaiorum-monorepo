@@ -411,7 +411,12 @@ class TablePlayer {
     await Promise.all(active.map(async (table) => {
       this.log('collecting results for', table.id)
       const runner = new BoardRunner(table.id)
-      await runner.run()
+      try {
+        await runner.run()
+      } catch (err) {
+        console.error("------> error running the runner for table: ", table.id, err)
+        return
+      }
       const rewards = runner.rewards()
 
       console.log("rewards: ", rewards)
