@@ -16,7 +16,9 @@ function generateImage(prompt:string) {
       prompt: prompt,
       engine: 'stable-diffusion-v1-5',
       diffusion: "k_dpm_2_ancestral",
+      steps: 50,
       apiKey: process.env.DREAM_STUDIO_API_KEY!,
+      cfgScale: 10,
     })
     
     api.on('image', (image) => {
@@ -29,8 +31,11 @@ function generateImage(prompt:string) {
   })
 }
 
+const colors = ['orange', 'green', 'purple', 'blue', 'yellow', 'red']
+
 function promptFromNameAndDescription({name, description}:{name:string, description:string}) {
-  return `the most beautiful photograph of a Roman ceremonial mask. The mask has bright, glowing neon eyes and is called "${name}." unreal engine 5, octane render, crisp, intricate details, dark and moody, lens bloom. ${description}`
+  const color = colors[Math.floor(Math.random() * colors.length)]
+  return `the most beautiful photograph of a Roman ceremonial mask with glowing ${color} neon eyes and is called "${name}." unreal engine 5, octane render, crisp, intricate details, dark and moody.`
 }
 
 task('generate')
@@ -38,27 +43,25 @@ task('generate')
     const path = "./metadata/descriptions/alien_tungsten.yml"
     const file = fs.readFileSync(path, 'utf8')
     const descriptions:{name:string, description:string}[] = YAML.parse(file).alientungsten_masks
+    const directory = "./metadata/alien_tungsten"
 
-    return Promise.all(descriptions.slice(0,10).map(async ({ name, description}, i) => {
-      const directory = `./metadata/alien_tungsten/${i}`
-      fs.mkdirSync(directory)
+    return Promise.all(descriptions.slice(0,50).map(async ({ name, description}, i) => {
+      // const directory = `./metadata/alien_tungsten/${i}`
+      // fs.mkdirSync(directory)
       const image = await generateImage(promptFromNameAndDescription({name, description}))
-      fs.writeFileSync(`${directory}/metadata.json`, Buffer.from(JSON.stringify({
-        name,
-        description,
-        image: 'todo',
-        attributes: [
-          {
-            "trait_type": "rarity", 
-            "value": "TODO"
-          }, 
-        ]
-      }, null, 2)))
+      // fs.writeFileSync(`${directory}/metadata.json`, Buffer.from(JSON.stringify({
+      //   name,
+      //   description,
+      //   image: 'todo',
+      //   attributes: [
+      //     {
+      //       "trait_type": "rarity", 
+      //       "value": "TODO"
+      //     }, 
+      //   ]
+      // }, null, 2)))
       console.log('finished', i, name)
-      fs.renameSync(image.filePath, `${directory}/image.png`)
+      fs.renameSync(image.filePath, `${directory}/${i}-${name}.png`)
       return image
     }))
-
-    console.log('done')
-
   })
