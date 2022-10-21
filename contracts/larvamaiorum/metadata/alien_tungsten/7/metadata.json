@@ -1,0 +1,11 @@
+{
+  "name": "Ninja Mask",
+  "description": "Although this mask is seldom seen in auction houses, it is most often seen in the hands of ninjas; the alien entities with the ability to walk through walls. When a ninja would bring ruin to a household, his reputation would precede him. A household would only be safe from the ninja once this mask was acquired and someone donned it.",
+  "image": "todo",
+  "attributes": [
+    {
+      "trait_type": "rarity",
+      "value": "TODO"
+    }
+  ]
+}
