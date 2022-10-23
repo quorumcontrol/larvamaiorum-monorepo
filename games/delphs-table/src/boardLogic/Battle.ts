@@ -1,5 +1,5 @@
 import { deterministicRandom } from "./random"
-import Warrior from "./Warrior"
+import Warrior, { WarriorState } from "./Warrior"
 import debug from 'debug'
 import EventEmitter from "events"
 
@@ -20,14 +20,22 @@ interface Roll {
   defenseRoll: number
 }
 
+interface RollReport {
+  attacker: WarriorState
+  defender: WarriorState
+  attackRoll: number
+  defenseRoll: number
+}
+
 export interface BattleTickReport {
   id: string
-  rolls: Roll[]
+  rolls: RollReport[]
   isOver: boolean
-  winner?: Warrior
-  loser?: Warrior
+  winner?: WarriorState
+  loser?: WarriorState
   tick: number
   startingTick: number
+  warriors: WarriorState[]
 }
 
 const WOOTGUMP_TAKE_PERCENTAGE = 0.5
@@ -74,12 +82,19 @@ class Battle extends EventEmitter {
     }
     const report:BattleTickReport = {
       id: this.battleId(),
-      rolls,
+      rolls: rolls.map((r) => {
+        return {
+          ...r,
+          attacker: r.attacker.toWarriorState(),
+          defender: r.defender.toWarriorState(),
+        }
+      }),
       isOver: this.isOver(),
-      winner: this.winner(),
-      loser: this.loser(),
+      winner: this.winner()?.toWarriorState(),
+      loser: this.loser()?.toWarriorState(),
       tick: this.tick,
       startingTick: this.startingTick,
+      warriors: this.warriors.map((w) => w.toWarriorState()),
     }
     this.emit(TICK_EVT, report)
     return report

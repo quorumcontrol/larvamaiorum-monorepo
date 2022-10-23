@@ -1,22 +1,27 @@
 
 import Cell, { CellOutComeDescriptor } from './Cell'
 import { deterministicRandom, fakeRandomSeed } from './random'
-import Warrior from './Warrior'
+import Warrior, { WarriorState } from './Warrior'
 import debug from 'debug'
-import { BytesLike } from 'ethers'
+import { InventoryItem } from './items'
 
 const log = debug('Grid')
 
 interface QuestOutput {
-  firstBlood?: Warrior
-  firstGump?: Warrior
+  firstBlood?: WarriorState
+  firstGump?: WarriorState
 }
+
+export type DestinationSettings = Record<string,{x:number, y:number}>
+export type ItemPlays = Record<string, InventoryItem>
 
 export interface TickOutput {
   tick: number
   seed: string
   outcomes: CellOutComeDescriptor[][]
   quests: QuestOutput
+  ranked: WarriorState[]
+  itemPlays: ItemPlays
 }
 
 interface GridOptions {
@@ -86,16 +91,34 @@ class Grid {
     return { tick: this.tick, seed: this.currentSeed }
   }
 
-  start(seed: BytesLike) {
+  start(seed: string) {
     this.currentSeed = seed.toString()
     this.initialCellPopulation(this.warriors)
     this.started = true
   }
 
-  handleTick(randomness: BytesLike): TickOutput {
+  handleTick(randomness: string, destinationSets:DestinationSettings, itemPlays:ItemPlays): TickOutput {
     if (this.isOver()) {
       throw new Error('ticking when already over')
     }
+
+    Object.keys(destinationSets).forEach((player) => {
+      const warrior = this.warriors.find((w) => w.id.toLowerCase() === player.toLowerCase())
+      if (!warrior) {
+        return
+      }
+      warrior.setDestination(destinationSets[player].x, destinationSets[player].y)
+    })
+
+    Object.keys(itemPlays).forEach((player) => {
+      const warrior = this.warriors.find((w) => w.id.toLowerCase() === player.toLowerCase())
+      if (!warrior) {
+        return
+      }
+      const itemPlay = itemPlays[player]
+      warrior.setItem({ address: itemPlay.address, id: itemPlay.id })
+    })
+
     this.currentSeed = randomness.toString()
     let outcomes: CellOutComeDescriptor[][] = []
     let quests:QuestOutput = {}
@@ -119,7 +142,7 @@ class Grid {
     })
 
     this.tick++;
-    return { tick: this.tick, seed: this.currentSeed, outcomes, quests }
+    return { tick: this.tick, seed: this.currentSeed, outcomes, quests, itemPlays, ranked: this.rankedWarriors().map((w) => w.toWarriorState() ) }
   }
 
   isOver() {
@@ -180,21 +203,25 @@ class Grid {
     }
   }
 
+  private warriorStateToWarrior(ws:WarriorState) {
+    return this.warriors.find((w) => w.id === ws.id)!
+  }
+
   private handleMiniQuests(outcome: CellOutComeDescriptor):QuestOutput {
     const quests:QuestOutput = {}
     if (!this.firstGump) {
       const harvestingPlayers = Object.keys(outcome.harvested)
       if (harvestingPlayers.length > 0) {
         this.firstGump = this.warriorFromId(harvestingPlayers[0])
-        quests.firstGump = this.firstGump
+        quests.firstGump = this.firstGump.toWarriorState()
       }
     }
     if (!this.firstBlood) {
       const ticks = outcome.battleTicks
       const firstOver = ticks.find((t) => t.isOver)
       if (firstOver) {
-        this.firstBlood = firstOver.winner!
-        quests.firstBlood = this.firstBlood
+        this.firstBlood = this.warriorStateToWarrior(firstOver.winner!)
+        quests.firstBlood = this.firstBlood.toWarriorState()
       }
     }
     outcome.battleTicks.forEach((tick) => {

@@ -16,13 +16,27 @@ import { useAccount } from "wagmi";
 import { useUsername } from "../hooks/Player";
 import SignupModal from "./SignupModal";
 
-
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
-  const { address, isConnected, isConnecting } = useAccount()
+  const { address, isConnected, isConnecting } = useAccount({
+    onDisconnect: () => {
+      console.log("on disconnect fired from layout")
+    }
+  })
+  const [lastAddress, setLastAddress] = useState(address)
   const { data:username, isLoading, isFetched } = useUsername(address)
   const [navigating, setNavigating] = useState(false);
   const [modalOpen, setModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (lastAddress && address !== lastAddress) {
+      console.log("account change from ", lastAddress, "to", address)
+      // not sure, but there's been a bug in the app where not everything resets on account change, so this fixes it.
+      window.location.reload()
+      return
+    }
+    setLastAddress(address)
+  }, [address, lastAddress])
 
   useEffect(() => {
     const handleStart = (url: string) =>

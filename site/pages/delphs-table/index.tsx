@@ -8,14 +8,6 @@ import {
   Button,
   Stack,
   Spacer,
-  TableContainer,
-  Table,
-  Thead,
-  Th,
-  Tr,
-  Tbody,
-  Td,
-  TableCaption
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import NextLink from "next/link";
@@ -29,10 +21,8 @@ import { useTeam, useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import { useLogin } from "../../src/hooks/useUser";
 import border from "../../src/utils/dashedBorder";
-import { useRouter } from "next/router";
 
 const Lobby: NextPage = () => {
-  const router = useRouter()
   const { address } = useAccount();
   const { data: username, isLoading } = useUsername(address);
   const {
@@ -66,7 +56,7 @@ const Lobby: NextPage = () => {
     <>
       <Layout>
         <Stack direction={["column", "row"]}>
-          <VStack spacing="4" alignItems="left" maxW="40%">
+          <VStack spacing="4" alignItems="left">
             <Heading>Delph&apos;s Table</Heading>
             <Text textColor="brand.orange">
               12,500 $SKL rewards for this week!

@@ -21,7 +21,7 @@ module.exports = {
     },
     optimization: {
         sideEffects: true,
-        // usedExports: true,
+        usedExports: true,
     },
     output: {
         filename: "index.js",

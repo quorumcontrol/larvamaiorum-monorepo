@@ -1,6 +1,6 @@
 import { DelphsTable } from "../../contracts/typechain"
 import { delphsContract, playerContract } from "./contracts"
-import Grid from '../boardLogic/Grid'
+import Grid, { DestinationSettings, ItemPlays } from '../boardLogic/Grid'
 import Warrior from "../boardLogic/Warrior"
 import { utils } from "ethers"
 import { defaultInitialInventory } from "../boardLogic/items"
@@ -84,13 +84,22 @@ class BoardRunner {
       if (i === 0) {
         return // skip the first one which is just setup
       }
-      roll.destinations.forEach((d) => {
-        grid.warriors.find((w) => w.id.toLowerCase() === d.player.toLowerCase())?.setDestination(d.x.toNumber(), d.y.toNumber())
-      })
-      roll.items.forEach((itemPlay) => {
-        grid.warriors.find((w) => w.id.toLowerCase() === itemPlay.player.toLowerCase())?.setItem({ address: itemPlay.itemContract, id: itemPlay.id.toNumber() })
-      })
-      grid.handleTick(roll.random)
+
+      const destinations = roll.destinations.reduce((memo, destination) => {
+        return {
+          ...memo,
+          [destination.player]: {x: destination.x.toNumber(), y: destination.y.toNumber()}
+        }
+      }, {} as DestinationSettings)
+
+      const itemPlays = roll.items.reduce((memo, play) => {
+        return {
+          ...memo,
+          [play.player]: {address: play.itemContract, id: play.id.toNumber() }
+        }
+      }, {} as ItemPlays)
+
+      grid.handleTick(roll.random, destinations, itemPlays)
     })
 
     this.didRun = true

@@ -4,7 +4,6 @@ import Grid from "./Grid";
 import { deterministicRandom } from "./random";
 import debug from 'debug'
 import items, { getIdentifier, Inventory, InventoryItem } from './items'
-import { BytesLike } from "ethers";
 
 const log = debug('Warrior')
 
@@ -18,7 +17,16 @@ export interface WarriorStats {
   initialHealth: number;
   initialGump: number;
   initialInventory: Inventory;
-  autoPlay: boolean
+  autoPlay: boolean;
+}
+
+export interface WarriorState extends WarriorStats {
+  currentHealth: number;
+  wootgumpBalance: number;
+  location?: [number,number];
+  inventory: Inventory;
+  currentItem?: InventoryItem;
+  destination?: [number,number]
 }
 
 export function generateFakeWarriors(count: number, seed: string) {
@@ -76,6 +84,25 @@ class Warrior extends EventEmitter implements WarriorStats {
     this.initialInventory = opts.initialInventory
     this.inventory = deepClone(opts.initialInventory)
     this.autoPlay = opts.autoPlay
+  }
+
+  toWarriorState():WarriorState {
+    return {
+      id: this.id,
+      name: this.name,
+      attack: this.attack,
+      defense: this.defense,
+      initialHealth: this.initialHealth,
+      initialGump: this.initialGump,
+      initialInventory: this.initialInventory,
+      autoPlay: this.autoPlay,
+      currentHealth: this.currentHealth,
+      wootgumpBalance: this.wootgumpBalance,
+      location: this.location ? [this.location.x, this.location.y] : undefined,
+      currentItem: this.currentItem,
+      inventory:this.inventory,
+      destination: this.destination,
+    }
   }
 
   isAlive() {
