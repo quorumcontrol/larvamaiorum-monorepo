@@ -32,7 +32,7 @@ const Play: NextPage = () => {
   const { data: relayer } = useRelayer();
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
-  const [fullScreen, setFullScreen] = useState(false);
+  const [_fullScreen, setFullScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
   const { data: gameRunner, over } = useGameRunner(
@@ -103,17 +103,23 @@ const Play: NextPage = () => {
 
   const handlePlayCardMessage = useCallback(
     async (evt: GameEvent) => {
-      console.log("handle play card: ", evt);
-      const name: "theieve" | "berserk" = evt.data.name;
-      const item = items.find(
-        (i) => i.name.toLowerCase() === name.toLowerCase()
-      );
-      if (!item) {
-        throw new Error("item not found in the UI layer");
+      try {
+        console.log("handle play card: ", evt);
+        const name: "theieve" | "berserk" = evt.data.name;
+        const item = items.find(
+          (i) => i.name.toLowerCase() === name.toLowerCase()
+        );
+        if (!item) {
+          throw new Error("item not found in the UI layer");
+        }
+        await mutation.mutateAsync({ address: item.address, id: item.id });
+      } catch (err) {
+        console.error('error playing card', err)
+        sendToIframe({type: 'cardError', data: {}})
       }
-      mutation.mutateAsync({ address: item.address, id: item.id });
+
     },
-    [mutation]
+    [mutation, sendToIframe]
   );
 
   const handleMessage = useCallback(
@@ -183,7 +189,6 @@ const Play: NextPage = () => {
     handleMessage,
     handleFullScreenMessage,
     handlePlayCardMessage,
-    sendToIframe,
     address,
     registerInterestMutation,
     tableId,
