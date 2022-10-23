@@ -204,16 +204,12 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/a1ebc9c5`}
+                src={`https://playcanv.as/e/b/214bfffb`}
                 ref={iframe}
                 top="0"
                 left="0"
                 w="100%"
                 minH= "70vh"
-
-                // w={fullScreen ? "100vw" : "100%"}
-                // minH={fullScreen ? "100vh" : "70vh"}
-                // position={fullScreen ? "fixed" : undefined}
               />
             )}
             {isClient && over && (

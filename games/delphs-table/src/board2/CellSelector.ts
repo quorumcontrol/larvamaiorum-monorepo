@@ -13,6 +13,11 @@ class CellSelector extends ScriptTypeBase {
     y: number
   }
 
+  lastTouch?: {
+    x: number
+    y:number
+  }
+
   initialize() {
     if (!this.entity.camera) {
       console.error("This script must be applied to an entity with a camera component.");
@@ -28,7 +33,7 @@ class CellSelector extends ScriptTypeBase {
     if (this.app.touch) {
       this.app.touch.on(pc.EVENT_TOUCHSTART, this.touchStart, this);
       this.app.touch.on(pc.EVENT_TOUCHEND, this.touchEnd, this);
-      // this.app.touch.on(pc.EVENT_TOUCHMOVE, this.maybeClearTouchEvent, this);
+      this.app.touch.on(pc.EVENT_TOUCHMOVE, this.setLastTouch, this);
     }
   }
   
@@ -40,17 +45,33 @@ class CellSelector extends ScriptTypeBase {
     this.startEvent = { x: e.x, y: e.y, time: Date.now() }
   }
 
+  setLastTouch(e: pc.TouchEvent) {
+    if (e.touches.length === 1) {
+      this.lastTouch = {
+        x: e.touches[0].x,
+        y: e.touches[0].y,
+      }
+    }
+  }
+
   touchStart(e: pc.TouchEvent) {
     // Only perform the raycast if there is one finger on the screen
     if (e.touches.length === 1) {
       console.log('touch start')
+      this.lastTouch = {
+        x: e.touches[0].x,
+        y: e.touches[0].y,
+      }
       this.startEvent = { x: e.touches[0].x, y: e.touches[0].y, time: Date.now() }
     }
   }
 
   touchEnd(e: pc.TouchEvent) {
-    console.log('touch end')
-    this.calculateShouldRay(e.touches[0].x, e.touches[0].y)
+    console.log('touch end', e, this.lastTouch)
+    if (!this.lastTouch) {
+      throw new Error('should not be no last touch')
+    }
+    this.calculateShouldRay(this.lastTouch.x, this.lastTouch.y)
   }
 
   private calculateShouldRay(x:number, y:number) {
