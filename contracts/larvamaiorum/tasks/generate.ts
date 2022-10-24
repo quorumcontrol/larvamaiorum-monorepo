@@ -45,7 +45,9 @@ task('generate')
     const descriptions:{name:string, description:string}[] = YAML.parse(file).alientungsten_masks
     const directory = "./metadata/alien_tungsten"
 
-    return Promise.all(descriptions.slice(0,50).map(async ({ name, description}, i) => {
+    const offset = 200
+
+    return Promise.all(descriptions.slice(offset,offset+50).map(async ({ name, description}, i) => {
       // const directory = `./metadata/alien_tungsten/${i}`
       // fs.mkdirSync(directory)
       const image = await generateImage(promptFromNameAndDescription({name, description}))
@@ -61,7 +63,7 @@ task('generate')
       //   ]
       // }, null, 2)))
       console.log('finished', i, name)
-      fs.renameSync(image.filePath, `${directory}/${i}-${name}.png`)
+      fs.renameSync(image.filePath, `${directory}/${offset+i}-${name}.png`)
       return image
     }))
   })
