@@ -23,7 +23,7 @@ const trustedForwarder = trustedForwarderContract()
 
 const highWaterForSFuel = utils.parseEther('1')
 
-export async function handle(event: any, context: any, callback: any) {
+export async function handle(event: any, _context: any, callback: any) {
   const { relayerAddress, userAddress, token, issuedAt } = JSON.parse(event.body)
 
   // first get the balances
@@ -55,7 +55,7 @@ export async function handle(event: any, context: any, callback: any) {
     })
   }
 
-  singletonQueue.push(async () => {
+  return singletonQueue.push(async () => {
     try {
       let tx: providers.TransactionResponse
       log('sending sfuel')

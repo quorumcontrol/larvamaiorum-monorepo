@@ -1,12 +1,19 @@
 import { useQuery } from 'react-query'
 import { IERC721__factory } from '../../../badge-of-assembly-types'
 import mainnetProvider from '../../utils/mainnetProvider'
+import { memoize } from '../../utils/memoize'
 
-const pudgies = IERC721__factory.connect('0xbd3531da5cf5857e7cfaa92426877b022e612cf8', mainnetProvider)
-const lilPudgies = IERC721__factory.connect('0x524cab2ec69124574082676e6f654a18df49a048', mainnetProvider)
-const rogs = IERC721__factory.connect('0x062e691c2054de82f28008a8ccc6d7a1c8ce060d', mainnetProvider)
+const pudgyContracts = memoize(() => {
+  const mainnet = mainnetProvider()
+  const pudgies = IERC721__factory.connect('0xbd3531da5cf5857e7cfaa92426877b022e612cf8', mainnet)
+  const lilPudgies = IERC721__factory.connect('0x524cab2ec69124574082676e6f654a18df49a048', mainnet)
+  const rogs = IERC721__factory.connect('0x062e691c2054de82f28008a8ccc6d7a1c8ce060d', mainnet)
+  return [pudgies, lilPudgies, rogs]
+})
 
 export const hasPudgy = async (address:string) => {
+  const [pudgies, lilPudgies, rogs] = pudgyContracts()
+
   const [pudgBal, lilBal, rogBal] = await Promise.all([
     pudgies.balanceOf(address),
     lilPudgies.balanceOf(address),

@@ -22,8 +22,8 @@ import "video.js/dist/video-js.css";
 const { chains, provider } = configureChains(
   [
     skaleMainnet,
-    chain.polygon,
     chain.mainnet,
+    chain.polygon,
     chain.ropsten,
     chain.rinkeby,
     chain.goerli,
