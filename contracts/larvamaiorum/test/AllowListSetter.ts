@@ -39,6 +39,8 @@ describe("AllowListSetter", function () {
     expect(await allowListSetter.balanceOf(alice.address)).to.equal(1)
   })
 
-
-
+  it('doesnt let it happen for free', async () => {
+    const { allowListSetter, alice } = await loadFixture(deployAllowListSetter)
+    await expect(allowListSetter.connect(alice).buy(alice.address)).to.be.revertedWith('ERC20: insufficient allowance')
+  })
 });

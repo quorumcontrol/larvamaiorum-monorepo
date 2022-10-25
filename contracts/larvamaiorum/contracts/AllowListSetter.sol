@@ -13,6 +13,8 @@ contract AllowListSetter is AccessControl, ERC2771Context {
     using EnumerableMap for EnumerableMap.AddressToUintMap;
     using SafeERC20 for IERC20;
 
+    string private constant MISSING_ADMIN_ROLE = "missing admin role";
+
     event SupplyAdded(uint256 amount);
     event Purchase(address indexed account);
 
@@ -54,17 +56,17 @@ contract AllowListSetter is AccessControl, ERC2771Context {
     }
 
     function addSupply(uint256 amount) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         supply += amount;
     }
 
     function setPaused(bool isPaused) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         paused = isPaused;
     }
 
     function drain(address to) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         uint256 balance = _wootGump.balanceOf(address(this));
         _wootGump.transfer(to, balance);
     }
@@ -74,17 +76,17 @@ contract AllowListSetter is AccessControl, ERC2771Context {
     }
 
     function consume(address account) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         _allowListSpots.set(account, 0);
     }
 
     function setCurrentPrice(uint256 price) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         currentPrice = price;
     }
 
     function bulkConsume(address[] calldata accounts) public {
-        require(hasRole(ADMIN_ROLE, _msgSender()), "missing admin role");
+        require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         uint256 len = accounts.length;
         for (uint256 i; i < len; i++) {
             _allowListSpots.set(accounts[i], 0);
