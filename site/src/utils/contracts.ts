@@ -13,9 +13,9 @@ const MAINNET_BOA = "0x2C6FD25071Fd516947682f710f6e9F5eD610207F";
 
 export const BOA_ADDRESS = isTestnet ? TESTNET_BOA : MAINNET_BOA
 
-type ProviderHolder = providers.Provider|Signer|NonceManager
+export type ProviderHolder = providers.Provider|Signer|NonceManager
 
-function getProvider(providerOrSigner?:ProviderHolder):providers.Provider {
+export function getProvider(providerOrSigner?:ProviderHolder):providers.Provider {
   if (!providerOrSigner) {
     return skaleProvider
   }

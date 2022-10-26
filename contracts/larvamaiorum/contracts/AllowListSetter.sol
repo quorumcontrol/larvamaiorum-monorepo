@@ -72,7 +72,8 @@ contract AllowListSetter is AccessControl, ERC2771Context {
     }
 
     function balanceOf(address account) public view returns (uint256) {
-        return _allowListSpots.get(account);
+        (,uint256 currentBalance) = _allowListSpots.tryGet(account);
+        return currentBalance;
     }
 
     function consume(address account) public {

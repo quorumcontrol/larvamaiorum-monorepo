@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",
+    "hardhat-deploy": "^0.11.18",
     "stability-client": "^1.6.1",
     "yaml": "^2.1.3"
   }
