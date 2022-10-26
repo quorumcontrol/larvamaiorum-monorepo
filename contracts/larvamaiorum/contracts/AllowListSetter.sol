@@ -24,10 +24,10 @@ contract AllowListSetter is AccessControl, ERC2771Context {
 
     IERC20 private _wootGump;
 
-    uint256 currentPrice;
-    uint256 supply;
+    uint256 public currentPrice;
+    uint256 public supply;
 
-    bool paused;
+    bool public paused;
 
     struct Balance {
         address account;
@@ -47,9 +47,9 @@ contract AllowListSetter is AccessControl, ERC2771Context {
 
     function buy(address account) public {
         require(!paused, "buying stopped");
-        _wootGump.safeTransferFrom(_msgSender(), address(this), currentPrice);
+        require(supply > 0, "no more supply");
         supply--;
-        require(supply >= 0, "no more supply");
+        _wootGump.safeTransferFrom(_msgSender(), address(this), currentPrice);
         (,uint256 currentBalance) = _allowListSpots.tryGet(account);
         _allowListSpots.set(account, currentBalance + 1);
         emit Purchase(account);
@@ -58,6 +58,15 @@ contract AllowListSetter is AccessControl, ERC2771Context {
     function addSupply(uint256 amount) public {
         require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
         supply += amount;
+    }
+    
+    function removeSupply(uint256 amount) public {
+      require(hasRole(ADMIN_ROLE, _msgSender()), MISSING_ADMIN_ROLE);
+      if (amount >= supply) {
+        supply = 0;
+        return;
+      }
+      supply -= amount;
     }
 
     function setPaused(bool isPaused) public {

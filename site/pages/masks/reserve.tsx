@@ -7,25 +7,39 @@ import {
   Stack,
   Spinner,
 } from "@chakra-ui/react";
-import { constants, utils } from "ethers";
+import { utils } from "ethers";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useAccount } from "wagmi";
 import Layout from "../../src/components/Layout";
 import Video from "../../src/components/Video";
-import { useMaskAllowListBalance } from "../../src/hooks/masks";
+import { useMaskAllowListBalance, usePresalePrice, usePresaleSpotsRemaining, usePurchaseMask } from "../../src/hooks/masks";
+import { useLogin } from "../../src/hooks/useUser";
 import { useWootgumpBalance } from "../../src/hooks/useWootgump";
 import border from "../../src/utils/dashedBorder";
 import humanFormatted from "../../src/utils/humanFormatted";
 
-const COST_OF_SPOT = utils.parseEther('15000')
+const COST_OF_SPOT = utils.parseEther('1000')
 
 const ReserveMask: NextPage = () => {
+  const { login, isLoggingIn, isLoggedIn } = useLogin()
   const { address } = useAccount()
   const { data: allowListBalance } = useMaskAllowListBalance(address)
-  const { data:gumpBalance } = useWootgumpBalance(address)
+  const { data: gumpBalance } = useWootgumpBalance(address)
+  const { data: presalePrice } = usePresalePrice()
+  const { data: spotsRemaining } = usePresaleSpotsRemaining()
+  const { mutateAsync, isError: isBuyError, isSuccess: isBuySuccess, isLoading: isBuying, reset } = usePurchaseMask()
 
   const canAfford = gumpBalance && gumpBalance.gte(COST_OF_SPOT)
+
+  const handleBuyClick = async () => {
+    try {
+      reset()
+      await mutateAsync({addr: address!, cost: COST_OF_SPOT})
+    } catch (err) {
+      console.error("error buying: ", err)
+    }
+  }
 
   return (
     <>
@@ -61,8 +75,11 @@ const ReserveMask: NextPage = () => {
               holders. Masks of the Ancients come in 3 rarities:
               uncommon, rare, and ultra-rare.
             </Text>
+            {spotsRemaining && (
+              <Text fontSize="md">Only {spotsRemaining.toNumber()} pre-sale mask(s) remain.</Text>
+            )}
             <Box p="5" backgroundImage={border}>
-              <Text>One mask costs $GUMP 15,000</Text>
+              <Text>One mask costs $GUMP {presalePrice ? humanFormatted(presalePrice) : '...'}</Text>
             </Box>
             <Box fontSize={"md"}>
               { allowListBalance && gumpBalance && (
@@ -75,7 +92,12 @@ const ReserveMask: NextPage = () => {
                 <Spinner />
               )}
             </Box>
-            { canAfford && <Button variant="primary">Buy (1) Presale Mask</Button> }
+            { spotsRemaining?.eq(0) && <Text>Sold out.</Text>}
+            { !isLoggingIn && !isLoggedIn && <Button variant="primary" onClick={() => login()}>Login </Button>}
+            { isLoggedIn && canAfford && !isBuying && (spotsRemaining?.toNumber() || 0) > 0 && <Button variant="primary" onClick={handleBuyClick}>Buy (1) Presale Mask</Button> }
+            { isBuyError && <Text>Something went wrong.</Text>}
+            { isBuySuccess && <Text>Congratulations!</Text>} 
+            { (isBuying || isLoggingIn ) && <Spinner />}
           </VStack>
         </Stack>
       </Layout>

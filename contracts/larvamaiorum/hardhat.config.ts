@@ -25,6 +25,12 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    // hardhat: {
+    //   chainId: ""
+    //   forking: {
+    //     url: "https://staging-v2.skalenodes.com/v1/roasted-thankful-unukalhai",
+    //   }
+    // },
     skale: {
       url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
       accounts: [
@@ -50,6 +56,7 @@ const config: HardhatUserConfig = {
       accounts: [
         process.env.CALYPSO_PRIVATE_KEY,
       ].filter((k) => !!k) as string[],
+      tags: ["mainnet"],
     },
   }
 };
