@@ -30,7 +30,6 @@ const MaskIndex: NextPage = () => {
                 animationUrl="/video/largerMask-masksOfAncients.mp4"
                 controls
                 autoPlay
-                playsInline
                 loop
                 maxH="450px"
               />

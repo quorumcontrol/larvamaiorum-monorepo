@@ -48,7 +48,7 @@ const ReserveMask: NextPage = () => {
       </Head>
       <Layout>
         <Stack direction={["column", "row"]} justify="space-between">
-          <Box p="10">
+          <Box p={["2", "10"]}>
             <Video
               animationUrl="/video/maskRapidFire.mp4"
               autoPlay
@@ -56,16 +56,16 @@ const ReserveMask: NextPage = () => {
               muted
               loop
               maxH="600px"
-              maxW="600px"
+              maxW="70vw"
               margin="auto"
             />
           </Box>
           <VStack
-            p="10"
+            p={["2", "10"]}
             borderColor="brand.orange"
-            borderWidth="1px"
+            borderWidth={["0", "1px"]}
             alignItems="left"
-            maxW="38%"
+            maxW={["full", "38%"]}
             spacing={5}
           >
             <Heading>Presale: Mask of the Ancients</Heading>
