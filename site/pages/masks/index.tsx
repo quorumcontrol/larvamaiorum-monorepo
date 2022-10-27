@@ -31,7 +31,7 @@ const MaskIndex: NextPage = () => {
         <VStack w="full" spacing="10">
           <Flex w="100%" maxH="450px" alignItems="center" bgColor="black">
               <Video
-                animationUrl="/video/masksOfTheAnicentsPromo.mp4"
+                animationUrl="/video/masksOfTheAncientsPromo.mp4"
                 controls
                 loop
                 maxH="450px"
