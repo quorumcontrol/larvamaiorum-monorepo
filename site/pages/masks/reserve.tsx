@@ -44,7 +44,7 @@ const ReserveMask: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Crypto Colosseum: Masks of the Ancients Reservation</title>
+        <title>Presale: Masks of the Ancients</title>
       </Head>
       <Layout>
         <Stack direction={["column", "row"]} justify="space-between">

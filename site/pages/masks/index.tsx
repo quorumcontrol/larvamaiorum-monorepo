@@ -17,19 +17,22 @@ import Carousel, { Slide } from "../../src/components/Carousel";
 import Link from "next/link";
 import border from "../../src/utils/dashedBorder";
 import Video from "../../src/components/Video";
+import Head from "next/head";
 
 const boxPadding = ["0", "50px"];
 
 const MaskIndex: NextPage = () => {
   return (
     <>
+      <Head>
+        <title>Crypto Colosseum: Masks of the Ancients</title>
+      </Head>
       <Layout>
         <VStack w="full" spacing="10">
           <Flex w="100%" maxH="450px" alignItems="center" bgColor="black">
               <Video
-                animationUrl="/video/largerMask-masksOfAncients.mp4"
+                animationUrl="/video/masksOfTheAnicentsPromo.mp4"
                 controls
-                autoPlay
                 loop
                 maxH="450px"
               />
