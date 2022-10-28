@@ -19,7 +19,7 @@ import { useWootgumpBalance } from "../../src/hooks/useWootgump";
 import border from "../../src/utils/dashedBorder";
 import humanFormatted from "../../src/utils/humanFormatted";
 
-const COST_OF_SPOT = utils.parseEther('1000')
+const COST_OF_SPOT = utils.parseEther('15000')
 
 const ReserveMask: NextPage = () => {
   const { login, isLoggingIn, isLoggedIn } = useLogin()
