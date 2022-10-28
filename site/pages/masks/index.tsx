@@ -44,6 +44,14 @@ const MaskIndex: NextPage = () => {
               w="100%"
               alignItems="center"
             >
+              <VStack maxW="30em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Masks of the Ancients</Heading>
+                <Text>
+                  Wootgump infused masks allow the wearer to join the summoning ritual and bring forth an artifact or warrior to the Crypto Roman world.
+                </Text>
+              </VStack>
+              <Spacer />
+
               <Box>
               <Video
                 animationUrl="/video/masksOfTheAncientsPromo.mp4"
@@ -52,13 +60,6 @@ const MaskIndex: NextPage = () => {
                 maxW="600px"
               />
               </Box>
-              <Spacer />
-              <VStack maxW="30em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Masks of the Ancients</Heading>
-                <Text>
-                  Wootgump infused masks allow the wearer to join the summoning ritual and bring forth an artifact or warrior to the Crypto Roman world.
-                </Text>
-              </VStack>
             </Stack>
           </Flex>
 
