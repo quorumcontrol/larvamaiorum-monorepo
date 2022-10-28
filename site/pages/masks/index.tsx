@@ -58,15 +58,6 @@ const MaskIndex: NextPage = () => {
             </Stack>
           </Flex>
 
-          {/* <Flex w="100%" maxH="450px" alignItems="center" bgColor="black">
-              <Video
-                animationUrl="/video/masksOfTheAncientsPromo.mp4"
-                controls
-                loop
-                maxH="450px"
-              />
-          </Flex> */}
-
           <Flex
             w="100%"
             backgroundImage={["none", border]}
