@@ -19,7 +19,6 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 import Image from "next/image";
 import AppLink from "./AppLink";
 import logo from "../../assets/images/logo.svg";
-import useIsClientSide from "../hooks/useIsClientSide";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import NavigationProfile from "./NavigationProfile";
@@ -44,7 +43,6 @@ const NavItem: React.FC<{ href: string; children: React.ReactNode, isMobile?:boo
 
 const Navigation = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const isClient = useIsClientSide();
   const router = useRouter();
 
   useEffect(() => {
@@ -74,7 +72,7 @@ const Navigation = () => {
           <NavItem isMobile href="/delphs-table">Delph&apos;s Table</NavItem>
           <NavItem isMobile href="/leaderboard">Leaderboard</NavItem>
           <NavItem isMobile href="/badge-of-assembly">Badge of Assembly</NavItem>
-          <NavItem isMobile href="/graphic-lore">Graphic Lore</NavItem>
+          <NavItem isMobile href="/masks">Masks</NavItem>
           <NavItem isMobile href="/classic">Classic</NavItem>
           <NavItem isMobile href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
         </VStack>
@@ -103,7 +101,7 @@ const Navigation = () => {
         <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
         <NavItem href="/leaderboard">Leaderboard</NavItem>
         <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
-        <NavItem href="/graphic-lore">Graphic Lore</NavItem>
+        <NavItem href="/masks">Masks</NavItem>
         <NavItem href="/classic">Classic</NavItem>
         <NavItem href="https://docs.larvamaiorum.com/">Litepaper</NavItem>
 

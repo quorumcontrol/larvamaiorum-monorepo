@@ -16,11 +16,11 @@ import historiaTitle from "../assets/images/historiaTitle.png";
 import Carousel, { Slide } from "../src/components/Carousel";
 import Link from "next/link";
 import border from "../src/utils/dashedBorder";
+import Video from "../src/components/Video";
 
 const boxPadding = ["0", "50px"];
 
 const Home: NextPage = () => {
-
   return (
     <>
       <Layout>
@@ -63,12 +63,55 @@ const Home: NextPage = () => {
                   capped by your skill. Crypto Rome is not a safe place.
                 </Text>
               </Box>
-              <Link href="https://discord.gg/Z2S3EtQKCn">
-                <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                  JOIN DISCORD
-                </Button>
-              </Link>
+              <Link href="/delphs-table">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                      PLAY MiNIGAME
+                    </Button>
+                  </Link>
             </Box>
+          </Flex>
+
+          <Flex
+            w="100%"
+            overflow="hidden"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", "none"]}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="10"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Masks of the Ancients</Heading>
+                <Text>
+                  250 unique masks of tiered rarity entitle the purchaser to
+                  mint a warrior or artifact. This NFT collection, available now
+                  to wootgump holders, will premiere on the NFTrade platform
+                  when it launches on SKALE.
+                </Text>
+                <Box>
+                  <Link href="/masks">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                      LEARN MORE
+                    </Button>
+                  </Link>
+                </Box>
+              </VStack>
+
+              <Spacer />
+              <Box>
+                <Video
+                  animationUrl="/video/masksOfTheAncientsPromo.mp4"
+                  controls
+                />
+              </Box>
+            </Stack>
           </Flex>
 
           <Flex
@@ -90,7 +133,6 @@ const Home: NextPage = () => {
                 <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
                 <Text>Weekly Prizes: 12,500 $SKL.</Text>
                 <Text>
-                  
                   The Oracle of Delphi is worried you are not prepared to
                   support your warriors in the Arctic Jungle. He released a
                   mini-game to teach you about the dangers and the spoils of
@@ -107,116 +149,7 @@ const Home: NextPage = () => {
 
               <Spacer />
               <Box>
-                <video
-                  id="full-video"
-                  controls
-                  preload="auto"
-                  width="100%"
-                  height="100%"
-                  data-setup="{}"
-                >
-                  <source src="/video/delphsPromoVideo.mp4" type="video/mp4" />
-
-                  <p className="vjs-no-js">
-                    To view this video please enable JavaScript, and consider
-                    upgrading to a web browser that supports HTML5 video
-                  </p>
-                </video>
-              </Box>
-            </Stack>
-          </Flex>
-
-          <Flex
-            w="100%"
-            backgroundImage={["none", border]}
-            borderBottom={["1px dashed", "none"]}
-            borderBottomColor={"brand.orange"}
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-            <Stack
-              direction={["column", "row"]}
-              spacing="10"
-              w="100%"
-              alignItems="center"
-            >
-              <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
-                <Text>
-                  The story of how the alien, Ima, first discovered large $SKL
-                  deposits in the arctic regions of Earth. Part I of this
-                  graphic novella is minting page by page.
-                </Text>
-                <Box>
-                  <Link href="/graphic-lore">
-                    <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
-                      Read now
-                    </Button>
-                  </Link>
-                </Box>
-              </VStack>
-
-              <Spacer />
-              <Box mt="10">
-                <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
-              </Box>
-            </Stack>
-          </Flex>
-
-          
-
-          <Flex
-            w="100%"
-            overflow="hidden"
-            backgroundImage={["none", border]}
-            borderBottom={["1px dashed", "none"]}
-            borderBottomColor={"brand.orange"}
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-            <Stack
-              direction={["column", "row"]}
-              spacing="10"
-              w="100%"
-              alignItems="center"
-            >
-              <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Larva Maiorum</Heading>
-                <Text>
-                  &quot;Masks of the Ancient Ones.&quot; A 1,111 Genesis mask
-                  collection launching soon. This special collection entitles
-                  the wearer to the absolute best game items at launch.
-                  Gladiator warriors and ultra rare artifacts bless the wearer
-                  of these wootgump infused masks.
-                </Text>
-              </VStack>
-
-              <Spacer />
-              <Box>
-                <video
-                  id="full-video"
-                  controls
-                  preload="auto"
-                  width="100%"
-                  height="100%"
-                  data-setup="{}"
-                >
-                  <source
-                    src="/video/teaser-noComingSoon.mp4"
-                    type="video/mp4"
-                  />
-                  <source
-                    src="/video/teaser-noComingSoon.webm"
-                    type="video/webm"
-                  />
-
-                  <p className="vjs-no-js">
-                    To view this video please enable JavaScript, and consider
-                    upgrading to a web browser that supports HTML5 video
-                  </p>
-                </video>
+                <Video animationUrl="/video/delphsPromoVideo.mp4" controls />
               </Box>
             </Stack>
           </Flex>
@@ -281,6 +214,44 @@ const Home: NextPage = () => {
               </Carousel>
             </Box>
           </Box>
+
+          <Flex
+            w="100%"
+            backgroundImage={["none", border]}
+            borderBottom={["1px dashed", "none"]}
+            borderBottomColor={"brand.orange"}
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+            <Stack
+              direction={["column", "row"]}
+              spacing="10"
+              w="100%"
+              alignItems="center"
+            >
+              <VStack maxW="22em" alignItems="left">
+                <Heading size={["xl", "2xl"]}>Graphic Lore</Heading>
+                <Text>
+                  The story of how the alien, Ima, first discovered large $SKL
+                  deposits in the arctic regions of Earth. Part I of this
+                  graphic novella is minting page by page.
+                </Text>
+                <Box>
+                  <Link href="/graphic-lore">
+                    <Button variant="secondary" mt="10" px="1.5rem" py="2rem">
+                      Read now
+                    </Button>
+                  </Link>
+                </Box>
+              </VStack>
+
+              <Spacer />
+              <Box mt="10">
+                <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
+              </Box>
+            </Stack>
+          </Flex>
         </VStack>
       </Layout>
     </>

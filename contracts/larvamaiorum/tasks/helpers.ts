@@ -1,0 +1,17 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types"
+import { AllowListSetter__factory } from "../typechain-types"
+
+export const getDeployer = async (hre:HardhatRuntimeEnvironment) => {
+  const { deployer: deployerAddr } = await hre.getNamedAccounts()
+  return hre.ethers.getSigner(deployerAddr)
+}
+
+export const getAllowListSpot = async (hre:HardhatRuntimeEnvironment) => {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/AllowListSetter.json`
+  );
+
+  const { AllowListSetter__factory } = await import("../typechain-types");
+
+  return AllowListSetter__factory.connect(deploy.address, await getDeployer(hre))
+}

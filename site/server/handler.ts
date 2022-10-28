@@ -30,7 +30,7 @@ dotenv.config({
 
 const ONE = utils.parseEther('1')
 
-const NUMBER_OF_ROUNDS = 15
+const NUMBER_OF_ROUNDS = 10
 const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
 
