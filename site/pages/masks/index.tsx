@@ -9,11 +9,7 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Image from "next/image";
 import Layout from "../../src/components/Layout";
-import BadgeClaimCard from "../../src/components/BadgeClaimCard";
-import historiaTitle from "../../assets/images/historiaTitle.png";
-import Carousel, { Slide } from "../../src/components/Carousel";
 import Link from "next/link";
 import border from "../../src/utils/dashedBorder";
 import Video from "../../src/components/Video";
@@ -31,7 +27,6 @@ const MaskIndex: NextPage = () => {
         <VStack w="full" spacing="10">
           <Flex
             w="100%"
-            backgroundImage={["none", border]}
             borderBottom={["1px dashed", "none"]}
             borderBottomColor={"brand.orange"}
             alignItems="center"
@@ -44,7 +39,7 @@ const MaskIndex: NextPage = () => {
               w="100%"
               alignItems="center"
             >
-              <VStack maxW="30em" alignItems="left">
+              <VStack maxW="22em" alignItems="left">
                 <Heading size={["xl", "2xl"]}>Masks of the Ancients</Heading>
                 <Text>
                   Wootgump infused masks allow the wearer to join the summoning ritual and bring forth an artifact or warrior to the Crypto Roman world.
@@ -57,7 +52,7 @@ const MaskIndex: NextPage = () => {
                 animationUrl="/video/masksOfTheAncientsPromo.mp4"
                 controls
                 loop
-                maxW="600px"
+                maxW={["90vw", "600px"]}
               />
               </Box>
             </Stack>
@@ -156,6 +151,7 @@ const MaskIndex: NextPage = () => {
                   muted
                   autoPlay
                   playsInline
+                  maxW={["90vw", "600px"]}
                 />
               </Box>
             </Stack>
