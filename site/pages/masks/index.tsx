@@ -49,7 +49,7 @@ const MaskIndex: NextPage = () => {
 
               <Box>
               <Video
-                animationUrl="/video/masksOfTheAncientsPromo.mp4"
+                animationUrl="/video/maskWithVoiceOver.mp4"
                 controls
                 loop
                 maxW={["90vw", "600px"]}
