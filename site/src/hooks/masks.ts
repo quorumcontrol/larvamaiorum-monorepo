@@ -5,16 +5,16 @@ import { memoize } from "../utils/memoize";
 import multicallWrapper from "../utils/multicallWrapper";
 import { isTestnet } from '../utils/networks';
 import { skaleProvider } from '../utils/skaleProvider'
-import testnetAddresses from '../../masks/deployments/skaletest/addresses.json'
 import { useRelayer } from './useUser';
 import { BigNumber } from 'ethers';
-// import mainnetAddresses from '../../masks/deployments/skale/addresses.json'
+import mainnetAddresses from '../../masks/deployments/skale/addresses.json'
+import testnetAddresses from '../../masks/deployments/skaletest/addresses.json'
 
 const addresses = memoize(() => {
   if (isTestnet) {
     return testnetAddresses
   }
-  throw new Error('no mainnet deploy yet')
+  return mainnetAddresses
 })
 
 // the extra unused parameter of _address is here because memoize just does a .toString() on the args and both the signer and provider become [Object Object] so they get memoized even if the provider/signer change
@@ -88,19 +88,7 @@ export const usePurchaseMask = () => {
       transactionHash: tx.hash
     }
   }, {
-    // TODO: example of mutation
-    // onMutate: async (thisPlayer) => {
-    //   await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
 
-    //   const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
- 
-    //   // Optimistically update to the new value
-    //   queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
-  
-    //   // Return a context object with the snapshotted value
-    //   return { previousPlayers }
-      
-    // },
     onSettled: (data) => {
       if (!data) {
         console.error('on settled without data')
