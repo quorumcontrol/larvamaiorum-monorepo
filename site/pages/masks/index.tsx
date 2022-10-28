@@ -54,15 +54,25 @@ const MaskIndex: NextPage = () => {
               alignItems="center"
             >
               <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Summoning Power</Heading>
+                <Heading size={["xl", "2xl"]}>Where?</Heading>
                 <Text>
-                  Wear your mask to the summoning ritual to bring forth a warrior or artifact of equal rarity.
+                  Active on Delph&apos;s Table? Pre-mint masks for $GUMP 15,000 starting today.
                 </Text>
+                <Text>
+                  Purchase the masks in other currencies as soon as NFTrade launches on SKALE (soon).
+                </Text>
+                <Box>
+                  <Link href="/masks/reserve">
+                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                      reserve now
+                    </Button>
+                  </Link>
+                </Box>
               </VStack>
 
               <Spacer />
-              <Box mt="10">
-                <Video animationUrl="/video/2-masks-rotating.mp4" loop muted autoPlay playsInline />
+              <Box>
+                <Video animationUrl="/video/maskRapidFire.mp4" autoPlay loop muted playsInline maxH="450px" />
               </Box>
             </Stack>
           </Flex>
@@ -83,25 +93,23 @@ const MaskIndex: NextPage = () => {
               alignItems="center"
             >
               <VStack maxW="22em" alignItems="left">
-                <Heading size={["xl", "2xl"]}>Active on Delph&apos;s?</Heading>
+                <Heading size={["xl", "2xl"]}>Summon</Heading>
                 <Text>
-                  Pre-mint masks for $GUMP 15,000 starting today.
+                  Masks of the Ancients are minted with three rarities: Uncommon, Rare, and Ultra-Rare.
                 </Text>
-                <Box>
-                  <Link href="/masks/reserve">
-                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                      reserve now
-                    </Button>
-                  </Link>
-                </Box>
+                <Text>
+                  Wear your mask to the summoning ritual to bring forth a warrior or artifact of equal rarity. Each mask may only be used once, but the art and PFP is yours forever.
+                </Text>
               </VStack>
 
               <Spacer />
-              <Box>
-                <Video animationUrl="/video/maskRapidFire.mp4" autoPlay loop muted playsInline maxH="450px" />
+              <Box mt="10">
+                <Video animationUrl="/video/2-masks-rotating.mp4" loop muted autoPlay playsInline />
               </Box>
             </Stack>
           </Flex>
+
+          
         </VStack>
       </Layout>
     </>
