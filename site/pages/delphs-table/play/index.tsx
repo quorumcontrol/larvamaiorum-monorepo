@@ -35,12 +35,12 @@ const Play: NextPage = () => {
   const [_fullScreen, setFullScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
-  const { data: gameRunner, over } = useGameRunner(
-    tableId,
-    address,
-    iframe.current || undefined,
-    ready
-  );
+  // const { data: gameRunner, over } = useGameRunner(
+  //   tableId,
+  //   address,
+  //   iframe.current || undefined,
+  //   ready
+  // );
 
   useEffect(() => {
     setTableId(untypedTableId as string | undefined);
@@ -74,14 +74,14 @@ const Play: NextPage = () => {
 
   useWaitForTable(handleTableRunning);
 
-  useEffect(() => {
-    return () => {
-      console.log("unmounted the play page");
-      if (gameRunner) {
-        gameRunner.stop();
-      }
-    };
-  }, [gameRunner]);
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("unmounted the play page");
+  //     if (gameRunner) {
+  //       gameRunner.stop();
+  //     }
+  //   };
+  // }, [gameRunner]);
 
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => {
@@ -199,7 +199,7 @@ const Play: NextPage = () => {
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="100%">
-            {isClient && !over && (
+            {isClient && (
               <Box
                 id="game"
                 as="iframe"
@@ -212,9 +212,9 @@ const Play: NextPage = () => {
                 minH= "70vh"
               />
             )}
-            {isClient && over && (
+            {/* {isClient && over && (
               <GameOverScreen player={address} runner={gameRunner} />
-            )}
+            )} */}
           </Box>
         </Flex>
       </LoggedInLayout>

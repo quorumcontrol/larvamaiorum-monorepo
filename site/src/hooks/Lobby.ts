@@ -3,6 +3,8 @@ import { useMutation, useQueryClient, useQuery } from "react-query";
 import { useAccount, useSigner } from "wagmi";
 import { lobbyContract, playerContract } from "../utils/contracts";
 import { useRelayer } from "./useUser";
+import { addressToUid, db } from '../../src/utils/firebase'
+import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore"; 
 
 const WAITING_PLAYERS_KEY = "waiting-players"
 
@@ -57,14 +59,17 @@ export const useRegisterInterest = () => {
   const { data:relayer } = useRelayer()
 
   return useMutation(async ({ addr }: { addr: string }) => {
-    if (!relayer?.ready()) {
-      throw new Error("the relayer must be ready to register interest");
-    }
-    const tx = await relayer.wrapped.lobby().registerInterest();
-    await tx.wait()
-    return {
-      addr
-    }
+    await setDoc(doc(db, "delphsLobby", addressToUid(addr)), {
+      timestamp: serverTimestamp(),
+    });
+    // if (!relayer?.ready()) {
+    //   throw new Error("the relayer must be ready to register interest");
+    // }
+    // const tx = await relayer.wrapped.lobby().registerInterest();
+    // await tx.wait()
+    // return {
+    //   addr
+    // }
   }, {
     // onMutate: async (thisPlayer) => {
     //   await queryClient.cancelQueries(WAITING_PLAYERS_KEY)

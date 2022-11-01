@@ -36,6 +36,8 @@ class RelayManager extends EventEmitter {
   forwarder: TrustedForwarder
   user:Signer
 
+  address?:string
+
   private setupForTokenCreationPromise:Promise<any>
 
   private preTokenData?:PreTokenData
@@ -50,6 +52,9 @@ class RelayManager extends EventEmitter {
   constructor(user:Signer) {
     super()
     this.user = user
+    this.user.getAddress().then((addr) => {
+      this.address = addr
+    })
     this.forwarder = trustedForwarderContract().connect(this.deviceWallet!)
     this.setupForTokenCreationPromise = this.setupForTokenCreation()
   }
