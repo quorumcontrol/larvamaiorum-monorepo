@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { Wallet } from "ethers";
+import { keccak256 } from "ethers/lib/utils";
 import { NonceManager } from '@ethersproject/experimental'
 import * as functions from "firebase-functions";
 import { db } from "./app"
@@ -9,19 +10,27 @@ import mainnetBots from '../../contracts/bots-mainnet'
 import { isTestnet } from '../../src/utils/networks'
 import SingletonQueue from '../../src/utils/singletonQueue'
 import { skaleProvider } from "../../src/utils/skaleProvider";
+import { delphsContract, delphsGumpContract, playerContract } from "../../src/utils/contracts";
+import { defineString } from "firebase-functions/params";
+import { memoize } from "../../src/utils/memoize";
+
+const delphsPrivateKey = defineString("DELPHS_PRIVATE_KEY")
 
 // const ONE = utils.parseEther('1')
 
-// const NUMBER_OF_ROUNDS = 10
-// const TABLE_SIZE = 8
-// const WOOTGUMP_MULTIPLIER = 24
+const NUMBER_OF_ROUNDS = 10
+const TABLE_SIZE = 8
+const WOOTGUMP_MULTIPLIER = 24
 
 const botSetup = isTestnet ? testnetBots : mainnetBots
 
-// // const PAYOUT_TRACKER = keccak256(Buffer.from('delphs-needs-payout'))
 
 // // const SECONDS_BETWEEN_ROUNDS = 15
 // // const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
+
+function hashString(msg: string) {
+  return keccak256(Buffer.from(msg))
+}
 
 function shuffle(array: any[]) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -47,31 +56,39 @@ async function getBots(num: number) {
   })
 }
 
-if (!process.env.DELPHS_PRIVATE_KEY) {
-  console.error('no private key')
-  throw new Error("must have a DELPHS private key")
-}
+
 
 const txSingleton = new SingletonQueue()
 
-const provider = skaleProvider
+const walletAndContracts = memoize(() => {
+  functions.logger.debug("delphs private key")
+  if (!delphsPrivateKey.value()) {
+    console.error('no private key')
+    throw new Error("must have a DELPHS private key")
+  }
+  const provider = skaleProvider
 
-const delphsWallet = new NonceManager(new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(provider))
-delphsWallet.getAddress().then((addr) => {
-  console.log("Delph's address: ", addr)
+  const delphsWallet = new NonceManager(new Wallet(delphsPrivateKey.value()).connect(provider))
+  delphsWallet.getAddress().then((addr) => {
+    console.log("Delph's address: ", addr)
+  })
+
+  const delphs = delphsContract("delphs", delphsWallet)
+  const player = playerContract("delphs", delphsWallet)
+  const delphsGump = delphsGumpContract("delphs", delphsWallet)
+
+  return {
+    delphs,
+    player,
+    delphsGump,
+    delphsWallet
+  }
 })
 
 
-const lobby = lobbyContract("delphs", delphsWallet)
-const delphs = delphsContract("delphs", delphsWallet)
-const player = playerContract("delphs", delphsWallet)
-const delphsGump = delphsGumpContract("delphs", delphsWallet)
-const accolades = accoladesContract("delphs", delphsWallet)
-const listKeeper = listKeeperContract("delphs", delphsWallet)
 
 export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}").onCreate(async (change, context) => {
-  functions.logger.debug("change", change)
-  functions.logger.debug("context", context)
+  const { delphs, player, delphsGump, delphsWallet } = walletAndContracts()
 
   const playerUid = context.params.player
   if (!playerUid) {
@@ -88,7 +105,62 @@ export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}"
     })
 
     const tableId = randomUUID()
-    functions.logger.debug("all players", playerUids)
+
+    if (playerUids.length === 0) {
+      return
+    }
+
+    const waiting = playerUids.map((uid) => uid.match(/w:($1)/)![1])
+
+    const botNumber = Math.max(10 - playerUids.length, 0)
+    const id = tableId
+
+    const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
+      const [name, gump] = await Promise.all([
+        player.name(address),
+        delphsGump.balanceOf(address),
+      ])
+      if (!name) {
+        functions.logger.debug(`${address} has no name`)
+        return undefined
+      }
+      return {
+        name,
+        address,
+        delphsGump: gump,
+        seed: hashString(`${id}-${player!.name}-${player!.address}`),
+        isBot: isBot,
+      }
+    }
+
+    const playersWithNamesAndSeeds = (await Promise.all([
+      ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
+      ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
+    ])).filter((p) => !!p)
+
+    const tx = await txSingleton.push(async () => {
+      functions.logger.debug('doing create and start tx', { tableId })
+
+      const startTx = await delphs.createAndStart({
+        id,
+        players: playersWithNamesAndSeeds.map((p) => p!.address),
+        seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
+        gameLength: NUMBER_OF_ROUNDS,
+        owner: await delphsWallet.getAddress(),
+        startedAt: 0,
+        tableSize: TABLE_SIZE,
+        wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
+        initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
+        attributes: [],
+        autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
+      }, { gasLimit: 3_000_000 })
+      functions.logger.debug('doing orchestrator state add', { tableId })
+      return startTx
+    })
+    functions.logger.debug('waiting for create and start', { tableId })
+    await tx.wait()
+
+    functions.logger.debug("all players", { tableId, playerUids })
     const newDoc = db.doc(`/tables/${tableId}`)
     transaction.create(newDoc, {
       players: playerUids,
