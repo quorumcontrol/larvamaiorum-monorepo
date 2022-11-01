@@ -4,11 +4,15 @@ service cloud.firestore {
 
     function allowedToMakeMove(player, table) {
       return request.auth.uid == player &&
-        player in table.data.players &&
-        request.resource.data.keys().hasOnly(table.data.round)
+        player in table.data.players //&&
+        // request.resource.data.keys().hasOnly([table.data.round])
     }
 
     match /tables/{tableId=**} {
+      allow read;
+    }
+
+    match /playerLocations/{player} {
       allow read;
     }
 

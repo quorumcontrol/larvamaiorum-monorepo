@@ -4,7 +4,7 @@ import { useAccount, useSigner } from "wagmi";
 import { lobbyContract, playerContract } from "../utils/contracts";
 import { useRelayer } from "./useUser";
 import { addressToUid, db } from '../../src/utils/firebase'
-import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore"; 
+import { doc, setDoc, serverTimestamp, onSnapshot } from "firebase/firestore"; 
 
 const WAITING_PLAYERS_KEY = "waiting-players"
 
@@ -40,16 +40,20 @@ export const useWaitForTable = (onTableStarted: (tableId?: string) => any) => {
   const { address } = useAccount();
 
   useEffect(() => {
-    if (!address || !lobbyContract) {
+    if (!address) {
       return;
     }
-    const handle = (_: string, tableId: string, _evt: any) => {
-      onTableStarted(tableId);
-    };
-    const filter = lobbyContract().filters.GameStarted(address, null);
-    lobbyContract().on(filter, handle);
+    const docRef = doc(db, `playerLocations/${addressToUid(address)}`)
+    const unsub = onSnapshot(docRef, (doc) => {
+      console.log("got a table id: ", doc, doc.data())
+      const data = doc.data()
+      if (!data ) {
+        return
+      }
+      onTableStarted(data.table);
+    })
     return () => {
-      lobbyContract().off(filter, handle);
+      unsub()
     };
   }, [address, onTableStarted]);
 };

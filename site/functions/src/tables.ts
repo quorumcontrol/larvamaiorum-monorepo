@@ -6,7 +6,6 @@ import * as functions from "firebase-functions";
 import { db } from "./app"
 import testnetBots from '../../contracts/bots-testnet'
 import mainnetBots from '../../contracts/bots-mainnet'
-// import { memoize } from "../../src/utils/memoize";
 import { isTestnet } from '../../src/utils/networks'
 import SingletonQueue from '../../src/utils/singletonQueue'
 import { skaleProvider } from "../../src/utils/skaleProvider";
@@ -17,6 +16,8 @@ import { DelphsTable } from "../../contracts/typechain";
 import { WarriorStats } from "../../src/boardLogic/Warrior"
 import { defaultInitialInventory } from "../../src/boardLogic/items";
 import { FieldValue } from "firebase-admin/firestore";
+import { TableStatus } from '../../src/utils/tables'
+import { addressToUid } from '../../src/utils/firebaseHelpers'
 
 const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
@@ -27,14 +28,6 @@ const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
 
 const botSetup = isTestnet ? testnetBots : mainnetBots
-
-enum TableStatus {
-  UNSTARTED = 0,
-  STARTED = 1,
-  COMPLETE = 2,
-  PAID = 3,
-}
-
 
 // // const SECONDS_BETWEEN_ROUNDS = 15
 // // const STOP_MOVES_BUFFER = 4 // seconds before the next round to stop moves
@@ -184,13 +177,20 @@ export const onLobbyWrite = functions.runWith({ secrets: [delphsPrivateKey.name]
           }
         }
       }, {}),
-      rounds: 15,
-      wootgumpMultiplier: 15,
+      tableSize: TABLE_SIZE,
+      rounds: NUMBER_OF_ROUNDS,
+      wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
       round: 0,
       rolls: [],
       status: TableStatus.UNSTARTED,
     })
 
+    playersWithNamesAndSeeds.forEach((seed) => {
+      if (!seed?.isBot) {
+        transaction.create(db.doc(`tables/${tableId}/moves/${addressToUid(seed!.address)}`), {})
+      }
+    })
+    
     playerUids.forEach((player) => {
       const lobbyRef = db.doc(`delphsLobby/${player}`)
       const playerTableRef = db.doc(`playerLocations/${player}`)
@@ -282,7 +282,7 @@ async function startTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocu
   })
 }
 
-async function rollTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
+async function rollTable(_delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
   functions.logger.info('rolling table', table.id)
   const tableData = table.data()
   const updateDoc:any = {
@@ -298,9 +298,21 @@ async function rollTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocum
   return db.doc(table.ref.path).update(updateDoc)
 }
 
-async function completeTheTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
+async function completeTheTable(_delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
   functions.logger.info('complete the table', table.id)
   // const tableData = table.data()
- 
-  return
+  //TODO: actually pay out folks
+  const data = table.data()
+  if (!data) {
+    functions.logger.error("no error", {tableId: table.id})
+    throw new Error("no data")
+  }
+
+  return db.runTransaction(async (transaction) => {
+    data.players.forEach((uid:string) => {
+      functions.logger.debug("deleting playerLocations/", uid, {tableId: table.id})
+      const ref = db.doc(`playerLocations/${uid}`)
+      transaction.delete(ref)
+    })
+  })
 }

@@ -6,15 +6,11 @@ import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import { useRelayer } from "../../../src/hooks/useUser";
-import promiseWaiter from "../../../src/utils/promiseWaiter";
-import SingletonQueue from "../../../src/utils/singletonQueue";
-import useGameRunner from "../../../src/hooks/gameRunner";
+import useGameRunner from "../../../src/hooks/firebaseGameRunner";
 import GameOverScreen from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
 import { usePlayCardMutation } from "../../../src/hooks/useDelphsTable";
 import items from "../../../src/boardLogic/items";
-
-const txQueue = new SingletonQueue();
 
 interface GameEvent {
   type: string;
@@ -35,12 +31,12 @@ const Play: NextPage = () => {
   const [_fullScreen, setFullScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
-  // const { data: gameRunner, over } = useGameRunner(
-  //   tableId,
-  //   address,
-  //   iframe.current || undefined,
-  //   ready
-  // );
+  const { data: gameRunner, over } = useGameRunner(
+    tableId,
+    address,
+    iframe.current || undefined,
+    ready
+  );
 
   useEffect(() => {
     setTableId(untypedTableId as string | undefined);
@@ -74,14 +70,14 @@ const Play: NextPage = () => {
 
   useWaitForTable(handleTableRunning);
 
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("unmounted the play page");
-  //     if (gameRunner) {
-  //       gameRunner.stop();
-  //     }
-  //   };
-  // }, [gameRunner]);
+  useEffect(() => {
+    return () => {
+      console.log("unmounted the play page");
+      if (gameRunner) {
+        gameRunner.stop();
+      }
+    };
+  }, [gameRunner]);
 
   const handleFullScreenMessage = useCallback(() => {
     setFullScreen((old) => {
@@ -112,14 +108,17 @@ const Play: NextPage = () => {
         if (!item) {
           throw new Error("item not found in the UI layer");
         }
-        await mutation.mutateAsync({ address: item.address, id: item.id });
+        if (!gameRunner) {
+          throw new Error('no game runner')
+        }
+        await gameRunner.playCard(item.address, item.id)
       } catch (err) {
         console.error('error playing card', err)
         sendToIframe({type: 'cardError', data: {}})
       }
 
     },
-    [mutation, sendToIframe]
+    [mutation, sendToIframe, gameRunner]
   );
 
   const handleMessage = useCallback(
@@ -130,29 +129,18 @@ const Play: NextPage = () => {
       if (!tableId) {
         throw new Error("no tableId");
       }
+      if (!gameRunner) {
+        throw new Error("missing game runner")
+      }
 
       console.log("params", tableId, appEvent.data);
-      txQueue.push(async () => {
-        await promiseWaiter(500); // try to fix a broken nonce issue
-        const delphsTable = relayer.wrapped.delphsTable();
-        const tx = await delphsTable.setDestination(
-          tableId,
-          appEvent.data.destination[0],
-          appEvent.data.destination[1],
-          { gasLimit: 250000 }
-        ); // normally around 80k
-        console.log("--------------- destination tx: ", tx);
-        return await tx
-          .wait()
-          .then((receipt) => {
-            console.log("------------ destination receipt: ", receipt);
-          })
-          .catch((err) => {
-            console.error("----------- error with destinationSetter", err);
-          });
-      });
+      try {
+        await gameRunner.setDestination(appEvent.data.destination[0], appEvent.data.destination[1])
+      } catch (err) {
+        console.error("error setting destination: ", err)
+      }
     },
-    [tableId, relayer]
+    [tableId, relayer, gameRunner]
   );
 
   useEffect(() => {
@@ -199,7 +187,7 @@ const Play: NextPage = () => {
       <LoggedInLayout>
         <Flex direction={["column", "column", "column", "row"]}>
           <Box minW="100%">
-            {isClient && (
+            {isClient && !over && (
               <Box
                 id="game"
                 as="iframe"
@@ -212,9 +200,9 @@ const Play: NextPage = () => {
                 minH= "70vh"
               />
             )}
-            {/* {isClient && over && (
+            {isClient && over && (
               <GameOverScreen player={address} runner={gameRunner} />
-            )} */}
+            )}
           </Box>
         </Flex>
       </LoggedInLayout>
