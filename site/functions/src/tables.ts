@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { Wallet } from "ethers";
+import { utils, Wallet } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import { NonceManager } from '@ethersproject/experimental'
 import * as functions from "firebase-functions";
@@ -11,10 +11,14 @@ import { isTestnet } from '../../src/utils/networks'
 import SingletonQueue from '../../src/utils/singletonQueue'
 import { skaleProvider } from "../../src/utils/skaleProvider";
 import { delphsContract, delphsGumpContract, playerContract } from "../../src/utils/contracts";
-import { defineString } from "firebase-functions/params";
+import { defineSecret } from "firebase-functions/params";
 import { memoize } from "../../src/utils/memoize";
+import { DelphsTable } from "../../contracts/typechain";
+import { WarriorStats } from "../../src/boardLogic/Warrior"
+import { defaultInitialInventory } from "../../src/boardLogic/items";
+import { FieldValue } from "firebase-admin/firestore";
 
-const delphsPrivateKey = defineString("DELPHS_PRIVATE_KEY")
+const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
 // const ONE = utils.parseEther('1')
 
@@ -23,6 +27,13 @@ const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
 
 const botSetup = isTestnet ? testnetBots : mainnetBots
+
+enum TableStatus {
+  UNSTARTED = 0,
+  STARTED = 1,
+  COMPLETE = 2,
+  PAID = 3,
+}
 
 
 // // const SECONDS_BETWEEN_ROUNDS = 15
@@ -60,15 +71,15 @@ async function getBots(num: number) {
 
 const txSingleton = new SingletonQueue()
 
-const walletAndContracts = memoize(() => {
+const walletAndContracts = memoize((delphsKey:string) => {
   functions.logger.debug("delphs private key")
-  if (!delphsPrivateKey.value()) {
-    console.error('no private key')
+  if (!delphsKey) {
+    functions.logger.error("missing private key", process.env)
     throw new Error("must have a DELPHS private key")
   }
   const provider = skaleProvider
 
-  const delphsWallet = new NonceManager(new Wallet(delphsPrivateKey.value()).connect(provider))
+  const delphsWallet = new NonceManager(new Wallet(delphsKey).connect(provider))
   delphsWallet.getAddress().then((addr) => {
     console.log("Delph's address: ", addr)
   })
@@ -85,15 +96,14 @@ const walletAndContracts = memoize(() => {
   }
 })
 
-
-
-export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}").onCreate(async (change, context) => {
-  const { delphs, player, delphsGump, delphsWallet } = walletAndContracts()
+export const onLobbyWrite = functions.runWith({ secrets: [delphsPrivateKey.name] }).firestore.document("/delphsLobby/{player}").onCreate(async (change, context) => {
+  const { delphs, player, delphsGump, delphsWallet } = walletAndContracts(process.env[delphsPrivateKey.name]!)
 
   const playerUid = context.params.player
   if (!playerUid) {
     return
   }
+  functions.logger.debug("write iniiated by", playerUid)
 
   // now let's create the table
   return db.runTransaction(async (transaction) => {
@@ -104,13 +114,15 @@ export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}"
       playerUids.push(doc.id)
     })
 
-    const tableId = randomUUID()
+    const tableId = hashString(randomUUID())
 
     if (playerUids.length === 0) {
       return
     }
 
-    const waiting = playerUids.map((uid) => uid.match(/w:($1)/)![1])
+    functions.logger.debug("player uids: ", playerUids)
+
+    const waiting = playerUids.map((uid) => uid.match(/w:(.+)/)![1])
 
     const botNumber = Math.max(10 - playerUids.length, 0)
     const id = tableId
@@ -154,7 +166,6 @@ export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}"
         attributes: [],
         autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
       }, { gasLimit: 3_000_000 })
-      functions.logger.debug('doing orchestrator state add', { tableId })
       return startTx
     })
     functions.logger.debug('waiting for create and start', { tableId })
@@ -164,10 +175,20 @@ export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}"
     const newDoc = db.doc(`/tables/${tableId}`)
     transaction.create(newDoc, {
       players: playerUids,
+      seeds: playersWithNamesAndSeeds.reduce((memo, seed) => {
+        return {
+          ...memo,
+          [seed!.address]: {
+            ...seed,
+            delphsGump: Math.floor(parseFloat(utils.formatEther(seed!.delphsGump)))
+          }
+        }
+      }, {}),
       rounds: 15,
-      seed: 'todo',
       wootgumpMultiplier: 15,
       round: 0,
+      rolls: [],
+      status: TableStatus.UNSTARTED,
     })
 
     playerUids.forEach((player) => {
@@ -180,3 +201,106 @@ export const onLobbyWrite = functions.firestore.document("/delphsLobby/{player}"
     })
   })
 })
+
+
+async function _roller() {
+  functions.logger.info('roller rolling')
+  const { delphs } = walletAndContracts(process.env[delphsPrivateKey.name]!)
+  await txSingleton.push(async () => {
+    return delphs.rollTheDice()
+  })
+  const latest = await delphs.latestRoll()
+
+  // find all unstarted tables
+  const [snapshot, randomness] = await Promise.all([
+    db.collection('/tables').where("status", "in", [TableStatus.UNSTARTED, TableStatus.STARTED, TableStatus.COMPLETE]).get(),
+    delphs.rolls(latest)
+  ])
+  const promises:Promise<any>[] = []
+
+  snapshot.forEach((doc) => {
+    switch (doc.data().status) {
+      case TableStatus.UNSTARTED:
+        return promises.push(startTable(delphs, doc, {
+          roll: latest.toNumber(),
+          randomness,
+        }))
+      case TableStatus.STARTED:
+        return promises.push(rollTable(delphs, doc, {
+          roll: latest.toNumber(),
+          randomness,
+        }))
+      case TableStatus.COMPLETE:
+        return promises.push(completeTheTable(delphs, doc, {
+          roll: latest.toNumber(),
+          randomness,
+        }))
+      default:
+        throw new Error("missing status: " + doc.data().status)
+    }
+    
+  })
+  return Promise.all(promises)
+}
+
+// emulators can't actually exec ever 10 seconds
+export const roller = functions.runWith({secrets: [delphsPrivateKey.name]}).pubsub.schedule('every 10 seconds').onRun(_roller)
+export const rollerTest = functions.runWith({secrets: [delphsPrivateKey.name] }).https.onRequest((req, resp) => {
+  _roller().then(() => {
+    resp.sendStatus(200)
+  }).catch((err) => {
+    functions.logger.error('problem rolling', err)
+    resp.sendStatus(500)
+  })
+})
+
+interface Roll {
+  roll: number,
+  randomness: string,
+}
+
+async function startTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
+  functions.logger.info('starting table', table.id)
+  const warriors:WarriorStats[] = await Promise.all(Object.values(table.data().seeds).map(async (seed:any) => {
+    const stats = await delphs.statsForPlayer(table.id, seed.address)
+    return {
+      id: seed.address,
+      name: seed.name,
+      attack: stats.attack.toNumber(),
+      defense: stats.defense.toNumber(),
+      initialHealth: stats.health.toNumber(),
+      initialGump: seed.delphsGump,
+      initialInventory: defaultInitialInventory,
+      autoPlay: seed.isBot,
+    }
+  }))
+  functions.logger.debug('warriors', table.id, warriors)
+  return db.doc(table.ref.path).update({
+    warriors,
+    status: TableStatus.STARTED,
+    startRoll: roll
+  })
+}
+
+async function rollTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
+  functions.logger.info('rolling table', table.id)
+  const tableData = table.data()
+  const updateDoc:any = {
+    rolls: FieldValue.arrayUnion(roll),
+    round: FieldValue.increment(1),
+  }
+  if ((tableData.rolls || []).length >= tableData.rounds) {
+    updateDoc['status'] = TableStatus.COMPLETE
+  } else {
+    functions.logger.debug("rolls length: ", tableData.rolls.length, table.id)
+  }
+
+  return db.doc(table.ref.path).update(updateDoc)
+}
+
+async function completeTheTable(delphs:DelphsTable, table: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>, roll: Roll) {
+  functions.logger.info('complete the table', table.id)
+  // const tableData = table.data()
+ 
+  return
+}
