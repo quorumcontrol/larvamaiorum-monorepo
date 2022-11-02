@@ -2,10 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function allowedToMakeMove(player, table) {
+    function allowedToMakeMove(player, tableId) {
+      let table = get(/databases/$(database)/documents/tables/$(tableId)).data;
+      let currentRound = table.round;
       return request.auth.uid == player &&
-        player in table.data.players //&&
-        // request.resource.data.keys().hasOnly([table.data.round])
+        player in table.players &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([string(currentRound)]);
     }
 
     match /tables/{tableId=**} {
@@ -23,7 +25,7 @@ service cloud.firestore {
 
     match /tables/{tableId}/moves/{player} {
       // allow write: if request.auth.uid == player && (player in get(/databases/$(database)/documents/tables/$(tableId)).data.players);
-      allow write: if allowedToMakeMove(player, get(/databases/$(database)/documents/tables/$(tableId)))
+      allow write: if allowedToMakeMove(player, tableId); 
     }
 
     match /{document=**} {
