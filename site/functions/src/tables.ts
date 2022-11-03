@@ -83,7 +83,7 @@ const walletAndContracts = memoize(async (delphsKey: string) => {
   })
 
   const sendTx = await delphsWallet.sendTransaction({
-    value: utils.parseEther('0.2'),
+    value: utils.parseEther('0.1'),
     to: relayWallet.address,
   })
   functions.logger.info("funded relayer", { tx: sendTx.hash, relayer: relayWallet.address })
@@ -111,119 +111,128 @@ const walletAndContracts = memoize(async (delphsKey: string) => {
   }
 })
 
-export const onLobbyWrite = functions.runWith({ secrets: [delphsPrivateKey.name] }).firestore.document("/delphsLobby/{player}").onCreate(async (change, context) => {
-  const { delphs, player, delphsGump, delphsAddress } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
-
-  const playerUid = context.params.player
-  if (!playerUid) {
-    return
-  }
-  functions.logger.debug("write iniiated by", playerUid)
-
-  // now let's create the table
-  return db.runTransaction(async (transaction) => {
-    // get all the players waiting
-    const snapshot = await db.collection("/delphsLobby").get()
-    const playerUids: string[] = []
-    snapshot.forEach((doc) => {
-      playerUids.push(doc.id)
-    })
-
-    const tableId = hashString(randomUUID())
-
-    if (playerUids.length === 0) {
+export const onLobbyWrite = functions
+  .runWith({ 
+    secrets: [delphsPrivateKey.name], 
+    failurePolicy: true
+  })
+  .firestore
+  .document("/delphsLobby/{player}")
+  .onWrite(async (_change, context) => {
+    if (context.eventType == "google.firestore.document.delete") {
       return
     }
-
-    functions.logger.debug("player uids: ", playerUids)
-
-    const waiting = playerUids.map((uid) => uid.match(/w:(.+)/)![1])
-
-    const botNumber = Math.max(10 - playerUids.length, 0)
-    const id = tableId
-
-    const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
-      const [name, team, gump] = await Promise.all([
-        player.name(address),
-        player.team(address),
-        delphsGump.balanceOf(address),
-      ])
-      if (!name) {
-        functions.logger.debug(`${address} has no name`)
-        return undefined
-      }
-      return {
-        name,
-        address,
-        delphsGump: gump,
-        team: team.toNumber(),
-        seed: hashString(`${id}-${player!.name}-${player!.address}`),
-        isBot: isBot,
-      }
+    const playerUid = context.params.player
+    if (!playerUid) {
+      return
     }
+    functions.logger.debug("write initiated by", playerUid)
 
-    const playersWithNamesAndSeeds = (await Promise.all([
-      ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
-      ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
-    ])).filter((p) => !!p)
+    // now let's create the table
+    return db.runTransaction(async (transaction) => {
+      // get all the players waiting
 
-    const tx = await txSingleton.push(async () => {
-      functions.logger.debug('doing create and start tx', { tableId })
+      const snapshot = await db.collection("/delphsLobby").get()
+      const playerUids: string[] = []
+      snapshot.forEach((doc) => {
+        playerUids.push(doc.id)
+      })
 
-      const startTx = await delphs.createAndStart({
-        id,
-        players: playersWithNamesAndSeeds.map((p) => p!.address),
-        seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
-        gameLength: NUMBER_OF_ROUNDS,
-        owner: delphsAddress,
-        startedAt: 0,
-        tableSize: TABLE_SIZE,
-        wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
-        initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
-        attributes: [],
-        autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
-      }, { gasLimit: 3_000_000 })
-      return startTx
-    })
-    functions.logger.debug('waiting for create and start', { tableId })
-    await tx.wait()
-
-    functions.logger.debug("all players", { tableId, playerUids })
-    const newDoc = db.doc(`/tables/${tableId}`)
-    transaction.create(newDoc, {
-      players: playerUids,
-      seeds: playersWithNamesAndSeeds.reduce((memo, seed) => {
-        return {
-          ...memo,
-          [seed!.address]: {
-            ...seed,
-            delphsGump: Math.floor(parseFloat(utils.formatEther(seed!.delphsGump)))
-          }
-        }
-      }, {}),
-      tableSize: TABLE_SIZE,
-      rounds: NUMBER_OF_ROUNDS,
-      wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
-      round: 0,
-      status: TableStatus.UNSTARTED,
-    })
-
-    playersWithNamesAndSeeds.forEach((seed) => {
-      if (!seed?.isBot) {
-        transaction.create(db.doc(`tables/${tableId}/moves/${addressToUid(seed!.address)}`), {})
+      if (playerUids.length === 0) {
+        return
       }
-    })
+      const tableId = hashString(randomUUID())
+      const { delphs, player, delphsGump, delphsAddress } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
 
-    playerUids.forEach((player) => {
-      const lobbyRef = db.doc(`delphsLobby/${player}`)
-      const playerTableRef = db.doc(`playerLocations/${player}`)
-      transaction.delete(lobbyRef)
-      transaction.create(playerTableRef, {
-        table: tableId,
+      functions.logger.debug("player uids: ", playerUids)
+
+      const waiting = playerUids.map((uid) => uid.match(/w:(.+)/)![1])
+
+      const botNumber = Math.max(10 - playerUids.length, 0)
+      const id = tableId
+
+      const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
+        const [name, team, gump] = await Promise.all([
+          player.name(address),
+          player.team(address),
+          delphsGump.balanceOf(address),
+        ])
+        if (!name) {
+          functions.logger.debug(`${address} has no name`)
+          return undefined
+        }
+        return {
+          name,
+          address,
+          delphsGump: gump,
+          team: team.toNumber(),
+          seed: hashString(`${id}-${player!.name}-${player!.address}`),
+          isBot: isBot,
+        }
+      }
+
+      const playersWithNamesAndSeeds = (await Promise.all([
+        ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
+        ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
+      ])).filter((p) => !!p)
+
+      const tx = await txSingleton.push(async () => {
+        functions.logger.debug('doing create and start tx', { tableId })
+
+        const startTx = await delphs.createAndStart({
+          id,
+          players: playersWithNamesAndSeeds.map((p) => p!.address),
+          seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
+          gameLength: NUMBER_OF_ROUNDS,
+          owner: delphsAddress,
+          startedAt: 0,
+          tableSize: TABLE_SIZE,
+          wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
+          initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
+          attributes: [],
+          autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
+        }, { gasLimit: 3_000_000 })
+        return startTx
+      })
+      functions.logger.debug('waiting for create and start', { tableId })
+      await tx.wait()
+
+      functions.logger.debug("all players", { tableId, playerUids })
+      const newDoc = db.doc(`/tables/${tableId}`)
+      transaction.create(newDoc, {
+        players: playerUids,
+        seeds: playersWithNamesAndSeeds.reduce((memo, seed) => {
+          return {
+            ...memo,
+            [seed!.address]: {
+              ...seed,
+              delphsGump: Math.floor(parseFloat(utils.formatEther(seed!.delphsGump)))
+            }
+          }
+        }, {}),
+        tableSize: TABLE_SIZE,
+        rounds: NUMBER_OF_ROUNDS,
+        wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
+        round: 0,
+        status: TableStatus.UNSTARTED,
+      })
+
+      playersWithNamesAndSeeds.forEach((seed) => {
+        if (!seed?.isBot) {
+          transaction.create(db.doc(`tables/${tableId}/moves/${addressToUid(seed!.address)}`), {})
+        }
+      })
+
+      playerUids.forEach((player) => {
+        const lobbyRef = db.doc(`delphsLobby/${player}`)
+        const playerTableRef = db.doc(`playerLocations/${player}`)
+        transaction.delete(lobbyRef)
+        transaction.create(playerTableRef, {
+          table: tableId,
+        })
       })
     })
   })
-})
 
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
@@ -295,9 +304,9 @@ export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] 
       const { delphs } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
       const rollData = roll.data()
 
-      const promises:Promise<any>[] = []
+      const promises: Promise<any>[] = []
       snapshot.forEach((table) => {
-        promises.push(_startTable(transaction, delphs, table, {roll: rollData.roll, randomness: rollData.randomness }))
+        promises.push(_startTable(transaction, delphs, table, { roll: rollData.roll, randomness: rollData.randomness }))
       })
       return Promise.all(promises)
     })
@@ -309,7 +318,7 @@ export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.nam
   .onCreate(async (_roll, { params }) => {
     const rollNumber = parseInt(params.rollNumber)
     const query = db.collection('/tables').where("status", "==", TableStatus.STARTED)
-    
+
     return db.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(query)
       if (snapshot.size == 0) {
@@ -331,7 +340,7 @@ export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.nam
         })
         if ((rollNumber - start) >= len) {
           functions.logger.debug("updating to complete")
-          tableData.players.forEach((playerUid:string) => {
+          tableData.players.forEach((playerUid: string) => {
             transaction.delete(db.doc(`/playerLocations/${playerUid}`))
           })
           transaction.update(table.ref, {
@@ -343,7 +352,10 @@ export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.nam
   })
 
 export const handleCompletedTables = functions
-  .runWith({ secrets: [delphsPrivateKey.name] })
+  .runWith({
+    secrets: [delphsPrivateKey.name],
+    failurePolicy: true,
+  })
   .firestore
   .document('tables/{tableId}')
   .onUpdate(async (change) => {
@@ -446,7 +458,6 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
       memo.gumpBurn[playerId].team = team
     }
   })
-  functions.logger.debug("gump", memo.gumpMint, memo.gumpBurn)
   memo.accolades = memo.accolades.concat(rewards.ranked.slice(0, 3).map((w, i) => {
     return {
       id: i,
@@ -513,7 +524,7 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
     const questTrackerTx = await questTracker.register(quest, { gasLimit: 5_000_000 })
     functions.logger.debug('quest tracker tx: ', questTrackerTx.hash)
     await questTrackerTx.wait()
-    db.doc(table.ref).update({
+    db.doc(tableDoc.ref.path).update({
       status: TableStatus.PAID
     })
   })
