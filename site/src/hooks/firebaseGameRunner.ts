@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import Grid, { DestinationSettings, ItemPlays } from "../boardLogic/Grid"
 import Warrior, { WarriorState } from "../boardLogic/Warrior"
 import { InventoryItem } from "../boardLogic/items"
-import { doc, onSnapshot, query, getDocs, collection, where, updateDoc } from 'firebase/firestore'
+import { doc, onSnapshot, query, getDocs, collection, where, updateDoc, getDoc, limit, orderBy } from 'firebase/firestore'
 import { addressToUid, db, uidToAddress } from "../utils/firebase"
 import { TableStatus } from '../utils/tables'
 
@@ -26,6 +26,11 @@ interface BoardSetup {
   warriors?: WarriorState[]
 }
 
+interface DatabaseRoll {
+  roll: number
+  randomness: string
+}
+
 export class GameRunner extends EventEmitter {
   tableId: string
   iframe: HTMLIFrameElement
@@ -41,6 +46,8 @@ export class GameRunner extends EventEmitter {
   player: string
 
   latestState?: any // TODO: we should really type this using a converter
+  rolls: DatabaseRoll[]
+  private latestRoundProcessed = 0;
 
   private unsubscribe?: () => any
 
@@ -51,34 +58,22 @@ export class GameRunner extends EventEmitter {
     log('--------------- new firebase game runnner')
     this.singleton = new SingletonQueue(`game-runner-${tableId}`)
     this.tableId = tableId
+    this.rolls = []
     this.iframe = iframe
     this.player = player
   }
 
   async setup() {
-    const docRef = doc(db, `/tables/${this.tableId}`)
-    this.unsubscribe = onSnapshot(docRef, (doc) => {
-      const data = doc.data()
-      if (!data) {
+    const unsubscribeTable = onSnapshot(doc(db, `/tables/${this.tableId}`), (tableDoc) => {
+      const data = tableDoc.data()
+      if (!data || data.status == TableStatus.UNSTARTED) {
         return
       }
       this.latestState = data
-
-      if (!this.started && data.status !== TableStatus.UNSTARTED) {
-        this.singleton.push(() => this.go())
-      }
-
-      const latest = this.latest
-      this.latestState.rolls.slice(latest).forEach((_roll:any, i:number) => {
-        this.singleton.push(async () => {
-          console.log('handle roll', latest, i)
-          return this.handleRoll(latest + i)
-        })
-      })
+      unsubscribeTable()
+      this.go()
     })
-
     log('------------ firebase game runner setup')
-
     return this
   }
 
@@ -96,7 +91,7 @@ export class GameRunner extends EventEmitter {
     }
     const ref = doc(db, "tables", this.tableId, "moves", addressToUid(this.player))
     const update = {
-      [this.latestState.round]: {
+      [this.currentRoll()]: {
         destination: {
           x,
           y,
@@ -113,7 +108,7 @@ export class GameRunner extends EventEmitter {
     }
     const ref = doc(db, "tables", this.tableId, "moves", addressToUid(this.player))
     return updateDoc(ref, {
-      [this.latestState.round]: {
+      [this.currentRoll()]: {
         item: { address, id }
       }
     })
@@ -136,6 +131,7 @@ export class GameRunner extends EventEmitter {
       return
     }
     log('----------- setting gameRunner.started to true')
+    log(this.latestState)
     this.started = true
 
     this.grid = new Grid({
@@ -156,21 +152,57 @@ export class GameRunner extends EventEmitter {
       warriors: this.grid.rankedWarriors().map((w) => w.toWarriorState()),
     }
     log('shipping setup', this.latestState)
-    return this.ship('setupBoard', msg)
+    this.ship('setupBoard', msg)
+
+
+    const start = this.latestState.startRoll.roll
+    const len = this.latestState.rounds
+
+    const q = query(collection(db, "/rolls"), where('roll', '>', start), orderBy('roll'), limit(len))
+
+    this.unsubscribe = onSnapshot(q, (rollSnapshot) => {
+      const rolls:DatabaseRoll[] = []
+      console.log("new rolls: ", rollSnapshot.size)
+      rollSnapshot.forEach((rollDoc) => {
+        if (rollDoc.id == 'latest') {
+          return
+        }
+        const data = rollDoc.data() as DatabaseRoll
+        console.log("roll data", data)
+        rolls.push(data)
+      })
+      console.log('new rolls', rolls)
+      this.rolls = rolls
+      this.singleton.push(async () => {
+        console.log("executing roll handler from ", this.latestRoundProcessed)
+        this.rolls.slice(this.latestRoundProcessed).forEach((roll) => {
+          return this.handleRoll(roll)
+        })
+      })
+    })
   }
 
-  private async handleRoll(idx: number) {
+  private currentRoll() {
+    if (!this.rolls && !this.latestState) {
+      throw new Error('need to have a started table')
+    }
+    if (this.rolls.length > 0) {
+      return this.rolls.slice(-1)[0].roll
+    }
+    return this.latestState.startRoll.roll
+  }
+
+  private async handleRoll(roll:DatabaseRoll) {
     if (!this.latestState) {
       throw new Error("handling roll without a latest state")
     }
-    console.log("handle roll: ", idx)
-    const movesIdx = idx// - 1
+    console.log("handle roll: ", roll)
+    
+    const movesIdx = roll.roll - 1
     console.log("looking for moves: ", movesIdx)
     const moves = collection(db, "tables", this.tableId, "moves")
     const q = query(moves, where(movesIdx.toString(), "!=", null))
     const snapshot = await getDocs(q)
-
-    const roll = this.latestState.rolls[idx]
 
     const iframeRoll: IFrameRoll = {
       index: roll.roll,
@@ -179,7 +211,7 @@ export class GameRunner extends EventEmitter {
       items: [],
     }
 
-    console.log("moves: ", snapshot, snapshot.size)
+    console.log("moves: ", snapshot, "size: ", snapshot.size)
 
     snapshot.forEach((doc) => {
       const data = doc.data()
@@ -199,6 +231,7 @@ export class GameRunner extends EventEmitter {
       }
     })
     this.shipRoll(iframeRoll)
+    this.latestRoundProcessed++
   }
 
   private shipRoll(roll: IFrameRoll) {

@@ -3,11 +3,15 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function allowedToMakeMove(player, tableId) {
+      let latestRoll = get(/databases/$(database)/documents/rolls/latest).data.roll;
       let table = get(/databases/$(database)/documents/tables/$(tableId)).data;
-      let currentRound = table.round;
       return request.auth.uid == player &&
         player in table.players &&
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly([string(currentRound)]);
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([string(latestRoll)]);
+    }
+
+    match /rolls/{roll} {
+      allow read;
     }
 
     match /tables/{tableId=**} {
