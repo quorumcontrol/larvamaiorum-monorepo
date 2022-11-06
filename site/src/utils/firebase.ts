@@ -21,7 +21,6 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 
 export const functions = getFunctions(app);
-connectFunctionsEmulator(functions, "localhost", 5001);
 export const getToken = httpsCallable(functions, 'getToken')
 
 // export const testSecret = httpsCallable(functions, 'testSecret')
@@ -31,13 +30,17 @@ export const getToken = httpsCallable(functions, 'getToken')
 
 // firebaseApps previously initialized using initializeApp()
 export const db = getFirestore();
-connectFirestoreEmulator(db, 'localhost', 8080);
 
 export const auth = getAuth();
-connectAuthEmulator(auth, "http://localhost:9099");
 
 export function addressToUid(address:string) {
   return `w:${address}`
+}
+
+if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+  connectFirestoreEmulator(db, 'localhost', 8080);
+  connectAuthEmulator(auth, "http://localhost:9099");
 }
 
 const regExp = /w:(.+)/

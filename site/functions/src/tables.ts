@@ -252,7 +252,7 @@ async function _roller() {
 }
 
 // emulators can't actually exec ever 10 seconds
-export const roller = functions.runWith({ secrets: [delphsPrivateKey.name] }).pubsub.schedule('every 10 seconds').onRun(_roller)
+export const roller = functions.runWith({ secrets: [delphsPrivateKey.name] }).pubsub.schedule("every 14 seconds").onRun(_roller)
 export const rollerTest = functions.runWith({ secrets: [delphsPrivateKey.name] }).https.onRequest((req, resp) => {
   _roller().then(() => {
     resp.sendStatus(200)
