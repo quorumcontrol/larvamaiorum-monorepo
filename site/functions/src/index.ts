@@ -1,2 +1,2 @@
-export * from './tokens'
-export * from './tables'
+export * from "./tokens"
+export * from "./tables"

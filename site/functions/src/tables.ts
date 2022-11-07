@@ -2,13 +2,13 @@ import { randomUUID } from "crypto";
 import { BigNumber, BigNumberish, utils, Wallet } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import * as functions from "firebase-functions";
-import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
-import { wrapContract } from 'kasumah-relay-wrapper'
-import { db } from "./app"
-import testnetBots from '../../contracts/bots-testnet'
-import mainnetBots from '../../contracts/bots-mainnet'
-import { addresses, isTestnet } from '../../src/utils/networks'
-import SingletonQueue from '../../src/utils/singletonQueue'
+import KasumahRelayer from "skale-relayer-contracts/lib/src/KasumahRelayer"
+import { wrapContract } from "kasumah-relay-wrapper"
+import { appFunctions, db } from "./app"
+import testnetBots from "../../contracts/bots-testnet"
+import mainnetBots from "../../contracts/bots-mainnet"
+import { addresses, isTestnet } from "../../src/utils/networks"
+import SingletonQueue from "../../src/utils/singletonQueue"
 import { skaleProvider } from "../../src/utils/skaleProvider";
 import { accoladesContract, delphsContract, delphsGumpContract, playerContract, trustedForwarderContract } from "../../src/utils/contracts";
 import { questTrackerContract } from "../../src/utils/questTracker";
@@ -18,18 +18,22 @@ import { Accolades, DelphsGump, DelphsTable, Player, QuestTracker, TeamStats, Te
 import Warrior, { WarriorState, WarriorStats } from "../../src/boardLogic/Warrior"
 import { defaultInitialInventory, InventoryItem } from "../../src/boardLogic/items";
 import { Transaction } from "firebase-admin/firestore";
-import { TableStatus } from '../../src/utils/tables'
-import { addressToUid, uidToAddress } from '../../src/utils/firebaseHelpers'
+import { TableStatus } from "../../src/utils/tables"
+import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
 import { getBytesAndCreateToken } from "skale-relayer-contracts/lib/src/tokenCreator";
 
+type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+
 const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
-const ONE = utils.parseEther('1')
+const ONE = utils.parseEther("1")
 
 const NUMBER_OF_ROUNDS = 10
 const TABLE_SIZE = 8
 const WOOTGUMP_MULTIPLIER = 24
+
+const TIME_BETWEEN_ROLLS = 10
 
 const botSetup = isTestnet ? testnetBots : mainnetBots
 
@@ -46,7 +50,7 @@ function shuffle(array: any[]) {
 
     // swap elements array[i] and array[j]
     // we use "destructuring assignment" syntax to achieve that
-    // you'll find more details about that syntax in later chapters
+    // you"ll find more details about that syntax in later chapters
     // same can be written as:
     // let t = array[i]; array[i] = array[j]; array[j] = t
     [array[i], array[j]] = [array[j], array[i]];
@@ -83,7 +87,7 @@ const walletAndContracts = memoize(async (delphsKey: string) => {
   })
 
   const sendTx = await delphsWallet.sendTransaction({
-    value: utils.parseEther('0.1'),
+    value: utils.parseEther("0.1"),
     to: relayWallet.address,
   })
   functions.logger.info("funded relayer", { tx: sendTx.hash, relayer: relayWallet.address })
@@ -112,8 +116,8 @@ const walletAndContracts = memoize(async (delphsKey: string) => {
 })
 
 export const onLobbyWrite = functions
-  .runWith({ 
-    secrets: [delphsPrivateKey.name], 
+  .runWith({
+    secrets: [delphsPrivateKey.name],
     failurePolicy: true
   })
   .firestore
@@ -128,7 +132,7 @@ export const onLobbyWrite = functions
     }
     functions.logger.debug("write initiated by", playerUid)
 
-    // now let's create the table
+    // now let"s create the table
     return db.runTransaction(async (transaction) => {
       // get all the players waiting
 
@@ -177,7 +181,7 @@ export const onLobbyWrite = functions
       ])).filter((p) => !!p)
 
       const tx = await txSingleton.push(async () => {
-        functions.logger.debug('doing create and start tx', { tableId })
+        functions.logger.debug("doing create and start tx", { tableId })
 
         const startTx = await delphs.createAndStart({
           id,
@@ -194,7 +198,7 @@ export const onLobbyWrite = functions
         }, { gasLimit: 3_000_000 })
         return startTx
       })
-      functions.logger.debug('waiting for create and start', { tableId })
+      functions.logger.debug("waiting for create and start", { tableId })
       await tx.wait()
 
       functions.logger.debug("all players", { tableId, playerUids })
@@ -234,33 +238,88 @@ export const onLobbyWrite = functions
     })
   })
 
+const _roller = async () => {
+  try {
+    functions.logger.info("roll the dice")
+    const snapshot = await db.collection("/tables").where("status", "in", [TableStatus.UNSTARTED, TableStatus.STARTED]).get()
+    if (snapshot.size == 0) {
+      functions.logger.info("skipping roll because no running tables")
+      return
+    }
+    const { delphs } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
 
-type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
+    functions.logger.debug("roller rolling")
+    const tx = await txSingleton.push(async () => {
+      return delphs.rollTheDice()
+    })
+    await tx.wait()
+    functions.logger.debug("roller complete")
+    const latest = await delphs.latestRoll()
+    const randomness = await delphs.rolls(latest)
+    functions.logger.debug("writing roll")
 
-async function _roller() {
-  functions.logger.info('roller rolling')
-  const { delphs } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
-  await txSingleton.push(async () => {
-    return delphs.rollTheDice()
-  })
-  const latest = await delphs.latestRoll()
-  const randomness = await delphs.rolls(latest)
-  const batch = db.batch()
-  batch.create(db.doc(`/rolls/${latest.toNumber()}`), { roll: latest.toNumber(), randomness })
-  batch.set(db.doc(`/rolls/latest`), { roll: latest.toNumber(), randomness })
-  return batch.commit()
+    const batch = db.batch()
+    batch.create(db.doc(`/rolls/${latest.toNumber()}`), { roll: latest.toNumber(), randomness })
+    batch.set(db.doc("/rolls/latest"), { roll: latest.toNumber(), randomness })
+    await batch.commit()
+  } catch (err) {
+    functions.logger.error("error rolling", err)
+  } finally {
+    functions.logger.debug("done")
+    const doc = await db.doc("_internal/stopRolling").get()
+    if (doc.exists) {
+      return
+    }
+    // otherwise let's roll again
+    await enqueueRoll()
+    return
+  }
 }
 
-// emulators can't actually exec ever 10 seconds
-export const roller = functions.runWith({ secrets: [delphsPrivateKey.name] }).pubsub.schedule("every 14 seconds").onRun(_roller)
-export const rollerTest = functions.runWith({ secrets: [delphsPrivateKey.name] }).https.onRequest((req, resp) => {
-  _roller().then(() => {
-    resp.sendStatus(200)
-  }).catch((err) => {
-    functions.logger.error('problem rolling', err)
-    resp.sendStatus(500)
+export const roller = functions
+  .runWith({
+    secrets: [delphsPrivateKey.name],
+    memory: "512MB",
   })
-})
+  .tasks.taskQueue({
+    retryConfig: {
+      maxAttempts: 5,
+      minBackoffSeconds: 60,
+    },
+    rateLimits: {
+      maxConcurrentDispatches: 1,
+    },
+  }).onDispatch(_roller)
+
+const enqueueRoll = async () => {
+  functions.logger.debug("enqueueing roll")
+  if (process.env.FUNCTIONS_EMULATOR) {
+    setTimeout(_roller, TIME_BETWEEN_ROLLS * 1000)
+    return
+  }
+  // otherwise we want to enqueue another roll
+  const queue = appFunctions.taskQueue("roller");
+  await queue.enqueue(
+    {
+      id: `roll-${randomUUID()}`,
+    },
+    {
+      scheduleDelaySeconds: TIME_BETWEEN_ROLLS,
+      dispatchDeadlineSeconds: 60 * 5 // 5 minutes
+    },
+  )
+}
+
+export const startRolling = functions
+  .runWith({
+    secrets: [delphsPrivateKey.name],
+  })
+  .https
+  .onRequest(async (req, resp) => {
+    functions.logger.debug("enqueue")
+    enqueueRoll()
+    resp.sendStatus(200)
+  })
 
 interface Roll {
   roll: number,
@@ -268,7 +327,7 @@ interface Roll {
 }
 
 async function _startTable(transaction: Transaction, delphs: DelphsTable, table: QueryDoc, roll: Roll) {
-  functions.logger.info('starting table', table.id)
+  functions.logger.info("starting table", table.id)
   const warriors: WarriorStats[] = await Promise.all(Object.values(table.data().seeds).map(async (seed: any) => {
     const stats = await delphs.statsForPlayer(table.id, seed.address)
     return {
@@ -282,7 +341,7 @@ async function _startTable(transaction: Transaction, delphs: DelphsTable, table:
       autoPlay: seed.isBot,
     }
   }))
-  functions.logger.debug('warriors', table.id, warriors)
+  functions.logger.debug("warriors", table.id, warriors)
   return transaction.update(table.ref, {
     warriors,
     status: TableStatus.STARTED,
@@ -292,9 +351,9 @@ async function _startTable(transaction: Transaction, delphs: DelphsTable, table:
 
 export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] })
   .firestore
-  .document('rolls/{rollNumber}')
+  .document("rolls/{rollNumber}")
   .onCreate(async (roll, ctx) => {
-    const query = db.collection('/tables').where("status", "==", TableStatus.UNSTARTED)
+    const query = db.collection("/tables").where("status", "==", TableStatus.UNSTARTED)
 
     return db.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(query)
@@ -312,17 +371,17 @@ export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] 
     })
   })
 
-export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name] })
+export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name], memory: "1GB" })
   .firestore
-  .document('rolls/{rollNumber}')
+  .document("rolls/{rollNumber}")
   .onCreate(async (_roll, { params }) => {
     const rollNumber = parseInt(params.rollNumber)
-    const query = db.collection('/tables').where("status", "==", TableStatus.STARTED)
+    const query = db.collection("/tables").where("status", "==", TableStatus.STARTED)
 
     return db.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(query)
       if (snapshot.size == 0) {
-        functions.logger.debug('no tables in progress')
+        functions.logger.debug("no tables in progress")
         return
       }
 
@@ -355,9 +414,10 @@ export const handleCompletedTables = functions
   .runWith({
     secrets: [delphsPrivateKey.name],
     failurePolicy: true,
+    memory: "1GB",
   })
   .firestore
-  .document('tables/{tableId}')
+  .document("tables/{tableId}")
   .onUpdate(async (change) => {
     const table = change.after
     const tableData = table.data()
@@ -377,7 +437,7 @@ interface CompleteTableContracts {
 
 async function completeTheTable({ delphsGump, accolades, teamStats, questTracker }: CompleteTableContracts, tableDoc: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>) {
   if (!delphsGump || !accolades || !teamStats || !questTracker) {
-    throw new Error('missing contracts')
+    throw new Error("missing contracts")
   }
   const snapshot = await db.collection(`/tables/${tableDoc.id}/moves`).get()
   const moves: Record<string, any> = {}
@@ -401,10 +461,10 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
   grid.start(table.startRoll.randomness)
   const start = table.startRoll.roll
   const len = table.rounds
-  const rolls = await db.collection(`/rolls`).where('roll', '>', start).limit(len).orderBy('roll').get()
+  const rolls = await db.collection("/rolls").where("roll", ">", start).limit(len).orderBy("roll").get()
 
   rolls.forEach((rollDoc) => {
-    if (rollDoc.id == 'latest') {
+    if (rollDoc.id == "latest") {
       return
     }
     const { randomness, roll } = rollDoc.data()
@@ -489,24 +549,24 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
   await txSingleton.push(async () => {
     if (Object.keys(memo.gumpMint).length > 0) {
       const tx = await delphsGump.bulkMint(Object.values(memo.gumpMint), { gasLimit: 12_000_000 })
-      functions.logger.debug('delphsGump mint prize tx: ', tx.hash, Object.values(memo.gumpMint))
+      functions.logger.debug("delphsGump mint prize tx: ", tx.hash, Object.values(memo.gumpMint))
       await tx.wait()
     }
 
     if (Object.keys(memo.gumpBurn).length > 0) {
       const tx = await delphsGump.bulkBurn(Object.values(memo.gumpBurn), { gasLimit: 8_000_000 })
-      functions.logger.debug('delphsGump burn prize tx: ', tx.hash, Object.values(memo.gumpBurn))
+      functions.logger.debug("delphsGump burn prize tx: ", tx.hash, Object.values(memo.gumpBurn))
       await tx.wait()
     }
 
     const accoladesTx = await accolades.multiUserBatchMint(memo.accolades, [], { gasLimit: 8_000_000 })
-    functions.logger.debug('accoladesTx tx: ', accoladesTx.hash, memo.accolades)
+    functions.logger.debug("accoladesTx tx: ", accoladesTx.hash, memo.accolades)
     await accoladesTx.wait()
 
     let stats = Object.values(memo.gumpMint).map((g) => ({ player: g.to, team: g.team, value: g.amount, tableId: table.id }))
     stats = stats.concat(Object.values(memo.gumpBurn).map((g) => ({ player: g.to, team: g.team, value: g.amount.mul(-1), tableId: table.id })))
     const teamTx = await teamStats.register(stats, { gasLimit: 5_000_000 })
-    functions.logger.debug('team tx: ', teamTx.hash)
+    functions.logger.debug("team tx: ", teamTx.hash)
     await teamTx.wait()
 
     const quest = Object.keys(rewards.quests.battlesWon).map((player) => {
@@ -517,12 +577,12 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
         player,
         team,
         value: val,
-        questId: keccak256(Buffer.from('battles-won')),
+        questId: keccak256(Buffer.from("battles-won")),
         tableId: table.id,
       }
     })
     const questTrackerTx = await questTracker.register(quest, { gasLimit: 5_000_000 })
-    functions.logger.debug('quest tracker tx: ', questTrackerTx.hash)
+    functions.logger.debug("quest tracker tx: ", questTrackerTx.hash)
     await questTrackerTx.wait()
     db.doc(tableDoc.ref.path).update({
       status: TableStatus.PAID

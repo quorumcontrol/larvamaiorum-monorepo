@@ -19,6 +19,7 @@
     "firebase": "^9.13.0",
     "firebase-admin": "^10.3.0",
     "firebase-functions": "^4.0.2",
+    "kasumah-multicall": "^0.0.48",
     "kasumah-relay-wrapper": "^0.0.48",
     "skale-relayer-contracts": "^0.0.10"
   },
