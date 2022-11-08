@@ -9,6 +9,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import pulser from "../utils/pulser";
 import randomColor from "../utils/randomColor";
+import { HOVER_EVT, STOP_HOVER_EVT } from "./CellSelector";
 import TileLogic, { cellNameFromCoordinates } from "./TileLogic";
 
 @createScript("playerLogic")
@@ -22,6 +23,9 @@ class PlayerLogic extends ScriptTypeBase {
   animationHolder: Entity
   playerModel: Entity
   playerArrow: Entity
+  stats: Entity
+  statsText: Entity
+  statsName: Entity
 
   currentTween?: Tween
 
@@ -34,11 +38,27 @@ class PlayerLogic extends ScriptTypeBase {
     this.playerModel = mustFindByName(this.entity, "Viking")
     this.playerArrow = mustFindByName(this.entity, 'PlayerArrow')
     this.cardEntity = mustFindByName(this.nameEntity, "Card")
+    this.stats = mustFindByName(this.entity, "Stats")
+    this.statsText = mustFindByName(this.stats, "StatsText")
+    this.statsName = mustFindByName(this.stats, "Name")
+    mustFindByName(this.stats, "Background").button!.on(pc.EVENT_MOUSEDOWN, (evt:MouseEvent) => {
+      console.log('evt', evt)
+      evt.stopPropagation()
+      this.unhover()
+    }, this)
+    this.entity.on(HOVER_EVT, this.hover, this)
+    this.app.on(STOP_HOVER_EVT, this.unhover, this)
   }
 
   update() {
     this.nameEntity.lookAt(this.camera.getPosition())
     this.nameEntity.rotateLocal(0, 180, 0)
+
+    if (this.stats.enabled) {
+      this.stats.lookAt(this.camera.getPosition())
+      this.stats.rotateLocal(0, 180, 0)
+    }
+
     // if (this.app.keyboard.wasPressed(pc.KEY_B) && this.name === '0xe546b43E7fF912FEf7ED75D69c1d1319595F6080') {
     //   this.setBattlingAnimation(true)
     // }
@@ -52,6 +72,7 @@ class PlayerLogic extends ScriptTypeBase {
     const nameScript: any = this.getScript(this.nameEntity, 'textMesh')
     nameScript.text = setup.name
     this.name = setup.id
+    this.updateStats(setup)
     const position = this.localPositionFromCell(setup.location[0], setup.location[1])
     this.entity.setLocalScale(0.04, 0.04, 0.04)
     this.entity.setPosition(position.x, 0, position.z)
@@ -68,6 +89,8 @@ class PlayerLogic extends ScriptTypeBase {
 
   handleStateUpdate(warriorState:WarriorState) {
     const cardScript: any = this.getScript(this.cardEntity, 'textMesh')
+    this.updateStats(warriorState)
+    this.unhover()
 
     if (warriorState.currentItem) {
       const itemDescription = itemFromInventoryItem(warriorState.currentItem)
@@ -89,6 +112,32 @@ class PlayerLogic extends ScriptTypeBase {
       this.playerModel.setEulerAngles(0,0,0)
       this.playerModel.setLocalPosition(0,-1,0)
     }
+  }
+
+  toggleHover() {
+    this.nameEntity.enabled = !this.nameEntity.enabled
+    this.stats.enabled = !this.stats.enabled
+  }
+
+  hover() {
+    this.nameEntity.enabled = false
+    this.stats.enabled = true
+  }
+
+  unhover() {
+    this.nameEntity.enabled = true
+    this.stats.enabled = false
+  }
+
+  updateStats(state:WarriorState) {
+    this.statsName.element!.text = state.name
+    this.statsText.element!.text = 
+    `
+A: ${state.attack}
+D: ${state.defense}
+HP: ${state.currentHealth}/${state.initialHealth}
+$G: ${state.wootgumpBalance}
+    `.trim()
   }
 
   handleBattle(battleTick: BattleTickReport, tile: TileLogic, warriorElements: Record<string, PlayerLogic>) {

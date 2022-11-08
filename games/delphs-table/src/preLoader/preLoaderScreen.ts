@@ -17,7 +17,13 @@ class PreLoaderScreen extends ScriptTypeBase {
     this.scrollText = this.app.touch ? "pinch" : "scroll"
     this.clickText = this.app.touch ? "tap" : "click"
 
-    mustFindByName(this.entity, "DescriptionText").element!.text = this.descriptionText()
+    const descriptionText = mustFindByName(this.entity, "DescriptionText").element!
+    descriptionText.text = this.descriptionText()
+    this.app.once(MESSAGE_EVENT, (msg:any) => {
+      if (msg.type = 'TABLE_CREATED') {
+        descriptionText.text = "Get ready. Your table is prepared, it will just be a moment."
+      }
+    }, this)
 
     const sceneItem = this.app.scenes.find('DelphsBoard');
     if (!sceneItem) {

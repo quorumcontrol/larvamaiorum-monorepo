@@ -9,7 +9,6 @@ import { useRelayer } from "../../../src/hooks/useUser";
 import useGameRunner from "../../../src/hooks/firebaseGameRunner";
 import GameOverScreen from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
-import { usePlayCardMutation } from "../../../src/hooks/useDelphsTable";
 import items from "../../../src/boardLogic/items";
 
 interface GameEvent {
@@ -22,7 +21,6 @@ const Play: NextPage = () => {
   const { tableId: untypedTableId } = router.query;
 
   const [tableId, setTableId] = useState(untypedTableId as string | undefined);
-  const mutation = usePlayCardMutation(tableId);
 
   const { address } = useAccount();
   const { data: relayer } = useRelayer();
@@ -63,9 +61,11 @@ const Play: NextPage = () => {
           "Crypto Colosseum: Delph's Table",
           `/delphs-table/play?tableId=${tableId}`
         );
+        console.log("telling iframe table is ready")
+        sendToIframe({type: "TABLE_CREATED"})
       }
     },
-    [setTableId]
+    [setTableId, sendToIframe]
   );
 
   useWaitForTable(handleTableRunning);
@@ -118,7 +118,7 @@ const Play: NextPage = () => {
       }
 
     },
-    [mutation, sendToIframe, gameRunner]
+    [sendToIframe, gameRunner]
   );
 
   const handleMessage = useCallback(
@@ -192,7 +192,7 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/214bfffb`}
+                src={`https://playcanv.as/e/b/d3d3dcdc`}
                 ref={iframe}
                 top="0"
                 left="0"

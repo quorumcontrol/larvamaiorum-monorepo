@@ -3,11 +3,13 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 
 export const SELECT_EVT = 'PLAYER_SELECT'
+export const HOVER_EVT = 'START_HOVER_EVENT'
+export const STOP_HOVER_EVT = 'STOP_HOVER_EVENT'
 
 @createScript("cellSelector")
 class CellSelector extends ScriptTypeBase {
 
-  startEvent?:{
+  startEvent?: {
     time: number
     x: number
     y: number
@@ -15,7 +17,14 @@ class CellSelector extends ScriptTypeBase {
 
   lastTouch?: {
     x: number
-    y:number
+    y: number
+  }
+
+  hoverTime?: {
+    isHovering: boolean
+    time: number
+    x: number
+    y: number
   }
 
   initialize() {
@@ -27,7 +36,7 @@ class CellSelector extends ScriptTypeBase {
     // Add a mousedown event handler
     this.app.mouse.on(pc.EVENT_MOUSEDOWN, this.mouseDown, this);
     this.app.mouse.on(pc.EVENT_MOUSEUP, this.mouseUp, this);
-    // this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.clearMouseEvent, this);
+    this.app.mouse.on(pc.EVENT_MOUSEMOVE, this.handleMouseMove, this);
 
     // Add touch event only if touch is available
     if (this.app.touch) {
@@ -36,7 +45,25 @@ class CellSelector extends ScriptTypeBase {
       this.app.touch.on(pc.EVENT_TOUCHMOVE, this.setLastTouch, this);
     }
   }
-  
+
+  update(dt: number) {
+    if (this.hoverTime) {
+      this.hoverTime.time += dt
+      if (this.hoverTime.time >= 0.2 || this.hoverTime.isHovering) {
+        this.doHoverCast()
+      }
+    }
+  }
+
+  handleMouseMove(evt: MouseEvent) {
+    this.hoverTime = {
+      time: 0,
+      x: evt.x,
+      y: evt.y,
+      isHovering: !!this.hoverTime?.isHovering,
+    }
+  }
+
   mouseUp(e: pc.MouseEvent) {
     this.calculateShouldRay(e.x, e.y)
   }
@@ -74,7 +101,7 @@ class CellSelector extends ScriptTypeBase {
     this.calculateShouldRay(this.lastTouch.x, this.lastTouch.y)
   }
 
-  private calculateShouldRay(x:number, y:number) {
+  private calculateShouldRay(x: number, y: number) {
     if (!this.startEvent) {
       return
     }
@@ -97,13 +124,13 @@ class CellSelector extends ScriptTypeBase {
     this.startEvent = undefined
   }
 
-  private getDistance(x:number, y:number) {
+  private getDistance(x: number, y: number) {
     // Return the distance between the two points
     var dx = this.startEvent!.x - x;
-    var dy = this.startEvent!.y - y;    
-    
+    var dy = this.startEvent!.y - y;
+
     return Math.sqrt((dx * dx) + (dy * dy));
-};
+  };
 
   doRaycast(screenX: number, screenY: number) {
     // The pc.Vec3 to raycast from (the position of the camera)
@@ -125,6 +152,40 @@ class CellSelector extends ScriptTypeBase {
       console.log(SELECT_EVT, hitEntity)
       this.app.fire(SELECT_EVT, hitEntity)
     }
+  }
+
+  doHoverCast() {
+    if (!this.hoverTime) {
+      console.error('no hover time even though doing the hover cast')
+      return
+    }
+    // The pc.Vec3 to raycast from (the position of the camera)
+    const from = this.entity.getPosition();
+
+    // The pc.Vec3 to raycast to (the click position projected onto the camera's far clip plane)
+    const to = this.entity.camera!.screenToWorld(
+      this.hoverTime.x,
+      this.hoverTime.y,
+      this.entity.camera!.farClip
+    );
+
+    // Raycast between the two points and return the closest hit result
+    const result = this.app.systems.rigidbody!.raycastFirst(from, to);
+
+    // If there was a hit, emit the entity
+    if (result && result.entity.name == "PlayerPhysics") {
+      if (!this.hoverTime.isHovering) {
+        this.hoverTime.isHovering = true
+        const hitEntity = result.entity;
+        hitEntity.parent.fire(HOVER_EVT)
+      }
+      return
+    }
+
+    // otherwise we stopped hovering
+    this.app.fire(STOP_HOVER_EVT)
+    this.hoverTime.isHovering = false
+
   }
 }
 

@@ -121,11 +121,20 @@ class GameController extends ScriptTypeBase {
   }
 
   handleSelect(entity:Entity) {
-    console.log('game controller select: ', entity)
+    console.log('game controller select: ', entity, entity.name)
+    if (entity.name == "PlayerPhysics") {
+      const playerLogic = this.getScript<PlayerLogic>(entity.parent as Entity, 'playerLogic')
+      if (!playerLogic) {
+        throw new Error('no player logic')
+      }
+      playerLogic.toggleHover()
+      return
+    }
     if (this.canSelect) {
       const tileLogic = this.getScript<TileLogic>(entity, 'tileLogic')
       if (!tileLogic) {
-        throw new Error('missing tile logic on selected entity')
+        console.log('missing tile logic on selected entity')
+        return
       }
       this.app.fire(PENDING_DESTINATION, tileLogic)
       this.pingExternal(PENDING_DESTINATION, { destination: [tileLogic.x, tileLogic.y] })
