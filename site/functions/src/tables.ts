@@ -12,7 +12,7 @@ import SingletonQueue from "../../src/utils/singletonQueue"
 import { skaleProvider } from "../../src/utils/skaleProvider";
 import { accoladesContract, delphsContract, delphsGumpContract, playerContract, trustedForwarderContract } from "../../src/utils/contracts";
 import { questTrackerContract } from "../../src/utils/questTracker";
-import { defineSecret } from "firebase-functions/params";
+import { defineSecret, defineString } from "firebase-functions/params";
 import { memoize } from "../../src/utils/memoize";
 import { Accolades, DelphsGump, DelphsTable, Player, QuestTracker, TeamStats, TeamStats2__factory } from "../../contracts/typechain";
 import Warrior, { WarriorState, WarriorStats } from "../../src/boardLogic/Warrior"
@@ -22,6 +22,8 @@ import { TableStatus } from "../../src/utils/tables"
 import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
 import { getBytesAndCreateToken } from "skale-relayer-contracts/lib/src/tokenCreator";
+
+defineString('NEXT_PUBLIC_MAINNET')
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
 
