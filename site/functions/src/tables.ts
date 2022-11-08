@@ -23,7 +23,7 @@ import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
 import { getBytesAndCreateToken } from "skale-relayer-contracts/lib/src/tokenCreator";
 
-defineString('NEXT_PUBLIC_MAINNET')
+defineString("NEXT_PUBLIC_MAINNET")
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
 

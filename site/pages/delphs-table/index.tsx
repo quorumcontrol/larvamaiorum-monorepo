@@ -10,9 +10,12 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import Head from "next/head";
 import NextLink from "next/link";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 import Layout from "../../src/components/Layout";
+import SignupModal from "../../src/components/SignupModal";
 import { useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import { useLogin } from "../../src/hooks/useUser";
@@ -28,29 +31,44 @@ const Lobby: NextPage = () => {
     isLoggingIn: relayerLoading,
   } = useLogin();
 
+  const [showModal, setShowModal] = useState(false);
+
   const isClient = useIsClientSide();
 
   return (
     <>
+      <Head>
+        <title>Crypto Colosseum: Delph&apos;s Table</title>
+      </Head>
+      <SignupModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        ignoreSkip
+      />
       <Layout>
         <Stack direction={["column", "row"]}>
           <VStack spacing="4" alignItems="left">
             <Heading>Delph&apos;s Table</Heading>
-            <Text textColor="brand.orange">
-              $SKL rewards for playing!
-            </Text>
+            <Text textColor="brand.orange">$SKL rewards for playing!</Text>
             <Text>
               Delph&apos;s Table is a multiplayer board-game. Collect Wootgump.
-              Battle other warriors. Use your wits to outsmart your
-              competitors.
+              Battle other warriors. Use your wits to outsmart your competitors.
             </Text>
             <Text>Win accolades, and tons of rewards.</Text>
             {isClient && !isLoading && address && !username && (
-              <Box backgroundImage={border} p="10">
-                <Text>
-                  You need a username to play.
-                </Text>
-              </Box>
+              <VStack
+                backgroundImage={border}
+                p="10"
+                spacing={4}
+                alignItems="left"
+              >
+                <Text>You need a username to play.</Text>
+                <Box>
+                  <Button onClick={() => setShowModal(true)} variant="primary">
+                    Set Username
+                  </Button>
+                </Box>
+              </VStack>
             )}
             {isClient && !isLoading && address && username && (
               <VStack spacing="5" alignItems="left">
@@ -58,7 +76,11 @@ const Lobby: NextPage = () => {
                   <Spinner />
                 )}
                 {!isLoggedIn && !(relayerLoading || !readyToLogin) && (
-                  <Button variant="primary" onClick={() => login()}>Login to Play</Button>
+                  <Box>
+                    <Button variant="primary" onClick={() => login()}>
+                      Login to Play
+                    </Button>
+                  </Box>
                 )}
                 {isLoggedIn && (
                   <NextLink passHref href="/delphs-table/play">
