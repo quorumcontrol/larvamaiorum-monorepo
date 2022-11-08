@@ -25,7 +25,7 @@ import border from "../utils/dashedBorder";
 import { useUserBadges } from "../hooks/BadgeOfAssembly";
 import TeamPicker from "./TeamPicker";
 import { useUsername } from "../hooks/Player";
-import { BigNumberish } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
 
 const log = debug("SignupModal");
 
@@ -56,7 +56,7 @@ const SignupModal: React.FC<{
     try {
       setLoading(true);
       log("creating new user");
-      await login(username, newTeam);
+      await login(username, (newTeam || BigNumber.from(13)));
       queryClient.cancelQueries(queryKey);
       queryClient.setQueryData(["/player/username/", address], () => {
         return username;

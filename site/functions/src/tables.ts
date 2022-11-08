@@ -156,7 +156,7 @@ export const onLobbyWrite = functions
       const id = tableId
 
       const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
-        const [name, team, gump] = await Promise.all([
+        const [name, onchainTeam, gump] = await Promise.all([
           player.name(address),
           player.team(address),
           delphsGump.balanceOf(address),
@@ -165,6 +165,10 @@ export const onLobbyWrite = functions
           functions.logger.debug(`${address} has no name`)
           return undefined
         }
+
+        // if the address is a bot, then leave number 13, otherwise if the address is human, use team #13 (Novus Ludio)
+        const team = onchainTeam.eq(0) ? BigNumber.from(isBot ? 0: 13) : onchainTeam
+
         return {
           name,
           address,
@@ -504,9 +508,6 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
     if (reward.gt(0)) {
       // bots get 1/4 of their earnings
       const calculatedReward = team == 0 ? reward.div(4) : reward
-      if (team === 0) {
-        functions.logger.debug(`reduce ${playerId} from ${utils.formatEther(reward)} to ${utils.formatEther(calculatedReward)}`)
-      }
       memo.gumpMint[playerId] ||= { to: playerId, amount: BigNumber.from(0), team }
       memo.gumpMint[playerId].amount = memo.gumpMint[playerId].amount.add(calculatedReward)
       memo.gumpMint[playerId].team = team
