@@ -26,7 +26,7 @@ const Play: NextPage = () => {
   const { data: relayer } = useRelayer();
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
-  const [_fullScreen, setFullScreen] = useState(false);
+  const [fullScreen, setFullScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
   const { data: gameRunner, over } = useGameRunner(
@@ -80,22 +80,18 @@ const Play: NextPage = () => {
   }, [gameRunner]);
 
   const handleFullScreenMessage = useCallback(() => {
-    setFullScreen((old) => {
-      const newState = !old;
-      console.log('moving full screen to: ', newState)
-      try {
-        if (newState) {
-          iframe.current?.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-      } catch (err) {
-        console.error('full screen error: ', err)
+    if (fullScreen) {
+      if (typeof document.exitFullscreen !== 'undefined') {
+        document.exitFullscreen();
       }
-
-      return newState;
-    });
-  }, [setFullScreen]);
+      setFullScreen(false)
+      return
+    }
+    setFullScreen(true)
+    if (typeof iframe.current?.requestFullscreen !== 'undefined') {
+      iframe.current?.requestFullscreen();
+    }
+  }, [setFullScreen, fullScreen]);
 
   const handlePlayCardMessage = useCallback(
     async (evt: GameEvent) => {
@@ -192,12 +188,14 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/d3d3dcdc`}
+                src={`https://playcanv.as/e/b/503db47c`}
                 ref={iframe}
                 top="0"
                 left="0"
-                w="100%"
-                minH= "70vh"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={4_000_000}
               />
             )}
             {isClient && over && (
