@@ -31,9 +31,9 @@ const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
 const ONE = utils.parseEther("1")
 
-const NUMBER_OF_ROUNDS = 10
+const NUMBER_OF_ROUNDS = 12
 const TABLE_SIZE = 8
-const WOOTGUMP_MULTIPLIER = 24
+const WOOTGUMP_MULTIPLIER = 20
 
 const TIME_BETWEEN_ROLLS = 10
 
