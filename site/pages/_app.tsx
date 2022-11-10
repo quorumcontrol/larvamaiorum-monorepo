@@ -16,6 +16,7 @@ import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Script from "next/script";
 import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
+import "../src/utils/firebase";
 import "../styles/video-background.css";
 import "video.js/dist/video-js.css";
 

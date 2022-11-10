@@ -1,8 +1,9 @@
 import { Chain } from "@rainbow-me/rainbowkit";
 import { isTestnet } from "./networks";
+import skaleAddresses from "./skaleAddresses";
 
 export const skaleTestnet: Chain = {
-  id: 499161117,
+  id: skaleAddresses.testnet.id,
   name: 'Skale Testnet',
   network: 'skaletestnet',
   iconUrl: '/SKALE_logo.svg',
@@ -12,17 +13,17 @@ export const skaleTestnet: Chain = {
     symbol: 'sFUEL',
   },
   rpcUrls: {
-    default: 'https://staging-v2.skalenodes.com/v1/roasted-thankful-unukalhai',
-    wss: 'wss://staging-v2.skalenodes.com/v1/ws/roasted-thankful-unukalhai',
+    default: skaleAddresses.testnet.default,
+    wss: skaleAddresses.testnet.wss,
   },
   blockExplorers: {
-    default: { name: 'BlockScout', url: 'https://roasted-thankful-unukalhai.explorer.staging-v2.skalenodes.com/' },
+    default: { name: 'BlockScout', url: skaleAddresses.testnet.explorer },
   },
   testnet: true,
 };
 
 export const skaleMainnet: Chain = {
-  id: 1032942172,
+  id: skaleAddresses.mainnet.id,
   name: 'Crypto Rome Network',
   network: 'cryptorome',
   iconUrl: '/SKALE_logo.svg',
@@ -33,11 +34,11 @@ export const skaleMainnet: Chain = {
     symbol: 'sFUEL',
   },
   rpcUrls: {
-    default: 'https://mainnet.skalenodes.com/v1/haunting-devoted-deneb',
-    wss: 'wss://mainnet.skalenodes.com/v1/ws/haunting-devoted-deneb',
+    default: skaleAddresses.mainnet.default,
+    wss: skaleAddresses.mainnet.wss,
   },
   blockExplorers: {
-    default: { name: 'BlockScout', url: 'https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/' },
+    default: { name: 'BlockScout', url: skaleAddresses.mainnet.explorer },
   },
   testnet: false,
 }

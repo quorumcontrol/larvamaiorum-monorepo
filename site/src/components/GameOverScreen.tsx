@@ -12,7 +12,7 @@ import NextLink from "next/link";
 import { useMemo } from "react";
 import { SocialIcon } from "react-social-icons";
 import { InventoryItem } from "../boardLogic/items";
-import { GameRunner } from "../hooks/gameRunner";
+import { GameRunner } from "../hooks/firebaseGameRunner";
 import { ACCOLADES_WITH_IMAGES } from "../utils/accoladesWithImages";
 import AccoladeCard from "./AccoladeCard";
 

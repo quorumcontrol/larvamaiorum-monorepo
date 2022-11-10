@@ -10,14 +10,13 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
+import Head from "next/head";
 import NextLink from "next/link";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useAccount } from "wagmi";
-import { BigNumberish } from "ethers";
-import AppLink from "../../src/components/AppLink";
 import Layout from "../../src/components/Layout";
-import TeamPicker from "../../src/components/TeamPicker";
-import { useTeam, useUsername } from "../../src/hooks/Player";
+import SignupModal from "../../src/components/SignupModal";
+import { useUsername } from "../../src/hooks/Player";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import { useLogin } from "../../src/hooks/useUser";
 import border from "../../src/utils/dashedBorder";
@@ -31,76 +30,57 @@ const Lobby: NextPage = () => {
     readyToLogin,
     isLoggingIn: relayerLoading,
   } = useLogin();
-  const { data: team, isFetched: teamFetched } = useTeam(address);
+
+  const [showModal, setShowModal] = useState(false);
 
   const isClient = useIsClientSide();
 
-  const [pickedTeam, setPickedTeam] = useState<BigNumberish | undefined>();
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const onTeamPick = useCallback(async () => {
-    try {
-      setErr("");
-      setLoading(true);
-      await login(undefined, pickedTeam);
-    } catch (err) {
-      console.error("error saving team: ", err);
-      setErr("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [pickedTeam, login, setLoading, setErr]);
-
   return (
     <>
+      <Head>
+        <title>Crypto Colosseum: Delph&apos;s Table</title>
+      </Head>
+      <SignupModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        ignoreSkip
+      />
       <Layout>
         <Stack direction={["column", "row"]}>
           <VStack spacing="4" alignItems="left">
             <Heading>Delph&apos;s Table</Heading>
-            <Text textColor="brand.orange">
-              12,500 $SKL rewards for this week!
-            </Text>
+            <Text textColor="brand.orange">$SKL rewards for playing!</Text>
             <Text>
               Delph&apos;s Table is a multiplayer board-game. Collect Wootgump.
-              Battle other warriors. Use your wits to outsmart your
-              competitors.
+              Battle other warriors. Use your wits to outsmart your competitors.
             </Text>
-            <Text>Win acolades, and tons of rewards.</Text>
-            {loading && <Spinner />}
-            {isClient && username && teamFetched && !team && !loading && (
-              <Box p="5" backgroundImage={border}>
-                <Text fontSize="md">
-                  Pick your team to play. You only have to do this once. You can
-                  change your team later.
-                </Text>
-                <TeamPicker address={address} onSelect={setPickedTeam} hideTitle />
-                <Box>
-                  {!!pickedTeam && (
-                    <Button variant="primary" onClick={() => onTeamPick()}>
-                      Save
-                    </Button>
-                  )}
-                  {err && <Text colorScheme="red">{err}</Text>}
-                </Box>
-              </Box>
-            )}
+            <Text>Win accolades, and tons of rewards.</Text>
             {isClient && !isLoading && address && !username && (
-              <Box backgroundImage={border} p="10">
-                <Text>
-                  You need a username and a{" "}
-                  <AppLink href="/badge-of-assembly">Badge of Assembly</AppLink>{" "}
-                  to play.
-                </Text>
-              </Box>
+              <VStack
+                backgroundImage={border}
+                p="10"
+                spacing={4}
+                alignItems="left"
+              >
+                <Text>You need a username to play.</Text>
+                <Box>
+                  <Button onClick={() => setShowModal(true)} variant="primary">
+                    Set Username
+                  </Button>
+                </Box>
+              </VStack>
             )}
-            {isClient && !isLoading && address && username && team && !loading && (
+            {isClient && !isLoading && address && username && (
               <VStack spacing="5" alignItems="left">
                 {!isLoggedIn && (relayerLoading || !readyToLogin) && (
                   <Spinner />
                 )}
                 {!isLoggedIn && !(relayerLoading || !readyToLogin) && (
-                  <Button variant="primary" onClick={() => login()}>Login to Play</Button>
+                  <Box>
+                    <Button variant="primary" onClick={() => login()}>
+                      Login to Play
+                    </Button>
+                  </Box>
                 )}
                 {isLoggedIn && (
                   <NextLink passHref href="/delphs-table/play">

@@ -6,15 +6,10 @@ import { useAccount } from "wagmi";
 import LoggedInLayout from "../../../src/components/LoggedInLayout";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import { useRelayer } from "../../../src/hooks/useUser";
-import promiseWaiter from "../../../src/utils/promiseWaiter";
-import SingletonQueue from "../../../src/utils/singletonQueue";
-import useGameRunner from "../../../src/hooks/gameRunner";
+import useGameRunner from "../../../src/hooks/firebaseGameRunner";
 import GameOverScreen from "../../../src/components/GameOverScreen";
 import { useRegisterInterest, useWaitForTable } from "../../../src/hooks/Lobby";
-import { usePlayCardMutation } from "../../../src/hooks/useDelphsTable";
 import items from "../../../src/boardLogic/items";
-
-const txQueue = new SingletonQueue();
 
 interface GameEvent {
   type: string;
@@ -26,13 +21,12 @@ const Play: NextPage = () => {
   const { tableId: untypedTableId } = router.query;
 
   const [tableId, setTableId] = useState(untypedTableId as string | undefined);
-  const mutation = usePlayCardMutation(tableId);
 
   const { address } = useAccount();
   const { data: relayer } = useRelayer();
   const isClient = useIsClientSide();
   const iframe = useRef<HTMLIFrameElement>(null);
-  const [_fullScreen, setFullScreen] = useState(false);
+  const [fullScreen, setFullScreen] = useState(false);
   const [ready, setReady] = useState(false);
   const registerInterestMutation = useRegisterInterest();
   const { data: gameRunner, over } = useGameRunner(
@@ -67,9 +61,11 @@ const Play: NextPage = () => {
           "Crypto Colosseum: Delph's Table",
           `/delphs-table/play?tableId=${tableId}`
         );
+        console.log("telling iframe table is ready")
+        sendToIframe({type: "TABLE_CREATED"})
       }
     },
-    [setTableId]
+    [setTableId, sendToIframe]
   );
 
   useWaitForTable(handleTableRunning);
@@ -84,22 +80,18 @@ const Play: NextPage = () => {
   }, [gameRunner]);
 
   const handleFullScreenMessage = useCallback(() => {
-    setFullScreen((old) => {
-      const newState = !old;
-      console.log('moving full screen to: ', newState)
-      try {
-        if (newState) {
-          iframe.current?.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-      } catch (err) {
-        console.error('full screen error: ', err)
+    if (fullScreen) {
+      if (typeof document.exitFullscreen !== 'undefined') {
+        document.exitFullscreen();
       }
-
-      return newState;
-    });
-  }, [setFullScreen]);
+      setFullScreen(false)
+      return
+    }
+    setFullScreen(true)
+    if (typeof iframe.current?.requestFullscreen !== 'undefined') {
+      iframe.current?.requestFullscreen();
+    }
+  }, [setFullScreen, fullScreen]);
 
   const handlePlayCardMessage = useCallback(
     async (evt: GameEvent) => {
@@ -112,14 +104,17 @@ const Play: NextPage = () => {
         if (!item) {
           throw new Error("item not found in the UI layer");
         }
-        await mutation.mutateAsync({ address: item.address, id: item.id });
+        if (!gameRunner) {
+          throw new Error('no game runner')
+        }
+        await gameRunner.playCard(item.address, item.id)
       } catch (err) {
         console.error('error playing card', err)
         sendToIframe({type: 'cardError', data: {}})
       }
 
     },
-    [mutation, sendToIframe]
+    [sendToIframe, gameRunner]
   );
 
   const handleMessage = useCallback(
@@ -130,29 +125,18 @@ const Play: NextPage = () => {
       if (!tableId) {
         throw new Error("no tableId");
       }
+      if (!gameRunner) {
+        throw new Error("missing game runner")
+      }
 
       console.log("params", tableId, appEvent.data);
-      txQueue.push(async () => {
-        await promiseWaiter(500); // try to fix a broken nonce issue
-        const delphsTable = relayer.wrapped.delphsTable();
-        const tx = await delphsTable.setDestination(
-          tableId,
-          appEvent.data.destination[0],
-          appEvent.data.destination[1],
-          { gasLimit: 250000 }
-        ); // normally around 80k
-        console.log("--------------- destination tx: ", tx);
-        return await tx
-          .wait()
-          .then((receipt) => {
-            console.log("------------ destination receipt: ", receipt);
-          })
-          .catch((err) => {
-            console.error("----------- error with destinationSetter", err);
-          });
-      });
+      try {
+        await gameRunner.setDestination(appEvent.data.destination[0], appEvent.data.destination[1])
+      } catch (err) {
+        console.error("error setting destination: ", err)
+      }
     },
-    [tableId, relayer]
+    [tableId, relayer, gameRunner]
   );
 
   useEffect(() => {
@@ -204,12 +188,14 @@ const Play: NextPage = () => {
                 id="game"
                 as="iframe"
                 // src={`https://playcanv.as/e/b/d5i364yY/?player=${address}`}
-                src={`https://playcanv.as/e/b/214bfffb`}
+                src={`https://playcanv.as/e/b/503db47c`}
                 ref={iframe}
                 top="0"
                 left="0"
-                w="100%"
-                minH= "70vh"
+                w={fullScreen ? "100vw" : "100%"}
+                minH={fullScreen ? "100vh" : "70vh"}
+                position={fullScreen ? "fixed" : undefined}
+                zIndex={4_000_000}
               />
             )}
             {isClient && over && (

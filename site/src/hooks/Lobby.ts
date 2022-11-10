@@ -3,6 +3,8 @@ import { useMutation, useQueryClient, useQuery } from "react-query";
 import { useAccount, useSigner } from "wagmi";
 import { lobbyContract, playerContract } from "../utils/contracts";
 import { useRelayer } from "./useUser";
+import { addressToUid, db } from '../../src/utils/firebase'
+import { doc, setDoc, serverTimestamp, onSnapshot } from "firebase/firestore"; 
 
 const WAITING_PLAYERS_KEY = "waiting-players"
 
@@ -38,46 +40,33 @@ export const useWaitForTable = (onTableStarted: (tableId?: string) => any) => {
   const { address } = useAccount();
 
   useEffect(() => {
-    if (!address || !lobbyContract) {
+    if (!address) {
       return;
     }
-    const handle = (_: string, tableId: string, _evt: any) => {
-      onTableStarted(tableId);
-    };
-    const filter = lobbyContract().filters.GameStarted(address, null);
-    lobbyContract().on(filter, handle);
+    const docRef = doc(db, `playerLocations/${addressToUid(address)}`)
+    const unsub = onSnapshot(docRef, (doc) => {
+      console.log("got a table id: ", doc, doc.data())
+      const data = doc.data()
+      if (!data ) {
+        return
+      }
+      onTableStarted(data.table);
+    })
     return () => {
-      lobbyContract().off(filter, handle);
+      unsub()
     };
   }, [address, onTableStarted]);
 };
 
+// TODO: can we time this out on the client to set the "Hey I'm still here bit"
 export const useRegisterInterest = () => {
   const queryClient = useQueryClient();
-  const { data:relayer } = useRelayer()
 
   return useMutation(async ({ addr }: { addr: string }) => {
-    if (!relayer?.ready()) {
-      throw new Error("the relayer must be ready to register interest");
-    }
-    const tx = await relayer.wrapped.lobby().registerInterest();
-    await tx.wait()
-    return {
-      addr
-    }
+    await setDoc(doc(db, "delphsLobby", addressToUid(addr)), {
+      timestamp: serverTimestamp(),
+    });
   }, {
-    // onMutate: async (thisPlayer) => {
-    //   await queryClient.cancelQueries(WAITING_PLAYERS_KEY)
-
-    //   const previousPlayers = queryClient.getQueryData(WAITING_PLAYERS_KEY)
- 
-    //   // Optimistically update to the new value
-    //   queryClient.setQueryData(WAITING_PLAYERS_KEY, (old:{addr:string}[]|undefined) => [...(old || []), thisPlayer])
-  
-    //   // Return a context object with the snapshotted value
-    //   return { previousPlayers }
-      
-    // },
     onError: (err, _newPlayer, context) => {
       console.error('error joinging: ', err)
       // queryClient.setQueryData(WAITING_PLAYERS_KEY, context ? context.previousPlayers : [])

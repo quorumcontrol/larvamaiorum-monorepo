@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import RelayManager from "../utils/relayer";
 import { BigNumberish } from "ethers";
 import { playerContract } from "../utils/contracts";
+import { auth, getToken } from "../utils/firebase";
+import { signInWithCustomToken } from "firebase/auth";
 
 export const useRelayer = () => {
   const { data:signer } = useSigner()
@@ -74,6 +76,16 @@ export const useLogin = () => {
       }
 
       await setUserNameAndOrTeam()
+
+      console.log('------------- firebase')
+      const resp = await getToken({
+        userAddress: relayer.address,
+        relayerAddress: relayer.deviceWallet?.address,
+        issuedAt: relayer.deviceToken?.issuedAt,
+        token: relayer.deviceToken?.signature.toString(),
+      })
+      console.log('resp: ', resp.data)
+      await signInWithCustomToken(auth, (resp.data as any).firebaseToken)
 
       setLoggedIn(true)
     } catch (err) {
