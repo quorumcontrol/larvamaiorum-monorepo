@@ -1,0 +1,13 @@
+{
+  "name": "Stonespire Mask",
+  "description": "A cold, heartless cabal is said to have conducted perverse and inhumane experiments on a colossal being located in an underground tower, a strange geologic formation. The Stonespire Mask was found embedded in the earth near this spire and is said to carry a fragment of the spirit of the creature that was experimented upon.  The depraved stone mages who resided there are long gone, and some believe that the spirit who was stuffed in the mask still haunts the dark tower.",
+  "tokenId": 90,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/77_Stonespire_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

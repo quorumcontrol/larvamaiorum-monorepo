@@ -1,0 +1,13 @@
+{
+  "name": "Devilcaller Mask",
+  "description": "Made from metal, this mask was liberated from the lair of the Fallen Zar. It is crafted with demonic blood and is thought to once belong to a powerful creature that sought to escape their circle of existence. In other words, this mask is a beacon for these demons. Whoever donned this ritualistic mask also seeks that same escape. Wisdom dictates that it stay in its original place.",
+  "tokenId": 244,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/219_Devilcaller_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

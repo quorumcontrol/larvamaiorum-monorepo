@@ -1,0 +1,13 @@
+{
+  "name": "Adamantine Mask of Inspiration",
+  "description": "This axescarred mask  was forged from adamantine under the watchful eye of the Smith God. What it must have been to craft something so beautiful, without proof of its intended function! After the onset of twilight, the Smith gave this mask away as he quietly departed for an unknown destination. One day, an enterprising but foolish young soldier in the service of Orris IV came across this rare and unearthly object. The soldier donned the mask and has since found himself wandering the wastes.",
+  "tokenId": 55,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/178_Adamantine_Mask_of_Inspiration.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

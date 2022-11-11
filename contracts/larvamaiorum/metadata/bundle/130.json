@@ -1,0 +1,13 @@
+{
+  "name": "Diving Mask",
+  "description": "This mask was found with other diving equipment on an expedition to the South of the DAO lands, where an ancient city is said to be obscured on the edge of a mountain that overlooks the sea. Signs of great floods and landslides still scar the surrounding areas, which is likely to be the remains of an ancient pre-Protectorate city.  It was theorized by an explorer that this mask was taken from the city during its destruction and hurriedly left in a relic cave in the south.",
+  "tokenId": 130,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/78_Diving_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

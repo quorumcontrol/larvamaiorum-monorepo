@@ -1,0 +1,13 @@
+{
+  "name": "The Praetorian Mask",
+  "description": "Another one of the masks crafted by an ancient people, precursors to the Crypto Romans, to ward off an ancient menace. This mask has been handed down from one member to the next of this elite group, stationed in an ancient temple along the east coast of the continent, who would defend against any invasion. The Praetorian Mask bears the likeness of the ancient warrior and it is said that his spirit ebbs and flows from this mask.",
+  "tokenId": 238,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/56_The_Praetorian_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

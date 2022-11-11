@@ -1,0 +1,13 @@
+{
+  "name": "Dusty mask",
+  "description": "The Blood Crescent clan of the Iron Kingdoms harbors a rare obsession with compiling records, documents and texts in its private Library. So great is their obsession that they often collect mundane writings from throughout the Empire to add to their Library.  One such text, thought to be the diary of the city's former billionaire, the \"Prince of Dirt\", was found in a dwelling of the displaced near the Crossing and brought back to this library. The Dusty Mask is an accoutrement of this rare book.",
+  "tokenId": 198,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/89_Dusty_mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

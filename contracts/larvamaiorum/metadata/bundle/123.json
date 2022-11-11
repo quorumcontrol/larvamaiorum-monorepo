@@ -1,0 +1,13 @@
+{
+  "name": "Steppe Rider Mask",
+  "description": "The queen of the mounts is the first ruffian on horseback, the strongest of all steppe riders. Residents of the steppes ride swift camels out of necessity, but some craft elaborate costumes to overtake their foes. This mask was from a queen's costume that she wore to deceive her followers and frighten her enemies.  Judging from the smeared blood on this mask, it can be concluded that it was worn for blood duels where guile and a swift steed were key.",
+  "tokenId": 123,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/132_Steppe_Rider_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Forlorn Mask",
+  "description": "This mask can trace its origins to a wisp lost from another plane of existence at the edge of the sky. The particular story that led to this mask coming into existence is more sad, than terrible. A fragment of this spirit sought refuge on the edge of the Crypto-Roman empire and lent shelter to those who entered its domain. After centuries of isolation, the wisp vanished in a streak of light as a result of an elaborate, cruel trick played by nameless evil.",
+  "tokenId": 245,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/48_Forlorn_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

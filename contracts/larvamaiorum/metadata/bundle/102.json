@@ -1,0 +1,13 @@
+{
+  "name": "The Spiteful Castmask",
+  "description": "Deep in the steamy jungles to the north, in a cave full of snakes, spiders, and other nasties, only the bravest of fiends would tarry. Enough courage was found to explore as deep as can be hacked through a crawling ravine.  To reward their courage and make it safe for a general to cross this gully, a trove of items from ages past were found, including this castmask. The face is said to not fit any living person though it gives a sense of meanness that is enough for most warlords.",
+  "tokenId": 102,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/102_The_Spiteful_Castmask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

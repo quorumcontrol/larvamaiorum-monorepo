@@ -1,0 +1,13 @@
+{
+  "name": "Daylit Mask",
+  "description": "A merchant vessel plowed across the sea with a hull full of carrots, soups, and bendable lampshades. The ship was surrounded by the icy ocean, but not a single iceberg in sight. High up in the crow's nest, the least sightly of their scurvy crew was delighted to see the legendary gleaming iceberg Konighami in the distance. There they found the Daylit Mask, embedded in the shining ice, too shy to descend to greet them.",
+  "tokenId": 70,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/208_Daylit_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

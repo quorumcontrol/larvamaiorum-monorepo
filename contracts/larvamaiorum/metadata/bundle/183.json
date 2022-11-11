@@ -1,0 +1,13 @@
+{
+  "name": "Mask of Twisting Vestiges",
+  "description": "This mask is bright and festive on the outside, with a cheery opening on the bottom and a thorny crown at its crest. Happy eyes peer inquisitively from deep within its confines. But look closer  and find that it has a living mouth, twisted in anger and hunger and so very, very hungry.  The mask wanders and wants to caress, but a single touch of its crackling surface will set a man aflame. Who has been chasing the mask, or who the mask has been chasing?",
+  "tokenId": 183,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/180_Mask_of_Twisting_Vestiges.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Forgotten Battler's Mask",
+  "description": "Its design is unknown but these masks are said to have been forged in the fire by the great inventor, maker of all things. They were left to the Wastelands to be forgotten and found by their new keepers. Rumors persist that their great purpose lies in their design and it is only a matter of time before somebody discovers what lies beneath the  mask: the eyes that only witness battles.",
+  "tokenId": 177,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/95_Forgotten_Battler_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

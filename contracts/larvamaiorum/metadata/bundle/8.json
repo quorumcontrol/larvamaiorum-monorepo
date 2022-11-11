@@ -1,0 +1,13 @@
+{
+  "name": "Elven Beastmaster Mask",
+  "description": "Supposedly, this set of masks hung from the skull of an elven creature who lived in the woods. Sentient beings succumbed to the will of this beast; a beast with a taste for human flesh. According to popular legend he is also something of an expert on woodland beasts and he was killed by the gods. But due to this waste of potential, they felt merciful and allowed him to roam the wilderness, feral and free. In return he gifted them with this strange and fearsome mask, which  shouldn't have surprised them, as all of his masks were also sentient beings. He would kill them to make one, as he hunted prey to fill his belly.",
+  "tokenId": 8,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/214_Elven_Beastmaster_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    }
+  ]
+}

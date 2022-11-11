@@ -1,0 +1,13 @@
+{
+  "name": "Tribulation Ant Mask",
+  "description": "The Tribulation Ant mask was found deep within the belly of a giant, red ant hungry to cling to life. A vagabond traveler took pity on the dying insect, delivering him to a farmer's care. The giant, red ant allowed this mask to be removed from his belly, and after it was removed he recovered and returned to the forest. It is a great mystery how the mask ended up in the ant's abdomen in the first place.",
+  "tokenId": 202,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/1_Tribulation_Ant_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

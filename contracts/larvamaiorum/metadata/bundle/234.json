@@ -1,0 +1,13 @@
+{
+  "name": "Bubbling Mask",
+  "description": "This mask was found on the seashore of the Shoal Islands, in an underwater tomb guarded by bubbling skulls. The journal of a long lost civilization tells of a great cataclysm that took place some 12,000 years ago, and that this mask was the mortician's final project, meant to convey not just the living face of a brave and noble warrior, but also the thoughtful countenance of their ancestors.",
+  "tokenId": 234,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/164_Bubbling_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

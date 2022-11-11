@@ -1,0 +1,13 @@
+{
+  "name": "Golden Coin Greep Mask",
+  "description": "The imperious Golden Coin Greep used to perch high on a tall skyscraper, wearing this mask collecting a tax from any not keeping careful watch of their coinpurses, but fell from its resting place during one of the many wars between the Crypto Roman Empire and the Iron Kingdoms. Stunned by its unceremonious descent, it crashed through roofs of many homes. Some say if one dons this lost mask, it will show you where there are hidden treasures within your world.",
+  "tokenId": 243,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/79_Golden_Coin_Greep_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

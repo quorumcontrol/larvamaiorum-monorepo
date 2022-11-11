@@ -1,0 +1,13 @@
+{
+  "name": "Monster Magazine Mask",
+  "description": "Pagan Publishing released an inventory of real and fictitious sea creatures in the Crypto World. This headwear appears to be based off one of the known monsters, the Necronaut. This mask came as a complimentary gift with the one of a kind first printing of the Monster Magazine.  Hoarders, keep this one in your collection for bragging rights.",
+  "tokenId": 150,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/10_Monster_Magazine_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

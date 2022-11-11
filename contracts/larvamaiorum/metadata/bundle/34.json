@@ -1,0 +1,13 @@
+{
+  "name": "Dire Religion Mask",
+  "description": "In the barren Iron Kingdoms, a group of travelers decided to stay in a local abandoned church. They quickly found out it was not abandoned after all and so they had a beastly night between hunting through dark and winding halls. One by one they either succumbed to fatigue, fear, or an awful death. By the time the expedition mounted their nerve and made their escape, all that greeted them was a courtyard with a pedestal bearing this mask.",
+  "tokenId": 34,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/123_Dire_Religion_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

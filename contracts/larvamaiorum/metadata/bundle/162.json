@@ -1,0 +1,13 @@
+{
+  "name": "The Black Piesta",
+  "description": "A magpie from a parallel world, the Black Piesta has been know to rob those who come within its reach of important trinkets and hidden wealth. A legend arose of the Black Piesta after an incredible series of lab experiments collected  tenured scholars from across the world. Inspired by the parallel world theory, these tenured scholars feverishly worked to create a gate between worlds. The gate closed almost immediately, but not before this mask slipped through.",
+  "tokenId": 162,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/15_The_Black_Piesta.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

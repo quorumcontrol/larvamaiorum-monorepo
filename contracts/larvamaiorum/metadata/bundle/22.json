@@ -1,0 +1,13 @@
+{
+  "name": "Elder Dragon Mask",
+  "description": "Incredible as it is true, this mask would have been one of the trophies from the many battles of a great wigislord. Bearing it proudly, the wigislord crossed the land, invincible.  It was said that the Elder Dragon's power would shoot lightning from its eyes and deafen an opponent with the roar of the wind. Even the mighty League could not stop it. A lazy dragon, this one. They called him Listless one.",
+  "tokenId": 22,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/19_Elder_Dragon_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

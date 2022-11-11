@@ -1,0 +1,13 @@
+{
+  "name": "Cardboard Burglar Mask",
+  "description": "Paying close attention, an explorer has noted that the Cardboard Burglar's mask seems to have been picked up from pieces of debris on an upper floor in the city of Kita, famous for its clock towers. It may have been wrapped in a window dressing from the bodega street market, the curtain to a private residence, or one of the banners that greet travelers exiting the city walls. A truly magnificent feat of fashioning has gone into this creation, it was not just thrown together!",
+  "tokenId": 39,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/107_Cardboard_Burglar_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

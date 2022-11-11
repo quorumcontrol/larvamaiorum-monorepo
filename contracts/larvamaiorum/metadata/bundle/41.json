@@ -1,0 +1,13 @@
+{
+  "name": "Hydro Mask",
+  "description": "A storm came upon this young traveler as he trekked his way through the perilous Foothills of Mount Oseibo. Seeking refuge from the unending rain, this traveler found himself within a holding cell, where a woman was found, who pleaded for help from behind her cell's bars. This woman's request was answered, and the traveller received this mask, but he could not fathom the depths of what he had unlocked. A curse was past; a debt forever scrapped, but at what expense?",
+  "tokenId": 41,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/138_Hydro_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

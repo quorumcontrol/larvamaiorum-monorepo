@@ -1,0 +1,13 @@
+{
+  "name": "Jungle Predator Mask",
+  "description": "This mask was surreptitiously taken from the Hive of the Hunted, an empire of terror that inhabited an overgrown patch of the  jungle and rose to power before invading the borderlands of the Burning Steppe. Uncovering details about this conquest is a tricky task and chances are that the Hive's reign of control is far from finished.",
+  "tokenId": 205,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/21_Jungle_Predator_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

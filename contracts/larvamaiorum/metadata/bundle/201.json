@@ -1,0 +1,13 @@
+{
+  "name": "Mazebeast's Mask",
+  "description": "Deep in the imperial sands there is a rumored maze, made of ivory and gems. A creature resides deep within it, without a face and without dreams.  Travelers who have the fortune to cross paths with this beast say that the Mazebeast is a creature of night who seeks the alliance of others. He has traded a spare few masks from his collections to travellers in exchange for stories and favors.",
+  "tokenId": 201,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/53_Mazebeast_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

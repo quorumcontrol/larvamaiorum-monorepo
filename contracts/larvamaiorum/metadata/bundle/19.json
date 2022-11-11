@@ -1,0 +1,13 @@
+{
+  "name": "Sundial Mask",
+  "description": "An astronomatrix told a legend to travelers far and wide of how a sundial, wielded by the hand of the sky god, had been concealing the truth about dark matter for generations. She spun a tale of intrigue and forbidden knowledge that led many travelers to leap at the chance of locating this immense, spherical object. The sundial was eventually found in an ancient temple that perched on the edge of the purple waterfall and was found by those travelers who were hungry for answers. This mask sat in its center.",
+  "tokenId": 19,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/23_Sundial_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Screaming Elephant Mask",
+  "description": "The people of the burning steppe are a violent race and though they speak in great booming voices, to speak to one in an inadequate voice is considered a great insult. One fateful day a naive traveler submitted to their will with low moans of disappointment after shattering his voice on their inhospitable terrain. The traveler sought consolation at the edge of their nation, in the limestone thermal pools. But so unlucky he was that a family of elephant warriors followed him, and they trampled him, leaving behind only this mask.",
+  "tokenId": 135,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/73_Screaming_Elephant_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

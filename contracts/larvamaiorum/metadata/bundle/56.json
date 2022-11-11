@@ -1,0 +1,13 @@
+{
+  "name": "Revolutionary Betrayal Shield",
+  "description": "Infected by a plague, the curse manifested on this mask, glowing with a putrid green light. Iron spikes protruding from the mask made it unusable by any but the most stalwart warrior, lest he or she risk impalement. Stained with corruption and riveted in history, it must not be forgotten. It was held by the least loyal men who died conquering the opposing forces of a monarch who had once been their sovereign. Unwilling to die in disgrace by bending the knee, they were approached by a robed man with red beams of light streaming from under his hood.",
+  "tokenId": 56,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/140_Revolutionary_Betrayal_Shield.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

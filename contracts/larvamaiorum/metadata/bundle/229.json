@@ -1,0 +1,13 @@
+{
+  "name": "Eternal Mask",
+  "description": "It is said that no one can ever take away the memories of this mask, because it casts its memory in obsidian, forging a relic that will last for eternity. This mask was molded bu volcanic rock, limestone and the holy waters of the sources of life to endow the wearer with the power gained from lifetimes worth of conflict and despair: understanding.  Whether you are learning or unlearning from a hard life, this mask will allow you see the world through a different lens.",
+  "tokenId": 229,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/115_Eternal_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Dragon Skull Mask",
+  "description": "The people of the Burning Steppes have a fearsome but strangely endearing way of napping, telling tales in their slumber, and the dragon skull mask is indeed a sharing device for one of their great myths, that of the dragon Kamyal. Kamyal might have preferred to live in a world without humans, but humans are not inclined to allow her wish come true.  Brought to life by the mountain's own screams, Kamyal is the ravener that burnt villages to the ground, she is the one who might have been called queen if the humans tried to make her one. This mask was found in her hoard after she fled the steppe.",
+  "tokenId": 27,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/114_Dragon_Skull_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

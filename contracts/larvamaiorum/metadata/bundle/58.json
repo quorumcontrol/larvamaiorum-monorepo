@@ -1,0 +1,13 @@
+{
+  "name": "Genie's Face",
+  "description": "In the Fabrikator Lands, this mask is said to be found at the bottom of a glass pit in the middle of a potent, poisonous pond. The one who desired it, dared to drink the water and then climb up the glass and buckle himself as tight, as possible, around the throat with a strong black thread. He let himself fall backwards into the water, where he would proceed to wait for the moment when the watery sprite descended below and in rarity handed over her mask with the utmost care.",
+  "tokenId": 58,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/197_Genie_s_Face.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Demonic Forester Mask",
+  "description": "The Vhudom Forest is a cursed place, where the trees all seem to have eyes, and their menacing skeletons protrude from their brittle soil. Those who dare to enter might someday awaken the spirit of the Forester, who will dispatch them with a terrible curse. One explorer, who ventured too deep into this forest, was successful in finding the spirit's grave within a grim visage deep in the woods. Could it be that this mask, found not far from that grave, is not the death knell of a greedy treasure seeker? Was he killed by the spirit of the Forester?",
+  "tokenId": 51,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/248_Demonic_Forester_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

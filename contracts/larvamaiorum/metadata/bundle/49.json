@@ -1,0 +1,13 @@
+{
+  "name": "Pupil of Alek",
+  "description": "A great mage and scholar from the northern hemisphere, Alek was revered by kings and peasants alike. He was said to have the power to know any language just by listening, to tame any beast and to foresee many future events. This most powerful wizard was said to have had a royal secret that he concealed with a mask. One day Alek abandoned his home incognito and travelled the world, taking up residence in the king's palace. In time Alek reappeared in public and wore a mask everywhere. The crazed kings finally found out who it was, had him locked up, then executed.",
+  "tokenId": 49,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/233_Pupil_of_Alek.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

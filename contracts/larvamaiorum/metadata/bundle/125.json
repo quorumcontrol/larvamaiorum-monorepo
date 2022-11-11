@@ -1,0 +1,13 @@
+{
+  "name": "Dragongrave Mask",
+  "description": "Ever since the arrival of the Dragongrave, reports have been pouring in of madmen in the borders of the Fabrikator Collective causing panic and terrorizing refugees. There is a general consensus among scholars that coincidence is unlikely. The Dragongrave Mask, according to the Dragongrave legend, can teach one to speak with dragons, but it's only for the brave and stable of mind. There are hints of it being seen somewhere within the Tower Shard of the Fabrikator Collective.",
+  "tokenId": 125,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/147_Dragongrave_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

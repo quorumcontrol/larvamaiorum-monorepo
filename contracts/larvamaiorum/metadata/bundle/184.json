@@ -1,0 +1,13 @@
+{
+  "name": "Eidolon's Pact Mask",
+  "description": "Rumors in Eidolon Academia suggest that a pact was formed between the faerie folk, a human, and a sorfgrith. The three would traverse the world in search of the ever  elusive mysteries of the past. All they asked in return was that they be spared destruction. This special mask, made by great smiths, is said to have shielded them from the present and the past and forever wards them off of future destruction.",
+  "tokenId": 184,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/130_Eidolon_s_Pact_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

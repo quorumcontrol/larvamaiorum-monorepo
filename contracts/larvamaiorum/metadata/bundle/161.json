@@ -1,0 +1,13 @@
+{
+  "name": "Fabrication Tamer Mask",
+  "description": "This mask was reportedly found in a Colossal Nest in the dark corners of eastern Gwynnd's Archipelago. Whether it was abandoned or taken by the mechanical Roc that resides there is unknown. Even the storyteller who had led explorers to the nest wept and fled, refusing to tell the secrets she had seen.  But the few who remained to witness the Roc settling into its clutch were rewarded with this mask.",
+  "tokenId": 161,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/179_Fabrication_Tamer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

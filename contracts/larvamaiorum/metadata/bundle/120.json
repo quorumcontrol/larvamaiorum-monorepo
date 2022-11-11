@@ -1,0 +1,13 @@
+{
+  "name": "Dragonborn Mask",
+  "description": "The mask comes from an ancient proverb in a culture before humanity. The dragonborn told tales and prophecies of dragons, demon masks and the intelligent minds that are yet to exist. This mask is said to have been worn by the dragonborn's leader when she was cast away from the rest of her kind. But before she rested, she left this mask for any who would pick it up.",
+  "tokenId": 120,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/26_Dragonborn_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

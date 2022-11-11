@@ -1,0 +1,13 @@
+{
+  "name": "Glider Mask",
+  "description": "This mask was surreptitiously taken from the Hive of the Gliders, an empire of terror that inhabited an overgrown landscape and rose to power before invading the Border Lands. Uncovering details about this conquest is a tricky task and chances are that the Hive's reign of control is far from finished.",
+  "tokenId": 182,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/3_Glider_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

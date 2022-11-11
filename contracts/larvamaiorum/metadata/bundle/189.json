@@ -1,0 +1,13 @@
+{
+  "name": "Chainrattler Mask",
+  "description": "This mask was found in a cavern beneath the Sabrum Dek monument in the DAO lands. The cavern was littered with human bones, so it is clear someone imprisoned here never escaped. One document on the desk of this unincarcerated victim condemned and denounced that unholy act they called colonization and the chainrattler was left there, in the shadows of the monument, as their gesture of defiance. It's unclear how come this satchel was the only artifact left behind, but it is the most nefarious article in the tomb and so it is included.",
+  "tokenId": 189,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/144_Chainrattler_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

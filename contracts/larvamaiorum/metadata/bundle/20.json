@@ -1,0 +1,13 @@
+{
+  "name": "Leviathan Skull Mask",
+  "description": "This skull mask was found in a chest that was hidden in the depths of an icy cove, far North of the Capricorn coast of the Empire. More powerful than any man and blown by a forceful wind from its perch, it was watched closely and closely guarded after fishermen recovered it.  It is believed that this giant but primitive leviathan was worshipped by many, and the mask crafted at its behest. For anyone brave enough to pilfer such a find though, it could well be an integral bargaining chip.",
+  "tokenId": 20,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/103_Leviathan_Skull_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Thunder Spots Mask",
+  "description": "This mask resembled the face of a gigantic and wise insect native to the sky. Though thought to be a harbinger of pestilence and famine, the massive creature was nevertheless respected for his fearlessness and dignity. When it was slain with thunder and lightning, its divine blood spilled forth from every orifice and conquered all who came before it. The Thunder Spots Mask was taken from the creature's skull where it was found, reeking of the accursed sky god.",
+  "tokenId": 38,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/41_Thunder_Spots_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

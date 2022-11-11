@@ -1,0 +1,13 @@
+{
+  "name": "Latzu Frenzy Mask",
+  "description": "Carved from dragon bone, Latzu masks were first discovered in the war torn ruins of an ancient temple in the Tahari Highlands by a settler. These wild lands once contained an army that had battled there. Judging by the scorch marks and the way the bodies had been scattered all over, it's thought that a skirmish took place and the survivors of that long ago conflict were inhumanely massacred by these masks. Luckily for us, a Latzu mask was found unscathed.",
+  "tokenId": 224,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/222_Latzu_Frenzy_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

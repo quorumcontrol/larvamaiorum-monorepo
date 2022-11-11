@@ -1,0 +1,13 @@
+{
+  "name": "Royal Sorcerer Mask",
+  "description": "This wooden mask was found in a dark cave said to have been the sanctum of an ancient and dread sorcerer. The people who ventured into this cave were never seen or heard from again. The entryway of the black cave was marked with a looming, and menacing skull. This mask was found in the skull's mouth rather than inside the sanctum itself.  To date, it has not been ascertained whether this mask is a decoration or if it has become a totem to warn adventurers away.",
+  "tokenId": 17,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/44_Royal_Sorcerer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

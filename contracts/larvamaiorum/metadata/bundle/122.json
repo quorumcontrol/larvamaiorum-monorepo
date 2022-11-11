@@ -1,0 +1,13 @@
+{
+  "name": "Ruined Masterpiece Mask",
+  "description": "Surrounding a great plateau within the Forest of No Return is a dense and humid jungle, clear, translucent waters and mystical beasts. Deep within this refuge this mask was found. The creatures indigenous to this forest are bound to these lands by an enchanted ritual that saw the extinction of the surrounding humans, elves and dwarves. Once this ritual sucked out their life and knowledge, the gods gifted this mask unto a most vile swamp witch.",
+  "tokenId": 122,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/182_Ruined_Masterpiece_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

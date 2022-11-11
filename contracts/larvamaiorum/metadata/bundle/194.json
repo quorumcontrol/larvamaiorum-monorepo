@@ -1,0 +1,13 @@
+{
+  "name": "Ethereal Mask",
+  "description": "Years ago, the sacred laboratory monitoring ethereal Dust from the top of Heaven's Hope mountain was raided. Stolen from its station, the mask had found its way to the pockets of a traveller...  There, it has waited patiently; willing to serve anyone controlling it. Its interior in gold and dazzling gems, this mask is said to be stronger than iron itself and can cut through pure diamond as if it were wet soap.  This mask is more than a little wicked, but the souls it has taken may in effect be the purest form of the ethereal plane.",
+  "tokenId": 194,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/221_Ethereal_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

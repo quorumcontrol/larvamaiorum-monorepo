@@ -1,0 +1,13 @@
+{
+  "name": "Scultone",
+  "description": "This devilish helm, created by the Hopping Goblin Coven to maintain treaties with a demonic lord was entrusted to one of the lords most trusted courtiers for safekeeping. However, when the lord was slain in a bloody coup, the coven swore revenge and imbued the helm with a bounty of terrifying power. And so, this man, its keeper, carried it down into the underground sewers where they orchestrated the assassinations of all those who had betrayed their lord. Still exhausted from their endeavor, they took the helm from each other, among murmurs and grumbles, and started descending once more into the depths. But once one of them put the helm on, his features distorted beyond recognition and he rose up to destroy those who would take his place.",
+  "tokenId": 6,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/226_Scultone.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

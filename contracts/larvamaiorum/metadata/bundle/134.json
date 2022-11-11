@@ -1,0 +1,13 @@
+{
+  "name": "Sword Mask",
+  "description": "The mask, unimaginatively titled The Sword Mask, contains a fragment of a famous sword called Chaoshunjian, which was an actual sword used by a famous general hundreds of years ago in the Dao Protectorates. The blade was purportedly made from an indestructible metal and endowed  with the power to cut anything. A sword said to be able to cut the world in two. The general's family were run out of the protectorates many years ago, and since that time this mask has been passed down quietly from one collector to another.",
+  "tokenId": 134,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/39_Sword_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

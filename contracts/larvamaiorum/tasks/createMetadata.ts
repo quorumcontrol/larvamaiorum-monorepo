@@ -8,7 +8,7 @@ import path from 'path'
 type Metadata = {name:string, description:string, originalId: number}
 type MetadataArray = Metadata[]
 
-const artworkBaseUrl = "ipfs://bafybeifu3ealxbb5fhjay3kqlysdwoiopomcyg7y7ytlngjyqeevcnkzfa"
+const artworkBaseUrl = "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4"
 
 const ultraRare = [
   8,11,16,29,30,58,65,75,167,201,214,220,229
@@ -63,15 +63,18 @@ function getRarity(i:number):Rarity {
 
 
 
-function jsonMetadata({name, description, originalId}:Metadata) {
+function jsonMetadata(tokenId:number, {name, description, originalId}:Metadata, artworkFilename:string) {
   const rarity = getRarity(originalId)
   return {
     name,
     description,
-    imageUrl: '',
-    properties: {
-
-    }
+    tokenId,
+    external_url: "https://cryptocolosseum.com/masks",
+    image: `${artworkBaseUrl}/${artworkFilename}`,
+    attributes: [{
+      trait_type: "Rarity",
+      value: rarity,
+    }]
   }
 }
 
@@ -79,9 +82,8 @@ task('create-metadata')
   .setAction(async (_, _hre) => {
     const descriptionPath = "./metadata/descriptions/alien_tungsten.yml"
     const file = fs.readFileSync(descriptionPath, 'utf8')
-    const artwork = (await getFileNames('./MaskArt/*.png')).map((fullPath:string) => {
+    const artwork = (await getFileNames('./MaskArt/cleaned/*.png')).map((fullPath:string) => {
       const name = path.basename(fullPath)
-      console.log('name', name)
       return {
         id: parseInt(name.match(/^(\d+)[_-]/)![1]),
         fullPath: fullPath,
@@ -90,15 +92,21 @@ task('create-metadata')
     }).sort((a,b) => {
       return a.id - b.id
     })
-    console.log(artwork)
+
     const descriptions:MetadataArray = YAML.parse(file).alientungsten_masks.map((nameAndDescription:{name:string, description:string}, i:number) => {
       return {
         ...nameAndDescription,
         originalId: i,
       }
     })
+
+    // descriptions.forEach((d, i) => {
+    //   console.log(`${i}-${d.name} is ${artwork[i].fullPath}`)
+    //   fs.writeFileSync(`./MaskArt/cleaned/${i}_${d.name.replace(/\W+/g, '_')}.png`, fs.readFileSync(artwork[i].fullPath))
+    // })
+
     const shuffled = shuffleMetadata(descriptions)
     shuffled.forEach((description, i) => {
-     
+      fs.writeFileSync(`./metadata/bundle/${i}.json`, Buffer.from(JSON.stringify(jsonMetadata(i, description, artwork[description.originalId].name), null, '  ')))
     })
   })

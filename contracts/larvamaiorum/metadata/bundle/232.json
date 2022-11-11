@@ -1,0 +1,13 @@
+{
+  "name": "Creator Demon Mask",
+  "description": "Dwelling in a dark forest, this demon may be one of, if not the oldest forces. Wounded and deranged by its own creations, this lonesome spirit guards its territory fiercely and has even been known to appear before travelers on the Necropolines of the Lost to chew their heart out. Ride other horses in this forest at your own risk as it is said that there are many lonely travelers who shoot first and ask questions later.  This mask was taken from the Necropolines of the Lost to bring a small peace of mind to the weary traveler.",
+  "tokenId": 232,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/128_Creator_Demon_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

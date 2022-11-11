@@ -63,7 +63,7 @@ describe("LarvaMaiorum", function () {
         await expect(larvaMaiorum.mint(alice.address)).to.be.reverted
       })
 
-      it("has the right metadata", async () => {
+      it("mints token 0 with correct metadata", async () => {
         const { larvaMaiorum } = await loadFixture(mintOneToAlice)
         // the next one is bigger than the supply so we expect it to revert
         expect(await larvaMaiorum.tokenURI(0)).to.equal(`${tokenBaseUri}0.json`)

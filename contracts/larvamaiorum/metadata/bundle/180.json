@@ -1,0 +1,13 @@
+{
+  "name": "Frozen Horror Mask",
+  "description": "The ancient snow covered terrain of the arctic jungle is home to a horde of warriors who carry their axes and shields against a backdrop of bitter, eternal ice. Imbued deep within the glimmering blade of the frosty executioners was the animating force behind this intricate mask. Village elders speak of the creature that lives sealed beneath the arctic wastes, a being that is as ancient as the frost that blankets the land. Few have gazed upon the ghastly visage of this frozen horror, and lived to tell the tale, but one warrior recovered this mask embedded in the ice on the roof of his lair.",
+  "tokenId": 180,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/243_Frozen_Horror_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

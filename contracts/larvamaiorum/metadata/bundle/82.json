@@ -1,0 +1,13 @@
+{
+  "name": "Ancient Watch",
+  "description": "This headwear appears to be made of pure gold. An inscription on the bottom reads \"In loving memory of the One who Watches\". It is thought that this is lost treasure from the City of Wyna, a city said to have fallen into the mists many centuries ago.  It is said that the One is always watching and will leave his treasure at the nesting place of an ibis, if one knows where to look.",
+  "tokenId": 82,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/116_Ancient_Watch.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

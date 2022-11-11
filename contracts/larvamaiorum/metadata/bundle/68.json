@@ -1,0 +1,13 @@
+{
+  "name": "Aspect of Death",
+  "description": "Some say this is what Death wears when she's in her natural habitat, where she has her own sort of justice and order. The Death Mask has the power to instill fear in those who wear it and it permits its wearer to go anywhere while cloaked in the darkness of non-existence.  Think carefully before wearing this mask, lest you forget the role it's granted you--to take on the aspects of Death. This mask cannot be destroyed but may be transformed.",
+  "tokenId": 68,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/131_Aspect_of_Death.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

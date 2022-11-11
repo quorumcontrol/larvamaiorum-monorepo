@@ -1,0 +1,13 @@
+{
+  "name": "Flimsy Harbor Mask",
+  "description": "In the tiny village of Golden Shore, on the coast of the Empire, there are two old vaults of unimaginable wealth. One was for the aristocracy of the town, and the other for the House of Merchants. They were created during the construction of the first stone sanctuary which would become the City of Golden Shore. This mask is said to have come from the merchants' vault.",
+  "tokenId": 91,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/134_Flimsy_Harbor_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

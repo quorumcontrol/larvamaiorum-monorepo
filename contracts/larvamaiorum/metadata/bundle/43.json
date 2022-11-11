@@ -1,0 +1,13 @@
+{
+  "name": "Wyvern Rage Mask",
+  "description": "The wyverns once roamed the world contently and patiently, but long ago, they were locked away, deep below the earth, by an ancient civilization. It is said that their wings were scorched by fire, and their beaks were melded in a row, unable to speak. The wyverns seethed with wrath and the only sounds to emanate from the ancient temple are their screams of rage. The Wyvern Rage Mask was taken off the robed statue at the heart of the temple. Wyverns make their nests in those wings now, and they wail at the bright moon in protest every night.",
+  "tokenId": 43,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/40_Wyvern_Rage_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

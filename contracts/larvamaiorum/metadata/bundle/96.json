@@ -1,0 +1,13 @@
+{
+  "name": "Bug Grin Mask",
+  "description": "Said to have been crafted by a race of insects long since gone, this originally bore the likeness of a general in the race's military. During their pursuit of wealth and knowledge, some explorers found this mask embedded in an ancient city's sewers.  They assume this mask must not be an item of worth due to the position that it was found in, but the gods know best in such cases.",
+  "tokenId": 96,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/35_Bug_Grin_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

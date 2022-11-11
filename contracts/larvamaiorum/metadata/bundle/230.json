@@ -1,0 +1,13 @@
+{
+  "name": "Ultimatum Mask",
+  "description": "The terrible race of faceless ones who dwell between the worlds of the living and the dead, have been seen to take this mask that is as thin as air and insubstantial as fog, avoiding the fate of their own race, building a treasury of lies to distract travelers from the harsh and distressing truths of life.  Though they don't appear to speak when their faces go bare, those blessed by their masks hear the chants and whispers of faceless ones.",
+  "tokenId": 230,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/106_Ultimatum_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

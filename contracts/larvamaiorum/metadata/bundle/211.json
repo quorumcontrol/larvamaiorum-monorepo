@@ -1,0 +1,13 @@
+{
+  "name": "Essence Shield",
+  "description": "A mask interred in the heart of a golden homunculus.  The wizard who created this creature sought to emulate the supreme being and the sacred fire many different times, but with varying success. In his last attempt, he created a creature that was in many ways aberrant, but it was more imbued with a potent energy than his previous attempts. The creature unfortunately groaned instead of laughing, gurgling when it had been trying to speak like the supreme being. This mask supposedly contains a shred of that energy.",
+  "tokenId": 211,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/156_Essence_Shield.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

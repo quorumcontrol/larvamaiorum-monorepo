@@ -1,0 +1,13 @@
+{
+  "name": "Mask of Death's Wrath",
+  "description": "Long ago, just southeast of what is now Nuitel, a powerful woman of terrible wrath made an alliance with a local tribe, who were powerless to refuse her demands. When they finally broke their oaths and she no longer needed their protection, she took up their innocent skulls and wove them into this mask from which their rage emanates when the wearer girds itself in those pieces passed down to him. Now the mask curses the wearer with unrelenting wrath and torments the helpless.",
+  "tokenId": 171,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/220_Mask_of_Death_s_Wrath.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    }
+  ]
+}

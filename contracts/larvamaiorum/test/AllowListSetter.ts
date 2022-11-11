@@ -80,7 +80,7 @@ describe("AllowListSetter", function () {
       return { delph, wootgump, alice, allowListSetter, me }
     }
 
-    it.only('works', async () => {
+    it('works', async () => {
       const { wootgump, alice, allowListSetter, me } = await loadFixture(deployOnTestnet)
       await expect(alice.sendTransaction({to: me.address, value: ONE.mul(10)})).to.not.be.reverted
       // await expect(wootgump.connect(me).approve(allowListSetter.address, ONE.mul(2))).to.not.be.reverted

@@ -1,0 +1,13 @@
+{
+  "name": "Wormcatcher Mask",
+  "description": "The Shining Queen has decreed that every two thousand, four hundred and fifty years, her followers must perform a most sacred ritual. This ritual requires them to journey under the cover of darkness with meager belongings deep into the Land of Wurms, until they find and retrieve a Wormcatcher Mask (Only a Queen could find and retrieve it). This Queen never wished to have any conjoint function with her throne. She had always enjoyed treasures and riches for hidden wonders.",
+  "tokenId": 110,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/184_Wormcatcher_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

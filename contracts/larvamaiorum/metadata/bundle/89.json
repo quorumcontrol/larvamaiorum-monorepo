@@ -1,0 +1,13 @@
+{
+  "name": "Masquerade Veil Mask",
+  "description": "In a forgotten shadow city, a leering yet loyal general served austere and commanding queen who one day decided to make him the ruler of the eastern half of her lands. The queen gifted this consort with a mask and commanded him to wear it but never reveal his face. It wasn't until he overpowered his master that he truly was able to remove this mask in the light of day. But it also wasn't long before the next palace coup, where her treacherous consort was assassinated by one of her own generals and it's said the mask reverted to its original design.",
+  "tokenId": 89,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/230_Masquerade_Veil_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

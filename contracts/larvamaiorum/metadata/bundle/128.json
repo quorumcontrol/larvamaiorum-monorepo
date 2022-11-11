@@ -1,0 +1,13 @@
+{
+  "name": "Baellaven",
+  "description": "This unusual mask was fashioned using metal imbued with raven's feathers, a symbol of death throughout many regions. As one might imagine, the people of Caen Prien, with their extensive knowledge of poisons, are quite adept at making this sort of mask. Caen Prien is a city originating from intense spirits, roaming in the sky and in its bloated streets.  It is said that the city was once only water, and to gaze upon it is to look into a drowned city.",
+  "tokenId": 128,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/238_Baellaven.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

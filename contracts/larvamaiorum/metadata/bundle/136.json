@@ -1,0 +1,13 @@
+{
+  "name": "Riftborn Behemoth Mask",
+  "description": "The cliffs at the edge of the searing plains rise to tower high and cast a shadow beyond to the unknown horizon. When the unpredictable winds change direction, heat and light soar as unrelenting as before on the dually darkening sands below. The towers are said to be part of an ancient city, forgotten in the wake of past cataclysm. This creature's mask is said to have been found among the rubble during a recent expedition.",
+  "tokenId": 136,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/146_Riftborn_Behemoth_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

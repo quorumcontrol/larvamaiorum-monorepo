@@ -1,0 +1,13 @@
+{
+  "name": "Memento Mori Mask",
+  "description": "The relentless raiders to the west of the ancient magickal city spared nothing, their exploits filled with lust and a thirst for power. The denizens in the southern portion of the city, most of whom lacked such abilities and tools, were quickly thwarted. But an ancient crippled Aluvian was found on the edge of town and he escaped the barbarians. Escaping west, a haggard figure hiding rags around his eyes and mouth was tallied on the cliffs edge. There was a flash and then in this man's arms lay a strange mask. It is said he left it behind on the cliff when he made his leap.",
+  "tokenId": 0,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/240_Memento_Mori_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

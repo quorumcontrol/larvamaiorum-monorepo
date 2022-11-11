@@ -1,0 +1,13 @@
+{
+  "name": "Hideous Horror Mask",
+  "description": "Only the bravest souls make their way to a place where legends have it that the winds whisper with spectral tales of a horror we cannot even comprehend. This horror lurks in the ancient Necropolis, absorbing unwary travelers at the drop of a helix. It is said that this horror oozed forth onto the land and became one with the wail of reality, growing its mask from its own body.",
+  "tokenId": 215,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/43_Hideous_Horror_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

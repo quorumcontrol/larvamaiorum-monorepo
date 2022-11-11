@@ -1,0 +1,13 @@
+{
+  "name": "Lavawreak Mask",
+  "description": "This adorned headpiece can be used to acquire many masks, clothe oneself in new garments, or be worn with a loincloth for a more enigmatic appearance. The mask was found on the temple steps of a mountain city covered in snow after being toppled by lava. The high priestess blessed the mask for a traveler before the city disappeared into cold and fire.  The mask is said to be daemonic, the priestess is said to be wise but vicious, and the lava flow is said to be a great blessing.",
+  "tokenId": 170,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/117_Lavawreak_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Cave Terror Mask",
+  "description": "A wandering adventurer came across the cave terror while exploring an ancient temple. The creature wore the mask as a trophy, claiming that those around it are so frightened they won't even dare to go near it. The hero snatched the mask away, earning himself a fatal injury in the process, and saved the cowardly souls of this world.",
+  "tokenId": 111,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/24_Cave_Terror_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

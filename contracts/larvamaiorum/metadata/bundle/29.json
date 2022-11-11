@@ -1,0 +1,13 @@
+{
+  "name": "Stillness",
+  "description": "The Stillness Mask is named for a very curious and clever pattern that it's said to possess. The pattern finds itself in the carving of the mask, one of precision. Those who gaze upon the carvings often describe the experience as akin to viewing an endlessly revolving still life painting. Fascinating.",
+  "tokenId": 29,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/200_Stillness.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Starcrown Officer Mask",
+  "description": "The members of the Ascension's Watch, dedicated to the prevention and repression of deeds hostile or detrimental to the peace of the city Gallow, are said to be fearless, immovable and unstoppable. Tough as nails, so to speak. They would never allow themselves to be caught off  guard with their officers' masks and insignia removed. Alas, there does not seem to have been one made for their lower ranks and so there is always the risk of their face being seen. One such resentful lower-ranking member of the Ascension's Watch stole away with this mask, made for their head officer and imbued with strange magics.",
+  "tokenId": 66,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/217_Starcrown_Officer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

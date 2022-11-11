@@ -1,0 +1,13 @@
+{
+  "name": "Illusion of Pain Mask",
+  "description": "In the haunted city of Al'Sei in the Iron Kingdoms, a tiny ghost appears in her own mask and laughs with her own voice. The story says that there's nothing behind the mask, it's just air, but from time to time a sharp stab can be felt from behind the mask that cuts deep. The pain is brief but when it's gone, a strange feeling remains. Who is brave enough to don this haunted mask and learn its secret.",
+  "tokenId": 60,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/74_Illusion_of_Pain_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

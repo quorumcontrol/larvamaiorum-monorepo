@@ -1,0 +1,13 @@
+{
+  "name": "Extinct Mask",
+  "description": "An old philosophical idea of how humanity will be lost in time was expressed through this mask. The Ancient, a creature of immense intellect and mystery, shared how he foresaw the extinction of his own race. They were doomed because they were not strong enough to capture monumental knowledge. After he had been overcome and consumed by the Void, he was seen as a messenger, a prophet.",
+  "tokenId": 127,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/50_Extinct_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

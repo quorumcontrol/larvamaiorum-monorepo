@@ -1,0 +1,13 @@
+{
+  "name": "The Head of Brigadestone",
+  "description": "The land where Brigadestone Castle stands used to be a site of rebirth, with flourishing trees and a riot of life. Brigadestone Castle has long decayed into a symbol of ruin with an overgrowth of shrubs and creeping plants. Death lurked in every corner. But the headless body of an old metal statue still stands in the courtyard. This mask once covered its head, but some village boys or ruthless travelers took the mask from its sport among the ruins and brambles.",
+  "tokenId": 99,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/173_The_Head_of_Brigadestone.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

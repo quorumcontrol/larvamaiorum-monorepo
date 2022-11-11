@@ -1,0 +1,13 @@
+{
+  "name": "Queen Arana's Mask",
+  "description": "In Ankalla, a distant land to the south of the Iron Kingdoms, there are no royalty, nor were their crown nor their fangs worn. The queen's glory was taken by the sun when it ascended above the Spring Kingdom, and the world was burnt in its wake. A daughter from the Earthmother had been found to rule in her stead, with a heart buried deep in her chest, and blood like red lotus coursing through her veins. The beast that guards the crown of Ankalla is a most ancient demon. This is the mask they found in its lair.",
+  "tokenId": 85,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/155_Queen_Arana_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

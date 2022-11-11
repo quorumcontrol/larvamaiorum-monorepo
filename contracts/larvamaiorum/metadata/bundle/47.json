@@ -1,0 +1,13 @@
+{
+  "name": "Absorption Mask",
+  "description": "A woman who walked with furious and erratic steps cradled an infant dressed in purple. One hand twisted the streaming, silken reins while the other soothed and stroked the child's raven hair. She bore a mask  that bore a long face, pointed at the chin and long in the snoot, with a deep divot. The mask, applied with glue and paint from an animal hide, acted to conceal the woman's own identity. Behind her, her mysterious procession plodded wearily towards a destination foretold by mystery and doom.",
+  "tokenId": 47,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/153_Absorption_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

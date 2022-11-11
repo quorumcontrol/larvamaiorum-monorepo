@@ -1,0 +1,13 @@
+{
+  "name": "Corporate Man Mask",
+  "description": "Larger and more refined than the average Crypto Roamer, the Crypto Corporate Man had his origins within the ranks of the Crypto Roman traders and thrived as an organizer of caravans. Corporates were originally reviled but soon became powerful members of society throughout the empire because of their diligence to tasks (though most agree they overdo it). The Corporate Man who acquired this mask is one who smells of rich oils and spices, sees blood in every deal, and travels to the edges of civilization with nothing more than a sack of gold and a single iron scimitar.",
+  "tokenId": 166,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/96_Corporate_Man_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Revenant's Mask",
+  "description": "Rumors increased when a corpulent salesman stopped his cart at the gates of Anet, city of the dead, to distribute brochures on funeral duties. He had with him a casket, within which lay the gaping cadaver of a child, with deep wounds across its back, holding a mask in its teeth. This object was sacred to the inhabitants of Anet. They sought it fiercely to whatever outcome, no one knows. All that's left of this event is a troubled spirit, now known only as the Seller, who will curse much misfortune onto the foolhardy adventurer who dares to wear his mask.",
+  "tokenId": 181,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/242_Revenant_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

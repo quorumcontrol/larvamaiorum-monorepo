@@ -1,0 +1,13 @@
+{
+  "name": "Lightbringer Mask",
+  "description": "This mask was found on top of an ancient temple, it is said to emit light from its mouth and eyes when worn by a worthy warrior. The explorer who submitted this mask for inclusion in the colosseum had used this mask during a fierce battle, aptly surprising his enemies and dodging their numberless arrows thanks to the mask's light. It is said that the first use of the mask requires a brave soul to undertake a side quest while gravely injured, demanding a commemorative scar that can never be healed.",
+  "tokenId": 190,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/112_Lightbringer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

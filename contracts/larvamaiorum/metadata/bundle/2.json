@@ -1,0 +1,13 @@
+{
+  "name": "Treasure Hunter Mask",
+  "description": "The shade of an old woman can be seen in the smile of a young woman who, with great energy and enthusiasm had sought for riches day in and day out. The Treasure Hunter never found her treasures, and died in her early twenties after many unsuccessful searches for treasure. The mask was found buried near the calm waters of a small island. It smells of salt and the ocean. What secrets could it reveal?",
+  "tokenId": 2,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/124_Treasure_Hunter_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

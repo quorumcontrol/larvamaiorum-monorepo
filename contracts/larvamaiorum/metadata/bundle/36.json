@@ -1,0 +1,13 @@
+{
+  "name": "Merciless Mask",
+  "description": "A ruthless assassin needs more than a weapon and a quick wit to get the job done. He needs a mask lest the victim find familiarity in his black eyes, which may lead to cries for mercy. This new kind of mask was crafted from cruel intentions, stained with the blood of it's first use.  It may have been found on the corpse of a retired assassin, or from the deserted workshop of some poor craftsman who discovered late in life his knack for a certain kind of sinister craftsmanship.",
+  "tokenId": 36,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/191_Merciless_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

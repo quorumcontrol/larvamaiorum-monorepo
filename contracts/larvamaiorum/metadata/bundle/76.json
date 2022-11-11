@@ -1,0 +1,13 @@
+{
+  "name": "Unknown",
+  "description": "Is this a mask or is it a door to eternal oblivion? A monk once told a group of wandering ascetics that the spirit world is inhabited by masks and those who die enter it. These worlds exist alongside our own but are reached only by death, or so it went, until someone found this mask in the vast emptiness of the obsidian temple. And with it a passage to a graveyard island.",
+  "tokenId": 76,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/235_Unknown.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

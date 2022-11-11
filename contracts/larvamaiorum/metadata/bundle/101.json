@@ -1,0 +1,13 @@
+{
+  "name": "Clockwork Gas Mask",
+  "description": "The most curious and exotic of all the masks was found on the countenance of a strange creature who Crypto Roman Agents encountered while exploring the cold depths of the North DAO wilderness. Supposedly, the long dead creature had been living in an ancient mechanical outpost located in the Iron Woods. The mechanized creatures had shunned other forms of machinery and engineering, and discarded lost souls who were consumed in their obsession. This clockwork gas mask is said to have brass valves and was created in secrecy by a mad craftsman who also chose to live alone in seclusion.",
+  "tokenId": 101,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/160_Clockwork_Gas_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

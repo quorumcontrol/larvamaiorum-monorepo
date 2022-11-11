@@ -1,0 +1,13 @@
+{
+  "name": "Skeleton Hood",
+  "description": "A mask that makes the wearer feel more aware of the impending end, for death is always waiting for us. But contained within the abyss of the silent grave, what it means to be alive is now beneath a veil that must be lifted. The Demon Witch Who Spooks the Horses said she'd never share the secret lore behind the cursed Skull Mask, as though it would be too telling of her own story.",
+  "tokenId": 236,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/11_Skeleton_Hood.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    }
+  ]
+}

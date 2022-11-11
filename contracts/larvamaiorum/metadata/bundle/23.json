@@ -1,0 +1,13 @@
+{
+  "name": "Lantern Mask",
+  "description": "A ray of light. Just a smidgen of hope in an otherwise grim reality, standing defiant next to a dark tower. The headless bearer of this mask is said to light the way for all those who have lost their faith, an idol that grants knowledge to the downtrodden. The light always shines brightest in the darkest of times and perhaps this mask is a testament to that.",
+  "tokenId": 23,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/202_Lantern_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

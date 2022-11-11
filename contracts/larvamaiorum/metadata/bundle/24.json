@@ -1,0 +1,13 @@
+{
+  "name": "Elder Giant Mask",
+  "description": "This mask was likely taken from the body of an elder giant that resided at the edge of the jungle and left to rot where he lay. Its bleached skull sat atop the skull of a human and a monkey in blank defiance. The death curse it would put on those who donned its leathery head was said to be unmatched. Local travelers are puzzled by this ghastly collection.",
+  "tokenId": 24,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/57_Elder_Giant_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

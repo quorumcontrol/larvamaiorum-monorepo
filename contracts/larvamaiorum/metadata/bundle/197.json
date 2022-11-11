@@ -1,0 +1,13 @@
+{
+  "name": "Lunatic's Helmet",
+  "description": "A young demonologist, in frantic possession of an improperly released Illmason and driven mad by the pent up energies, rendered his inquisitors helpless. He took to the dark red skies and from atop a mansion in the gnarled city to avoid immediate capture. But as days went by and he breathed the burning ash that choked his lungs he slowly lost the miniscule amount of courage he had. Fearing death, he cast himself from the sky, and this mask, molten hot fell from his head.",
+  "tokenId": 197,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/148_Lunatic_s_Helmet.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Jaguar Skull Mask",
+  "description": "In the north of the arctic jungle, heavy rivers and humid jungles seem to be home to beasts that walk on both two legs and on four. With its grisly injuries and opaque sack, this death distorted creature was thought to be one of those beasts. This creature's only request to the those who have witnessed it's agony is for them to take hold of it's ceremonial mask.",
+  "tokenId": 148,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/67_Jaguar_Skull_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

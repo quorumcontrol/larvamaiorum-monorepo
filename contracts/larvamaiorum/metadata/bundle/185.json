@@ -1,0 +1,13 @@
+{
+  "name": "Truthseeker Mask",
+  "description": "In the Eastern DAO Protectorates, word is that beneath the great Mount Olumond sits a King who rules over myriad kingdoms and worlds. The great libraries in the dominions of this King reveal all the knowledge of the world to his people. When an explorer came across this mask in a dark forest, he knew what he had to do: study like nobody's business, or guard the secret knowledge bestowed upon him with his life. And that's just what he did. He made an oath.",
+  "tokenId": 185,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/203_Truthseeker_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

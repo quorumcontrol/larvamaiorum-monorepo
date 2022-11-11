@@ -1,0 +1,13 @@
+{
+  "name": "Black Lion Mask",
+  "description": "The Black Lion Mask is said to be a cursed mask that gives its wearer powerful dominion over all beasts of the field. It is also said that this mask was created by a mad nobleman in the Neolithic Age, and the origins of this mask are shrouded in rumor and obscurity. This mysterious mask is so fierce that tales of those who possessed it are told to children to scare them.",
+  "tokenId": 132,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/181_Black_Lion_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

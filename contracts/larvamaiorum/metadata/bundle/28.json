@@ -1,0 +1,13 @@
+{
+  "name": "Howling Mask",
+  "description": "Two rival tribes of the forest, The Crytek and the Cryptomites, are forever vying for supremacy in the jungle of the Northern States. The conflict seemed to reach a climax when an assassin stole into the empire of the Crytek and stole the ceremonial Howling Mask of the Crytek. It is said that this nefarious one then hid among them, out of sight and leaving them to wonder if they are friend or foe.",
+  "tokenId": 28,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/17_Howling_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Lifebearer Helmet",
+  "description": "This helmet was retrieved from a fissure in the crust of a volcano, which is said to be the resting place of someone named Lifthrasher. They say he was deposited here by the Overseer of Death Arcade for no good reason and that, as a last punishment, he was also granted the power to take over a living being's body. His seemingly immortal spirit is now said to be trapped in a wheel, responding only to those with insight enough to enter his vile seraglio.",
+  "tokenId": 204,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/127_Lifebearer_Helmet.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

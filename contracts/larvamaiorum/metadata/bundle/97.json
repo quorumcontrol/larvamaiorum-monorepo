@@ -1,0 +1,13 @@
+{
+  "name": "Mizuzo Mask",
+  "description": "Some explorers found this mask in the ritual chamber of an ancient temple in the western corner of the DAO protectorates, while they were perusing the temple's many rooms and structures, seeking out riches and knowledge. They can only hope one day to decipher the creatures' mysteries for the sake of humanity and the protectorates.  For now all they have are bizarre notions from the creatures themselves.",
+  "tokenId": 97,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/31_Mizuzo_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

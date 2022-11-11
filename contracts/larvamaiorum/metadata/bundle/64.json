@@ -1,0 +1,13 @@
+{
+  "name": "Oilpit Mask",
+  "description": "This mask is mention to be found in a pool of oily black water in the arctic jungle. Sometimes, strange artifacts will appear in the river but disappear into the oil. The pool is rumored to never reach the ocean because it is robbed by these sooty retrovikings and there's nothing we know of that can stop their ruthlessness and greed.",
+  "tokenId": 64,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/22_Oilpit_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

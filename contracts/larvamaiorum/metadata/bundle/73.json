@@ -1,0 +1,13 @@
+{
+  "name": "Space Ess Mask",
+  "description": "The Space Ess mask is one adorned with stars and constellations and was reportedly found in the palace of a being who made sandwiches in the vacuum of the void. What this being was doing atop a gold planet within a star cluster is a mystery, but the mask is without peer. Does the one who found it dare to eat fried banana sandwiches, the kind the fabled being made?",
+  "tokenId": 73,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/70_Space_Ess_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

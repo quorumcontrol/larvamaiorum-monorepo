@@ -1,0 +1,13 @@
+{
+  "name": "Power of Unyielding Thought",
+  "description": "The Mind Divine is said to have secrets that tell the story of the gods before the gods. Secrets so old they could not be written down, they can only be expressed in thoughts. This relic shows a single ray of light that has cut through the darkness, holding fast onto memories before time and the cold of deep space extinguished the memories of light without form. The relic promises untold knowledge and power when worn. But there is those who fear that it would corrupt its wearer beyond all measure.",
+  "tokenId": 42,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/110_Power_of_Unyielding_Thought.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

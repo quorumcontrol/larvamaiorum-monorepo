@@ -1,0 +1,13 @@
+{
+  "name": "Ichor of a Lost Hero",
+  "description": "Off the coast of the Rajdi Archipelago, ancient wizards who had studied the sacred scriptures of the royal oracle traveled west to meet their fate. An old lighthouse off the coast of a sailor's grave marked the brave sons' direction.  50 years ago, a traveler found a small, purple ichor inside an ossuary next to the sea. It was mixed with dirt and bore a few scales on top. There was an inscription inside which enlisted help to find an old helmet, but no sign of the hero themselves.",
+  "tokenId": 221,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/199_Ichor_of_a_Lost_Hero.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

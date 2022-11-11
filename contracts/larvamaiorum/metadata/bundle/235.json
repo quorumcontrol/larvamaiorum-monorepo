@@ -1,0 +1,13 @@
+{
+  "name": "Experimental Occult Mask",
+  "description": "This mask was made in the makeshift laboratories of an occultist as part of a botched experiment. In an attempt to contact the spirits of the dead, the occultist instead created an 'abomination' from a portion of the spirits of the living. Faced with the terrifying results of her actions, she begged for divine forgiveness as the masked monstrosity tried to devour her. The entity couldn't manage to consume everything in its ravenous hunger and left the Occult Mask at this laboratory.",
+  "tokenId": 235,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/193_Experimental_Occult_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

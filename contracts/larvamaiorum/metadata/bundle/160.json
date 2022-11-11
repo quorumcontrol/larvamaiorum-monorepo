@@ -1,0 +1,13 @@
+{
+  "name": "Buzzard Skull Mask",
+  "description": "This skull was found lying near the smoldering pyre of the foothills of a great mountain range. It is thought to have been an animal hunter's totem, and it may be related to the Great Thunderbird. Legends say that the emblem was created to offer protection against an ancient cave  spirit, a beast which appeared in the form of a Storm Catcher. This one could offer the bird protection or ease throughout it's parching regions of dust, dried meat, and dying grass.",
+  "tokenId": 160,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/125_Buzzard_Skull_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

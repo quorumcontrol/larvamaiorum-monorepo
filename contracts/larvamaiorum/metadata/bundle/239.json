@@ -1,0 +1,13 @@
+{
+  "name": "Warmaker's Mask",
+  "description": "This mask was looted from the lair of a Steppe Hag where she had been living happily with hordes of the undead. It is thought to have initially come from an army long ago and it's now believed that the creature in the masks, a general, was slain by the Hag for usurping her power. The warlike mask is rumored to have lingering ethereal energy and is cursed by some.",
+  "tokenId": 239,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/71_Warmaker_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

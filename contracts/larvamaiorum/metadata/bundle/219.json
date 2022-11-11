@@ -1,0 +1,13 @@
+{
+  "name": "Necronaut Mask",
+  "description": "I've never heard of a Necronaut, but a necromancer's apprentice is responsible for building this strange, metal mask. The apprentice is the person who collects the undead creatures to revive.  The undead beings are commanded by their new leader; the necromancer. While the Necronaut may not know its creator, it must have something to do with this mask.  Maybe it's some kind of commanding device that is used by the leader of an undead army in order to communicate with their troops.",
+  "tokenId": 219,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/59_Necronaut_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

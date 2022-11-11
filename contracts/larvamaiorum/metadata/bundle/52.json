@@ -1,0 +1,13 @@
+{
+  "name": "Revilosh",
+  "description": "It is said that some of the holiest creatures that exist have brought down their judgement on the proud people of the Steppe. A strange creature with a long nose unlike anything ever seen before, caused the people of the steppe to go restless, their bellies churning with ill humor. One friendless child from a family of many children was found to be wandering the rugged terrain atop a great beast with two heads. Yet his face was tainted with sorrow and this sorrow managed passed onto his greedy family who rejected him ever more, deeming him no longer able to do any work. He bestowed upon them this mask, and an everlasting curse.",
+  "tokenId": 52,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/218_Revilosh.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

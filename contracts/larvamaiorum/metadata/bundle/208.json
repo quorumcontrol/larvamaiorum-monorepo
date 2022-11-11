@@ -1,0 +1,13 @@
+{
+  "name": "Eye Mask",
+  "description": "A Dark queen, cousin to the ruling family of the Iron Kingdoms, had arisen over a ruined city far off in the continent, commanding a legion of the arcane arts. The queen, who watched with jealousy as the people dwelt blissfully and practically untouched, was enraged when she saw an inventor at her workshop. The kingdom's success was her envy, but with her dark arts she wanted to purify it with suffering. Her dark magic turned the inventor's eye into a powerful mask that he relinquished to the queen. This mask is what she uses to spy on those long lost friends.",
+  "tokenId": 208,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/231_Eye_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

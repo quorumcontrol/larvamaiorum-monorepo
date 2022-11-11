@@ -1,0 +1,13 @@
+{
+  "name": "Garb of Haarya",
+  "description": "Once a princess of the Iron Kingdoms, Haarya was prized above all of the other maidens in the palace. Yet her life was cut short by a dark spell and now she dances only within the pages of this epic sage. This is her royal garb found within a shabby shack, a trade outpost catering to adventurers.  Cross the threshold and they say you can still hear the fierce princess dancing by a fire old, strangely devoid of smoke. The shack was once said to be haunted, and this mask seals the deal!",
+  "tokenId": 210,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/207_Garb_of_Haarya.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Happy as a Horse Mask",
+  "description": "The Horse God is a particularly potent deity. It is believed that you must be of the westen fold to receive His blessings while observing his rituals, lest you incur his jealousy. However, the Horse God simply smiles at those who come from the east. As an offering, these people place their masks on a horse, normally one that will be sacrificed. In that way, these clanging pieces of metal are symbolic tokens of joy and horse racing.",
+  "tokenId": 113,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/246_Happy_as_a_Horse_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "The Pale Wyrd Mask",
+  "description": "The Pale Wyrd Mask results in the petrification of all that see it. Dire prophecies warn of the coming of a pallid goddess, and death for all, who holds this dreadful mask close. Cast by the maker in a fearsome mold, this mask is shaped like a skull and living skin.",
+  "tokenId": 154,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/12_The_Pale_Wyrd_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

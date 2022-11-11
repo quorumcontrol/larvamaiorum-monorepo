@@ -1,0 +1,13 @@
+{
+  "name": "Templekeeper's Face",
+  "description": "One might find this mask in the sights of an investigative explorer of an ancient temple in the southern region. The explorer, who's been restoring what remained of the temple, having come upon this mask, had a sudden fear of the dark arts and hurried back to his childhood home and slept soundly that night. Perhaps he was shaken by the scandalous rumors that a cursed amulet was found with it. Conspiracy or no, those who wear this mask are said to have passed the trials of the accursed.",
+  "tokenId": 40,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/241_Templekeeper_s_Face.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

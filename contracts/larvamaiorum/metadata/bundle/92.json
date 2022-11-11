@@ -1,0 +1,13 @@
+{
+  "name": "Gorthin's Chaos Mask",
+  "description": "Gorthin was a feared and respected raiding clansman for his fury and cunning. Along with his chaos mask, he took up a life of crime, but claiming to be simply misunderstood. By all accounts, his life should be repudiated and dismissed but recent tales insist that he had a great and honorable death. The Chaos Mask carries a curse of immunity to the forces of order that cannot be recreated by any craftsman alive.",
+  "tokenId": 92,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/157_Gorthin_s_Chaos_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Shark Steak Mask",
+  "description": "Deep in the heart of the central Fabrikator Collectives, a being of pure energy is said to have vacated its own quarters, to journey forth in search of another unfortunate being to feast on. Apparently, this eldritch creature shed its form and split in two, manifesting as a drowsy spirit for a time, and then it found some luck! Hmph! This unusual mask, adorned with shark remains was found in the water circling the fort, leading foreigners to believe it may have washed ashore during a high tide... maybe.",
+  "tokenId": 3,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/244_Shark_Steak_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Mask of the Lyuerog",
+  "description": "Warships have a long, colorful history. Vessels that carried convicts to captivity, children away from danger, beasts of a burden and riches across the seas. The Lyuerog had none of these ambitious goals. A white vessel left burning in the sand after running aground, she succumbed to the Iron Winds that traveled with her from a faraway shore. The only person to explore her remains was an innocent soldier who slept more soundly for finding and this exotic mask taken from within its hold.",
+  "tokenId": 174,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/223_Mask_of_the_Lyuerog.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

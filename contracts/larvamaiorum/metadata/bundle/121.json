@@ -1,0 +1,13 @@
+{
+  "name": "Inertia Shroud Mask",
+  "description": "The Sheer Rocks, a place where fearful travelers threw in life and soul hoping to banish a rock golem horde. Boulder to boulder the swarm will seek you out for the dearest of deeds, that a loved one be set free from their tortured slumber. They demand the return of this Inertia Shroud mask, which must not be released to them lest they use it to awaken the burning mountain.  Suffice to say that after you hear the deafening clap, the earth will tremble and burst open from within.",
+  "tokenId": 121,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/42_Inertia_Shroud_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

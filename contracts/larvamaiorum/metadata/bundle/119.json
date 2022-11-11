@@ -1,0 +1,13 @@
+{
+  "name": "Horned Void Mask",
+  "description": "This mask was found in the frozen north, missing an eye and left in a pile of bones. Nobody knows which creature it originally belonged to, but the horns match the bone color. The bone material is similar between the top and bottom of the mask, so the horns may be attached to the headgear by some kind of elastic or metal fastener. Whatever the mystery behind this particular beast, one slice still grazes over the fallen hero.",
+  "tokenId": 119,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/51_Horned_Void_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

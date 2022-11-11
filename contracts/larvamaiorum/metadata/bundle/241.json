@@ -1,0 +1,13 @@
+{
+  "name": "Turtleshell Mask",
+  "description": "The folk of the Astariot Seas live for infamy and fables. They sail the cold summer seas in giant ships loaded with dark intent. Tales tell of the many women and men who made the dangerous passage from Iron Kingdoms to the Astariot Seas on one goal in mind: to reclaim their ancestral homeland and birthright. As they sailed towards distant shores one of them encountered a gigantic turtle and found this mask lodged in its shell. It is said that they tamed the mighty turtle and returned to the Iron Kingdoms triumphant.",
+  "tokenId": 241,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/209_Turtleshell_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

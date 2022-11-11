@@ -1,0 +1,13 @@
+{
+  "name": "Noctis Helm",
+  "description": "This is an ancient mask taken from the underground City of Night, where it has been kept for centuries. It is so old the letters of its title have been worn away, but its power remains. Some say that the mask's power can only be augmented with the approval of gods or spirits, though no one knows if they are weaving lore or truth. The Noctis mask was found in the sewers stashed beneath a thieves guild in the City of Night.",
+  "tokenId": 217,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/49_Noctis_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

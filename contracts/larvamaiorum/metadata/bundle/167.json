@@ -1,0 +1,13 @@
+{
+  "name": "Tsae's Mask",
+  "description": "This mask was scavenged from the Shipwreck of Tsae, who was guiding a great fleet northeast to journey far into the Astariot Seas. Tsae preserved his life in a cedar chest, hoping to return one day to rescue his beloved girl, Ilona. But when the chest drifted ashore, Tsae's twin sister (also named Ilona) found him and gave him absolution. The world has changed and these days Tsae is just another folk tale.",
+  "tokenId": 167,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/162_Tsae_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Water Butterfly Mask",
+  "description": "This mask was taken from a putrid swamp, a cesspool for sickness and misery. Most of its surface was left in tact and has in essence, deteriorated. This mask is said to have been missing for decades and was reclaimed by a warrior maiden during her search for wisdom and truth. The butterfly expressed knowledge not found in the ways of her tribe.",
+  "tokenId": 69,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/29_Water_Butterfly_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    }
+  ]
+}

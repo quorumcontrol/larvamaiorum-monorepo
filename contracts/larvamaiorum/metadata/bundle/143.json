@@ -1,0 +1,13 @@
+{
+  "name": "Hollowsoul Mask",
+  "description": "In a forgotten place, abandoned and without secret technology, the people live in simplicity and devote themselves to prayer. One morning, when the leader's son was gazing from the window facing east, he saw a terrifying beast wandering. Looking up the child gazed on the mask's reflective face and those empty eyes. While all others thought that it was a token of grace, the leader returned and requested that this mask be destroyed.",
+  "tokenId": 143,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/192_Hollowsoul_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

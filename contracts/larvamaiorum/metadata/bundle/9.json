@@ -1,0 +1,13 @@
+{
+  "name": "Ghost Bath Mask",
+  "description": "This mask is as elegant and dangerous as the creature from which it came. The murderous beast resides deep in the southern Ironwrought Mountains, in a spindly cave surrounded by misty waterfalls. The scaly monster seems to capture those who approach it, though no one has lived to tell the exact details of their demise. Is it the pressing water droplets or its keen scales that will drag you under? This mask personifies both lethal glory and its fearsome rhymes.",
+  "tokenId": 9,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/176_Ghost_Bath_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

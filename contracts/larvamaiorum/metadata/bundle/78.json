@@ -1,0 +1,13 @@
+{
+  "name": "Hateful Incantation",
+  "description": "An empire was thought to have once occupied what is now the Ironslought Desert. Who they were, where they came from, and why they left are all a mystery. Their legacy is still carved into the sand and windstorms change figments of these writings into dust as though they are haunting the bones, waiting for the day when they will arise again. Occasionally, a glimmer will emerge from among the sand causing riders to stop and look. Usually these glimmers are just mirages, but one band of travelers was lucky enough to find this mask buried in the sand.",
+  "tokenId": 78,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/249_Hateful_Incantation.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

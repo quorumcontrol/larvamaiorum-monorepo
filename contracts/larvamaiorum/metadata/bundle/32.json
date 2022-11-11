@@ -1,0 +1,13 @@
+{
+  "name": "Cenchris Mask",
+  "description": "Hidden deep within the Black Fens, south of Glenwood, the temple and mask of the long fallen gods of this place have been found.  Cenchris was a deity of wisdom and was worshipped by a group of dedicated followers.  They would pray not for themselves, but for those before them. It was thought that with the gods' guidance, they could save those condemned to death. Recently, in their words, Cenchris has become feared, opposed to her principles of clarity and comfort.",
+  "tokenId": 32,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/13_Cenchris_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

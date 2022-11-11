@@ -41,6 +41,7 @@ export interface LarvaMaiorumInterface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "bulkUpdateMetadata(uint256,uint256,uint256)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
+    "contractURI()": FunctionFragment;
     "currentlyMinting()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -62,6 +63,7 @@ export interface LarvaMaiorumInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setContractURI(string)": FunctionFragment;
     "setCurrentlyMinting(uint256)": FunctionFragment;
     "setMaxSupply(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -89,6 +91,7 @@ export interface LarvaMaiorumInterface extends utils.Interface {
       | "balanceOf"
       | "bulkUpdateMetadata"
       | "burn"
+      | "contractURI"
       | "currentlyMinting"
       | "getApproved"
       | "getRoleAdmin"
@@ -110,6 +113,7 @@ export interface LarvaMaiorumInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setContractURI"
       | "setCurrentlyMinting"
       | "setMaxSupply"
       | "supportsInterface"
@@ -174,6 +178,10 @@ export interface LarvaMaiorumInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "burn",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "contractURI",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "currentlyMinting",
@@ -257,6 +265,10 @@ export interface LarvaMaiorumInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setContractURI",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setCurrentlyMinting",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -336,6 +348,10 @@ export interface LarvaMaiorumInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "contractURI",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "currentlyMinting",
     data: BytesLike
   ): Result;
@@ -390,6 +406,10 @@ export interface LarvaMaiorumInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setContractURI",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -626,6 +646,8 @@ export interface LarvaMaiorum extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    contractURI(overrides?: CallOverrides): Promise<[string]>;
+
     currentlyMinting(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getApproved(
@@ -730,6 +752,11 @@ export interface LarvaMaiorum extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setContractURI(
+      newUri: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setCurrentlyMinting(
       metadataIndex: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -830,6 +857,8 @@ export interface LarvaMaiorum extends BaseContract {
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  contractURI(overrides?: CallOverrides): Promise<string>;
 
   currentlyMinting(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -935,6 +964,11 @@ export interface LarvaMaiorum extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setContractURI(
+    newUri: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setCurrentlyMinting(
     metadataIndex: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -1036,6 +1070,8 @@ export interface LarvaMaiorum extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    contractURI(overrides?: CallOverrides): Promise<string>;
+
     currentlyMinting(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
@@ -1134,6 +1170,11 @@ export interface LarvaMaiorum extends BaseContract {
       approved: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    setContractURI(
+      newUri: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     setCurrentlyMinting(
       metadataIndex: PromiseOrValue<BigNumberish>,
@@ -1318,6 +1359,8 @@ export interface LarvaMaiorum extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    contractURI(overrides?: CallOverrides): Promise<BigNumber>;
+
     currentlyMinting(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
@@ -1419,6 +1462,11 @@ export interface LarvaMaiorum extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setContractURI(
+      newUri: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1528,6 +1576,8 @@ export interface LarvaMaiorum extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     currentlyMinting(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
@@ -1629,6 +1679,11 @@ export interface LarvaMaiorum extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setContractURI(
+      newUri: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

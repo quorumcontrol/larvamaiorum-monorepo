@@ -1,0 +1,13 @@
+{
+  "name": "Cannibalistic Fear Mask",
+  "description": "There are a couple ghouls in this world that are cannibals. They use this type of mask to scare off animals and people to get easier access to prey. They have many of these masks, collected from ancient ruins and troves. They mostly use them to invoke fear into fresh meat, but the idols can be disguised to fool any straying travelers. Be careful when approaching a strange mask you may find on your travels.",
+  "tokenId": 187,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/100_Cannibalistic_Fear_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

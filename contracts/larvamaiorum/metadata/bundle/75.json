@@ -1,0 +1,13 @@
+{
+  "name": "Double Vision Mask",
+  "description": "A vigilante was found in the darkness of a wealthy district. He hunts the most vile of men as they know he is after them. This vigilante didn't have time to deal with witnesses and decided to put on a Double Vision mask before he dealt with the man he was after, cutting him with his own blade. The melee was pathetic; in two blinks' time he had killed the target, himself, and any potential witnesses. The fascination for this mask is that it apparently lets the wearer see what no one else can.",
+  "tokenId": 75,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/142_Double_Vision_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

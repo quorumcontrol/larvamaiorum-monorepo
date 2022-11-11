@@ -1,0 +1,13 @@
+{
+  "name": "Crystal Ball Hail Mask",
+  "description": "During the sixteen bloody days of the Battle of Hollywood, a splendid and ornate ball adorned with gems was reportedly shattered upon the ground. Lying scattered across the battlefield, so small were these broken shards that they were easily lost. But this mask, now only a frame, may have been fashioned from that same crystal ball and though we know little of its former glory, the cults of bounty hunters who have worn this mask are rumored to know something more.",
+  "tokenId": 33,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/84_Crystal_Ball_Hail_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Falseface Mask",
+  "description": "In many cultures, masks are also used in performances called \"falseface\". Falseface is meant to scare. This falseface mask, forged from its maker's fear of heights, thrives where there is plenty of air to cast the fiery carnivalesque dances to the sky.  The jagged incision behind the eyebrows is legendary to ward off evil spirits but it will also protect its bearer from the overpowering temptation of flight.",
+  "tokenId": 35,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/121_Falseface_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

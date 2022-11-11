@@ -1,0 +1,13 @@
+{
+  "name": "Gritty Mask",
+  "description": "A mask worn by an ancient leader of the Fabrikators who lost everything to the City. The city that the ancient tribe of men had assimilated into, believing that the proud tradition of their old tribe could be preserved and fostered there. Too late did they realize that this city was not like them and so they made war against it, never to be heard from again. The grime on this mask tells its own tale. Those who would wear it stride in shadows and steel, without friends or gods.",
+  "tokenId": 25,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/159_Gritty_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

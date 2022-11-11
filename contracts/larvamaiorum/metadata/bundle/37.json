@@ -1,0 +1,13 @@
+{
+  "name": "Myconoid Mask",
+  "description": "The myconoids of the Southern Trocertan forests are a greener and healthier fare than their ancestors from the mountain regions, which abandoned their customs for the creature comforts of the life in the wild. Scaten Flasha has a fondness for these fungi so she roams around in the forest quite often, though trips to the more extensive regions of this range have always been difficult and dangerous. While exploring, a vicious beast attacked her and left some nasty scratches with its fangs. Scaten returned to her dwelling with her mount and found on her table a pouch containing this mask, covered in fungal spores.",
+  "tokenId": 37,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/174_Myconoid_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

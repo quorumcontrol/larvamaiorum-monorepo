@@ -1,0 +1,13 @@
+{
+  "name": "Technolumic Mask",
+  "description": "This mask is the manifestation of the ghost of a man who took his beliefs too far. In a world in dire need for scientific breakthroughs, people are often distracted by what is slow and small. There are fewer and fewer scientists daring to explore the past and its technologies because of the time invested in learning the old ways. As if to spite them, this mask was found in the mountains in plain sight, its secrets at last revealed.",
+  "tokenId": 140,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/66_Technolumic_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Melonhead Mask",
+  "description": "This once was the only vice of a mad old nomad. His decades walked him across deserts and corners of hamlets, hedges and piles of hay. He lost his grip on civilization as he tried to keep up, eating local cuisine, or ancient fungi he found. But it was his palate that dulled and a search for a local fruit left him hardly sane. This mask was seen hanging draped in leaves carried by an ill wind where wild animals gathered. They seemed to know the words, the tune that this creature knew.",
+  "tokenId": 5,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/237_Melonhead_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

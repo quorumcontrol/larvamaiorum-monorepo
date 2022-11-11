@@ -1,0 +1,13 @@
+{
+  "name": "Jawless Mask",
+  "description": "According to magical folklore, this mask is said to be the severed head and face of a once fearsome wyrm, who was caught by fishermen while sleeping beneath the cold waves of the Kellen River. They cut off its head and bore it away in their present. As word of the gruesome prize spread, more and more began to gather in pursuit of the hideous trophy, clashing with one another in a lustful bloodlust. At last a bearded fisherman rising to the creature's death to claim the prize was slain as well, bearing only this mask.",
+  "tokenId": 45,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/195_Jawless_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}

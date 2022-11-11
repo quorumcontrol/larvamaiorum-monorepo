@@ -1,0 +1,13 @@
+{
+  "name": "Rock Biter Mask",
+  "description": "This \"mask\" is a suit of metallic scales woven into a cowhide, worn by a creature of wretched and inexplicable origins. This terrifying savage of unknown origins was intent on carrying his scales down to the southern empire in order to see the majesty of its people's capital, but ended up lost in the rugged mountains around the sea of irene. What calamity befell this creature that eradicated his mind as well as his body?",
+  "tokenId": 169,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/6_Rock_Biter_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

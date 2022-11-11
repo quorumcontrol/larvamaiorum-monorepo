@@ -1,0 +1,13 @@
+{
+  "name": "Karambit Mask",
+  "description": "The Western Lands are as varied as they come with fierce tribes, cavernous canyons, and fertile green valleys, they are seldom visited by those who waste away their lives in the capital. Those who enter find themselves in a world of magic and wonder, surrounded on all sides by the creatures of fantasy that have been dreamed into life. A clever explorer has returned with this mask, dug out of the Karambit Caverns deep in the canyons, shadowed by their steep sides.",
+  "tokenId": 168,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/158_Karambit_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

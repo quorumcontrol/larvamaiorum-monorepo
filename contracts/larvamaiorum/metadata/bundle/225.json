@@ -1,0 +1,13 @@
+{
+  "name": "Nook Mask",
+  "description": "An unknown refugee from the northern parts of that empire joined the rest of the world in this bustling metropolis. Though it's a fast paced city, for, every decade or so all one can hear are the voices and footsteps of beasts. Their ears hear these footfalls long before their eyes can find the uncouth. It is said that those with sharp enough ears can hear the ghost in the street wearing this mask.  Then they will know where they must walk.",
+  "tokenId": 225,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/122_Nook_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

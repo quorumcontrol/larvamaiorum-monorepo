@@ -1,0 +1,13 @@
+{
+  "name": "Mug's Mask",
+  "description": "Legendary craftsman, Mug, was an artisan of beer. He took a common brewing vessel and, by adding many rare ingredients, created a beer unlike any other. He was renowned for his technique in making it and people would come far and wide and often remain long at his brewery, waiting to taste his latest brew. Upon the eve of Mug's death, he sat down to write his will. To his family and dear friends he bequeathed the secret of his cooking method, the painstaking process of collecting utensils to make beer, which took a lifetime to acquire. Members of the Thieves' Guild who ventured forth and looted Mug's brewery became greedy and drank their prize too quickly. No sooner had they finished their kegs then their lives were taken as if drawn by a curse, their souls poured into this mask, for it is said that crying sorrow pours from the deep wells of this mask.",
+  "tokenId": 126,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/227_Mug_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

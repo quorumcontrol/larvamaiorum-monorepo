@@ -1,0 +1,13 @@
+{
+  "name": "Earl of Mirage's Mask",
+  "description": "It is said that this mask is related to lands in the north. Some speak of this place as an empire of stormy seas, far beyond the last spires of your ancestors. The few tales tell that they suffered a great existential cataclysm where one night turned into many nights in a row. It is said that it's last true inhabitant wore this mask while watching the horizon, forever wondering whether the glorious sun would return. Others say that these are words to lure one in, for those who wear this mask experience the terrible chill of the north.",
+  "tokenId": 87,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/93_Earl_of_Mirage_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

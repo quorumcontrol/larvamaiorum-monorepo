@@ -1,0 +1,13 @@
+{
+  "name": "Unicorn's Marrow",
+  "description": "A powerful wizard hunter was said to have accompanied a band of expeditioners that set off on a journey to the deepest reaches of the arctic jungle in search of an as yet undiscovered city. They long ago vanished with only this one mask for proof that they existed. The mask is said to have matured as it constantly drained life force, day and night. Traces of otherworldly spirits are said to linger in its haunting eyes, signs of its unceasing desire to dance. The unknown wizard hunter found this mask on an ancient statue and it was said to have been laden with ancient sigils, perhaps the ones that cursed the expedition.",
+  "tokenId": 63,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/234_Unicorn_s_Marrow.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    }
+  ]
+}

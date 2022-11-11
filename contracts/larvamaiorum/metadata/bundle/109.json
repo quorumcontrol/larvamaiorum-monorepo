@@ -1,0 +1,13 @@
+{
+  "name": "That Mask which Laughs in the Face of Death",
+  "description": "This mask is said to have been taken by a traveler who came near a haunted fortress. The rumors coming from this forsaken town seemed to indicate something more than the usual horde of undead. If a traveler visits the haunted fortress, it is thought this mask will melt away from contact with the death and laughter, from which it was conceived, until it is reduced to nothing but a knot shaped like an old man's head.  The strange figure, like a child's toy with a sunken head, will whistle in your ear and cackle when you return to the place from where you came.",
+  "tokenId": 109,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/247_That_Mask_which_Laughs_in_the_Face_of_Death.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    }
+  ]
+}
