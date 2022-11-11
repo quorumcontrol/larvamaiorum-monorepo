@@ -1,0 +1,58 @@
+{
+  "name": "playcanvas-typescript-example",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "source": "src/index.ts",
+  "main": "dist/scripts/index.js",
+  "scripts": {
+    "dev": "concurrently -n webpack,playcanvas-watch \"npm run dev:watch\" \"npm run dev:playcanvas-watch\"",
+    "dev:watch": "webpack --watch --mode=development",
+    "dev:playcanvas-watch": "node node_modules/playcanvas-sync/pcwatch.js --force",
+    "build": "webpack && node node_modules/playcanvas-sync/pcsync.js pushAll",
+    "pull": "node node_modules/playcanvas-sync/pcsync.js pullAll",
+    "prettier:check": "cross-var prettier --check $npm_package_config_prettier_pattern",
+    "prettier:all": "cross-var prettier --write $npm_package_config_prettier_pattern",
+    "prettier:staged": "prettier --write",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest"
+  },
+  "config": {
+    "prettier_pattern": "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bn.js": "^5.1.1",
+    "@types/jest": "^28.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "concurrently": "^7.0.0",
+    "cross-var": "^1.1.0",
+    "eslint": "^8.13.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "jest": "^28.1.1",
+    "playcanvas": "^1.57.1",
+    "playcanvas-sync": "github:playcanvas/playcanvas-sync",
+    "prettier": "^2.5.1",
+    "ts-jest": "^28.0.4",
+    "ts-loader": "^9.2.6",
+    "typescript": "4.6.4",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/node": "^17.0.42",
+    "@types/uuid": "^8.3.4",
+    "buffer": "^6.0.3",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
+    "debug": "^4.3.4",
+    "stream-browserify": "^3.0.0",
+    "ts-node": "^10.8.1",
+    "uuid": "^8.3.2"
+  }
+}
