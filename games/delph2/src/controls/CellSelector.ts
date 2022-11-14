@@ -137,7 +137,6 @@ class CellSelector extends ScriptTypeBase {
 
     // If there was a hit, emit the entity
     if (result) {
-      console.log(SELECT_EVT, result)
       this.app.fire(SELECT_EVT, result)
     }
   }
