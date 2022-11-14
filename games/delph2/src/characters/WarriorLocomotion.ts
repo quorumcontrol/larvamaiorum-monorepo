@@ -31,6 +31,9 @@ class WarriorLocomotion extends ScriptTypeBase {
       this.entity.lookAt(this.destination.x, 0, this.destination.z)
     }
     this.speed = speed
+    if (!this.viking) {
+      console.error('here we are', this.entity.name, this.entity.getGuid(), this)
+    }
     this.viking.anim!.setFloat('speed', speed)
   }
 
@@ -46,7 +49,7 @@ class WarriorLocomotion extends ScriptTypeBase {
 
   update(dt: number) {
     // this.entity.lookAt(this.destination)
-    if (this.speed > 0) {
+    if (this.speed > 0 && this.destination) {
       const current = this.entity.getPosition()
       const vector = new Vec3().sub2(this.destination, current).normalize().mulScalar(this.speed * dt)
       vector.y = current.y

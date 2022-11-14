@@ -3,7 +3,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import WarriorLocomotion from "./WarriorLocomotion";
-import { randomFloat } from "../utils/randoms";
+import Warrior from "../game/Warrior";
 
 export const ARRIVED_EVT = 'warrior:arrived'
 export const CLOSE_TO_DESTINATION_EVT = 'warrior:closeToDest'
@@ -13,7 +13,8 @@ export enum State {
   move,
   harvest,
   battle,
-  dead
+  dead,
+  taunt
 }
 
 @createScript("warriorBehavior")
@@ -23,11 +24,9 @@ class WarriorBehavior extends ScriptTypeBase {
   anim:AnimComponent
   locomotion:WarriorLocomotion
 
+  warrior?: Warrior
   battling?:Entity
-
-  timeInBattle = 0
-  timeDead = 0
-
+  
   initialize() {
     this.state = State.move
     this.anim = mustFindByName(this.entity, 'viking').anim!
@@ -37,37 +36,13 @@ class WarriorBehavior extends ScriptTypeBase {
       throw new Error('no locomotion')
     }
     this.locomotion = locomotion
-    this.entity.on('battle', (otherBehavior:WarriorBehavior) => {
-      if (this.state === State.battle) {
-        return
-      }
-      this.doBattle(otherBehavior.entity)
-    })
-    this.entity.on(BATTLE_OVER_WIN_EVT, () => {
-      this.setState(State.move)
-    })
+  }
+
+  setWarrior(warrior:Warrior) {
+    this.warrior = warrior
   }
 
   update(dt: number) {
-    if (this.state === State.battle) {
-      this.timeInBattle += dt
-      if (this.timeInBattle >= 1) {
-        if (randomFloat() > 0.75) {
-          this.handleBattleOver()
-        }
-        this.timeInBattle = 0
-      }
-    }
-    if (this.state === State.dead) {
-      this.timeDead += dt
-      if (this.timeDead >= 3) {
-        if (randomFloat() > 0.6) {
-          console.log('arising')
-          this.setState(State.move)
-        }
-        this.timeDead = 0
-      }
-    }
     const gumps = this.app.root.findByTag('harvestable')
     gumps.forEach((gumpNode) => {
       const gump = gumpNode as Entity
@@ -82,37 +57,9 @@ class WarriorBehavior extends ScriptTypeBase {
     if ([State.battle, State.dead].includes(this.state)) {
       return
     }
-
-    const warriors = this.app.root.findByTag('warrior')
-    warriors.forEach((warriorNode) => {
-      if ((warriorNode as Entity).getGuid() === this.entity.getGuid()) {
-        return
-      }
-      if (this.battling?.getGuid() === (warriorNode as Entity).getGuid()) {
-        return
-      }
-      const state = this.getBehavior(warriorNode as Entity)
-      if ([State.battle, State.dead].includes(state.state)) {
-        return
-      }
-      if (this.entity.getPosition().distance(warriorNode.getPosition()) < 1) {
-        this.doBattle(warriorNode as Entity)
-      }
-    })
   }
 
-  private handleBattleOver() {
-    if (randomFloat() >= 0.5) {
-      if (this.battling) {
-        this.battling.fire(BATTLE_OVER_WIN_EVT)
-      }
-      this.setState(State.dead)
-      return
-    }
-    this.setState(State.move)
-  }
-
-  private setState(newState:State) {
+  setState(newState:State) {
     if (this.state === newState) {
       return
     }
@@ -124,6 +71,12 @@ class WarriorBehavior extends ScriptTypeBase {
         this.anim.setFloat('health', 100)
         this.locomotion.setSpeed(4)
         return
+      case State.taunt:
+        //TODO this should be an animation, but for now idle it
+        this.anim.setBoolean('battling', false)
+        this.anim.setFloat('health', 100)
+        this.locomotion.setSpeed(0)
+        return
       case State.dead:
         this.anim.setFloat('health', 0)
         this.anim.setBoolean('battling', false)
@@ -134,21 +87,6 @@ class WarriorBehavior extends ScriptTypeBase {
         this.locomotion.setSpeed(0)
         return
     }
-  }
-
-  private doBattle(otherWarrior:Entity) {
-    this.battling = otherWarrior
-    this.setState(State.battle)
-    this.entity.lookAt(otherWarrior.getPosition())
-    otherWarrior.fire('battle', this)
-  }
-
-  private getBehavior(warrior:Entity) {
-    const behave = this.getScript<WarriorBehavior>(warrior, 'warriorBehavior')
-    if (!behave) {
-      throw new Error('no behavior')
-    }
-    return behave
   }
 
 }
