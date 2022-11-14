@@ -1,0 +1,17 @@
+{
+  "name": "Clockwork Paladin Mask",
+  "description": "Beneath the Emerald River was an ancient city, plagued by an old menace. Only those souls with the courage to cleanse it of the shadow could claim this mysterious mask in its depths. It is said the mask was once worn by the Stone Age Paladins and roamed the earth fighting gloom and extending the light. This was a time when darkness was rampant and malevolent.",
+  "tokenId": 74,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/36_Clockwork_Paladin_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Mask of Rumor",
+  "description": "This mask is stained with tales of travelers and other beings, the likes of which cannot be found where it was found. And yet it would not seem to be merely the graven word and fanciful imaginings of humble journeyers. Both denizen and traveler, common and exotic, all seem to wear a sense of this mask, twisted as it is. Perhaps you can also hear the rumors, if worn truthfully.  Theories abound, but this is the only artifact that ties all of the seemingly disparate tales together.",
+  "tokenId": 114,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/154_Mask_of_Rumor.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

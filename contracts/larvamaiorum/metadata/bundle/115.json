@@ -1,0 +1,17 @@
+{
+  "name": "Moonlight Guardian Mask",
+  "description": "The Moonlight Guardian mask is said to belong to this caretaker of the dark places of the forest and rivers, and even the sky. The legends say that their riddle is always their mask, befuddling whoever wears it. In the darkness of night and when it vanished, no one could tell if it belonged to a man or a beast. Whoever put it on would go mad, or afflicted by the moon cycle.",
+  "tokenId": 115,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/137_Moonlight_Guardian_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

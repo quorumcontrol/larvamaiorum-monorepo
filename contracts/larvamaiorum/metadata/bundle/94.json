@@ -1,0 +1,17 @@
+{
+  "name": "Water Eclipse Mask",
+  "description": "This mask was found at the bottom of an unending waterfall in the eastern Crypto Roman Empire, where it supposedly washed ashore after the villages on either side clashed during an unrelenting and solitary blood war that left the rivers running red.  The bloodshed hastened and spilled over the lands, as it was said that a victory had not been found in this incessant warfare.  The Water Eclipse Mask was found far below the surface and sits with murky waters, waiting silently to be able to look out across the black seas.",
+  "tokenId": 94,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/52_Water_Eclipse_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

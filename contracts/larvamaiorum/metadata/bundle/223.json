@@ -1,0 +1,17 @@
+{
+  "name": "Cockatrice Mask",
+  "description": "The frontier village of Cotya was covered by the first winter snow while they waited outside the gates of a besieged town. The cloistered trappers who lived there told them of the sad plight of the resident cockatrice. Calling to him, they had invited him inside. The cockatrice poured his soul into a funeral mask, leading the trappers out of civilization and back to their village.",
+  "tokenId": 223,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/119_Cockatrice_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

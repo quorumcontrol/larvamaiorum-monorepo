@@ -1,0 +1,17 @@
+{
+  "name": "The Sleeping Stalker",
+  "description": "A young traveler who had fled the misfortune of all his problems finally arrived at his destination, exhausted on the shore of a desiccated riverbed. Wearily, he took off his boots but was soon disturbed by a pair of creeping golden eyes in the distance grinning in wicked delight as a creature arched its back and lept towards him. The creature shrieked, reeling backwards and displaying its fearsome teeth and possessing the young traveler with horrific fear. This sleeping creature's mask was found near the trade routes on top of a pile of leaves.",
+  "tokenId": 233,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/82_The_Sleeping_Stalker.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

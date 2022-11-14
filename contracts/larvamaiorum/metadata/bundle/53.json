@@ -1,0 +1,17 @@
+{
+  "name": "Pulsatio Maxima Mask",
+  "description": "The mask of the Pulsatio Maxima animates in places of great bloodlust and energy. Some say that it is the beating heart of a giant hulking thing that exerts its domination by subjugating those who defy it. Others say it is the helm of an interdimensional invader that led a battle of armies across reality. Some say that is a fragment of a collapsing star billions of miles in diameter; an unseen force of impossibly bad luck that travels from world to world, seeping into desolate landscapes and triggering chaos.",
+  "tokenId": 53,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/37_Pulsatio_Maxima_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

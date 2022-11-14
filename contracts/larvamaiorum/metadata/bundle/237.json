@@ -1,0 +1,17 @@
+{
+  "name": "Portrait Mask",
+  "description": "The mischievous artist Jesaja Rosseau and his sworn friend Monitis Tirendi raised the ultimate easel to the sky in a vengeful flare, concluding their mortal feud with the strokes of a single sword. The son, however, unexpectedly intervened just as the artist died by fatally shooting his father in the back. As the shield protected him from the blade, it seemed only right that Monitis should finish Jesaja's brushwork and hang his betrayal on his own door. Surprisingly, there was a likeness of a mask, which Monitis later crafted, to be found in these strokes.",
+  "tokenId": 237,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/133_Portrait_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

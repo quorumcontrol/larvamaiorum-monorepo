@@ -1,0 +1,17 @@
+{
+  "name": "Mask of the Astariot Hag",
+  "description": "Near the shores of the Astariot Sea and the Icy Woods, lived a witch that no one had heard from for a decade and a day. She was furious with the world, gazing upon it with a jaded eye. People thought she was dead — and then one stormy night she came back, bringing something with her. In her screaming rage she spoke only incomprehensible chants, but we can only guess who was on the other side of that masquerade. Further and further the black magic spread, madness in her eyes. Finally the witch vanished again, some say to the Astariot Sea below, but this time all that's left is a mournful, angry ghost... and this mask.",
+  "tokenId": 155,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/210_Mask_of_the_Astariot_Hag.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

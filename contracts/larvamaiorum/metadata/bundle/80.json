@@ -1,0 +1,17 @@
+{
+  "name": "Hephasm Helm",
+  "description": "It's said that Hephasm can be induced by the memories of crushing pressure and the roar of displaced seawater. When the great ancient dragon turtle smashed through a natural arch of rock called Dvorcail to make way for himself, wide gouts of water rose up and covered the landscape with a deluge. This lead to many speculations about whether or not the mask sprung forth from one of those gouts.",
+  "tokenId": 80,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/190_Hephasm_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

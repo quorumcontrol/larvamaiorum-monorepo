@@ -1,0 +1,17 @@
+{
+  "name": "Ironsilk Mask",
+  "description": "Once worn during the Royal Forest Court's first night of festivities, this mask was found guarded by an iron spider in the royal forest by a fellow reveler. It is constructed of spidersilk and has an engraving on the back that says \"Fair Folk, midnight secret, count stars under a silken mask.\"   Few know what to expect when coming up against these otherworldly iron spiders, but those who do have a tendency to avoid eye contact whenever possible. This mask must never be worn in daylight.",
+  "tokenId": 15,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/32_Ironsilk_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

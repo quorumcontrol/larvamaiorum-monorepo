@@ -1,0 +1,17 @@
+{
+  "name": "Diamond Queen Mask",
+  "description": "In the remains of a crystalline kingdom that once existed with the elven empires, not far form the Eastern foundations of the Conclave, there grew a vampire queen on a pillar of diamonds. Taking the title of Diamond Queen she live a long time and far into old age, gathering followers and building an empire. Legends say that at her end she was betrayed by one of her lieutenants and fled eastward in search of  a new home. This mask was found among the remains of the diamond pillar from whence she sprung and had been slowly cemented in the pillar over the years.",
+  "tokenId": 13,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/186_Diamond_Queen_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

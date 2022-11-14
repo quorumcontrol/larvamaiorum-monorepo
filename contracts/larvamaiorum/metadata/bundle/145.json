@@ -1,0 +1,17 @@
+{
+  "name": "Cybernetic Cyclops Mask",
+  "description": "A scholar learned by chance that the mechs that terrorized the overgrown kingdom to the east of the DAO protectorates radiated with distant frequencies. The whispers that reached this scholar claimed that the earth became one as these malevolent machines marched in circles around the earth. If these monsters did not stop marching, they would take control of all life on the planet. This cybernetic mask was reportedly retrieved by a freelance reconnaissance officer who made it within the walls of this kingdom and sought shelter from the heavy machines.",
+  "tokenId": 145,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/61_Cybernetic_Cyclops_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

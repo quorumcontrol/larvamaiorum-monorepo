@@ -1,0 +1,17 @@
+{
+  "name": "Renneker Mask",
+  "description": "This mask is rumored to have been made from the skinned head of an ogre. Those who have seen the mask believe so because such a creature was once spotted carrying it. What does one do when such a thing wanders near their town? Brave souls confronted it in an attempt to collect this bone-cored mask. The brave warriors of the town of Renneker returned with this prized mask.  They celebrated their victory and wore the masks collected from the ogre as they opened their tavern at the edge of town.",
+  "tokenId": 100,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/91_Renneker_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

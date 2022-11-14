@@ -1,0 +1,17 @@
+{
+  "name": "Fruit of the Savannah",
+  "description": "In the savannah just to the south of the arctic jungle there was a tribe of frugivores secluded from the rest of the world. They raised humble families on the earth and enjoyed what their land had to provide. But there was a group of outsiders that took note of their steady existence, so they invited them in to offer them bread and wine. They invited sirens in their festivities, who used their voices to enchant the savannah dwellers. The Fruit of the Savannah is just another bauble taken from those enchanted.",
+  "tokenId": 59,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/81_Fruit_of_the_Savannah.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Ghostly Sail Mask",
+  "description": "Sulkily sailing through the forbidden sea, which few have ever seen, is a ghastly ship and on that ghastly ship is a Ghostly Sail mask. Without a name, this haunting mask and the boat it adorns can only be described by the spattered red paint coming from that ship's bow. who would capture  such an imposing figure as this and what sailors took to this seas to never return?",
+  "tokenId": 26,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/185_Ghostly_Sail_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -61,6 +61,8 @@ contract LarvaMaiorum is
 
     uint256 public maxSupply;
 
+    string public contractURI;
+
     /**
      * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
      * account that deploys the contract.
@@ -75,6 +77,16 @@ contract LarvaMaiorum is
         _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(METADATA_SETTER_ROLE, _msgSender());
     }
+
+    function setContractURI(string calldata newUri) public returns (bool) {
+        require(
+            hasRole(METADATA_SETTER_ROLE, _msgSender()),
+            "LM: missing metadata setter role"
+        );
+        contractURI = newUri;
+        
+        return true;
+    } 
 
     function tokenURI(uint256 tokenId)
         public
@@ -168,15 +180,16 @@ contract LarvaMaiorum is
 
     function _internalMint(address to) internal {
         uint256 current = _tokenIdTracker.current();
+
         if (current >= maxSupply) {
             revert("maximum supply exceeded");
         }
+        _tokenIdTracker.increment();
 
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _mint(to, current);
         tokenIdToMetadataUri[current] = currentlyMinting;
-        _tokenIdTracker.increment();
     }
 
     /**

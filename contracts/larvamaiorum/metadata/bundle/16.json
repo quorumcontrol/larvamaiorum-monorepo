@@ -1,0 +1,17 @@
+{
+  "name": "Cursed Harlequin Mask",
+  "description": "The story of this mask is set in Vanduhi, the whimsical city of carnivals and illusion. One evening, as revelry was underway and the citizens were gathering around an open flame to partake in festivities and celebrations, a performer, with a conical hat and strange mask adorning his head,  walked by with his head down. Appearing restless and slightly intoxicated, he suddenly mumbles something incoherent, before speaking out loud, \"The old ones want to turn my thoughts towards death! But they try in vain as I am timeless.\" It is even said that he pushed another performer's conical hat into the fire before his mask was confiscated by the guard.",
+  "tokenId": 16,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/245_Cursed_Harlequin_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Unbound Kingdom Mask",
+  "description": "This mask was found in the Town of the Sky's the Limit, rich with treasures from the new world and it's explorer: a wise tradesman whose greed got the better of him. Customary to their culture, those who are destined to die great deaths must inhale a clove of garlic for three days before receiving a title, none greater than \"King\". The trader stayed behind for his royal coronation and when a new trade ship from the new world returned, they were surprised to find \"The King\" resting on his ornate riches and wearing this mask with anguish in his eyes.",
+  "tokenId": 226,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/239_Unbound_Kingdom_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

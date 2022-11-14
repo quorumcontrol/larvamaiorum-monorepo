@@ -1,0 +1,17 @@
+{
+  "name": "Storied Mask of the Burning Steppe",
+  "description": "The Deadlands of the Burning Steppe are a people of experts and craftsmen. Wisecrats and hexers are among the few honored positions in the teeming country. Amongst the common folk, there have been many who have felt what it is to wear this elaborate headpiece, but none can be found anymore to say for sure where it came from. From every angle this mask is fascinating, and anybody who has possessed it is fortunate. Though they cannot speak in the tongue of the people of the steppes, nor can they bear the harsh climate or the brutal battles they love so dearly.",
+  "tokenId": 112,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/211_Storied_Mask_of_the_Burning_Steppe.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

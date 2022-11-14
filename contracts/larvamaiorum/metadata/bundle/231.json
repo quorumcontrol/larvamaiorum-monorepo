@@ -1,0 +1,17 @@
+{
+  "name": "Frost Eclipse Mask",
+  "description": "Found in the Forge Lands, recounted as a mask rumored to have been worn by a colossal frost titan of great age and power. The snow beast was said to have been so big, taller than most trees and mountains.  The word of the tribe in the area surrounding this region, who worshiped this frost titan as their deity, was that the Frost Eclipse Mask was an article of faith described in an ancient scroll.",
+  "tokenId": 231,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/55_Frost_Eclipse_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

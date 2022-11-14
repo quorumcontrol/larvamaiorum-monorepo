@@ -1,0 +1,17 @@
+{
+  "name": "Bone Rattler Mask",
+  "description": "In the northern regions, not far from the arctic jungle,  all sorts of animals walk on four and two legs. They do this effortlessly at the top of unbelievably tall trees and on the ground. With its grim injuries, cloudy eyes, and terrifying spectre of death and decay, this fetid creature looked like an animal. This creature seemed to want a travelling party of Retro Vikings to take its relic mask.  Rumor has it that the mask was left on behalf of the creature by the great bone god for his brave warriors.",
+  "tokenId": 218,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/111_Bone_Rattler_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

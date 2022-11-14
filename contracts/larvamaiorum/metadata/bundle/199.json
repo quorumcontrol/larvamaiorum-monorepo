@@ -1,0 +1,17 @@
+{
+  "name": "Malign Mask",
+  "description": "A malign entity has been possessing the mind of any mortal that captures the eyes of its guards. Be warned, these lethal beasts will attack anyone they perceive as a threat, and will not cease until they are killed. It is said that these shadowed ornate masks are generated when a mortal dies against a Malign's followers. They cannot be pierced by most projectile or melee weapons.",
+  "tokenId": 199,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/129_Malign_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Funky Punky Pet Mask",
+  "description": "Deep in the crypt of a spooky cemetery, in the middle of a misty morning, an explorer was headed to their final reward. As their coffin drifted on its bier through the gates, the unfortunate soul within reached out with one final request, that someone find their pet peacock and give him his favorite green rattle. So it was, as the peals of laughter echoed through the woods, that explorers placed this funky mask on the hollowed out skull of their young explorer.",
+  "tokenId": 228,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/87_Funky_Punky_Pet_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

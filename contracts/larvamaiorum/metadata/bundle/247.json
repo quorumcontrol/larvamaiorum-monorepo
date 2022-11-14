@@ -1,0 +1,17 @@
+{
+  "name": "House Crow Mask",
+  "description": "The House Crow mask has been overlooked, discarded, gloated over and lost more times than anyone can count on their fingers. It's been found by archeologists, by miners and by merchants in the markets of many lands and kingdoms. But none of these masks have been the same.",
+  "tokenId": 247,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/20_House_Crow_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Julanzang",
+  "description": "Profound knowledge of the world and reality is not always welcome. The Julanzang is unusual because there are few who would morally be able to either wear the mask, or handle the knowledge it bears. The mask is said to exist near the Crossroads, that limbo where notions of reality intersect.  It's believed that the juluanzang was created by blending the essences of spiritual masters, ancient cosmic demons and those who harnessed the power of the beyond through ancient rituals. One wears this mask at one's own peril, but someone must, because it is said to be ceaselessly seeking.",
+  "tokenId": 104,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/236_Julanzang.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

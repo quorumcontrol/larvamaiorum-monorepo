@@ -1,0 +1,17 @@
+{
+  "name": "Taskmaster Helm",
+  "description": "It is rumored that this helm was taken from the ranks of a regiment of \"Stagskulls\", a vast army that bolstered the Protectorate. The Randal's Gate officers doing the honors simply didn't enjoy wearing this grizzled armor, tied down by such restrictive regulations. Thus, their taskmaster decided to hold an auction and sell out this mask! They made quite the fortune, continuing to serve as a mercenary company while wearing a different shade of green.",
+  "tokenId": 156,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/149_Taskmaster_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

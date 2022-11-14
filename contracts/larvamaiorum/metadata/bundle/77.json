@@ -1,0 +1,17 @@
+{
+  "name": "Miscellaneous Helm",
+  "description": "The Creekside Bridge was an old bridge, as bridges go. Silent waves lapped at its broken boards, mercifully instead of relentlessly. A young traveller found himself on that same bridge in the dead of winter, wandering the creekbanks looking for a pleasant campfire to warm this unforgiving evening. Camping beneath the bridge, he noticed a disheveled duck, a forest ogre and a huge frog strolling by. This helmet had sunk to the creek's floor, lifting along with the water from the rushing river towards the bridge, and with the help of the ogre, the duck, and the frog, he retrieved it.",
+  "tokenId": 77,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/75_Miscellaneous_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

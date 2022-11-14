@@ -1,0 +1,17 @@
+{
+  "name": "Haunted Harlequin Mask",
+  "description": "Once a virtuoso of the Jardi's School of Ballet, this enchanting dancer was cursed by the mask he wore. His name is unrecorded and all we know is that he often went missing from his training class in the ethereal Vanduhi circus. At some point he began wearing a mask on stage to conceal his identity. Yet his beauty shone through the illusion and his classes resumed to full house. But one fateful evening, he was unmasked yet again and died horribly, in a fire no less! Many say that it takes only the bones of this dancer to awaken this bizarre mask found in his dressing room.",
+  "tokenId": 71,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/206_Haunted_Harlequin_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

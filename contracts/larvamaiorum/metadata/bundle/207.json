@@ -1,0 +1,17 @@
+{
+  "name": "Sky Trader Mask",
+  "description": "A trader ship captained by an ambitious though crooked crew set sail for adventure with the bearing of a strong west wind at their back. Their ship, the Sky's the Limit loosed herself from captivity by those who sought to harness the prevailing forces of natural energy and technological prowess, before making a short voyage to the shores of a new land. This mask  was found on an ancient warrior and the boat was teeming with treasures from the new world.",
+  "tokenId": 207,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/68_Sky_Trader_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

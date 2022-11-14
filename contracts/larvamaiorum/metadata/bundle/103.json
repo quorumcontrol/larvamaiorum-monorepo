@@ -1,0 +1,17 @@
+{
+  "name": "Cronus Arcana",
+  "description": "A group of acolytes deep in the forest, in east of the world incurred casualties from an unknown creature that the locals declare to be a monster. They say the creature had abandoned its earthly body to live in a celestial plane. The acolytes had reason to believe that this new form was not limitless and longed for the chance to discern the creature's weaknesses and try to destroy it utterly. This mask was crafted to help combat this celestial beast, but the beast disappeared before it could be used.",
+  "tokenId": 103,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/33_Cronus_Arcana.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

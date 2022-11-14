@@ -1,0 +1,17 @@
+{
+  "name": "Earl's Shadow",
+  "description": "The Earl was lost for many days, during his journey up Ironwrought Mountain. He found himself wandering in an unfamiliar world and could hear the melody of an unknown voice telling him to claim his own power. Finally he saw this mask, lying crookedly at the foot of an ancient tree and knew he belonged here. He donned the mask and felt its power. The tree creaked and groaned, keening loudly, with the unearthly sound of a song. The Earl then joined in the chorus, singing with the shadows.",
+  "tokenId": 151,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/232_Earl_s_Shadow.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

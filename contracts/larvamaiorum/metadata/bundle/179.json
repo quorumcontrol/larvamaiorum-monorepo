@@ -1,0 +1,17 @@
+{
+  "name": "Jiandis",
+  "description": "Said to have been crafted by a race of insects long since gone, Jiandis originally bore the likeness of a general in their military. Some explorers found this mask in an ancient temple in the eastern corner of the continent, while they were perusing the temple's many rooms and structures, seeking out riches and knowledge. They can only hope one day to decipher the creatures' mysteries for the sake of humanity and even eternity.",
+  "tokenId": 179,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/0_Jiandis.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

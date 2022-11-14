@@ -1,0 +1,17 @@
+{
+  "name": "Panoramic Moose Head Mask",
+  "description": "It's rumored that in the past members of a family would carefully carry a Panoramic Moose Head Mask passed from one generation to the next. With the mask the storyteller would tell the family's defining legend, of how one day a cousin, a stranger, and their pet moose walked into town to find adventure and intrigue. Having encounters with dragons, pirates, and an evil emperor, they were responsible for saving the village from an icy fate.",
+  "tokenId": 107,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/145_Panoramic_Moose_Head_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -18,3 +18,14 @@ task('set-presale-price')
     await tx.wait()
     console.log('done: ', tx.hash)
   })
+
+task('get-buyers')
+  .setAction(async (_, hre) => {
+    const allowListSetter = await getAllowListSpot(hre)
+    const filter = allowListSetter.filters.Purchase(null)
+    const evts = await allowListSetter.queryFilter(filter)
+    console.log("count: ", evts.length)
+    evts.forEach((evt) => {
+      console.log(evt.args.account)
+    })
+  })

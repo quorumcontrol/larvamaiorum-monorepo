@@ -1,0 +1,17 @@
+{
+  "name": "Mask of the Lost",
+  "description": "Perhaps the most perplexing thing about the Mask of the Lost is that the legend tells of a small village in the heart of the steppe, Bladewind, far from civilization and unusually peaceful, unwilling or simply unaware of their namesake. They say that a boy who grew up outside the boundaries of natural peace would return to that village once every year and donate a mask, yet he would never take anything in exchange. This artifact  is said to be the forgotten mask, one the boy left in the town without speaking to anyone.",
+  "tokenId": 7,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/108_Mask_of_the_Lost.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

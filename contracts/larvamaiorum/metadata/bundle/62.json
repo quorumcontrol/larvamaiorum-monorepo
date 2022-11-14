@@ -1,0 +1,17 @@
+{
+  "name": "Profane Mask",
+  "description": "The Weeping Tower was an ancient rune tower discovered by a profanity wizard, after hearing an unknown language resounding to him at night. The sound of the voice in his head scared him and the tower intrigued him so much, he volunteered to live there alone. Clad in darkness and its dripping mists, the building rained curses on the hapless wizard and he soon found himself haunted by invisible hands  scratching at the door, invisible whispers tingling his mind. When it became too much and he finally fled, all he was carrying was this inexplicable mask. The beast inside the mask is said to bear a spider's face.",
+  "tokenId": 62,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/204_Profane_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

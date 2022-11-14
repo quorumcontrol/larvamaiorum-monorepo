@@ -1,0 +1,17 @@
+{
+  "name": "Grief Cataclysm Mask",
+  "description": "In the far north, the Sun rises and sets with cruel speed, like an inferno all but quenched, a cycle of death and rebirth, without time to mourn the departures longingly. The Empire attempted to carve out a kingdom in these lands. But soon history will forget these attemps as winds change, and outposts melt away to become part of the barren tundra. If one possesses this mask, wearing it is too much of a burden for the soul unless one can look upon the sunrise each day.",
+  "tokenId": 1,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/85_Grief_Cataclysm_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

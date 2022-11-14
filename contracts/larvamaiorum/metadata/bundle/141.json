@@ -1,0 +1,17 @@
+{
+  "name": "Moloch's Crown",
+  "description": "At the deepest level of the dungeon in the westernmost steppes, where the sky doesn't seem to get any lighter the deeper you go, there is a single throne overlooking a bonfire where once a now unfamiliar figure used to sit. Sadly, not much remains of his misadventures and this crown is the only item of value to be found.  Those claiming to have worn this crown have been bestowed unnatural bravery. Unsurprisingly, however, the bravest villains are bitterest monsters.",
+  "tokenId": 141,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/97_Moloch_s_Crown.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

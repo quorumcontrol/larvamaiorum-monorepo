@@ -1,0 +1,17 @@
+{
+  "name": "Miscreant Manual Mask",
+  "description": "Pagan Publishing unveiled a catalog of the villains of the Crypto World. This headwear appears to be based off one of the known figures, the Laughter Killer. This mask came as a complimentary gift with the one of a kind first printing of their inventory of villains, the Miscreant Manual. Hoarders, keep this one in your collection for bragging rights.",
+  "tokenId": 164,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/58_Miscreant_Manual_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

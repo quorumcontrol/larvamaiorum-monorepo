@@ -1,0 +1,17 @@
+{
+  "name": "The Solar Mask",
+  "description": "The Solar Mask possesses countless powers, according to legend. Supposedly a relic of long lost empire, the mirror embedded in the mask's forehead emits a powerful blast of light.  Supposedly the mask can also detect life within a short range, the beam rendering fruit fertile. Another legend divulges that this mask absorbs all of the nutrients from a harvested plant so that it is completely dried out and brittle. These are only some of the many powers this ancient mask is  said to possess.",
+  "tokenId": 48,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/16_The_Solar_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Shipwrecked Mask",
+  "description": "This mask is said to have worn the brave faces of many who had to spend years at sea, making it a relic of old seafaring eras. Many questing sailors have made the journey to find this mask, but some had never come back. The claims that this mask is cursed by a sea god are still unconfirmed, but not unheard of.  The few sailors who found the mask returned home bearing frightening tales of a storm that has never before been seen.",
+  "tokenId": 21,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/47_Shipwrecked_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

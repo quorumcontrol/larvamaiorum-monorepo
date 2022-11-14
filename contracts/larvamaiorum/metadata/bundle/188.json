@@ -1,0 +1,17 @@
+{
+  "name": "Lizardmother's Mask",
+  "description": "In the frozen forests of the North, a lizard woman gave this mask to warriors for their assistance. The cold there is bitter and ruins the skin, but this mask, she found in a cave, bright and shiny and cured with the blood of the Lizard Mother. The lizard woman asked for their assistance, and these brave warriors harvested ice from the One True Well, to stock her home. It took half a season, and now the deep winter frost is vanquished!",
+  "tokenId": 188,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/126_Lizardmother_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

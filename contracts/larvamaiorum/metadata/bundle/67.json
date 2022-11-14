@@ -1,0 +1,17 @@
+{
+  "name": "Stone Wars Helm",
+  "description": "This helm was ironically used in a bellicose clash of civilizations, far from the borders of its homeland. The clash took place at shield mouth, an ancient training ground used by an unknown empire of defensives. Isolated and barren, these regal ruins were long abandoned when a battle erupted sometime between two ancient peoples. It is unknown fortifications were once established there prior to the First Cataclysm, or if it was used as a staging ground by warriors scrambling to engage in conflict first hand. This mask was all that was left at shield mouth.",
+  "tokenId": 67,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/113_Stone_Wars_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

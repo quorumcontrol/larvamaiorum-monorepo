@@ -1,0 +1,17 @@
+{
+  "name": "Generic Helm",
+  "description": "A bounty hunter who confronted a phantom of the deep forest wearing this helmet likely found it to be largely ornamental, and it was abandoned while they fled. It's an effective mask at frightening anyone not watching where you come from, but it's also heavy and cumbersome. One who wears this helm should make haste in battle, or he may find himself without it.",
+  "tokenId": 124,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/98_Generic_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

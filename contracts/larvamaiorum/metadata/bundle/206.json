@@ -1,0 +1,17 @@
+{
+  "name": "Pale Hoar Mask",
+  "description": "The winter witch's wrath never been seen in a single year but its power was strong enough to freeze the whole of the arctic jungle. No living thing was able to survive this winter and only its icy boneyards remained. It was clear that the spirits did not rest peacefully in her frosty embrace for it haunted the region for as long as winter continued. These masks are made from the carved bones of those who could not escape the frost and if it's true what folks say this mask will find you, if you happen to be out in the jungle alone and unprotected on a cold winter's eve.",
+  "tokenId": 206,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/224_Pale_Hoar_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Mushroom Luncher Mask",
+  "description": "In the east, travelers stumbled upon a cave that littered the strange humanoid remains of what they believed to be an ancient wave of sentient plants. It was in the depths of this particular cave that they also spotted this mask. Apparently, the plants would roar and wave their arms as if in mock conversation to any passerby near their lair.  It is unknown if these plants were fierce or kind, but surely all beings of life have as much substance and intelligence as a passerby.",
+  "tokenId": 79,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/45_Mushroom_Luncher_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

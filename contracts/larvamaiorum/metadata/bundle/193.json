@@ -1,0 +1,17 @@
+{
+  "name": "Frog Slayer's Mask",
+  "description": "This mask lies in the depths of a vast underground lake, protected within the humid auspices of a rare frog statue with regenerating abilities. It is unknown how the mask came to be.  Perhaps the frog climbed out of his lair after an earthquake, into an underground lake and perished, immortalized in stone, leaving behind only this mask. Perhaps he was slain by a powerful force. For some reason, this mask is soaked in the blood of both man and beast.",
+  "tokenId": 193,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/83_Frog_Slayer_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

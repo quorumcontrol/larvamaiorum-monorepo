@@ -1,0 +1,17 @@
+{
+  "name": "Lich Queen Mask",
+  "description": "A Lich Queen was so obsessed with the treasures of an ancient civilization on the Archipelago of Tohoku that she spent her living days seeking out lost cities and dreaming of the day when she might drink their finest wines, eat their rarest delicacies, and walk their jeweled paths. Her fortune paid for many expeditions, but all to no avail. Criticized for being both extravagant and foolish, she was mocked by her academic peers. Refusing to admit defeat, she sunk all of her wealth into one last, desperate expedition, which recovered this mask, but never sated her thirst for treasure.",
+  "tokenId": 163,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/101_Lich_Queen_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

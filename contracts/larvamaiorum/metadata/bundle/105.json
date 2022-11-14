@@ -1,0 +1,17 @@
+{
+  "name": "Manichoreana Festival Mask",
+  "description": "A luxurious festival mask made many years ago in honour of the Empress Manichoreana. This effigy is a gift from her gracious and exalted hands. It was sculpted in the likeness of the Death God, but over the years its visage became brittle and fell away.  When the war broke out, there wasn't time to fashion a new mask and so they used this one. The young man who wore it had much success in the Colosseum and in the battles that followed. And you now find it here.",
+  "tokenId": 105,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/104_Manichoreana_Festival_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

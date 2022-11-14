@@ -1,0 +1,17 @@
+{
+  "name": "Mask of the Kraken King",
+  "description": "This mask was found in an ancient crypt littered with similar trophies of monsters and beasts. The Kraken King is thought elusive, yet massive, and feared. No sign of the creature has ever been seen but some who have wrestled with them have been killed. One piece of evidence points this relic to be from a great undersea empire, the mind behind an ancient and forgotten kingdom.",
+  "tokenId": 248,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/189_Mask_of_the_Kraken_King.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

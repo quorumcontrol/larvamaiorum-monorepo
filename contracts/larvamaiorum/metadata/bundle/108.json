@@ -1,0 +1,17 @@
+{
+  "name": "Ash Mask of the First Fools",
+  "description": "The First Fools come from the ashes of the most powerful wootgump plants, which they themselves burned when they committed a great folly. In the ashes they hid peacefully and crafted this mask. They are the first and most foolish of the Retro Vikings because they have no need for warring, or anger, or ambition. Though given past performance in life, these emotions (and more) will inevitably return, and so will the introspective Retro Vikings.",
+  "tokenId": 108,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/86_Ash_Mask_of_the_First_Fools.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

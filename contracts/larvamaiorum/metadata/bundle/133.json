@@ -1,0 +1,17 @@
+{
+  "name": "Raven's Secret Mask",
+  "description": "In the mountains of the North, there is a creature with enormous and camouflaged wings, who devours those that live at its mercy. The only clue to the creature's location is the calling of a raven, many miles away from its whereabouts. This raven is known for being cleverer than any man and revealing its knowledge to those who are willing to pledge complete loyalty to it what it knows. This mask was taken from the lair of one of these ravens.",
+  "tokenId": 133,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/166_Raven_s_Secret_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

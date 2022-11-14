@@ -1,0 +1,17 @@
+{
+  "name": "Waterline Wastrel Mask",
+  "description": "Legend tells of a scepter that would control the tides and could raise and lower water levels as it pleased. One day, a servant of the scepter went against its keeper's wishes and made the water rise too high. The keeper was flooded, their castle submerged, but the lackeys of the scepter survived and the scepter was shattered into many pieces. One such piece slipped away, fleeing to distant shores, where it was forged into this mask,  a warning to those who would scheme against the spirits of the water.",
+  "tokenId": 203,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/194_Waterline_Wastrel_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

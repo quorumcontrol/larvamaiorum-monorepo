@@ -1,0 +1,17 @@
+{
+  "name": "Dead Zenith Mask",
+  "description": "This mask, resembling the visage on the head of a totem, was taken from the Horde Fortress of the Dead Zentih. The Horde Fortress of the Dead Zentih, surrounded by jagged rock formations, was alerted to the presence of an enemy uprising and their forces immediately deployed. In the midst of vicious fighting, one who was unfamiliar to their ways overtook the gate and slipped into their pyramid. This intruder had slipped by the defenses of their people, taking this relic away in a matter of mere seconds before they even knew what had transpired.",
+  "tokenId": 176,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/38_Dead_Zenith_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

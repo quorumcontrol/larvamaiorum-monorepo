@@ -1,0 +1,17 @@
+{
+  "name": "Massacre Mask",
+  "description": "The Massacre mask is a grotesque visage dripping with blood and gore. Some say that it was found in the upper echelons of a demonic palace being guarded by its demonic residents. Others say it was found in the possession of an outlandish entity in the vast cold darkness of space. These origins don't matter to its dedicated wearer because, as the darkness found itself stopped by the cold, iron visage of the mask, it was their duty to destroy all who crossed their path.",
+  "tokenId": 44,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/205_Massacre_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Protectorate Mask",
+  "description": "This mask is no mystery. It is a testament to a nation with roots in the past, and forges a path for a world without dependence on Nature's ultimate power. A tradition of the Protectorate is to paint masks with rich gold pigmentation in order to stake a claim to the ground and assert dominion. This was intentionally made by the creators of potions and other elixirs who plied this trade, in order to explore the landscapes while leisurely daydreaming in their gilded world. However, its gilding has long since worn away.",
+  "tokenId": 142,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/163_Protectorate_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

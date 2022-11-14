@@ -1,0 +1,17 @@
+{
+  "name": "Entanglement Mask",
+  "description": "Emotional ties are psychic cords woven from symbolic thinking and emotional feedback loops. These ties are sometimes called mea culpae and are used by a spare few emotomancers of the Fabrikator Collective in spells and rituals as conduits and anchors for emotional feedback.  When done without care, this emotional feedback could spell disaster. The wearer of this mask is lost in emotional pathways, trading self for self again, and again, and again.",
+  "tokenId": 200,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/76_Entanglement_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Floating Head Mask",
+  "description": "This mask is said to be cursed with a terrible curse of possession, given power by an unknown being that never tires of inflicting confusion and strangeness. After being adopted from the South of the Land Bridges, it was shunned by all who knew it. One merchant swallowed his pride and traded it: trading in souls, the poor merchant paid his pound of gold to the unknown being who cast the weird enchantment on this mask. The mask may grant a strange aspect but ask yourself, who would ever want to wear such an otherworldly curse?",
+  "tokenId": 186,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/139_Floating_Head_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

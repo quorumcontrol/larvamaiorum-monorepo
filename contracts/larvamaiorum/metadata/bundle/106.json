@@ -1,0 +1,17 @@
+{
+  "name": "Scavenger Pig Mask",
+  "description": "The Scavenger Pig Mask was first seen on the back of a hungry creature in a muddy pool. Its savior freed it from immediate death, but as it succumbed to its exhaustion, it presented him with this mask... as if it were some kind of reward. Waste not away with this amazing relic of the land; regrettably it bears the scars of scavenger pigs, so it is stained with mud.  With some cleaning, this mask could become a precious commodity.",
+  "tokenId": 106,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/34_Scavenger_Pig_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

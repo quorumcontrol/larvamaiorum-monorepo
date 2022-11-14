@@ -1,0 +1,17 @@
+{
+  "name": "Ghostly Skull",
+  "description": "The skull of a creature long since deceased enters the world to beg of you this one rare bane. Sometimes it has a point to make while other times it merely speaks to say goodbye to you: \"farewell\". The Ghostly Skull demands the remembrance of what has turned to dust before arrogance turns the living into ghosts.",
+  "tokenId": 30,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/201_Ghostly_Skull.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

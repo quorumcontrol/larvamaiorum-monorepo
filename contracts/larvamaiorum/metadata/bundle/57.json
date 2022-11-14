@@ -1,0 +1,17 @@
+{
+  "name": "Gold Idol Mask",
+  "description": "While exploring the derelict mason's city of Lacarum at the top of an isolated mountain, a small intrepid posse bushwacked their way through the ivy coating an outcropping stone wall, and found this! This gold idol mask was found in a remote and largely forgotten shrine to a forgotten oracle. Somewhere, there are riches to claim by donning this find!",
+  "tokenId": 57,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/99_Gold_Idol_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

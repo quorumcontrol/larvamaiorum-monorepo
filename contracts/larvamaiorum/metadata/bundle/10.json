@@ -1,0 +1,17 @@
+{
+  "name": "Divining Dive Mask",
+  "description": "Diving for lost treasure is a game we all play. Most have learned the hard way that diving into the deep also means diving into the past. Every watery endeavor that takes one into the deep risks the memories that the ancients might have long since released. The divining mask was recovered from a chamber below the Sea of Tears, but was forgotten by those who found it.  Those who specialize in scrying with water can put this mask on to take a quick glimpse into the memories of the lagoon.",
+  "tokenId": 10,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/92_Divining_Dive_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

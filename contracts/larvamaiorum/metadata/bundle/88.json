@@ -1,0 +1,17 @@
+{
+  "name": "Star Drawing Mask",
+  "description": "The penultimate mask in Flasha's gallery is one of a number which has been said to reveal celestial truths with one look into their surfaces. This particular mask, and its tilted, drawn stars along with mystical words, can be interpreted to mean personal truths or the sometimes personal and universal duality of mankind's life and history. In any case, there is as yet no record of a individual who has found a reasonable amount of fortune that has been paid for any masks in Flasha's gallery.",
+  "tokenId": 88,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/175_Star_Drawing_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

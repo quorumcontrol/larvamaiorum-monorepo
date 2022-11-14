@@ -1,0 +1,17 @@
+{
+  "name": "Colossus Halfmask",
+  "description": "This menacing face half cover the wearer's own. Where's the other half? It was taken by some terrible force that made the wearer's incessant and crazed out of control. These horrifying events happen in a land where every day people exchange coins for food. Eating once or twice a day, living in a home where every year or so it floods. And for the few that are lucky to escape this fate, it has followed them.",
+  "tokenId": 12,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/14_Colossus_Halfmask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

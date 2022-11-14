@@ -1,0 +1,17 @@
+{
+  "name": "Personal Income Generator",
+  "description": "The nameless Gizmocrat entrepreneur who engineered this device had a desperation for invention, like a train without brakes. Bombarded by stupid ideas, the inventor invented an idea that would let the concept take over in another man's life, risking dire consequences that the mage himself was too afraid to face. It was a scream in the dark aimed at his own extinction and this mask formed in fear of the touch of iron and the greed for coin.",
+  "tokenId": 138,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/152_Personal_Income_Generator.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

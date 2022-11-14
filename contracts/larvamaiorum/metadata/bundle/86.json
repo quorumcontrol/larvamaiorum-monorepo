@@ -1,0 +1,17 @@
+{
+  "name": "Voidmaster's Mask",
+  "description": "The Voidmaster's mask came from the pile of belongings left in his wake. What remained of his existence is shrouded in mystery and might melt away if one looks too closely. Some say he is from another dimension and it was his deeds that shifted the balance between that dimension and the dimension we now inhabit. What will happen to this world when the balance is restored? No one can be certain, but many romanticize the possibilities.",
+  "tokenId": 86,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/72_Voidmaster_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

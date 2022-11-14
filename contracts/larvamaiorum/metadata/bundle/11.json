@@ -1,0 +1,17 @@
+{
+  "name": "Hunter's Storytelling Mask",
+  "description": "This tribal style headwear is not only a trophy, but displays mastery of the bow and arrow, with a taste for the challenge and pursuit of skilled game. When found embedded in the earth, it was promptly taken to the home of one who hunted game on foot, so he may welcome his old friend and tell the tales of many hunts swapped.",
+  "tokenId": 11,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/109_Hunter_s_Storytelling_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

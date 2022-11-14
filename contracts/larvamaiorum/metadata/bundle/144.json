@@ -1,0 +1,17 @@
+{
+  "name": "Stash Mask",
+  "description": "It is said that the creature that created this mask was little likely to put it to good use. It was likely stashed away by its maker, wedged into the interior of a deep lair where it lay dormant for hundreds of years, gathering dust and grime as no one dug into the crevasses of this place to disturb it. The Scorps Cyst Mask must have been a trophy, or a signifier of conquest, according to pathfinders who have seen it. Yet, if that is the case, what is it conquering?",
+  "tokenId": 144,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/80_Stash_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

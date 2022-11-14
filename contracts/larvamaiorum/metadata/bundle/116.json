@@ -1,0 +1,17 @@
+{
+  "name": "Infernal Scout War Mask",
+  "description": "A valley near a shallow inlet in the very southern gulf is plagued by a most invincible enemy that raid the villages and settlements. This foe could not be tracked, only felt. There was no warning when they came until they weren't there anymore. Experiments unleashing the power of this vile spirit have been done before, but according to the locals, there's no defense which is why they put up such a fight. This mask was snatched from the heart of this hostile spirit by a great ghosthunter.",
+  "tokenId": 116,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/135_Infernal_Scout_War_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

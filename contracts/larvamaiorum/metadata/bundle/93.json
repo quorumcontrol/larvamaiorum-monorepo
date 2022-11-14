@@ -1,0 +1,17 @@
+{
+  "name": "Hallucinatory Mask",
+  "description": "A mycologist from the Carcinian Mountains spoke to recent visitors from the west. He mentioned a mask he obtained from a deceased Carcinian shaman and also that great wild things might be moving about, getting close to the vault. The Carcinian tribe worried about these effects, even though the type of mushrooms used by the creator of this mask are known to help induce visions of spiritualism. He suggested that eating what lay inside the vault (largely a pile of precious metals and mushrooms) would help alleviate their worries, but they thought he was mask-mad and confiscated this mask.",
+  "tokenId": 93,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/216_Hallucinatory_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

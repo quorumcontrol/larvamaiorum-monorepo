@@ -1,0 +1,17 @@
+{
+  "name": "City's Apostle Mask",
+  "description": "The people of the Imperial Capital do not share their power and secrets easily, but the stories spoken of this mask go something like this: The mask is said to have been carried by a man who saved the city from disaster but was imprisoned and hanged in gratitude. Consider what sort of luck and fate one would have if they happened to be wearing the City's Apostle Mask during a procession, and if fate dictates, it must be put on.",
+  "tokenId": 195,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/90_City_s_Apostle_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

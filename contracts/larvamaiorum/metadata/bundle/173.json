@@ -1,0 +1,17 @@
+{
+  "name": "Glass Mask",
+  "description": "Once a year during the festival of Han and Lai, the Celestial Maiden takes on mortal form in the capital of the DAO Protectorates. In her crystal palace she is praised and worshiped, but those that don't wash from the day of filth are apt to be captured and imprisoned by the Maiden's devoted sister, the Traitorous Servant, who outwits gods and giants with as much ease as if they were fine cord. The Maidens' Mask was found in her vault, there hanging on a dusty rack between her exquisite slumber robes and her sword collection.",
+  "tokenId": 173,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/141_Glass_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

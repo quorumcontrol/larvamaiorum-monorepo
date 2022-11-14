@@ -1,0 +1,17 @@
+{
+  "name": "Seer Mask",
+  "description": "Protected from the rain and cold mountain air, the ancient family that dwelled atop this creepy mountain would speak only to bringers of their own food, confidantes of their own secrets, bards to their own stories.   They had a morbid history because of all the guests who came and never left. The people of this resolute family wanted to keep their wisdom from the hordes below to control it as they saw fit. To that end, they forged a secret technique that could see through any barrier to the soul, and imbued it in this mask.",
+  "tokenId": 46,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/196_Seer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

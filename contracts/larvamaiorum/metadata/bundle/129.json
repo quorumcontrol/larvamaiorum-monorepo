@@ -1,0 +1,17 @@
+{
+  "name": "Moon Artist Mask",
+  "description": "The Iron Kingdoms are a land where the moon's majesty dominates the way people dress and interact. The inhabitants even prefer to keep their feet apart, because they are said to be two halves of the whole with the moon as their union. This mask depicts the influence, marvel, and power that the full moon manifests on the world. This potent mask is said to have been created by the ancient intelligences of old, and some believe that the ritual sacrifices of blessed water before wearing it may have something to do with its power or where it was found.",
+  "tokenId": 129,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/120_Moon_Artist_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

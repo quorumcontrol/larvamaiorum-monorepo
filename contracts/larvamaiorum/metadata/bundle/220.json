@@ -1,0 +1,17 @@
+{
+  "name": "Dark Devourer Mask",
+  "description": "Those that first saw this mask in the clutches of a dark devourer assumed that it was actually a fruit that is eaten and liquefied instantly by this creature. The Dark Devourer Mask was taken as bounty by one who had spotted this beast while it was feeding on a group of Black Beast Zombies. These beasts bolt in and devour exhausted, fleeing enemies with their powerful claws, and are the rightful rulers of the night.",
+  "tokenId": 220,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/64_Dark_Devourer_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

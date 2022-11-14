@@ -1,0 +1,17 @@
+{
+  "name": "Hellbound Mask",
+  "description": "The land of Caustic Furnace is, as you might imagine, just as hot and vile as the name would imply. Here, a caravan of merchants with their barrels and wares stacked high met their end in the worst of ways. It's said that they perished at the hands of a vicious pirate, and his is the only thing that remains—his scorched, blackened mask.  Shaped from a material that cannot tolerate even the slightest hint of fire, nobody can be sure of it's origins. The scarcity in which it hides keeps this Hellbound Mask desirable to any trophy hunter who would wish to add it to their collection.",
+  "tokenId": 117,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/170_Hellbound_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

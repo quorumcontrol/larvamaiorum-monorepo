@@ -1,0 +1,17 @@
+{
+  "name": "Paradox Mask",
+  "description": "Within the Labyrinth of Time, there is a mask known only as the Paradox. An explorer came back from finding it and said that the mask had been, in reality, nothing more than an ornate ornament. The Labyrinth's defenders were unsurprised by this outcome: all who set out to find the mask were assuredly doomed to paralysis, entombment and death by nothingness itself.",
+  "tokenId": 159,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/69_Paradox_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

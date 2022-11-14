@@ -1,0 +1,17 @@
+{
+  "name": "Curseweaver's Mask",
+  "description": "A pained man, on his deathbed, whispered an ultimate curse, calling down from the heavens a famine of death on his people. Wordlessly he cursed this mask be carried forth until an end was put to the agony of the dead in this miserable hamlet. It was found that the curse for this device had been so dark and destructive that its entire kingdom ceased to exist. It remained in the cursed land, unhindered by nature or peace.",
+  "tokenId": 213,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/30_Curseweaver_s_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

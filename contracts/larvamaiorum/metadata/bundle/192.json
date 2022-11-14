@@ -1,0 +1,17 @@
+{
+  "name": "Mountain Machination Mask",
+  "description": "The Water Machine Mask is an ancient symbol of power in the mountain regions of Moris. It is said that somewhere in these lands is a massive fortress hidden deep inside a great mountain. The mask was given as a prize following a riddle that rewarded the first living creature to solve this monumental puzzle. The riddle's author instructed those interested in competing for the mask to start a visionfinding journey, for the mountains have been here for much longer than any living creature on this land.",
+  "tokenId": 192,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/28_Mountain_Machination_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

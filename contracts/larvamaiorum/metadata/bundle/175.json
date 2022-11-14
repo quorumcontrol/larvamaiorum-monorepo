@@ -1,0 +1,17 @@
+{
+  "name": "Storm Caller Mask",
+  "description": "The Storm Caller Mask was rumored to keep the wearer blessed with the power of storms, and there has been a great number of Storm Callers in the very short history of the Crusaders of Decentralized Light. It is said that anyone who wears this mask can summon up mighty storms with a mere thought. The mask was located this past summer by a clever girl seeking adventure and glory. Her story speaks of how she and her BFF, an enthusiastic wood nymph named Azula, were able to find the secret door to the Storm Caller's hidden vault, where the mask sat upon a stand.",
+  "tokenId": 175,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/118_Storm_Caller_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

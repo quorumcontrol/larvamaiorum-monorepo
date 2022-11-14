@@ -1,0 +1,17 @@
+{
+  "name": "Lock Him In The Golden Cage Mask",
+  "description": "The Mask Weaver of the darkest North and mercifully furthest from the human civilization lives a life shrouded in mystery. The only known thing about him except for his occupation is this mask. The Mask Weaver forged the fragments of an ancient mask into something mysterious and intricate and decorated it with an unholy symbol.  Invisible hands are rumored to shake the forge, though living hands never seem to touch it. And none knows just who, or what, the Mask Weaver is escaping.",
+  "tokenId": 54,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/213_Lock_Him_In_The_Golden_Cage_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

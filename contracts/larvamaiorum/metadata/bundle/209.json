@@ -1,0 +1,17 @@
+{
+  "name": "Mechanical Mask",
+  "description": "This personable mask is one graced with only the most curious eyeholes, their corners slightly upturned for your chagrin. The unreadable invigoration hiding behind this mask is and can only be triggered by an unwavering script flipping in an endless loop. It's said that this mask was brought to life by a volcano spirit long ago who spent his existence enslaved to the spinning of an evil mechanical lithograph.",
+  "tokenId": 209,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/136_Mechanical_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "The Order Masks",
+  "description": "The Order, a group of humans of modest size, unearthed an accruement of the sea god's wrath many millenia ago. The stars had been fractured, their worlds reeling from the blows, when the Order came, dredging away the rubble. They traveled to a tomb hidden beneath the waves and walked away with this mask. Whether this mask originates from humanity or from nature is unclear,  but it bears the mark of it's former bearers.",
+  "tokenId": 95,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/63_The_Order_Masks.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

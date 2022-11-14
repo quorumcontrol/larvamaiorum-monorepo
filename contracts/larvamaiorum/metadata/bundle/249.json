@@ -1,0 +1,17 @@
+{
+  "name": "Parasite Mask",
+  "description": "This mask, taken from a strange creature of the sea apparently infests the host with a parasite that enters through the eye and steals knowledge in the night. The parasite's true name can only be whispered twice, before it takes control.  Those that have worn it seem to have been restored, although any sense of normalcy left was lost since they were compelled to go on a pilgrimage to find the parasite's mother.",
+  "tokenId": 249,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/46_Parasite_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Union Helmet",
+  "description": "It would seem this mask was ripped from the face of a soldier, not an unknown entity trying to conceal their identity. A solemn expression on this helmet hints at regret. This is a symbol of remembrance.  The wearer remembers the time they witnessed the Empire rise to power before being dominated and tamed.  They remember the humiliation of subjugation and the subjugation of life.",
+  "tokenId": 158,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/62_Union_Helmet.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

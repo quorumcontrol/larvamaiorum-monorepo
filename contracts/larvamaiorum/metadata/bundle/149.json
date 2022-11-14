@@ -1,0 +1,17 @@
+{
+  "name": "Iron Teeth Mask",
+  "description": "In the scorching wastes of the South, mortal enemies are battled day and night. The most vicious among their crews are pulled aside each night and a new identity is given to them in order to blend in with their brothers. These savage avatars of war paint the colors of their flag on their faces and don ceremonial masks, like this one, made of the platinum teeth of their fallen. It is removed each morning as a reminder that before the heat death, there must be celebration.",
+  "tokenId": 149,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/150_Iron_Teeth_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

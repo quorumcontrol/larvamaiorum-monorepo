@@ -1,0 +1,17 @@
+{
+  "name": "Stained Mask",
+  "description": "This mask is stained and gouged but there is no sentimentality to the damage, it is a tool. It is rumored to provide the wearer with the power over blood. For example, many ghouls have long sought this mystery mask and managed only to fail at its treasure even as they died cruelly slow deaths at its hands. For years the woodland creatures watched with fascination as the fiends were tortured in their own private arena. Only those of a truly depraved nature are willing to wear this monstrous mask.",
+  "tokenId": 172,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/228_Stained_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

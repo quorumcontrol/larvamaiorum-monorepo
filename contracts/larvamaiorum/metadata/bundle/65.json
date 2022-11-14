@@ -1,0 +1,17 @@
+{
+  "name": "Timepiece Mask",
+  "description": "The Timepiece Mask originally belonged to the Lord of Time, who was called upon to keep the mantle of power separate from the chaos. Many adventures were had beneath the stellar veil and battles were fought against hundreds that tried to open that veil and loosed chaos from within. The Lord of Time, after an eternity of duty, had grown weary and needed assistance. A traveler took responsibility of wearing this mask, which had granted him power dilating time and reversing time.",
+  "tokenId": 65,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/60_Timepiece_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

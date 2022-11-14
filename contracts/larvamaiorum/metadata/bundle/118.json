@@ -1,0 +1,17 @@
+{
+  "name": "Ruler of the Deep Mask",
+  "description": "The Ruler of the Deep mask holds a special place in the hearts of Tenuity Isle natives, who say this mask was dropped from the sky one day and became part of their culture. Whatever it has seen can not be good; some elders say it makes their skin crawl just looking at it.  Whatever is true, the Ruler of the Deep is a very powerful mask with a deep connection to Tenuity Isles folklore.",
+  "tokenId": 118,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/25_Ruler_of_the_Deep_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

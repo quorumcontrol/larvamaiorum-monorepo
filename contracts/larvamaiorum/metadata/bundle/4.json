@@ -1,0 +1,17 @@
+{
+  "name": "Swarm Origins Mask",
+  "description": "Deep in the jungles of the east is the supposed location of a lost city where in sunless pools, a swarm goddess is said to reside. The Swarm Origins mask was taken at great risk by one who visited this zone and managed to escape alive. It is speculated that since most of the eyes are missing, it might be possible to wear this mask, unseen and untouched by those who may wish any ill.",
+  "tokenId": 4,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/9_Swarm_Origins_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

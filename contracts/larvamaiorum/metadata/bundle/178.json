@@ -1,0 +1,17 @@
+{
+  "name": "Frost Crystal Mask",
+  "description": "A corrupted explorer came upon the once mighty Cold Lord immobilized beneath the strength of their colossal crystals. This fortunate explorer looted a potent item and hastily retreated from the scene of crime, donning the mask and shielding his core temperature from the excess bite of winter's cold as he fled. Had he had no one to watch his back he would have perished, but thanks to this mask, this wayward traveler reclaimed his freedom on foot.",
+  "tokenId": 178,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/65_Frost_Crystal_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

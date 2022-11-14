@@ -1,0 +1,17 @@
+{
+  "name": "Fighting Kangaroo Mask",
+  "description": "Deep in the primordial bushlands of 'DAO territory, a bipedal creature traverses on a ceaseless hunt for something to eat. This was not always the case, before 'DAO invaded the animal's domain and introduced a strict hunting policy. Armed with weapons and fanned out in squads, women and men would kill its kin left and right. This mask  was taken from one such specimen, an emperor kangaroo.",
+  "tokenId": 157,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/198_Fighting_Kangaroo_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

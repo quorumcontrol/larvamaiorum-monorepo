@@ -1,0 +1,17 @@
+{
+  "name": "Chaos' End Helm",
+  "description": "This mask is made of metal and is lined with felt and soft quilts. It was found in Fort Purdius, a fortress on the north border of the Crypto Roman Empire that guards against the followers of Chaos and their vile thralls. It is engraved with the symbol of the Order of Silence, which generally is visible on the longswords of monks.  The fort's controller, Castor Grigorius was old and deranged when the townspeople were debating whether to destroy the fort to keep it from falling into enemy hands. It took some convincing, but they decided they could sell the fortress to the other side as a distraction, keeping only this mask as a reminder of the old stronghold.",
+  "tokenId": 72,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/143_Chaos_End_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

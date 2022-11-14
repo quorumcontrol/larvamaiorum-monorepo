@@ -1,0 +1,17 @@
+{
+  "name": "Cat's Eye Mask",
+  "description": "Believed to have been crafted by a race of felines, this mask came into the possession of an inconsistent ascetic who refused to record the details of her acquisition. In her last dying breath she spoke of how the lawless tribes of the desert had raided a ruin inhabited by ancient beings but they had defended themselves ferociously. It seems this mask is the fruit of an ancient and sacred ruin in the Iron Kingdoms' desert.",
+  "tokenId": 18,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/27_Cat_s_Eye_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

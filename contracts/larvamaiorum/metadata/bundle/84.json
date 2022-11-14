@@ -1,0 +1,17 @@
+{
+  "name": "Mutant Dragonshine Helm",
+  "description": "This metal helmet was actually the skull of a mutant dragon with a big mouth and horns, so big that it had to use a metal tower as a spine and make wings for itself out of metal sheets. The dragon swept up a tower in its quest to get more metal, but it became trapped at a bridge because the river at the bottom of the valley was too deep. It would sputter smoke from the twin exhaust pipes on its back, until the day it was rescued from a grisly death.  This mask and the metal plates found on its body from centuries of seeking metal is an eyewitness account of the most dramatic production in industry.",
+  "tokenId": 84,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/188_Mutant_Dragonshine_Helm.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

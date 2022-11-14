@@ -1,0 +1,17 @@
+{
+  "name": "Dragon of Seranil",
+  "description": "A ghastly and terrifying dragon greets all who venture too close to the Watchtower of Fear just beyond the borders of the Fabrikator Collective. Stories tell that there is an immense, black dragon perched in the icy tower, silently watching the proud city of Seranil before her. Other stories say that during the day, the Dragon is not to be seen or heard but has been said to awaken when night falls, spread its gigantic wingspan, and breathe razor sharp ice into the sky. A lucky adventurer who was exploring these treacherous lands, seeking out to prove that there is wealth to be found, somehow infiltrated the tower and found in an alcove surrounded by frost covered skulls, this ceremonial mask.",
+  "tokenId": 246,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/215_Dragon_of_Seranil.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

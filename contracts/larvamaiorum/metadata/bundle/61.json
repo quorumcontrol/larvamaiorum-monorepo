@@ -1,0 +1,17 @@
+{
+  "name": "Cryelid's Plume",
+  "description": "The mask appears to be that of a cryelid shaman, for which these creatures are well known for their love of the arts. This smears the feathers that are glued to the dark plate, and the intricate patterns carved into the frame have been lost to wear. Yet still it remains a curious item, adorning some wayfarer who visited the Iron Kingdoms and then returned with a mask in tow. The traveler had a reputation for making the ladies of the people swoon, but this mask had nothing to do with it.",
+  "tokenId": 61,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/167_Cryelid_s_Plume.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

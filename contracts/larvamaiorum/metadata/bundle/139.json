@@ -1,0 +1,17 @@
+{
+  "name": "Robo Gnasher Mask",
+  "description": "This mask was said to be given out by his majesty, King Lavitus of the gnashing teeth, ruler of the Mountains and Master of the Wastes. He is a dragon with breath so hot, it melts metal, who devours whole cities for lunch. He sent his first foot messenger to invesigate the humans when he saw their armies swell. The mountains are still smoldering in the sky over what was once the capital of the Upper Lands. The Robo Gnasher was commissioned long ago, after King Lavitus smashed the window of a human studio in frustration and saw this metal waste they had been using to conceal faces.",
+  "tokenId": 139,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/54_Robo_Gnasher_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

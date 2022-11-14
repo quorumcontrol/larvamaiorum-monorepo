@@ -1,0 +1,17 @@
+{
+  "name": "Tarot Mask",
+  "description": "The inside of this mask is adorned with tarot symbols and has been known to tell fortunes in lands far from home. Some say it was brought back to the Crypto Roman Empire on the back of a knight who was rumored to have found it on a lengthy quest. The glyphs run rampant, as if taunting one without a map, unless through the mask can one find the path.  Perhaps then the masked Tarot reader would find themselves amongst new friends and distant lands as they partook in an adventure befitting their destiny.",
+  "tokenId": 152,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/88_Tarot_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

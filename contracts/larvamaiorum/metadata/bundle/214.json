@@ -1,0 +1,17 @@
+{
+  "name": "Tyvian Skin Mask",
+  "description": "A dark and forbidding deity, Tyvian has come to be known as a distant manifestation of the deathly realm. Worshippers in pursuit of the secrets of this god's dark history, often left themselves unprotected and armorless in colosseum deathmatches as a display of faith in his eminence.  This mask is believed to be safely ensconced inside the ruler of Tyvian's tombs.  A warrior entering this den with the intent to retrieve it, released two days later, never recovered their identity.",
+  "tokenId": 214,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/183_Tyvian_Skin_Mask.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}

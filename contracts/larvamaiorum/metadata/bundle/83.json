@@ -1,0 +1,17 @@
+{
+  "name": "Crystal Santur",
+  "description": "If only those of the santurian city knew how close they were in proximity to the scheming Al'Dein, it might not be too late for them. Working in secret, an agent fashioned this mask from mirror shards and a heart of crystal, keeping it hidden from Al'Dein until the time was right. The agent disappeared years ago, never to resurface and the mask was broken, it's power lost, though perhaps not never to be found.",
+  "tokenId": 83,
+  "external_url": "https://cryptocolosseum.com/masks",
+  "image": "ipfs://bafybeicu5kvyzhqhzanofonlzjwqnlcbph72nzsycmjxgwgwi6t6locnf4/169_Crystal_Santur.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "uncommon"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
+    }
+  ]
+}
