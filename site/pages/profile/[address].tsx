@@ -25,6 +25,8 @@ import SignupModal from "../../src/components/SignupModal";
 import humanFormatted from "../../src/utils/humanFormatted";
 import { usePlayerAccolades } from "../../src/hooks/useAccolades";
 import AccoladesDisplay from "../../src/components/AccoladesDisplay";
+import { useMasksOfTheAncients } from "../../src/hooks/useMasksOfTheAncients";
+import MaskCard from "../../src/components/MaskCard";
 
 const Profile: NextPage = () => {
   const router = useRouter();
@@ -34,6 +36,10 @@ const Profile: NextPage = () => {
   );
   const { data: accolades } = usePlayerAccolades(address as string | undefined);
   const { data: team, isLoading: isTeamLoading } = useTeam(
+    address as string | undefined
+  );
+
+  const { data: masks, isLoading: isMasksLoading } = useMasksOfTheAncients(
     address as string | undefined
   );
   const { data: username } = useUsername(address as string | undefined);
@@ -56,7 +62,7 @@ const Profile: NextPage = () => {
     return (
       <>
         <Head>
-          <title>Crypto Colosseum: Profile</title>
+          <title>Crypto Colosseum: {username || address}</title>
           <meta
             name="description"
             content={`Crypto Colosseum: Larva Maiorum profile page for ${
@@ -74,7 +80,7 @@ const Profile: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Crypto Colosseum: Profile</title>
+        <title>Crypto Colosseum: {username || address}</title>
         <meta
           name="description"
           content={`Larva Maiorum profile page for ${username || address}`}
@@ -169,13 +175,48 @@ const Profile: NextPage = () => {
             </Box>
           </Box>
         </Box>
+
+        {(masks || []).length > 0 && (
+          <Box
+            backgroundImage={["none", border]}
+            px={[0, "10"]}
+            pt={[0, "5"]}
+            pb={[0, "10"]}
+            mt="10"
+          >
+            <Heading>Masks of the Ancients</Heading>
+            <Wrap spacing="10">
+              {isMasksLoading && <Spinner />}
+              {masks?.map((metadata, i) => {
+                return (
+                  <WrapItem key={`nftcard-${i}`}>
+                    <MaskCard metadata={metadata} />
+                  </WrapItem>
+                );
+              })}
+            </Wrap>
+          </Box>
+        )}
+
         {(accolades || []).length > 0 && (
-          <Box backgroundImage={["none", border]} px={[0, "10"]} pt={[0, "5"]} pb={[0, "10"]} mt="10">
+          <Box
+            backgroundImage={["none", border]}
+            px={[0, "10"]}
+            pt={[0, "5"]}
+            pb={[0, "10"]}
+            mt="10"
+          >
             <Heading>Accolades</Heading>
             <AccoladesDisplay address={address as string | undefined} />
           </Box>
         )}
-        <Box backgroundImage={["none", border]} px={[0, "10"]} pt={[0, "5"]} pb={[0, "10"]} mt="10">
+        <Box
+          backgroundImage={["none", border]}
+          px={[0, "10"]}
+          pt={[0, "5"]}
+          pb={[0, "10"]}
+          mt="10"
+        >
           <Heading>BADGES</Heading>
           <Wrap spacing="10">
             {isLoading && <Spinner />}

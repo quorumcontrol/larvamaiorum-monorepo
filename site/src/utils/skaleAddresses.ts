@@ -12,6 +12,12 @@ const skaleAddresses = {
     default: 'https://mainnet.skalenodes.com/v1/haunting-devoted-deneb',
     wss: 'wss://mainnet.skalenodes.com/v1/ws/haunting-devoted-deneb',
     explorer: 'https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/',
+  },
+  calypso: {
+    id: 1564830818,
+    default: 'https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague',
+    wss: 'wss://mainnet.skalenodes.com/v1/ws/honorable-steel-rasalhague',
+    explorer: 'https://honorable-steel-rasalhague.explorer.mainnet.skalenodes.com/',
   }
 }
 
