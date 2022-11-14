@@ -7,3 +7,7 @@ export function randomBounded(size: number) {
   const rnd = randomFloat() * size;
   return negative ? rnd * -1 : rnd;
 }
+
+export function randomInt(max:number) {
+  return Math.floor(randomFloat() * max)
+}
