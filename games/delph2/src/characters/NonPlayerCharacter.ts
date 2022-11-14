@@ -9,7 +9,10 @@ import WarriorLocomotion, { ARRIVED_EVT } from "./WarriorLocomotion";
 @createScript("nonPlayerCharacter")
 class NonPlayerCharacter extends ScriptTypeBase {
 
+  camera:Entity
   behavior:WarriorBehavior
+  nameScreen:Entity
+  name:Entity
 
   initialize() {
     this.behavior = this.getScript(this.entity, 'warriorBehavior')!
@@ -24,6 +27,19 @@ class NonPlayerCharacter extends ScriptTypeBase {
       }
       locoMotion.randomDestination()
     })
+    this.nameScreen = mustFindByName(this.entity, 'PlayerNameScreen')
+    this.name = mustFindByName(this.nameScreen, 'PlayerName')
+    this.camera = mustFindByName(this.app.root, 'Camera')
+  }
+
+  update() {
+    if (!this.behavior.warrior) {
+      return
+    }
+    this.name.element!.text = this.behavior.warrior.name
+    this.nameScreen.lookAt(this.camera.getPosition())
+    this.nameScreen.rotateLocal(0, 180, 0)
+
   }
 
 }
