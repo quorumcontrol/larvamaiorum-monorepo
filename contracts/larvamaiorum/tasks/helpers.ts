@@ -15,3 +15,13 @@ export const getAllowListSpot = async (hre:HardhatRuntimeEnvironment) => {
 
   return AllowListSetter__factory.connect(deploy.address, await getDeployer(hre))
 }
+
+export const getLarvaMaiorum = async (hre:HardhatRuntimeEnvironment) => {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/LarvaMaiorum.json`
+  );
+
+  const { LarvaMaiorum__factory } = await import("../typechain-types");
+
+  return LarvaMaiorum__factory.connect(deploy.address, await getDeployer(hre))
+}

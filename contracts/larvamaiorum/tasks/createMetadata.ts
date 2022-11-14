@@ -74,6 +74,10 @@ function jsonMetadata(tokenId:number, {name, description, originalId}:Metadata, 
     attributes: [{
       trait_type: "Rarity",
       value: rarity,
+    },
+    {
+      trait_type: "Tribe",
+      value: 'legionnaire',
     }]
   }
 }

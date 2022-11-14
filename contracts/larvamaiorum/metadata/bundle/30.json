@@ -8,6 +8,10 @@
     {
       "trait_type": "Rarity",
       "value": "ultra-rare"
+    },
+    {
+      "trait_type": "Tribe",
+      "value": "legionnaire"
     }
   ]
 }
