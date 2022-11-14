@@ -14,8 +14,18 @@ task('set-metadata')
       );
       const idx = larvaMaiorum.interface.parseLog(metadataUriLog!).args?.index as BigNumber;
       
-      const tx = await larvaMaiorum.setCurrentlyMinting(idx)
+      const tx = await larvaMaiorum.setCurrentlyMinting(idx.sub(1))
       console.log('tx: ', tx.hash)
       await tx.wait()
       console.log('done')
+  })
+
+task('set-currently-minting')
+  .addParam('index', 'the index of the metadata to mint')
+  .setAction(async ({index}, hre) => {
+    const larvaMaiorum = await getLarvaMaiorum(hre)
+    const tx = await larvaMaiorum.setCurrentlyMinting(index)
+    console.log('tx: ', tx.hash)
+    await tx.wait()
+    console.log('done')
   })
