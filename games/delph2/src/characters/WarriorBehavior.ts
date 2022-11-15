@@ -61,7 +61,7 @@ class WarriorBehavior extends ScriptTypeBase {
     this.timeSinceHeal += dt
     // TODO: this needs to be more consistent than this when synced
     if (this.timeSinceHeal > 1) {
-      this.warrior?.recover(0.1)
+      this.warrior?.recover(0.05)
       this.timeSinceHeal = 0
     }
     const gumps = this.app.root.findByTag('harvestable')

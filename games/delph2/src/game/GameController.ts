@@ -1,4 +1,4 @@
-import { randomInt } from "../utils/randoms";
+import { randomBounded, randomInt } from "../utils/randoms";
 import { Entity, Vec3 } from "playcanvas";
 import WarriorLocomotion from "../characters/WarriorLocomotion";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
@@ -27,6 +27,8 @@ class GameController extends ScriptTypeBase {
   playingField: PlayingField
   battles: BattleList
 
+  timeSinceSpawn = 0
+
   npcTemplate: Entity
 
   initialize() {
@@ -40,8 +42,10 @@ class GameController extends ScriptTypeBase {
   }
 
   update(dt:number) {
-    if (randomInt(1000) < 24) {
+    this.timeSinceSpawn += dt
+    if (this.timeSinceSpawn >= 1) {
       this.spawnGump()
+      this.timeSinceSpawn = 0
     }
     const warriors = this.app.root.findByTag('warrior')
     const warriorsWithPositions = warriors.map((warrior):BattleLook => {
@@ -125,17 +129,56 @@ class GameController extends ScriptTypeBase {
     }
 
     for (let i = 0; i < 10; i++) {
-      this.spawnGump()
+      this.spawnOneGump(this.playingField.randomPosition().mulScalar(1.25))
     }
 
+    for (let i = 0; i < 80; i++) {
+      this.spawnTree(this.playingField.randomPosition().mulScalar(1.25))
+    }
+
+    for (let i = 0; i < 5; i++) {
+      this.spawnDeer(this.playingField.randomPosition().mulScalar(1.25))
+    }
   }
 
   private spawnGump() {
+    const allGumps = this.app.root.findByTag('wootgump')
+    if (allGumps.length >= 200) {
+      return
+    }
+    allGumps.forEach((gump, i) => {
+      if (randomInt(100) <= 5) {
+        const xDiff = randomBounded(6)
+        const zDiff = randomBounded(6)
+        this.spawnOneGump(gump.getPosition().add(new Vec3(xDiff, 0, zDiff)))
+      }
+    })
+    // now let's see if we get a new area too
+    if (randomInt(100) <= 10) {
+      this.spawnOneGump(this.playingField.randomPosition().mulScalar(1.25))
+    }
+  }
+
+  private spawnOneGump(position:Vec3) {
     const gump = this.gumpTemplate.clone()
     gump.enabled = true
     this.app.root.addChild(gump)
-    const position = this.playingField.randomPosition().mulScalar(1.25)
     gump.setPosition(position.x, 0, position.z)
+  }
+
+  private spawnTree(position:Vec3) {
+    const tree = mustFindByName(this.app.root, 'Tree').clone()
+    tree.enabled = true
+    this.app.root.addChild(tree)
+    tree.rotate(0, randomBounded(180), 0)
+    tree.setPosition(position.x, 0, position.z)
+  }
+
+  private spawnDeer(position:Vec3) {
+    const deer = mustFindByName(this.app.root, 'Deer').clone()
+    deer.enabled = true
+    this.app.root.addChild(deer)
+    deer.setPosition(position.x, 0, position.z)
   }
 
 }

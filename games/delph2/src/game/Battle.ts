@@ -8,14 +8,19 @@ class Battle {
   app: Application
   started = false
   warriors: Entity[]
+  behaviors: WarriorBehavior[]
   clock = 0
   over = false
   completed = false
+  wootgumpPot = 0
 
   effect?:Entity
 
   constructor(app: Application, warriors?: Entity[]) {
     this.warriors = warriors || []
+    this.behaviors = this.warriors.map((warriorElement) => {
+      return mustGetScript<WarriorBehavior>(warriorElement, 'warriorBehavior')
+    })
     this.app = app
   }
 
@@ -31,28 +36,22 @@ class Battle {
     }
 
     if (this.clock > 5 && !this.completed) {
-      this.warriors.forEach((w) => {
-        const warrior = mustGetScript<WarriorBehavior>(w, 'warriorBehavior').warrior!
-        if (!warrior.isAlive()) {
-          warrior.recover(1.00)
+      this.behaviors.forEach((b, i) => {
+        if (!b.warrior) {
+          throw new Error('no warrior')
         }
-        mustGetScript<WarriorBehavior>(w, 'warriorBehavior').setState(State.move)
+        if (!b.warrior.isAlive()) {
+          b.warrior.recover(1.00)
+        }
+       b.setState(State.move)
       })
       this.completed = true
     }
 
   }
 
-  addWarrior(warrior: Entity) {
-    this.warriors.push(warrior)
-  }
-
   endIt() {
-    const behaviors = this.warriors.map((warriorElement) => {
-      return mustGetScript<WarriorBehavior>(warriorElement, 'warriorBehavior')
-    })
-
-    const warriors = behaviors.map((behavior) => {
+    const warriors = this.behaviors.map((behavior) => {
       const warrior = behavior.warrior
       if (!warrior) {
         throw new Error('missing warrior')
@@ -73,9 +72,12 @@ class Battle {
 
     warriors.forEach((warrior, i) => {
       if (warrior.isAlive()) {
-        behaviors[i].setState(State.move)
+        this.behaviors[i].setState(State.move)
       } else {
-        behaviors[i].setState(State.dead)
+        const gumpTaken = Math.floor(this.behaviors[i].warrior!.wootgumpBalance * 0.5)
+        this.behaviors[i].warrior!.wootgumpBalance -= gumpTaken
+        this.wootgumpPot += gumpTaken
+        this.behaviors[i].setState(State.dead)
       }
     })
 
