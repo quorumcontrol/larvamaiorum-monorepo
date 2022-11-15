@@ -2,7 +2,7 @@ import { Entity, Application } from 'playcanvas'
 import WarriorBehavior, { State } from '../characters/WarriorBehavior'
 import mustFindByName from '../utils/mustFindByName'
 import mustGetScript from '../utils/mustGetScript'
-import { randomFloat } from '../utils/randoms'
+import { randomFloat, randomInt } from '../utils/randoms'
 
 class Battle {
   app: Application
@@ -24,7 +24,7 @@ class Battle {
       return
     }
     this.clock += dt
-    if (this.clock > 1.2 && !this.over) {
+    if (this.clock > 1 && !this.over) {
       if (!this.over) {
         return this.endIt()
       }
@@ -32,6 +32,10 @@ class Battle {
 
     if (this.clock > 5 && !this.completed) {
       this.warriors.forEach((w) => {
+        const warrior = mustGetScript<WarriorBehavior>(w, 'warriorBehavior').warrior!
+        if (!warrior.isAlive()) {
+          warrior.recover(1.00)
+        }
         mustGetScript<WarriorBehavior>(w, 'warriorBehavior').setState(State.move)
       })
       this.completed = true
@@ -44,13 +48,37 @@ class Battle {
   }
 
   endIt() {
-    if (randomFloat() >= 0.5) {
-      mustGetScript<WarriorBehavior>(this.warriors[1], 'warriorBehavior').setState(State.dead)
-      mustGetScript<WarriorBehavior>(this.warriors[0], 'warriorBehavior').setState(State.move)
-    } else {
-      mustGetScript<WarriorBehavior>(this.warriors[0], 'warriorBehavior').setState(State.dead)
-      mustGetScript<WarriorBehavior>(this.warriors[1], 'warriorBehavior').setState(State.move)
+    const behaviors = this.warriors.map((warriorElement) => {
+      return mustGetScript<WarriorBehavior>(warriorElement, 'warriorBehavior')
+    })
+
+    const warriors = behaviors.map((behavior) => {
+      const warrior = behavior.warrior
+      if (!warrior) {
+        throw new Error('missing warrior')
+      }
+      return warrior
+    })
+
+    while (!warriors.some((w) => !w.isAlive())) {
+      const attackerIdx = randomFloat() >= 0.5 ? 0 : 1
+      const attacker = warriors[attackerIdx]
+      const defender = warriors[(attackerIdx + 1) % this.warriors.length]
+      const attackRoll = randomInt(attacker.currentAttack())
+      const defenseRoll = randomInt(defender.currentDefense())
+      if (attackRoll > defenseRoll) {
+        defender.currentHealth -= (attackRoll - defenseRoll)
+      }
     }
+
+    warriors.forEach((warrior, i) => {
+      if (warrior.isAlive()) {
+        behaviors[i].setState(State.move)
+      } else {
+        behaviors[i].setState(State.dead)
+      }
+    })
+
     this.over = true
     this.clock = 0
     this.effect?.destroy()
