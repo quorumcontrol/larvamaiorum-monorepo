@@ -93,9 +93,11 @@ class GameController extends ScriptTypeBase {
   }
 
   setup() {
-    const warriors = generateFakeWarriors(10, 'test')
+    const warriors = generateFakeWarriors(11, 'test')
+    const playerEl = mustFindByName(this.app.root, 'Player')
+    mustGetScript<WarriorBehavior>(playerEl, 'warriorBehavior').setWarrior(warriors[0])
 
-    for (let warrior of warriors) {
+    for (let warrior of warriors.slice(1)) {
       const character = this.npcTemplate.clone()
 
       const torso = mustFindByName(character, 'Torso')

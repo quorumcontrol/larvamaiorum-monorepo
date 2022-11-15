@@ -24,8 +24,13 @@ class WarriorBehavior extends ScriptTypeBase {
   anim:AnimComponent
   locomotion:WarriorLocomotion
 
+  camera:Entity
+  nameScreen:Entity
+  healthBar:Entity
   warrior?: Warrior
   battling?:Entity
+
+  timeSinceHeal = 0
   
   initialize() {
     this.state = State.move
@@ -36,13 +41,29 @@ class WarriorBehavior extends ScriptTypeBase {
       throw new Error('no locomotion')
     }
     this.locomotion = locomotion
+    this.nameScreen = mustFindByName(this.entity, 'PlayerNameScreen')
+    this.camera = mustFindByName(this.app.root, 'Camera')
+    this.healthBar = mustFindByName(this.nameScreen, 'HealthBar')
   }
 
   setWarrior(warrior:Warrior) {
     this.warrior = warrior
+    this.entity.fire('newWarrior', warrior)
   }
 
   update(dt: number) {
+    this.nameScreen.lookAt(this.camera.getPosition())
+    this.nameScreen.rotateLocal(0, 180, 0)
+    if (this.warrior) {
+      this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
+    }
+
+    this.timeSinceHeal += dt
+    // TODO: this needs to be more consistent than this when synced
+    if (this.timeSinceHeal > 1) {
+      this.warrior?.recover(0.1)
+      this.timeSinceHeal = 0
+    }
     const gumps = this.app.root.findByTag('harvestable')
     gumps.forEach((gumpNode) => {
       const gump = gumpNode as Entity
@@ -50,6 +71,7 @@ class WarriorBehavior extends ScriptTypeBase {
         const start = gump.getLocalPosition()
         gump.tween(start).to({x: start.x, y: start.y + 40, z: start.z}, 2.0).on('complete', () => {
           gump.destroy()
+          this.warrior!.wootgumpBalance += 1
         }).start()
       }
     })

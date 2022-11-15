@@ -1,5 +1,5 @@
-import { Entity, Vec3 } from "playcanvas";
-import PlayingField from "../game/PlayingField";
+import { Entity } from "playcanvas";
+import Warrior from "../game/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
@@ -13,8 +13,15 @@ class NonPlayerCharacter extends ScriptTypeBase {
   behavior:WarriorBehavior
   nameScreen:Entity
   name:Entity
+  statsScreen:Entity
+  healthBar:Entity
+  player: Entity
+
+  warrior:Warrior
+
 
   initialize() {
+    this.player = mustFindByName(this.app.root, 'Player')
     this.behavior = this.getScript(this.entity, 'warriorBehavior')!
 
     const locoMotion = this.getScript<WarriorLocomotion>(this.entity, 'warriorLocomotion')
@@ -28,18 +35,35 @@ class NonPlayerCharacter extends ScriptTypeBase {
       locoMotion.randomDestination()
     })
     this.nameScreen = mustFindByName(this.entity, 'PlayerNameScreen')
+    this.statsScreen = mustFindByName(this.entity, 'StatsScreen')
     this.name = mustFindByName(this.nameScreen, 'PlayerName')
     this.camera = mustFindByName(this.app.root, 'Camera')
+    this.healthBar = mustFindByName(this.nameScreen, 'HealthBar')
+    this.entity.on('newWarrior', (warrior) => {
+      this.name.element!.text = warrior.name
+      this.warrior = warrior
+    })
   }
 
   update() {
     if (!this.behavior.warrior) {
       return
     }
-    this.name.element!.text = this.behavior.warrior.name
+
+    if (this.entity.getPosition().distance(this.player.getPosition()) > 6) {
+      this.statsScreen.enabled = false
+    } else {
+      this.statsScreen.enabled = true
+      this.statsScreen.lookAt(this.camera.getPosition())
+      this.statsScreen.rotateLocal(0, 180, 0)
+      mustFindByName(this.statsScreen, 'Attack').element!.text = `A: ${this.warrior.currentAttack()}`
+      mustFindByName(this.statsScreen, 'Defense').element!.text = `D: ${this.warrior.currentDefense()}`
+      mustFindByName(this.statsScreen, 'Gump').element!.text = `G: ${this.warrior.wootgumpBalance}`
+
+    }
     this.nameScreen.lookAt(this.camera.getPosition())
     this.nameScreen.rotateLocal(0, 180, 0)
-
+    this.healthBar.element!.width = this.behavior.warrior.currentHealth / this.behavior.warrior.initialHealth * 150
   }
 
 }
