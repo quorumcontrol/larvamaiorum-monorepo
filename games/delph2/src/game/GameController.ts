@@ -136,14 +136,14 @@ class GameController extends ScriptTypeBase {
       this.spawnTree(this.playingField.randomPosition().mulScalar(1.25))
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
       this.spawnDeer(this.playingField.randomPosition().mulScalar(1.25))
     }
   }
 
   private spawnGump() {
     const allGumps = this.app.root.findByTag('wootgump')
-    if (allGumps.length >= 200) {
+    if (allGumps.length >= 100) {
       return
     }
     allGumps.forEach((gump, i) => {
