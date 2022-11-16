@@ -10,6 +10,11 @@ import randomColor from "../utils/randomColor";
 import { generateFakeWarriors } from "./Warrior";
 import mustGetScript from "../utils/mustGetScript";
 import WarriorBehavior from "../characters/WarriorBehavior";
+import Syncer from "../syncing/syncer";
+
+
+const params = new URLSearchParams(document.location.search);
+const userName = params.get('name')!
 
 type BattleList = Record<string, Battle> // guid to an existing battle
 
@@ -31,6 +36,8 @@ class GameController extends ScriptTypeBase {
 
   npcTemplate: Entity
 
+  syncer: Syncer
+
   initialize() {
     this.battles = {}
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
@@ -38,15 +45,16 @@ class GameController extends ScriptTypeBase {
     this.field = mustFindByName(this.app.root, 'gameBoard')
     this.playingField = this.getScript(this.field, 'playingField')!
     this.npcTemplate = mustFindByName(this.app.root, 'NPC')
+    this.syncer = new Syncer({ name: userName })
     this.setup()
   }
 
   update(dt:number) {
-    this.timeSinceSpawn += dt
-    if (this.timeSinceSpawn >= 1) {
-      this.spawnGump()
-      this.timeSinceSpawn = 0
-    }
+    // this.timeSinceSpawn += dt
+    // if (this.timeSinceSpawn >= 1) {
+    //   this.spawnGump()
+    //   this.timeSinceSpawn = 0
+    // }
     const warriors = this.app.root.findByTag('warrior')
     const warriorsWithPositions = warriors.map((warrior):BattleLook => {
       return {
@@ -99,46 +107,51 @@ class GameController extends ScriptTypeBase {
   setup() {
     const warriors = generateFakeWarriors(11, 'test')
     const playerEl = mustFindByName(this.app.root, 'Player')
+    const playerWarrior = warriors[0]
+    playerWarrior.name = userName!
     mustGetScript<WarriorBehavior>(playerEl, 'warriorBehavior').setWarrior(warriors[0])
+    playerEl.on('newDestination', (point:Vec3) => {
+      this.syncer.playerDestinationChange(point)
+    })
 
-    for (let warrior of warriors.slice(1)) {
-      const character = this.npcTemplate.clone()
+    // for (let warrior of warriors.slice(1)) {
+    //   const character = this.npcTemplate.clone()
 
-      const torso = mustFindByName(character, 'Torso')
+    //   const torso = mustFindByName(character, 'Torso')
 
-      const newMaterial = torso.render!.meshInstances[0].material.clone();
-      const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `TODO-${character.getGuid()}`, luminosity: 'light' }).map((c: number) => c / 255);
-      (newMaterial as any).diffuse.set(color[0], color[1], color[2])
-      newMaterial.update()
-      torso.render!.meshInstances[0].material = newMaterial
+    //   const newMaterial = torso.render!.meshInstances[0].material.clone();
+    //   const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `TODO-${character.getGuid()}`, luminosity: 'light' }).map((c: number) => c / 255);
+    //   (newMaterial as any).diffuse.set(color[0], color[1], color[2])
+    //   newMaterial.update()
+    //   torso.render!.meshInstances[0].material = newMaterial
 
-      character.tags.add('warrior')
-      character.enabled = true
-      this.app.root.addChild(character)
-      mustGetScript<WarriorBehavior>(character, 'warriorBehavior').setWarrior(warrior)
+    //   character.tags.add('warrior')
+    //   character.enabled = true
+    //   this.app.root.addChild(character)
+    //   mustGetScript<WarriorBehavior>(character, 'warriorBehavior').setWarrior(warrior)
 
-      const position = this.playingField.randomPosition()
+    //   const position = this.playingField.randomPosition()
 
-      character.setPosition(position.x, 0, position.z)
-      const script = this.getScript<WarriorLocomotion>(character, 'warriorLocomotion')
-      setTimeout(() => {
-        const position = this.playingField.randomPosition().mulScalar(1.25)
-        position.y = 0
-        script!.setDestination(position)
-      }, 100)
-    }
+    //   character.setPosition(position.x, 0, position.z)
+    //   const script = this.getScript<WarriorLocomotion>(character, 'warriorLocomotion')
+    //   setTimeout(() => {
+    //     const position = this.playingField.randomPosition().mulScalar(1.25)
+    //     position.y = 0
+    //     script!.setDestination(position)
+    //   }, 100)
+    // }
 
-    for (let i = 0; i < 10; i++) {
-      this.spawnOneGump(this.playingField.randomPosition().mulScalar(1.25))
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   this.spawnOneGump(this.playingField.randomPosition().mulScalar(1.25))
+    // }
 
     for (let i = 0; i < 80; i++) {
       this.spawnTree(this.playingField.randomPosition().mulScalar(1.25))
     }
 
-    for (let i = 0; i < 10; i++) {
-      this.spawnDeer(this.playingField.randomPosition().mulScalar(1.25))
-    }
+    // for (let i = 0; i < 10; i++) {
+    //   this.spawnDeer(this.playingField.randomPosition().mulScalar(1.25))
+    // }
   }
 
   private spawnGump() {

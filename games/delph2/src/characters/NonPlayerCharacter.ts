@@ -61,9 +61,6 @@ class NonPlayerCharacter extends ScriptTypeBase {
       mustFindByName(this.statsScreen, 'Gump').element!.text = `G: ${this.warrior.wootgumpBalance}`
 
     }
-    this.nameScreen.lookAt(this.camera.getPosition())
-    this.nameScreen.rotateLocal(0, 180, 0)
-    this.healthBar.element!.width = this.behavior.warrior.currentHealth / this.behavior.warrior.initialHealth * 150
   }
 
 }

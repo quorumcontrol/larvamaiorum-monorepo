@@ -25,13 +25,14 @@ class PlayerController extends ScriptTypeBase {
       if (behavior.state !== State.move) {
         return
       }
+      this.entity.fire('newDestination', result.point)
       locoMotion.setDestination(result.point)
     })
   }
 
-  update() {
+  // update() {
 
-  }
+  // }
 
 }
 

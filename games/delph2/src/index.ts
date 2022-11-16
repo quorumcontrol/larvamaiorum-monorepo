@@ -2,6 +2,7 @@
 import './controls'
 import './characters'
 import './game'
+import './syncing'
 
 console.log(`
 --------------------------------------------------------------------------------
