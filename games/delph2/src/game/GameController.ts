@@ -12,10 +12,6 @@ import mustGetScript from "../utils/mustGetScript";
 import WarriorBehavior from "../characters/WarriorBehavior";
 import Syncer from "../syncing/syncer";
 
-
-const params = new URLSearchParams(document.location.search);
-const userName = params.get('name')!
-
 type BattleList = Record<string, Battle> // guid to an existing battle
 
 interface BattleLook {
@@ -38,6 +34,8 @@ class GameController extends ScriptTypeBase {
 
   syncer: Syncer
 
+  user:string
+
   initialize() {
     this.battles = {}
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
@@ -45,7 +43,15 @@ class GameController extends ScriptTypeBase {
     this.field = mustFindByName(this.app.root, 'gameBoard')
     this.playingField = this.getScript(this.field, 'playingField')!
     this.npcTemplate = mustFindByName(this.app.root, 'NPC')
-    this.syncer = new Syncer({ name: userName })
+    
+    if (typeof document !== 'undefined') {
+      const params = new URLSearchParams(document.location.search);
+      const userName = params.get('name')!
+      this.user = userName
+  
+      this.syncer = new Syncer({ name: userName })
+    }
+
     this.setup()
   }
 
@@ -108,7 +114,7 @@ class GameController extends ScriptTypeBase {
     const warriors = generateFakeWarriors(11, 'test')
     const playerEl = mustFindByName(this.app.root, 'Player')
     const playerWarrior = warriors[0]
-    playerWarrior.name = userName!
+    playerWarrior.name = this.user
     mustGetScript<WarriorBehavior>(playerEl, 'warriorBehavior').setWarrior(warriors[0])
     playerEl.on('newDestination', (point:Vec3) => {
       this.syncer.playerDestinationChange(point)

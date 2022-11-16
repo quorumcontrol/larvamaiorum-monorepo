@@ -7,6 +7,6 @@ import './syncing'
 console.log(`
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Scripts warnings start here check them
+Script warnings start here check them
   `
 );
