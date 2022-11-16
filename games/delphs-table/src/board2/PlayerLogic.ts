@@ -20,7 +20,6 @@ class PlayerLogic extends ScriptTypeBase {
 
   nameEntity: Entity
   cardEntity: Entity
-  animationHolder: Entity
   playerModel: Entity
   playerArrow: Entity
   stats: Entity
@@ -33,7 +32,7 @@ class PlayerLogic extends ScriptTypeBase {
 
   initialize() {
     this.nameEntity = mustFindByName(this.entity, 'PlayerName')
-    this.animationHolder = mustFindByName(this.entity, 'HumanoidModel')
+    // this.animationHolder = mustFindByName(this.entity, 'HumanoidModel')
     this.camera = mustFindByName(this.app.root, "Camera")
     this.playerModel = mustFindByName(this.entity, "Viking")
     this.playerArrow = mustFindByName(this.entity, 'PlayerArrow')
@@ -76,11 +75,14 @@ class PlayerLogic extends ScriptTypeBase {
     const position = this.localPositionFromCell(setup.location[0], setup.location[1])
     this.entity.setLocalScale(0.04, 0.04, 0.04)
     this.entity.setPosition(position.x, 0, position.z)
-    const newMaterial = this.animationHolder.render!.meshInstances[0].material.clone();
+
+    const torso = mustFindByName(this.entity, 'HumanoidModel')
+
+    const newMaterial = torso.render!.meshInstances[0].material.clone();
     const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `${setup.name}`, luminosity: 'light' }).map((c: number) => c / 255);
     (newMaterial as any).diffuse.set(color[0], color[1], color[2])
     newMaterial.update()
-    this.animationHolder.render!.meshInstances[0].material = newMaterial
+    torso.render!.meshInstances[0].material = newMaterial
     if (setup.id === currentPlayer) {
       this.playerArrow.enabled = true
       pulser(this.playerArrow, 10, 1)
@@ -210,7 +212,7 @@ $G: ${state.wootgumpBalance}
   private setBattlingAnimation(isBattling: boolean) {
     try {
       console.log(`${this.name} setting battling animation`, isBattling)
-      this.animationHolder.anim?.setBoolean('isBattling', isBattling)
+      this.playerModel.anim?.setBoolean('isBattling', isBattling)
     } catch (err) {
       // sometimes during replay this item is destroyed before there is a chance foor the isBattling
       // to be set by the battleUI. This just ignores that error
@@ -221,7 +223,7 @@ $G: ${state.wootgumpBalance}
   private setIsDeadAnimation(isDead: boolean) {
     try {
       console.log(`${this.name} setting isDead animation`, isDead)
-      this.animationHolder.anim?.setBoolean('isDead', isDead)
+      this.playerModel.anim?.setBoolean('isDead', isDead)
     } catch (err) {
       // sometimes during replay this item is destroyed before there is a chance foor the isBattling
       // to be set by the battleUI. This just ignores that error
