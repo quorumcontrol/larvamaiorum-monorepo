@@ -10,11 +10,17 @@ task('catchup-testnet').setAction(async (_, hre) => {
   const mainnetContract = BadgeOfAssembly__factory.connect('0x2C6FD25071Fd516947682f710f6e9F5eD610207F', skaleMainnetProvider)
   let tokenId = 1;
   let metadata = await mainnetContract.metadata(tokenId);
+  const accts = await hre.getNamedAccounts();
+  const minter = accts.badgeMinter;
+  if (!minter) {
+    throw new Error("no minter")
+  }
   while (metadata.name !== "") {
     const testnetMeta = await testnetContract.metadata(tokenId);
     if (testnetMeta.name !== metadata.name) {
       console.log("minting ", metadata.name, " token id: ", tokenId);
       await testnetContract.setup(metadata, 1);
+      await testnetContract.setMinterAccess(tokenId, minter, true);
     }
     tokenId++;
     metadata = await mainnetContract.metadata(tokenId);

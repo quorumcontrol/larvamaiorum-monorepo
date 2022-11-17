@@ -1,4 +1,4 @@
-import { Contract, PayableOverrides, PopulatedTransaction, Signer, utils, Wallet } from 'ethers'
+import { Contract, PayableOverrides, PopulatedTransaction, Signer, Wallet } from 'ethers'
 import KasumahRelayer from 'skale-relayer-contracts/lib/src/KasumahRelayer'
 import { TrustedForwarder } from 'skale-relayer-contracts/lib/typechain-types'
 import { delphsContract, lobbyContract, playerContract, trustedForwarderContract } from './contracts'
@@ -7,17 +7,8 @@ import { skaleProvider } from './skaleProvider'
 import { wrapContract } from 'kasumah-relay-wrapper'
 import { bytesToSignForToken, createToken, PreTokenData, Token } from 'skale-relayer-contracts'
 import EventEmitter from 'events'
-import { backOff } from 'exponential-backoff'
-import { isTestnet } from './networks'
 
 const SESSION_EXPIRY = 43200
-
-const FAUCET_URL = isTestnet ? 
-  "https://larvammaiorumfaucetgjxd8a5h-testnet-faucet.functions.fnc.fr-par.scw.cloud" :
-  "https://larvammaiorumfaucetgjxd8a5h-mainnet-faucet.functions.fnc.fr-par.scw.cloud"
-
-const thresholdForFaucet = utils.parseEther("0.25");
-
 const DEVICE_PK_KEY = "delphs:relayerKey"
 
 const deviceWallet = memoize(() => {
@@ -105,7 +96,7 @@ class RelayManager extends EventEmitter {
     }
     this.deviceToken = token
     this.relayer = new KasumahRelayer(this.forwarder, this.deviceWallet!, user, token)
-    await this.maybeGetFaucet()
+    // await this.maybeGetFaucet()
     this.emit('ready')
   }
 
@@ -122,52 +113,6 @@ class RelayManager extends EventEmitter {
       throw new Error('wrapping before ready')
     }
     return wrapContract<T>((contract as unknown as Contract).connect(this.deviceWallet!), this.relayer)
-  }
-
-  private async maybeGetFaucet() {
-    if (!this.deviceWallet || !this.user || !this.deviceToken) {
-      throw new Error("cannot get faucet without wallet or user")
-    }
-    const [address, balance] = await Promise.all([
-      this.user.getAddress(),
-      this.deviceWallet.getBalance()
-    ])
-
-    if (balance.lte(thresholdForFaucet)) {
-      const resp = await fetch(FAUCET_URL, {
-        body: JSON.stringify({ userAddress: address, relayerAddress: this.deviceWallet.address, issuedAt: this.deviceToken.issuedAt, token: this.deviceToken!.signature }),
-        method: "post",
-      });
-      if (![200, 201].includes(resp.status)) {
-        console.error("bad response from faucet: ", resp.status);
-        throw new Error(`Bad response: ${resp.status} ${JSON.stringify(resp.json())}`);
-      }
-      const hash: string | undefined = (await resp.json()).transactionId;
-      console.log("received: ", hash);
-
-      if (hash) {
-        console.log("waiting on: ", hash);
-        const tx = await backOff(
-          async () => {
-            const tx = await skaleProvider.getTransaction(hash);
-            console.log('tx inside backof: ', tx)
-            if (!tx) {
-              throw new Error('no tx yet')
-            }
-            return tx
-          },
-          {
-            startingDelay: 500,
-            maxDelay: 1000,
-            numOfAttempts: 10,
-          }
-        );
-        if (!tx) {
-          throw new Error("missing tx");
-        }
-        await tx.wait();
-      }
-    }
   }
 
 }

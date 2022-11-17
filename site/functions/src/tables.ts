@@ -1,33 +1,25 @@
 import { randomUUID } from "crypto";
-import { BigNumber, BigNumberish, utils, Wallet } from "ethers";
+import { BigNumber, BigNumberish, utils } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import * as functions from "firebase-functions";
-import KasumahRelayer from "skale-relayer-contracts/lib/src/KasumahRelayer"
-import { wrapContract } from "kasumah-relay-wrapper"
 import { appFunctions, db } from "./app"
 import testnetBots from "../../contracts/bots-testnet"
 import mainnetBots from "../../contracts/bots-mainnet"
-import { addresses, isTestnet } from "../../src/utils/networks"
+import { isTestnet } from "../../src/utils/networks"
 import SingletonQueue from "../../src/utils/singletonQueue"
-import { skaleProvider } from "../../src/utils/skaleProvider";
-import { accoladesContract, delphsContract, delphsGumpContract, playerContract, trustedForwarderContract } from "../../src/utils/contracts";
-import { questTrackerContract } from "../../src/utils/questTracker";
-import { defineSecret, defineString } from "firebase-functions/params";
-import { memoize } from "../../src/utils/memoize";
-import { Accolades, DelphsGump, DelphsTable, Player, QuestTracker, TeamStats, TeamStats2__factory } from "../../contracts/typechain";
+import { defineString } from "firebase-functions/params";
+import { Accolades, DelphsGump, DelphsTable, QuestTracker, TeamStats } from "../../contracts/typechain";
 import Warrior, { WarriorState, WarriorStats } from "../../src/boardLogic/Warrior"
 import { defaultInitialInventory, InventoryItem } from "../../src/boardLogic/items";
 import { Transaction } from "firebase-admin/firestore";
 import { TableStatus } from "../../src/utils/tables"
 import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
-import { getBytesAndCreateToken } from "skale-relayer-contracts/lib/src/tokenCreator";
+import { delphsPrivateKey, walletAndContracts } from "./wallets";
 
 defineString("NEXT_PUBLIC_MAINNET")
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
-
-const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
 const ONE = utils.parseEther("1")
 
@@ -72,50 +64,6 @@ async function getBots(num: number) {
 
 const txSingleton = new SingletonQueue()
 
-const walletAndContracts = memoize(async (delphsKey: string) => {
-  functions.logger.debug("delphs private key")
-  if (!delphsKey) {
-    functions.logger.error("missing private key", process.env)
-    throw new Error("must have a DELPHS private key")
-  }
-  const provider = skaleProvider
-
-  const relayWallet = Wallet.createRandom().connect(provider)
-  functions.logger.info("Relay address: ", relayWallet.address)
-
-  const delphsWallet = new Wallet(delphsKey).connect(provider)
-  delphsWallet.getAddress().then((addr) => {
-    functions.logger.info("Delph's address: ", addr)
-  })
-
-  const sendTx = await delphsWallet.sendTransaction({
-    value: utils.parseEther("0.1"),
-    to: relayWallet.address,
-  })
-  functions.logger.info("funded relayer", { tx: sendTx.hash, relayer: relayWallet.address })
-
-  const delphs = delphsContract()
-  const player = playerContract()
-  const delphsGump = delphsGumpContract()
-  const accolades = accoladesContract()
-  const teamStats = TeamStats2__factory.connect(addresses().TeamStats2, provider)
-  const questTracker = questTrackerContract()
-  const trustedForwarder = trustedForwarderContract()
-
-  const token = await getBytesAndCreateToken(trustedForwarder, delphsWallet, relayWallet)
-  const kasumahRelayer = new KasumahRelayer(trustedForwarder.connect(relayWallet), relayWallet, delphsWallet, token)
-
-  return {
-    relayer: kasumahRelayer,
-    delphsAddress: delphsWallet.address,
-    delphs: wrapContract<DelphsTable>(delphs, kasumahRelayer),
-    player: wrapContract<Player>(player, kasumahRelayer),
-    delphsGump: wrapContract<DelphsGump>(delphsGump, kasumahRelayer),
-    accolades: wrapContract<Accolades>(accolades, kasumahRelayer),
-    teamStats: wrapContract<TeamStats>(teamStats, kasumahRelayer),
-    questTracker: wrapContract<QuestTracker>(questTracker, kasumahRelayer)
-  }
-})
 
 export const onLobbyWrite = functions
   .runWith({
