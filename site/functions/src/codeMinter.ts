@@ -12,11 +12,11 @@ import { NonceManager } from "@ethersproject/experimental";
 
 const badgeMinterPrivateKey = defineSecret("BADGE_MINTER_PRIVATE_KEY")
 
-const singleton = new SingletonQueue('faucet')
+const singleton = new SingletonQueue("faucet")
 
 const badgeOfAssembly = memoize(async (minterPrivateKey: string) => {
   const wallet = new NonceManager(new Wallet(minterPrivateKey).connect(skaleProvider))
-  return badgeOfAssemblyContract('minter', wallet)
+  return badgeOfAssemblyContract("minter", wallet)
 })
 
 export const codeMinter = functions
@@ -45,21 +45,21 @@ export const codeMinter = functions
     ])
 
     if (maxSize.eq(0)) {
-      throw new functions.https.HttpsError('failed-precondition', 'invalid code')
+      throw new functions.https.HttpsError("failed-precondition", "invalid code")
     }
 
     if (alreadyMinted || (currentCount.gte(maxSize))) {
-      throw new functions.https.HttpsError('failed-precondition', 'Code already used')
+      throw new functions.https.HttpsError("failed-precondition", "Code already used")
     }
 
     try {
       const tx = await singleton.push(async () => {
         try {
-          functions.logger.debug('adding to list')
+          functions.logger.debug("adding to list")
           await (await delph.listKeeper.add(list, entry, { gasLimit: 350_000 })).wait()
-          functions.logger.debug('minting')
+          functions.logger.debug("minting")
           const tx = await badgeContract.mint(address, tokenId, 1, { gasLimit: 1_000_000 })
-          functions.logger.debug('coded badge', tokenId, 'to', address, 'txid: ', tx.hash)
+          functions.logger.debug("coded badge", tokenId, "to", address, "txid: ", tx.hash)
           return tx
         } catch (err) {
           throw err
@@ -71,7 +71,7 @@ export const codeMinter = functions
         transactionId: tx.hash
       }
     } catch (err: any) {
-      functions.logger.error('error minting: ', err)
-      throw new functions.https.HttpsError('unknown', 'error minting', err)
+      functions.logger.error("error minting: ", err)
+      throw new functions.https.HttpsError("unknown", "error minting", err)
     }
   })

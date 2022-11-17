@@ -1,8 +1,8 @@
 import { Wallet } from "ethers";
 import { badgeOfAssemblyContract, listKeeperContract } from "../src/utils/contracts";
 import { skaleProvider } from "../src/utils/skaleProvider";
-import SimpleSyncher from '../src/utils/singletonQueue';
-import { keccak256 } from 'ethers/lib/utils';
+import SimpleSyncher from "../src/utils/singletonQueue";
+import { keccak256 } from "ethers/lib/utils";
 
 if (!process.env.BADGE_MINTER_PRIVATE_KEY) {
   throw new Error("must have a badge minter private key")
@@ -17,7 +17,7 @@ const delphSigner = new Wallet(process.env.DELPHS_PRIVATE_KEY).connect(skaleProv
 const boa = badgeOfAssemblyContract("schain", schainSigner)
 const listKeeper = listKeeperContract("delph", delphSigner)
 
-const singleton = new SimpleSyncher('codeMinter')
+const singleton = new SimpleSyncher("codeMinter")
 
 export async function handle(event: any, _context: any, callback: any) {
   const { address, code, tokenId }:{address: string, code: string, tokenId: number} = JSON.parse(event.body)
@@ -37,7 +37,7 @@ export async function handle(event: any, _context: any, callback: any) {
       body: JSON.stringify({
         address,
         exists: false,
-        error: 'invalid code',
+        error: "invalid code",
       }),
     })
   }
@@ -48,7 +48,7 @@ export async function handle(event: any, _context: any, callback: any) {
       body: JSON.stringify({
         address,
         eligible: false,
-        error: 'Code is already used up',
+        error: "Code is already used up",
         size: currentCount.toNumber(),
         maxSize: maxSize.toNumber(),
       }),
@@ -58,11 +58,11 @@ export async function handle(event: any, _context: any, callback: any) {
   try {
     const tx = await singleton.push(async () => {
       try {
-        console.log('adding to list')
+        console.log("adding to list")
         await (await listKeeper.add(list, entry, { gasLimit: 350_000 })).wait()
-        console.log('minting')
+        console.log("minting")
         const tx = await boa.mint(address, tokenId, 1, { gasLimit: 1_000_000 })
-        console.log('coded badge', tokenId, 'to', address,'txid: ', tx.hash)
+        console.log("coded badge", tokenId, "to", address,"txid: ", tx.hash)
         return tx
       } catch (err) {
         throw err
@@ -77,7 +77,7 @@ export async function handle(event: any, _context: any, callback: any) {
       }),
     })
   } catch (err:any) {
-    console.error('error minting: ', err)
+    console.error("error minting: ", err)
     return callback(null, {
       statusCode: 500,
       body: JSON.stringify({
