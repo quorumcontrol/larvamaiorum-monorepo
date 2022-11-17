@@ -9,7 +9,8 @@ const skaleAddresses = {
   },
   mainnet: {
     id: 1032942172,
-    default: 'https://mainnet.skalenodes.com/v1/haunting-devoted-deneb',
+    // default: 'https://mainnet.skalenodes.com/v1/haunting-devoted-deneb',
+    default: 'https://andromeda01.skale.prod.chorus1.net:10200',
     wss: 'wss://mainnet.skalenodes.com/v1/ws/haunting-devoted-deneb',
     explorer: 'https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/',
   },
