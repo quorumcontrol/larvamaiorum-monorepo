@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
-import { TrustedForwarder__factory } from "skale-relayer-contracts/lib/typechain-types";
 import "./app"
+import { TrustedForwarder__factory } from "skale-relayer-contracts/lib/typechain-types";
 import SingletonQueue from "../../src/utils/singletonQueue"
 import { addresses } from "../../src/utils/networks";
 import { skaleProvider } from "../../src/utils/skaleProvider"

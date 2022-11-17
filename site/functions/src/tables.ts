@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import "./app";
 import { BigNumber, BigNumberish, utils } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import * as functions from "firebase-functions";
@@ -7,7 +8,6 @@ import testnetBots from "../../contracts/bots-testnet"
 import mainnetBots from "../../contracts/bots-mainnet"
 import { isTestnet } from "../../src/utils/networks"
 import SingletonQueue from "../../src/utils/singletonQueue"
-import { defineString } from "firebase-functions/params";
 import { Accolades, DelphsGump, DelphsTable, QuestTracker, TeamStats } from "../../contracts/typechain";
 import Warrior, { WarriorState, WarriorStats } from "../../src/boardLogic/Warrior"
 import { defaultInitialInventory, InventoryItem } from "../../src/boardLogic/items";
@@ -16,8 +16,6 @@ import { TableStatus } from "../../src/utils/tables"
 import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
 import { delphsPrivateKey, walletAndContracts } from "./wallets";
-
-defineString("NEXT_PUBLIC_MAINNET")
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
 
