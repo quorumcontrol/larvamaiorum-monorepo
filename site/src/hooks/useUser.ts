@@ -2,13 +2,16 @@ import { useAccount, useSigner } from "wagmi";
 import { useQuery, useQueryClient } from 'react-query';
 import { useCallback, useEffect, useState } from "react";
 import RelayManager from "../utils/relayer";
-import { BigNumberish } from "ethers";
+import { BigNumberish, utils } from "ethers";
 import { playerContract } from "../utils/contracts";
-import { auth, getToken } from "../utils/firebase";
+import { auth, faucet, getToken } from "../utils/firebase";
 import { signInWithCustomToken } from "firebase/auth";
+import { backOff } from "exponential-backoff";
+
+const thresholdForFaucet = utils.parseEther("0.01")
 
 export const useRelayer = () => {
-  const { data:signer } = useSigner()
+  const { data: signer } = useSigner()
   const { address } = useAccount()
 
   return useQuery(['/relayer/', address], () => {
@@ -43,7 +46,7 @@ export const useLogin = () => {
 
   }, [relayer, setCanCreateToken])
 
-  const login = useCallback(async (username?: string, team?:BigNumberish) => {
+  const login = useCallback(async (username?: string, team?: BigNumberish) => {
     try {
       setIsLoggingIn(true)
       if (!canCreateToken || !relayer) {
@@ -75,6 +78,41 @@ export const useLogin = () => {
         }
       }
 
+      const maybeGetFaucet = async () => {
+        if ((await relayer?.deviceWallet?.getBalance())?.gt(thresholdForFaucet)) {
+          console.log("no need for faucet")
+          return
+        }
+        const resp = await faucet({
+          userAddress: relayer.address!,
+          relayerAddress: relayer.deviceWallet?.address!,
+          issuedAt: relayer.deviceToken?.issuedAt!,
+          token: relayer.deviceToken?.signature.toString()!,
+        })
+        if (resp.data.transactionId) {
+          const tx = await backOff(
+            async () => {
+              const tx = await relayer.deviceWallet!.provider.getTransaction(resp.data.transactionId!);
+              console.log('tx inside backoff: ', resp.data.transactionId, tx)
+              if (!tx) {
+                throw new Error('no tx yet: ' + resp.data.transactionId)
+              }
+              return tx
+            },
+            {
+              startingDelay: 500,
+              maxDelay: 1000,
+              numOfAttempts: 30,
+            }
+          );
+          if (!tx) {
+            console.error("tx hash: ", resp.data.transactionId, "missing")
+            throw new Error("missing tx");
+          }
+          await tx.wait();
+        }
+      }
+
       await setUserNameAndOrTeam()
 
       console.log('------------- firebase')
@@ -86,7 +124,7 @@ export const useLogin = () => {
       })
       console.log('resp: ', resp.data)
       await signInWithCustomToken(auth, (resp.data as any).firebaseToken)
-
+      maybeGetFaucet()
       setLoggedIn(true)
     } catch (err) {
       console.error('error login', err)
@@ -99,7 +137,6 @@ export const useLogin = () => {
     }
 
   }, [canCreateToken, setIsLoggingIn, setLoggedIn, relayer, signer, queryClient]);
-
 
   return { relayer, isLoggingIn, isLoggedIn, login, readyToLogin: canCreateToken };
 };

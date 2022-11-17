@@ -22,11 +22,7 @@ export const app = initializeApp(firebaseConfig);
 
 export const functions = getFunctions(app);
 export const getToken = httpsCallable(functions, 'getToken')
-
-// export const testSecret = httpsCallable(functions, 'testSecret')
-// if (typeof window !== 'undefined') {
-//   (window as any).testSecret = testSecret
-// }
+export const faucet = httpsCallable<{ relayerAddress:string, userAddress:string, token:string, issuedAt:number }, {message:string, transactionId?:string}>(functions, 'faucet')
 
 // firebaseApps previously initialized using initializeApp()
 export const db = getFirestore();

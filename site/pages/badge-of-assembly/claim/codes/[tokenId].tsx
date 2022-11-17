@@ -18,7 +18,7 @@ import { BigNumber } from 'ethers'
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Layout from "../../../../src/components/Layout";
 import Video from "../../../../src/components/Video";
@@ -28,10 +28,8 @@ import {
 } from "../../../../src/hooks/BadgeOfAssembly";
 import useIsClientSide from "../../../../src/hooks/useIsClientSide";
 import { isTestnet } from "../../../../src/utils/networks";
-
-const mintAPI = isTestnet ? 
-  "/api/local/codeMinter" : 
-  "https://larvammaiorumfaucetgjxd8a5h-codeminter-mainnet.functions.fnc.fr-par.scw.cloud"
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../../../src/utils/firebase";
 
 const CodeClaimer: NextPage = () => {
   const { address } = useAccount();
@@ -50,21 +48,17 @@ const CodeClaimer: NextPage = () => {
       if (!code) {
         return setErr('You must enter a code.')
       }
+
       if (!tokenId || !address) {
         return setErr('something went wrong, missing tokenId or address.')
       }
-      const resp = await fetch(mintAPI, {
-        method: "POST",
-        body: JSON.stringify({
-          address,
-          code: code.trim(),
-          tokenId: BigNumber.from(tokenId).toNumber(),
-        })
+      const codeMinter = httpsCallable<{address:string, code:string, tokenId:number}, {address:string, transactionId:string}>(functions, 'codeMinter')
+      const resp = await codeMinter({
+        address,
+        code: code.trim(),
+        tokenId: BigNumber.from(tokenId).toNumber(),
       })
-      if (resp.status !== 201) {
-        const { error } = await resp.json()
-        return setErr(error)
-      }
+      console.log("minted with tx hash: ", resp.data.transactionId)
 
       // success
       setDidMint(true)
@@ -74,7 +68,6 @@ const CodeClaimer: NextPage = () => {
     } finally {
       setSubmitting(false)
     }
-
   }
 
   const [didMint, setDidMint] = useState(false);
