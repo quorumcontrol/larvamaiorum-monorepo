@@ -17,6 +17,7 @@ class PlayingField extends ScriptTypeBase {
     });
 
     this.boundingBox = aabb
+    console.log("tile half extents: ", this.boundingBox.halfExtents.x, this.boundingBox.halfExtents.z)
   }
 
   randomPosition(): Vec3 {

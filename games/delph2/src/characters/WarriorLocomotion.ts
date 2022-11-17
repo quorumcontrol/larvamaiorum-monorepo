@@ -1,4 +1,4 @@
-import { Entity, RaycastResult, Vec3 } from "playcanvas";
+import { Entity, Vec3 } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
@@ -43,9 +43,9 @@ class WarriorLocomotion extends ScriptTypeBase {
     this.setSpeed(4)
   }
 
-  randomDestination() {
-    this.setDestination(this.boardScript.randomPosition())
-  }
+  // randomDestination() {
+  //   this.setDestination(this.boardScript.randomPosition())
+  // }
 
   update(dt: number) {
     // this.entity.lookAt(this.destination)

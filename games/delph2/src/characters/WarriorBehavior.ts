@@ -4,18 +4,7 @@ import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import WarriorLocomotion from "./WarriorLocomotion";
 import Warrior from "../game/Warrior";
-
-export const ARRIVED_EVT = 'warrior:arrived'
-export const CLOSE_TO_DESTINATION_EVT = 'warrior:closeToDest'
-export const BATTLE_OVER_WIN_EVT = 'warrior:battleOverWinEvt'
-
-export enum State {
-  move,
-  harvest,
-  battle,
-  dead,
-  taunt
-}
+import { State } from '../syncing/schema/DelphsTableState'
 
 @createScript("warriorBehavior")
 class WarriorBehavior extends ScriptTypeBase {
@@ -58,27 +47,27 @@ class WarriorBehavior extends ScriptTypeBase {
       this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
     }
 
-    this.timeSinceHeal += dt
-    // TODO: this needs to be more consistent than this when synced
-    if (this.timeSinceHeal > 1) {
-      this.warrior?.recover(0.05)
-      this.timeSinceHeal = 0
-    }
-    const gumps = this.app.root.findByTag('harvestable')
-    gumps.forEach((gumpNode) => {
-      const gump = gumpNode as Entity
-      if (this.entity.getPosition().distance(gump.getPosition()) < 0.6) {
-        const start = gump.getLocalPosition()
-        gump.tween(start).to({x: start.x, y: start.y + 40, z: start.z}, 2.0).on('complete', () => {
-          gump.destroy()
-          this.warrior!.wootgumpBalance += 1
-        }).start()
-      }
-    })
+    // this.timeSinceHeal += dt
+    // // TODO: this needs to be more consistent than this when synced
+    // if (this.timeSinceHeal > 1) {
+    //   this.warrior?.recover(0.05)
+    //   this.timeSinceHeal = 0
+    // }
+    // const gumps = this.app.root.findByTag('harvestable')
+    // gumps.forEach((gumpNode) => {
+    //   const gump = gumpNode as Entity
+    //   if (this.entity.getPosition().distance(gump.getPosition()) < 0.6) {
+    //     const start = gump.getLocalPosition()
+    //     gump.tween(start).to({x: start.x, y: start.y + 40, z: start.z}, 2.0).on('complete', () => {
+    //       gump.destroy()
+    //       this.warrior!.wootgumpBalance += 1
+    //     }).start()
+    //   }
+    // })
 
-    if ([State.battle, State.dead].includes(this.state)) {
-      return
-    }
+    // if ([State.battle, State.dead].includes(this.state)) {
+    //   return
+    // }
   }
 
   setState(newState:State) {

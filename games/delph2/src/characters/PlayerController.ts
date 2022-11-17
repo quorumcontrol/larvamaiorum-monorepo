@@ -1,10 +1,10 @@
-import { Entity, RaycastResult } from "playcanvas";
+import { Entity } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
-import { SELECT_EVT } from "../controls/CellSelector";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import WarriorLocomotion from "./WarriorLocomotion";
 import mustFindByName from "../utils/mustFindByName";
-import WarriorBehavior, { State } from "./WarriorBehavior";
+import WarriorBehavior from "./WarriorBehavior";
+import { Player } from "../syncing/schema/DelphsTableState";
 
 @createScript("playerController")
 class PlayerController extends ScriptTypeBase {
@@ -21,13 +21,12 @@ class PlayerController extends ScriptTypeBase {
     if (!locoMotion) {
       throw new Error('player controller requries locomotion')
     }
-    this.app.on(SELECT_EVT, (result:RaycastResult) => {
-      if (behavior.state !== State.move) {
-        return
-      }
-      this.entity.fire('newDestination', result.point)
-      locoMotion.setDestination(result.point)
-    })
+  }
+
+  setPlayer(player:Player) {
+    player.onChange = (changes) => {
+      console.log("changes: ", changes)
+    }
   }
 
   // update() {

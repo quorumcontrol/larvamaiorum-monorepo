@@ -3,7 +3,8 @@ import Warrior from "../game/Warrior";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
-import WarriorBehavior, { State } from "./WarriorBehavior";
+import WarriorBehavior from "./WarriorBehavior";
+import { State } from '../syncing/schema/DelphsTableState'
 import WarriorLocomotion, { ARRIVED_EVT } from "./WarriorLocomotion";
 
 @createScript("nonPlayerCharacter")
@@ -28,12 +29,12 @@ class NonPlayerCharacter extends ScriptTypeBase {
     if (!locoMotion) {
       throw new Error('player controller requries locomotion')
     }
-    this.entity.on(ARRIVED_EVT, () => {
-      if (this.behavior.state !== State.move) {
-        return
-      }
-      locoMotion.randomDestination()
-    })
+    // this.entity.on(ARRIVED_EVT, () => {
+    //   if (this.behavior.state !== State.move) {
+    //     return
+    //   }
+    //   locoMotion.randomDestination()
+    // })
     this.nameScreen = mustFindByName(this.entity, 'PlayerNameScreen')
     this.statsScreen = mustFindByName(this.entity, 'StatsScreen')
     this.name = mustFindByName(this.nameScreen, 'PlayerName')

@@ -1,5 +1,6 @@
 import { Entity, Application } from 'playcanvas'
-import WarriorBehavior, { State } from '../characters/WarriorBehavior'
+import WarriorBehavior from '../characters/WarriorBehavior'
+import { State } from '../syncing/schema/DelphsTableState'
 import mustFindByName from '../utils/mustFindByName'
 import mustGetScript from '../utils/mustGetScript'
 import { randomFloat, randomInt } from '../utils/randoms'
