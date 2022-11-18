@@ -13,10 +13,10 @@ class PlayerController extends ScriptTypeBase {
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
   }
 
-  update() {
-    this.screen.lookAt(this.camera.getPosition())
-    this.screen.rotateLocal(0, 180, 0)
-  }
+  // update() {
+  //   this.screen.lookAt(this.camera.getPosition())
+  //   this.screen.rotateLocal(0, 180, 0)
+  // }
 
 }
 

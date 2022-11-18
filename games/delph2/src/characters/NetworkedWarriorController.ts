@@ -14,6 +14,9 @@ class NetworkedWarriorController extends ScriptTypeBase {
   healthBar: Entity
   warrior: Warrior
 
+  screen: Entity
+  camera: Entity
+
   initialize() {
     const locomotion = this.getScript<WarriorLocomotion>(this.entity, 'warriorLocomotion')
     if (!locomotion) {
@@ -22,12 +25,16 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.locomotion = locomotion
     this.anim = mustFindByName(this.entity, 'viking').anim!
     this.healthBar = mustFindByName(this.entity, 'HealthBar')
+    this.camera = mustFindByName(this.app.root, 'Camera')
+    this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
   }
 
   update() {
     if (!this.warrior) {
       return
     }
+    this.screen.lookAt(this.camera.getPosition())
+    this.screen.rotateLocal(0, 180, 0)
     this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
   }
 
