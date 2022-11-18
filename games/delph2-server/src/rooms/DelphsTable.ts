@@ -1,33 +1,38 @@
 import { Room, Client } from "colyseus";
-import { DelphsTableState, Player } from "./schema/DelphsTableState";
+import util from 'util'
+import { DelphsTableState } from "./schema/DelphsTableState";
+import DelphsTableLogic from "../game/DelphsTableLogic";
+import { generateFakeWarriors } from "../game/Warrior";
 
 export class DelphsTable extends Room<DelphsTableState> {
 
+  game: DelphsTableLogic
+
   onCreate (options: any) {
     this.setState(new DelphsTableState());
+    this.game = new DelphsTableLogic(this.state)
+    this.game.start()
 
-    this.onMessage("updateDestination", (client, {x,z}:{x:number,z:number}) => {
-      console.log(client.sessionId, 'updateDestination', x, z)
-      this.state.players.get(client.sessionId).destination.assign({
-        x,
-        z,
-      })
+    this.onMessage("updateDestination", (client, destination:{x:number,z:number}) => {
+      console.log(client.sessionId, 'updateDestination', destination)
+      this.game.updateDestination(client.sessionId, destination)
     });
-
   }
 
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
-    this.state.players.set(client.sessionId, new Player())
+    const random = generateFakeWarriors(1, client.sessionId)
+    this.game.addWarrior(client.sessionId, random[0])
   }
 
   onLeave (client: Client, consented: boolean) {
     //TODO: handle constented
-    this.state.players.delete(client.sessionId)
+    this.game.removeWarrior(client.sessionId)
   }
 
   onDispose() {
     console.log("room", this.roomId, "disposing...");
+    this.game.stop()
   }
 
 }

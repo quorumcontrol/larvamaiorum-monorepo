@@ -12,6 +12,7 @@ class WarriorLocomotion extends ScriptTypeBase {
 
   speed: number = 0
   destination: Vec3
+  serverPosition: Vec3
   rootOriginal: Vec3
 
   viking: Entity
@@ -37,10 +38,15 @@ class WarriorLocomotion extends ScriptTypeBase {
     this.viking.anim!.setFloat('speed', speed)
   }
 
+  setServerPosition(point: Vec3) {
+    this.serverPosition = point
+  }
+
   setDestination(dest: Vec3) {
-    this.destination = new Vec3(dest.x, 0, dest.z)
-    this.entity.lookAt(this.destination.x, 0, this.destination.z)
-    this.setSpeed(4)
+    this.destination = dest
+    if (this.entity.getPosition().distance(dest) > 0.1) {
+      this.entity.lookAt(dest.x, 0, dest.z)
+    }
   }
 
   // randomDestination() {
@@ -48,25 +54,19 @@ class WarriorLocomotion extends ScriptTypeBase {
   // }
 
   update(dt: number) {
-    // this.entity.lookAt(this.destination)
-    if (this.speed > 0 && this.destination) {
+    if (this.speed == 0 && this.entity.getPosition().distance(this.serverPosition) > 0.25) {
       const current = this.entity.getPosition()
-      const vector = new Vec3().sub2(this.destination, current).normalize().mulScalar(this.speed * dt)
+      const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(4 * dt)
       vector.y = current.y
       const newPosition = current.add(vector)
       this.entity.setPosition(newPosition)
-      const distance = newPosition.distance(this.destination)
-      if (distance <= 0.25) {
-        this.setSpeed(0)
-        this.entity.fire(ARRIVED_EVT, this.destination)
-        return
-      }
-      if (distance <= 2) {
-        this.setSpeed(2)
-        this.entity.fire(CLOSE_TO_DESTINATION_EVT, this.destination)
-        return
-      }
-      this.setSpeed(4)
+    }
+    if (this.speed > 0 && this.serverPosition) {
+      const current = this.entity.getPosition()
+      const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(this.speed * dt)
+      vector.y = current.y
+      const newPosition = current.add(vector)
+      this.entity.setPosition(newPosition)
     }
   }
 
