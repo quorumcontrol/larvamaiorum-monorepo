@@ -23,6 +23,7 @@ const LeaderboardPage: NextPage = () => {
         <TabList>
           <Tab>Daily</Tab>
           <Tab>Weekly</Tab>
+          <Tab>Hourly</Tab>
           <Tab>Team</Tab>
           <Tab>First Gump</Tab>
           <Tab>First Blood</Tab>
@@ -36,6 +37,9 @@ const LeaderboardPage: NextPage = () => {
           </TabPanel>
           <TabPanel>
             <Leaderboard type="gump" timeframe="week" diff={diff} />
+          </TabPanel>
+          <TabPanel>
+            <Leaderboard type="dgump" timeframe="hour" diff={diff} />
           </TabPanel>
           <TabPanel>
             <Leaderboard type="team" timeframe="week" diff={diff} />

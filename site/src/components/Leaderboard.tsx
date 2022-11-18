@@ -47,6 +47,17 @@ const TeamRow: React.FC<{
   );
 };
 
+function labelFromTimeframe(timeframe:TimeFrames) {
+  switch(timeframe) {
+    case "day":
+      return "Day's"
+    case "week":
+      return "Week's"
+    case "hour":
+      return "Hour's"
+  }
+}
+
 const Leaderboard: React.FC<{
   timeframe: TimeFrames;
   type: LeaderBoardType;
@@ -54,7 +65,7 @@ const Leaderboard: React.FC<{
 }> = ({ timeframe, type, diff }) => {
   const { data: leaderboard, isLoading } = useLeaderboard(type, timeframe, diff as string|undefined);
 
-  const label = timeframe === "day" ? "Day's" : "Week's";
+  const label = labelFromTimeframe(timeframe)
 
   const entityLabel = type === "team" ? "Team" : "Player";
 
