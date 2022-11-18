@@ -49,10 +49,6 @@ class WarriorLocomotion extends ScriptTypeBase {
     }
   }
 
-  // randomDestination() {
-  //   this.setDestination(this.boardScript.randomPosition())
-  // }
-
   update(dt: number) {
     if (this.entity.getPosition().distance(this.serverPosition) > 1.5) {
       this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)

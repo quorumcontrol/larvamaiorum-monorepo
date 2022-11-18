@@ -11,6 +11,8 @@ class NetworkedWarriorController extends ScriptTypeBase {
   locomotion: WarriorLocomotion
   state: State
   anim: AnimComponent
+  healthBar: Entity
+  warrior: Warrior
 
   initialize() {
     const locomotion = this.getScript<WarriorLocomotion>(this.entity, 'warriorLocomotion')
@@ -19,6 +21,14 @@ class NetworkedWarriorController extends ScriptTypeBase {
     }
     this.locomotion = locomotion
     this.anim = mustFindByName(this.entity, 'viking').anim!
+    this.healthBar = mustFindByName(this.entity, 'HealthBar')
+  }
+
+  update() {
+    if (!this.warrior) {
+      return
+    }
+    this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
   }
 
   setState(newState:State) {
@@ -48,6 +58,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
   }
 
   setPlayer(player:Warrior) {
+    this.warrior = player
     console.log('player set', player.toJSON())
     this.entity.setPosition(player.position.x, 0, player.position.z)
     player.onChange = (changes) => {
