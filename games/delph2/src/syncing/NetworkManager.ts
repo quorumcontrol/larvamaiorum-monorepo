@@ -74,10 +74,14 @@ class NetworkManager extends ScriptTypeBase {
     effect.name = `battle-effect-${key}`
     this.app.root.addChild(effect)
     effect.enabled = true
-    effect.setPosition(new Vec3(battle.location.x, 0, battle.location.z))
     mustGetScript<any>(effect, 'effekseerEmitter').play()
-    battle.warriors.forEach((w, i) => {
-      this.warriors[w.id].lookAt(this.warriors[battle.warriors[(i + 1) % battle.warriors.length].id].getPosition())
+    const warriors = battle.warriorIds.map((id) => {
+      return this.warriors[id]
+    })
+    const position = warriors[0].getPosition().add(warriors[1].getPosition()).divScalar(2)
+    effect.setPosition(position)
+    warriors.forEach((warrior, i) => {
+      warrior.lookAt(warriors[(i + 1) % warriors.length].getPosition())
     })
   }
 
@@ -143,8 +147,9 @@ class NetworkManager extends ScriptTypeBase {
     //
     // A player has joined!
     //
-    const warriorEntity = mustFindByName(this.app.root, 'NPC')
+    const warriorEntity = mustFindByName(this.app.root, 'NPC').clone()
     warriorEntity.enabled = true
+    this.app.root.addChild(warriorEntity)
     const script = mustGetScript<NetworkedWarriorController>(warriorEntity, 'networkedWarriorController')
     script.setPlayer(warrior)
 

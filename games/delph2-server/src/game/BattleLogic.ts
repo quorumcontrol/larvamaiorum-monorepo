@@ -63,9 +63,9 @@ class BattleLogic {
       if (warrior.isAlive()) {
         warrior.setState(State.move)
       } else {
-        const gumpTaken = Math.floor(warrior.wootgumpBalance * 0.5)
-        warrior.wootgumpBalance -= gumpTaken
-        this.wootgumpPot += gumpTaken
+        const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5)
+        warrior.incGumpBalance(gumpTaken * -1)
+        warriors[(i+1) % warriors.length].incGumpBalance(gumpTaken)
         warrior.setState(State.dead)
       }
     })
@@ -81,13 +81,6 @@ class BattleLogic {
     console.log('battle started')
     this.started = true
     this.setBattling()
-    // const effect = mustFindByName(this.app.root, 'BattleEffect').clone()
-    // this.app.root.addChild(effect)
-    // effect.enabled = true
-    // effect.setPosition(this.warriors[0].getPosition().add(this.warriors[1].getPosition()).divScalar(2))
-    // mustGetScript<any>(effect, 'effekseerEmitter').play()
-    // this.effect = effect
-    // this.moveToPositions()
   }
 
   private setBattling() {

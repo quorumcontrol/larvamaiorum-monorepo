@@ -56,12 +56,12 @@ class NetworkedWarriorController extends ScriptTypeBase {
       this.setState(player.state)
     }
     player.destination.onChange = () => {
-      console.log("new destination: ", player.destination.toJSON())
+      // console.log("new destination: ", player.destination.toJSON())
       this.locomotion.setDestination(new Vec3(player.destination.x, 0, player.destination.z))
       // this.locomotion.setDestination(player.destination.x, player.destination.z)
     }
     player.position.onChange = () => {
-      console.log(' new position: ', player.position.toJSON())
+      // console.log(' new position: ', player.position.toJSON())
       this.locomotion.setServerPosition(new Vec3(player.position.x, 0, player.position.z))
     }
     this.entity.fire('newWarrior', player)

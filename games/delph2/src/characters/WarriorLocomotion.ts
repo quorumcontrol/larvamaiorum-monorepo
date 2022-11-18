@@ -54,15 +54,15 @@ class WarriorLocomotion extends ScriptTypeBase {
   // }
 
   update(dt: number) {
-    // if (this.speed == 0 && this.entity.getPosition().distance(this.serverPosition) > 0.25) {
-    //   this.entity.setPosition(this.serverPosition)
-    // }
+    if (this.entity.getPosition().distance(this.serverPosition) > 1.5) {
+      this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
+    }
     if (this.speed > 0 && this.serverPosition && this.entity.getPosition().distance(this.serverPosition) > 0.1) {
       const current = this.entity.getPosition()
       const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(this.speed * dt)
       vector.y = 0
       const newPosition = current.add(vector)
-      console.log(this.serverPosition, newPosition)
+      // console.log(this.serverPosition, newPosition)
       this.entity.setPosition(newPosition)
     }
   }

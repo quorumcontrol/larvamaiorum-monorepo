@@ -45,8 +45,7 @@ export class Warrior extends Schema {
 
 export class Battle extends Schema {
   @type("string") id:string
-  @type({array: Warrior }) warriors = new ArraySchema<Warrior>();
-  @type(Vec2) location: Vec2
+  @type({array: "string" }) warriorIds = new ArraySchema<string>();
 }
 
 export class DelphsTableState extends Schema {

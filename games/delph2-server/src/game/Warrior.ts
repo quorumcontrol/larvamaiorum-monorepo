@@ -67,8 +67,6 @@ class Warrior extends EventEmitter {
 
   // destination?: Vec3;
 
-  wootgumpBalance: number;
-
   constructor(state:WarriorState) {
     super()
     this.id = state.id
@@ -172,9 +170,7 @@ class Warrior extends EventEmitter {
       return 0;
     }
     if (this.state.currentHealth < 0) {
-      const amountToTopUp = this.state.currentHealth * -1
       this.state.currentHealth = 0
-      return amountToTopUp
     }
     const amountToUp = Math.min(
       this.state.initialHealth * percentage,

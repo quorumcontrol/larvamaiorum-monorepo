@@ -137,9 +137,7 @@ class DelphsTableLogic {
       const state = new Battle({
         id
       })
-      const position = new Vec2().add2(pair[0].position, pair[1].position).divScalar(2)
-      state.location = new StateVec2({x: position.x, z: position.y })
-      state.warriors.push(...pair.map((p) => p.state))
+      state.warriorIds.push(...pair.map((p) => p.id))
       // otherwise setup a battle
       const battle = new BattleLogic(id, pair, state)
       pair.forEach((w) => {
@@ -153,6 +151,7 @@ class DelphsTableLogic {
       battle.update(dt) // update first so that new battles that are not started can ignore the time
       battle.go()
       if (battle.completed) {
+        console.log('battle complete')
         battle.warriors.forEach((w) => {
           delete this.battles[w.id]
         })

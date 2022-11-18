@@ -15,6 +15,7 @@ class PlayerController extends ScriptTypeBase {
 
   update() {
     this.screen.lookAt(this.camera.getPosition())
+    this.screen.rotateLocal(0, 180, 0)
   }
 
 }
