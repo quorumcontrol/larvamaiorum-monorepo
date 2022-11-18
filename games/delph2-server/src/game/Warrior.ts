@@ -49,7 +49,7 @@ export function generateFakeWarriors(count: number, seed: string) {
 // }
 
 class Warrior extends EventEmitter {
-  // id: string;
+  id: string;
   // name: string = "DefaultName";
   // attack: number = 200;
   // defense: number = 100;
@@ -71,6 +71,7 @@ class Warrior extends EventEmitter {
 
   constructor(state:WarriorState) {
     super()
+    this.id = state.id
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
   }
@@ -85,6 +86,7 @@ class Warrior extends EventEmitter {
         x: current.x,
         z: current.y,
       })
+      console.log(this.id, this.state.position.toJSON())
       this.position = current
       const distance = current.distance(dest)
       if (distance <= 0.25) {
@@ -105,13 +107,22 @@ class Warrior extends EventEmitter {
   setSpeed(speed:number) {
     this.state.speed = speed
   }
+  
+  setState(state: State) {
+    this.state.state = state // state state state statey state
+    switch (state) {
+      case State.move:
+        this.setSpeedBasedOnDestination()
+        return
+      case State.battle:
+        this.setSpeed(0)
+        return
+    }
+  }
 
-  setDestination(x: number, z:number) {
-    this.state.destination.assign({
-      x,
-      z,
-    })
+  private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
+    console.log('dist to dest: ', dist)
     if (dist > 2) {
       this.setSpeed(4)
       return
@@ -121,6 +132,14 @@ class Warrior extends EventEmitter {
       return
     }
     this.setSpeed(0)
+  }
+
+  setDestination(x: number, z:number) {
+    this.state.destination.assign({
+      x,
+      z,
+    })
+    this.setSpeedBasedOnDestination()
   }
 
   private distanceToDestination() {

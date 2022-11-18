@@ -1,8 +1,17 @@
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Warrior as WarriorState, Vec2 as StateVec2 } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Warrior as WarriorState, Vec2 as StateVec2, Battle } from "../rooms/schema/DelphsTableState";
+import BattleLogic from './BattleLogic';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
+
+type BattleList = Record<string, BattleLogic> // guid to an existing battle
+
+interface BattleLook {
+  guid: string
+  warrior: Warrior
+  position: Vec2
+}
 
 class DelphsTableLogic {
   state: DelphsTableState
@@ -12,6 +21,7 @@ class DelphsTableLogic {
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
   trees: Record<string, Vec2>
+  battles: BattleList
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
@@ -20,6 +30,7 @@ class DelphsTableLogic {
     this.warriors = {}
     this.wootgump = {}
     this.trees = {}
+    this.battles = {}
   }
 
   start() {
@@ -51,6 +62,7 @@ class DelphsTableLogic {
     })
     this.spawnGump()
     this.checkForHarvest()
+    this.handleBattles(dt)
   }
 
   addWarrior(sessionId:string, stats:WarriorStats) {
@@ -58,6 +70,7 @@ class DelphsTableLogic {
     const position = this.randomPosition()
     const state = new WarriorState({
       ...stats,
+      id: sessionId,
       speed: 0,
       wootgumpBalance: stats.initialGump,
       currentHealth: stats.initialHealth
@@ -93,6 +106,58 @@ class DelphsTableLogic {
           this.state.wootgump.delete(gumpId)
         }
       })
+    })
+  }
+
+  handleBattles(dt: number) {
+    const pairs:[Warrior, Warrior][] = []
+
+    const warriors = Object.values(this.warriors)
+
+    warriors.forEach((w) => {
+      if (this.battles[w.id]) {
+        return
+      }
+      // otherwise find warriors we should battle
+      warriors.forEach((potentialOpponent) => {
+        if (potentialOpponent.id === w.id) {
+          return
+        }
+        if (w.position.distance(potentialOpponent.position) < 1) {
+          pairs.push([w, potentialOpponent])
+        }
+      })
+    })
+
+    pairs.forEach((pair) => {
+      if (pair.some((w) => this.battles[w.id])) {
+        return // if any pair is already in battle, then skip
+      }
+      const id = randomUUID()
+      const state = new Battle({
+        id
+      })
+      const position = new Vec2().add2(pair[0].position, pair[1].position).divScalar(2)
+      state.location = new StateVec2({x: position.x, z: position.y })
+      state.warriors.push(...pair.map((p) => p.state))
+      // otherwise setup a battle
+      const battle = new BattleLogic(id, pair, state)
+      pair.forEach((w) => {
+        this.battles[w.id] = battle
+      })
+      this.state.battles.set(id, battle.state)
+    })
+
+    // start them all
+    new Set(Object.values(this.battles)).forEach((battle) => {
+      battle.update(dt) // update first so that new battles that are not started can ignore the time
+      battle.go()
+      if (battle.completed) {
+        battle.warriors.forEach((w) => {
+          delete this.battles[w.id]
+        })
+        this.state.battles.delete(battle.id)
+      }
     })
   }
 

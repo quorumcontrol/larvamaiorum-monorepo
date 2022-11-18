@@ -1,16 +1,14 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud from '../game/Hud'
-import { Entity, RaycastResult } from "playcanvas";
+import { Entity, RaycastResult, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
-
-const client = new Client('ws://localhost:2567');
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -22,6 +20,7 @@ class NetworkManager extends ScriptTypeBase {
   player?: Entity
   playerSessionId?: string
   warriors:Record<string, Entity>
+  client: Client
 
   async initialize() {
     this.warriors = {}
@@ -30,11 +29,18 @@ class NetworkManager extends ScriptTypeBase {
       const params = new URLSearchParams(document.location.search);
       const userName = params.get('name')!
       this.user = userName
+      if (params.get('arena')) {
+        this.client = new Client("wss://zh8smr.colyseus.de")
+      } else {
+        this.client = new Client("ws://localhost:2567")
+      }
+    } else {
+      this.client = new Client("ws://localhost:2567")
     }
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
 
-    this.room = await client.joinOrCreate<DelphsTableState>("delphs", { name: "bobby" });
+    this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: "bobby" });
     this.room.state.warriors.onAdd = (player, key) => {
       this.handlePlayerAdd(player, key)
     }
@@ -51,9 +57,33 @@ class NetworkManager extends ScriptTypeBase {
     this.room.state.wootgump.onRemove = (_loc, key) => {
       this.handleGumpRemove(key)
     }
+    this.room.state.battles.onRemove = (_loc, key) => {
+      this.handleBattleRemove(key)
+    }
+    this.room.state.battles.onAdd = (battle, key) => {
+      this.handleBattleAdd(battle, key)
+    }
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
+  }
+
+  handleBattleAdd(battle:Battle, key:string) {
+    console.log('new battle: ', battle.toJSON())
+    const effect = mustFindByName(this.app.root, 'BattleEffect').clone()
+    effect.name = `battle-effect-${key}`
+    this.app.root.addChild(effect)
+    effect.enabled = true
+    effect.setPosition(new Vec3(battle.location.x, 0, battle.location.z))
+    mustGetScript<any>(effect, 'effekseerEmitter').play()
+    battle.warriors.forEach((w, i) => {
+      this.warriors[w.id].lookAt(this.warriors[battle.warriors[(i + 1) % battle.warriors.length].id].getPosition())
+    })
+  }
+
+  handleBattleRemove(key:string) {
+    console.log('battle over', key)
+    mustFindByName(this.app.root, `battle-effect-${key}`).destroy()
   }
 
   handleGumpAdd(gumpLocation: Vec2, key: string) {

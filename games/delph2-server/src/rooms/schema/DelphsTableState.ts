@@ -1,4 +1,4 @@
-import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
 export enum State {
   move,
@@ -43,10 +43,17 @@ export class Warrior extends Schema {
   @type("boolean") autoPlay = false
 }
 
+export class Battle extends Schema {
+  @type("string") id:string
+  @type({array: Warrior }) warriors = new ArraySchema<Warrior>();
+  @type(Vec2) location: Vec2
+}
+
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("string") seed: string = "todo:initialseed";
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({});
+  @type({ map: Battle }) battles = new MapSchema<Battle>({});
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({});
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({});
 }
