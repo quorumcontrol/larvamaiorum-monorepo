@@ -11,6 +11,7 @@ class DelphsTableLogic {
 
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
+  trees: Record<string, Vec2>
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
@@ -18,6 +19,7 @@ class DelphsTableLogic {
     this.state = state
     this.warriors = {}
     this.wootgump = {}
+    this.trees = {}
   }
 
   start() {
@@ -30,6 +32,10 @@ class DelphsTableLogic {
     }, 100)
     for (let i = 0; i < 10; i++) {
       this.spawnOneGump(this.randomPosition())
+    }
+    for (let i = 0; i < 80; i++) {
+      const position = this.randomPosition()
+      this.spawnTree(new Vec2(position.x, position.z))
     }
   }
 
@@ -48,11 +54,15 @@ class DelphsTableLogic {
   }
 
   addWarrior(sessionId:string, stats:WarriorStats) {
+    console.log('add warrior', stats)
     const position = this.randomPosition()
     const state = new WarriorState({
       ...stats,
       speed: 0,
+      wootgumpBalance: stats.initialGump,
+      currentHealth: stats.initialHealth
     })
+    console.log("state: ", state.toJSON())
     state.position.assign(position)
     state.destination.assign(position)
     this.warriors[sessionId] = new Warrior(state)
@@ -102,6 +112,12 @@ class DelphsTableLogic {
     if (randomInt(100) <= 10) {
       this.spawnOneGump(this.randomPosition())
     }
+  }
+
+  private spawnTree(position:Vec2) {
+    const id = randomUUID()
+    this.trees[id] = position
+    this.state.trees.set(id, new StateVec2().assign({x: position.x, z: position.y}))
   }
 
   randomPosition() {
