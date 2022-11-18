@@ -7,7 +7,7 @@ import { monitor } from "@colyseus/monitor";
 import { DelphsTable } from "./rooms/DelphsTable";
 
 export default Arena({
-    getId: () => "Your Colyseus App",
+    getId: () => "Delph's Table",
 
     initializeGameServer: (gameServer) => {
         /**
