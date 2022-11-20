@@ -23,6 +23,14 @@ export class InventoryOfItem extends Schema {
   @type("number") quantity: number = 0
 }
 
+export class Deer extends Schema {
+  @type("string") id: string
+  @type(Vec2) position: Vec2 = new Vec2();
+  @type(Vec2) destination: Vec2 = new Vec2();
+  @type("number") state: State = 0
+  @type("number") speed: number = 0
+}
+
 export class Warrior extends Schema {
   @type(Vec2) position: Vec2 = new Vec2();
   @type(Vec2) destination: Vec2 = new Vec2();
@@ -55,4 +63,5 @@ export class DelphsTableState extends Schema {
   @type({ map: Battle }) battles = new MapSchema<Battle>({});
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({});
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({});
+  @type({ map: Deer }) deer = new MapSchema<Deer>({});
 }

@@ -1,17 +1,12 @@
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Warrior as WarriorState, Vec2 as StateVec2, Battle } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
+import Deer from './Deer';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 
 type BattleList = Record<string, BattleLogic> // guid to an existing battle
-
-interface BattleLook {
-  guid: string
-  warrior: Warrior
-  position: Vec2
-}
 
 class DelphsTableLogic {
   state: DelphsTableState
@@ -21,6 +16,7 @@ class DelphsTableLogic {
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
   trees: Record<string, Vec2>
+  deer: Record<string, Deer>
   battles: BattleList
 
   // for now assume a blank table at construction
@@ -31,6 +27,7 @@ class DelphsTableLogic {
     this.wootgump = {}
     this.trees = {}
     this.battles = {}
+    this.deer = {}
   }
 
   start() {
@@ -48,6 +45,10 @@ class DelphsTableLogic {
       const position = this.randomPosition()
       this.spawnTree(new Vec2(position.x, position.z))
     }
+    for (let i = 0; i < 10; i++) {
+      const position = this.randomPosition()
+      this.spawnDeer(new Vec2(position.x, position.z))
+    }
   }
 
   stop() {
@@ -59,6 +60,9 @@ class DelphsTableLogic {
   update(dt:number) {
     Object.values(this.warriors).forEach((w) => {
       w.update(dt)
+    })
+    Object.values(this.deer).forEach((d) => {
+      d.update(dt)
     })
     this.spawnGump()
     this.checkForHarvest()
@@ -182,6 +186,18 @@ class DelphsTableLogic {
     const id = randomUUID()
     this.trees[id] = position
     this.state.trees.set(id, new StateVec2().assign({x: position.x, z: position.y}))
+  }
+
+  private spawnDeer(position:Vec2) {
+    const id = randomUUID()
+    const deerState = new DeerState()
+    deerState.position.assign({
+      x: position.x,
+      z: position.y
+    })
+    const deer = new Deer(deerState, this.wootgump, this.warriors)
+    this.deer[id] = deer
+    this.state.deer.set(id, deerState)
   }
 
   randomPosition() {

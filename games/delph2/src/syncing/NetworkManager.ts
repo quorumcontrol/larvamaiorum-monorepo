@@ -1,7 +1,7 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, Deer, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud from '../game/Hud'
 import { Entity, RaycastResult, Vec3 } from "playcanvas";
@@ -9,6 +9,7 @@ import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
+import DeerLocomotion from "../characters/DeerLocomotion";
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -17,14 +18,17 @@ class NetworkManager extends ScriptTypeBase {
   user: string
   gumpTemplate: Entity
   treeTemplate: Entity
+  deerTemplate: Entity
   player?: Entity
   playerSessionId?: string
   warriors:Record<string, Entity>
+  deer:Record<string, Entity>
   client: Client
 
   async initialize() {
     this.warriors = {}
-
+    this.deer = {}
+    this.deerTemplate = mustFindByName(this.app.root, "Deer")
     if (typeof document !== 'undefined') {
       const params = new URLSearchParams(document.location.search);
       const userName = params.get('name')!
@@ -63,9 +67,21 @@ class NetworkManager extends ScriptTypeBase {
     this.room.state.battles.onAdd = (battle, key) => {
       this.handleBattleAdd(battle, key)
     }
+    this.room.state.deer.onAdd = (deer, key) => {
+      this.handleDeerAdd(deer, key)
+    }
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
+  }
+
+  handleDeerAdd(deer:Deer, key: string) {
+    const deerEntity = this.deerTemplate.clone()
+    deerEntity.enabled = true
+    deerEntity.setPosition(deer.position.x, 0, deer.position.z)
+    this.app.root.addChild(deerEntity)
+    mustGetScript<DeerLocomotion>(deerEntity, 'deerLocomotion').setDeerState(deer)
+    this.deer[deer.id] = deerEntity
   }
 
   handleBattleAdd(battle:Battle, key:string) {

@@ -13,17 +13,11 @@ class WarriorLocomotion extends ScriptTypeBase {
   speed: number = 0
   destination: Vec3
   serverPosition: Vec3
-  rootOriginal: Vec3
 
   viking: Entity
-  root: Entity
-  board: Entity
-  boardScript: PlayingField
   clock: number = 0
 
   initialize() {
-    this.board = mustFindByName(this.app.root, 'gameBoard')
-    this.boardScript = this.getScript<PlayingField>(this.board, 'playingField')!
     this.viking = mustFindByName(this.entity, "viking")
   }
 
