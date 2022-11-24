@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DelphsTableState = exports.Warrior = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.State = void 0;
+exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.State = void 0;
 const schema_1 = require("@colyseus/schema");
 var State;
 (function (State) {
@@ -15,6 +15,8 @@ var State;
     State[State["battle"] = 2] = "battle";
     State[State["dead"] = 3] = "dead";
     State[State["taunt"] = 4] = "taunt";
+    State[State["chasing"] = 5] = "chasing";
+    State[State["deerAttack"] = 6] = "deerAttack";
 })(State = exports.State || (exports.State = {}));
 class Vec2 extends schema_1.Schema {
     constructor() {
@@ -52,6 +54,31 @@ __decorate([
     (0, schema_1.type)("number")
 ], InventoryOfItem.prototype, "quantity", void 0);
 exports.InventoryOfItem = InventoryOfItem;
+class Deer extends schema_1.Schema {
+    constructor() {
+        super(...arguments);
+        this.position = new Vec2();
+        this.destination = new Vec2();
+        this.state = 0;
+        this.speed = 0;
+    }
+}
+__decorate([
+    (0, schema_1.type)("string")
+], Deer.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)(Vec2)
+], Deer.prototype, "position", void 0);
+__decorate([
+    (0, schema_1.type)(Vec2)
+], Deer.prototype, "destination", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Deer.prototype, "state", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Deer.prototype, "speed", void 0);
+exports.Deer = Deer;
 class Warrior extends schema_1.Schema {
     constructor() {
         super(...arguments);
@@ -113,14 +140,42 @@ __decorate([
     (0, schema_1.type)("boolean")
 ], Warrior.prototype, "autoPlay", void 0);
 exports.Warrior = Warrior;
+class Battle extends schema_1.Schema {
+    constructor() {
+        super(...arguments);
+        this.warriorIds = new schema_1.ArraySchema();
+    }
+}
+__decorate([
+    (0, schema_1.type)("string")
+], Battle.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)({ array: "string" })
+], Battle.prototype, "warriorIds", void 0);
+exports.Battle = Battle;
+class DeerAttack extends schema_1.Schema {
+}
+__decorate([
+    (0, schema_1.type)("string")
+], DeerAttack.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], DeerAttack.prototype, "warriorId", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], DeerAttack.prototype, "deerId", void 0);
+exports.DeerAttack = DeerAttack;
 class DelphsTableState extends schema_1.Schema {
     constructor() {
         super(...arguments);
         this.tick = 0;
         this.seed = "todo:initialseed";
         this.warriors = new schema_1.MapSchema({});
+        this.battles = new schema_1.MapSchema({});
+        this.deerAttacks = new schema_1.MapSchema({});
         this.wootgump = new schema_1.MapSchema({});
         this.trees = new schema_1.MapSchema({});
+        this.deer = new schema_1.MapSchema({});
     }
 }
 __decorate([
@@ -133,9 +188,18 @@ __decorate([
     (0, schema_1.type)({ map: Warrior })
 ], DelphsTableState.prototype, "warriors", void 0);
 __decorate([
+    (0, schema_1.type)({ map: Battle })
+], DelphsTableState.prototype, "battles", void 0);
+__decorate([
+    (0, schema_1.type)({ map: DeerAttack })
+], DelphsTableState.prototype, "deerAttacks", void 0);
+__decorate([
     (0, schema_1.type)({ map: Vec2 })
 ], DelphsTableState.prototype, "wootgump", void 0);
 __decorate([
     (0, schema_1.type)({ map: Vec2 })
 ], DelphsTableState.prototype, "trees", void 0);
+__decorate([
+    (0, schema_1.type)({ map: Deer })
+], DelphsTableState.prototype, "deer", void 0);
 exports.DelphsTableState = DelphsTableState;

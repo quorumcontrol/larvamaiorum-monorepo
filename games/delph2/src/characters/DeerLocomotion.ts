@@ -3,7 +3,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import PlayingField from "../game/PlayingField";
-import { Deer } from "../syncing/schema/DelphsTableState";
+import { Deer, State } from "../syncing/schema/DelphsTableState";
 
 export const DEER_ARRIVED_EVT = 'deer:arrived'
 export const DEER_CLOSE_TO_DESTINATION_EVT = 'deerf:closeToDest'
@@ -14,11 +14,13 @@ class DeerLocomotion extends ScriptTypeBase {
   speed: number = 0
   destination: Vec3
   serverPosition: Vec3
+  state: State
 
   deer: Entity
 
   initialize() {
     this.deer = mustFindByName(this.entity, "deerModel")
+    this.state = State.move
   }
 
   setSpeed(speed: number) {
@@ -41,6 +43,10 @@ class DeerLocomotion extends ScriptTypeBase {
     if (this.entity.getPosition().distance(dest) > 0.1) {
       this.entity.lookAt(dest.x, 0, dest.z)
     }
+  }
+
+  setState(newState:State) {
+    this.deer.anim!.setBoolean('deerAttack', (newState === State.deerAttack))
   }
 
   update(dt: number) {
@@ -67,7 +73,7 @@ class DeerLocomotion extends ScriptTypeBase {
     deerstate.onChange = (changes) => {
       // console.log("changes: ", changes)
       this.setSpeed(deerstate.speed)
-      // this.setState(deerstate.state)
+      this.setState(deerstate.state)
     }
     deerstate.destination.onChange = () => {
       // console.log("new destination: ", player.destination.toJSON())

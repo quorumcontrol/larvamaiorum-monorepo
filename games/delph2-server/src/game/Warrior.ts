@@ -84,7 +84,6 @@ class Warrior extends EventEmitter {
         x: current.x,
         z: current.y,
       })
-      console.log(this.id, this.state.position.toJSON())
       this.position = current
       const distance = current.distance(dest)
       if (distance <= 0.25) {
@@ -115,12 +114,14 @@ class Warrior extends EventEmitter {
       case State.battle:
         this.setSpeed(0)
         return
+      case State.deerAttack:
+        this.setSpeed(0)
+        return
     }
   }
 
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
-    console.log('dist to dest: ', dist)
     if (dist > 2) {
       this.setSpeed(4)
       return

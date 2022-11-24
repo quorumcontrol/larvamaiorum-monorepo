@@ -63,8 +63,10 @@ exports.generateFakeWarriors = generateFakeWarriors;
 //   return JSON.parse(JSON.stringify(obj)) as T
 // }
 class Warrior extends events_1.default {
+    // destination?: Vec3;
     constructor(state) {
         super();
+        this.id = state.id;
         this.state = state;
         this.position = new playcanvas_1.Vec2(state.position.x, state.position.z);
     }
@@ -96,11 +98,21 @@ class Warrior extends events_1.default {
     setSpeed(speed) {
         this.state.speed = speed;
     }
-    setDestination(x, z) {
-        this.state.destination.assign({
-            x,
-            z,
-        });
+    setState(state) {
+        this.state.state = state; // state state state statey state
+        switch (state) {
+            case DelphsTableState_1.State.move:
+                this.setSpeedBasedOnDestination();
+                return;
+            case DelphsTableState_1.State.battle:
+                this.setSpeed(0);
+                return;
+            case DelphsTableState_1.State.deerAttack:
+                this.setSpeed(0);
+                return;
+        }
+    }
+    setSpeedBasedOnDestination() {
         const dist = this.distanceToDestination();
         if (dist > 2) {
             this.setSpeed(4);
@@ -111,6 +123,13 @@ class Warrior extends events_1.default {
             return;
         }
         this.setSpeed(0);
+    }
+    setDestination(x, z) {
+        this.state.destination.assign({
+            x,
+            z,
+        });
+        this.setSpeedBasedOnDestination();
     }
     distanceToDestination() {
         return new playcanvas_1.Vec2(this.state.position.x, this.state.position.z).distance(new playcanvas_1.Vec2(this.state.destination.x, this.state.destination.z));
@@ -138,9 +157,7 @@ class Warrior extends events_1.default {
             return 0;
         }
         if (this.state.currentHealth < 0) {
-            const amountToTopUp = this.state.currentHealth * -1;
             this.state.currentHealth = 0;
-            return amountToTopUp;
         }
         const amountToUp = Math.min(this.state.initialHealth * percentage, this.state.initialHealth - this.state.currentHealth);
         this.state.currentHealth += amountToUp;

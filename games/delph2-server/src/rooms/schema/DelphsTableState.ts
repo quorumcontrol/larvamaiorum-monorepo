@@ -5,7 +5,9 @@ export enum State {
   harvest,
   battle,
   dead,
-  taunt
+  taunt,
+  chasing,
+  deerAttack,
 }
 
 export class Vec2 extends Schema {
@@ -56,11 +58,18 @@ export class Battle extends Schema {
   @type({array: "string" }) warriorIds = new ArraySchema<string>();
 }
 
+export class DeerAttack extends Schema {
+  @type("string") id:string
+  @type("string") warriorId:string
+  @type("string") deerId:string
+}
+
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("string") seed: string = "todo:initialseed";
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({});
   @type({ map: Battle }) battles = new MapSchema<Battle>({});
+  @type({ map: DeerAttack }) deerAttacks = new MapSchema<DeerAttack>({});
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({});
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({});
   @type({ map: Deer }) deer = new MapSchema<Deer>({});

@@ -76,25 +76,32 @@ class WarriorBehavior extends ScriptTypeBase {
     }
     console.log('set state: ', newState, this.entity.name)
     this.state = newState
+    if (newState !== State.deerAttack) {
+      this.anim.setBoolean('deerAttack', false)
+    }
+    if (newState !== State.battle) {
+      this.anim.setBoolean('battling', false)
+    }
     switch (newState) {
       case State.move:
-        this.anim.setBoolean('battling', false)
         this.anim.setFloat('health', 100)
         this.locomotion.setSpeed(4)
         return
       case State.taunt:
         //TODO this should be an animation, but for now idle it
-        this.anim.setBoolean('battling', false)
         this.anim.setFloat('health', 100)
         this.locomotion.setSpeed(0)
         return
       case State.dead:
         this.anim.setFloat('health', 0)
-        this.anim.setBoolean('battling', false)
         this.locomotion.setSpeed(0)
         return
       case State.battle:
         this.anim.setBoolean('battling', true)
+        this.locomotion.setSpeed(0)
+        return
+      case State.deerAttack:
+        this.anim.setBoolean('deerAttack', true)
         this.locomotion.setSpeed(0)
         return
     }

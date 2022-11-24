@@ -5,6 +5,7 @@ import WarriorLocomotion from "./WarriorLocomotion";
 import mustFindByName from "../utils/mustFindByName";
 // import WarriorBehavior from "./WarriorBehavior";
 import { State, Warrior } from "../syncing/schema/DelphsTableState";
+import mustGetScript from "../utils/mustGetScript";
 
 @createScript("networkedWarriorController")
 class NetworkedWarriorController extends ScriptTypeBase {
@@ -27,6 +28,15 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.healthBar = mustFindByName(this.entity, 'HealthBar')
     this.camera = mustFindByName(this.app.root, 'Camera')
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
+    this.entity.once('newWarrior', () => {
+      const effect = mustFindByName(this.app.root, 'PlayerAppearEffect').clone()
+      effect.name = `player-appear-${this.entity.getGuid()}`
+      this.app.root.addChild(effect)
+      effect.setPosition(this.entity.getPosition())
+      effect.enabled = true
+      mustGetScript<any>(effect, 'effekseerEmitter').play()
+    })
+
   }
 
   update() {
@@ -44,19 +54,25 @@ class NetworkedWarriorController extends ScriptTypeBase {
     }
     console.log('set state: ', newState, this.entity.name)
     this.state = newState
+    if (newState !== State.deerAttack) {
+      this.anim.setBoolean('deerAttack', false)
+    }
+    if (newState !== State.battle) {
+      this.anim.setBoolean('battling', false)
+    }
     switch (newState) {
       case State.move:
-        this.anim.setBoolean('battling', false)
         this.anim.setFloat('health', 100)
         return
       case State.taunt:
         //TODO this should be an animation, but for now idle it
-        this.anim.setBoolean('battling', false)
         this.anim.setFloat('health', 100)
         return
       case State.dead:
         this.anim.setFloat('health', 0)
-        this.anim.setBoolean('battling', false)
+        return
+      case State.deerAttack:
+        this.anim.setBoolean('deerAttack', true)
         return
       case State.battle:
         this.anim.setBoolean('battling', true)

@@ -1,8 +1,9 @@
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
+import DeerAttackLogic from './DeerAttackLogic';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 
@@ -18,6 +19,7 @@ class DelphsTableLogic {
   trees: Record<string, Vec2>
   deer: Record<string, Deer>
   battles: BattleList
+  deerAttacks: Record<string, DeerAttackLogic>
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
@@ -28,6 +30,7 @@ class DelphsTableLogic {
     this.trees = {}
     this.battles = {}
     this.deer = {}
+    this.deerAttacks = {}
   }
 
   start() {
@@ -67,6 +70,7 @@ class DelphsTableLogic {
     this.spawnGump()
     this.checkForHarvest()
     this.handleBattles(dt)
+    this.handleDeerAttacks(dt)
   }
 
   addWarrior(sessionId:string, stats:WarriorStats) {
@@ -102,6 +106,16 @@ class DelphsTableLogic {
   }
 
   checkForHarvest() {
+    // let the deer feed first
+    Object.values(this.deer).forEach((deer) => {
+      Object.keys(this.wootgump).forEach((gumpId) => {
+        if (deer.position.distance(this.wootgump[gumpId]) < 0.7) {
+          delete this.wootgump[gumpId]
+          this.state.wootgump.delete(gumpId)
+        }
+      })
+    })
+
     Object.values(this.warriors).forEach((w) => {
       Object.keys(this.wootgump).forEach((gumpId) => {
         if (w.position.distance(this.wootgump[gumpId]) < 0.7) {
@@ -164,6 +178,40 @@ class DelphsTableLogic {
     })
   }
 
+  handleDeerAttacks(dt:number) {
+    const eligibleDeer = Object.values(this.deer).filter((d) => [State.move, State.chasing].includes(d.state.state))
+    const eligibleWarriors = Object.values(this.warriors).filter((w) => w.state.state === State.move)
+    eligibleDeer.forEach((deer) => {
+      eligibleWarriors.forEach((w) => {
+        // skip over already assigned warriors
+        if (w.state.state !== State.move) {
+          return
+        }
+        if (deer.position.distance(w.position) <= 0.6) {
+          console.log('deer close, setting up attack')
+          const id = randomUUID()
+          const attackState = new DeerAttack({
+            id,
+            warriorId: w.id,
+            deerId: deer.id 
+          })
+          this.state.deerAttacks.set(id, attackState)
+          const attack = new DeerAttackLogic(id, deer, w)
+          this.deerAttacks[id] = attack
+          attack.go()
+        }
+      })
+    })
+
+    Object.values(this.deerAttacks).forEach((attack) => {
+      attack.update(dt)
+      if (attack.complete) {
+        this.state.deerAttacks.delete(attack.id)
+        delete this.deerAttacks[attack.id]
+      }
+    })
+  }
+
   private spawnGump() {
     const allGumps = Object.values(this.wootgump)
     if (allGumps.length >= 100) {
@@ -173,13 +221,25 @@ class DelphsTableLogic {
       if (randomInt(100) <= 5) {
         const xDiff = randomBounded(6)
         const zDiff = randomBounded(6)
-        this.spawnOneGump({x: gump.x + xDiff, z: gump.y + zDiff})
+        const x = this.positionModulo(gump.x + xDiff)
+        const z = this.positionModulo(gump.y + zDiff)
+        this.spawnOneGump({x, z })
       }
     })
     // now let's see if we get a new area too
     if (randomInt(100) <= 10) {
       this.spawnOneGump(this.randomPosition())
     }
+  }
+
+  private positionModulo(dimension: number) {
+    if (dimension < 0 && dimension < 37) {
+      return 36
+    }
+    if (dimension > 37) {
+      return dimension % 35
+    }
+    return dimension
   }
 
   private spawnTree(position:Vec2) {
@@ -202,8 +262,8 @@ class DelphsTableLogic {
 
   randomPosition() {
     return {
-      x: randomBounded(38),
-      z: randomBounded(38),
+      x: randomBounded(37),
+      z: randomBounded(37),
     }
   }
 
