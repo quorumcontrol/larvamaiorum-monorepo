@@ -60,9 +60,12 @@ class BattleLogic {
     }
 
     warriors.forEach((warrior, i) => {
+      warrior.clearItem()
       if (warrior.isAlive()) {
+        warrior.sendMessage("Winner!")
         warrior.setState(State.move)
       } else {
+        warrior.sendMessage('You lose.')
         const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5)
         warrior.incGumpBalance(gumpTaken * -1)
         warriors[(i+1) % warriors.length].incGumpBalance(gumpTaken)
@@ -86,6 +89,7 @@ class BattleLogic {
   private setBattling() {
     this.warriors.forEach((w, i) => {
       w.setState(State.battle)
+      w.sendMessage('Battle!')
     })
   }
 }

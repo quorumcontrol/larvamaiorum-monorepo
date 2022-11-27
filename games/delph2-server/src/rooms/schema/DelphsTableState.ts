@@ -17,12 +17,12 @@ export class Vec2 extends Schema {
 
 export class Item extends Schema {
   @type("string") address: string
-  @type("string") id: string
+  @type("number") id: number
 }
 
 export class InventoryOfItem extends Schema {
   @type(Item) item:Item
-  @type("number") quantity: number = 0
+  @type("number") quantity: number
 }
 
 export class Deer extends Schema {
@@ -49,7 +49,7 @@ export class Warrior extends Schema {
   @type("number") wootgumpBalance:number
   @type({ map: InventoryOfItem }) initialInventory = new MapSchema<InventoryOfItem>({})
   @type({ map: InventoryOfItem }) inventory = new MapSchema<InventoryOfItem>({})
-  @type(Item) currentItem?:Item
+  @type(Item) currentItem:Item
   @type("boolean") autoPlay = false
 }
 

@@ -70,7 +70,7 @@ export const itemsByIdentifier = items.reduce((memo, item) => {
 
 export const defaultInitialInventory:Inventory = {
   [items[1].identifier]: {quantity: 1, item: { address: items[1].address, id: items[1].id }},
-  [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
+  // [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
 }
 
 export function itemFromInventoryItem(inventoryItem:InventoryItem) {

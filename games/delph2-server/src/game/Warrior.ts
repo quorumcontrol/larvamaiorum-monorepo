@@ -1,11 +1,14 @@
 import EventEmitter from "events";
 import debug from 'debug'
-import items, { getIdentifier, Inventory, InventoryItem } from './items'
+import items, { defaultInitialInventory, getIdentifier, Inventory, InventoryItem } from './items'
 import { deterministicRandom } from "./utils/randoms";
-import { State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
+import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
+import { Client } from "colyseus";
 
-const log = debug('Warrior')
+const log = console.log //debug('Warrior')
+
+const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
 
 export interface WarriorStats {
   id: string;
@@ -33,11 +36,11 @@ export function generateFakeWarriors(count: number, seed: string) {
     warriors[i] = {
       id: `warrior-${i}-${seed}`,
       name: `Warius ${i}`,
-      attack: deterministicRandom(1000, `generateFakeWarriors-${i}-attack`, seed),
-      defense: deterministicRandom(800, `generateFakeWarriors-${i}-defense`, seed),
-      initialHealth: deterministicRandom(2000, `generateFakeWarriors-${i}-health`, seed),
+      attack: deterministicRandom(1500, `generateFakeWarriors-${i}-attack`, seed) + 500,
+      defense: deterministicRandom(500, `generateFakeWarriors-${i}-defense`, seed) + 400,
+      initialHealth: deterministicRandom(1000, `generateFakeWarriors-${i}-health`, seed) + 1000,
       initialGump: 0,
-      initialInventory: {},
+      initialInventory: defaultInitialInventory,
       autoPlay: false,
     }
   }
@@ -62,19 +65,24 @@ class Warrior extends EventEmitter {
 
   state: WarriorState
 
-  position:Vec2
-  currentItem?: InventoryItem
+  position: Vec2
+  // currentItem?: InventoryItem
+
+  client: Client
+
+  timeWithoutCard = 0
 
   // destination?: Vec3;
 
-  constructor(state:WarriorState) {
+  constructor(client: Client, state: WarriorState) {
     super()
+    this.client = client
     this.id = state.id
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
   }
 
-  update(dt:number) {
+  update(dt: number) {
     if (this.state.state === State.move && this.state.speed > 0) {
       const current = new Vec2(this.state.position.x, this.state.position.z)
       const dest = new Vec2(this.state.destination.x, this.state.destination.z)
@@ -95,16 +103,40 @@ class Warrior extends EventEmitter {
         return
       }
     }
+    if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
+      this.timeWithoutCard += dt
+      if (this.timeWithoutCard > 45) {
+        this.spawnBerserk()
+      }
+    }
   }
 
-  incGumpBalance(amount:number) {
+  spawnBerserk() {
+    this.state.inventory.get(berserkIdentifier).quantity += 1
+    this.sendMessage('New Card!')
+  }
+
+  sendMessage(message:string) {
+    console.log('send mainhudmessage', message)
+    this.client.send('mainHUDMessage', message)
+  }
+
+  incGumpBalance(amount: number) {
+    if (amount !== 0) {
+      const message = amount < 0 ?
+        `Lost ${amount * -1} gump.` :
+        `+ ${amount} gump!`
+
+      this.sendMessage(message)
+    }
+
     this.state.wootgumpBalance += amount
   }
 
-  setSpeed(speed:number) {
+  setSpeed(speed: number) {
     this.state.speed = speed
   }
-  
+
   setState(state: State) {
     this.state.state = state // state state state statey state
     switch (state) {
@@ -133,7 +165,7 @@ class Warrior extends EventEmitter {
     this.setSpeed(0)
   }
 
-  setDestination(x: number, z:number) {
+  setDestination(x: number, z: number) {
     this.state.destination.assign({
       x,
       z,
@@ -190,27 +222,35 @@ class Warrior extends EventEmitter {
   //   this.setItem(available[i].item)
   // }
 
-  setItem(item:InventoryItem) {
-    log('setting item: ', item, ' existing: ', this.state.currentItem)
+  setItem(item: InventoryItem) {
+    log('setting item: ', item, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
     // find it in the inventory
-    const inventoryRecord = this.state.inventory.get(getIdentifier(item))
+    const identifier = getIdentifier(item)
+    log('identifier: ', identifier)
+    const inventoryRecord = this.state.inventory.get(identifier)
+    log('record: ', inventoryRecord?.toJSON())
     if (!inventoryRecord || inventoryRecord.quantity <= 0) {
       console.error('no inventory left for this item, not playing')
       return
     }
     inventoryRecord.quantity -= 1
-    this.currentItem = item
+    this.state.currentItem = new Item(item)
+    this.state.attack = this.currentAttack()
+    this.state.defense = this.currentDefense()
   }
 
   currentItemDetails() {
-    if (!this.currentItem) {
+    if (!this.state.currentItem) {
       return null
     }
-    return items.find((i) => i.address == this.currentItem!.address && i.id == this.currentItem!.id)
+    return items.find((i) => i.address == this.state.currentItem.address && i.id == this.state.currentItem.id)
   }
 
   clearItem() {
-    this.currentItem = undefined
+    this.state.currentItem = undefined
+    this.state.attack = this.currentAttack()
+    this.state.defense = this.currentDefense()
+    this.timeWithoutCard = 0
   }
 }
 

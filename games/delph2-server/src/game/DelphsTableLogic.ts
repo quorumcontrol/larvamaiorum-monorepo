@@ -1,9 +1,11 @@
+import { Client } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
+import { getIdentifier, InventoryItem } from './items';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 
@@ -71,32 +73,44 @@ class DelphsTableLogic {
     this.checkForHarvest()
     this.handleBattles(dt)
     this.handleDeerAttacks(dt)
+    this.handleRecovers(dt)
   }
 
-  addWarrior(sessionId:string, stats:WarriorStats) {
+  addWarrior(client:Client, stats:WarriorStats) {
     console.log('add warrior', stats)
+    const sessionId = client.sessionId
     const position = this.randomPosition()
     const state = new WarriorState({
       ...stats,
       id: sessionId,
       speed: 0,
       wootgumpBalance: stats.initialGump,
-      currentHealth: stats.initialHealth
+      currentHealth: stats.initialHealth,
     })
-    console.log("state: ", state.toJSON())
     state.position.assign(position)
     state.destination.assign(position)
-    this.warriors[sessionId] = new Warrior(state)
+    Object.keys(stats.initialInventory).forEach((key) => {
+      const initialInventory = stats.initialInventory[key]
+      state.initialInventory.set(key, new InventoryOfItem({quantity: initialInventory.quantity, item: new Item(initialInventory.item)}))
+      state.inventory.set(key, new InventoryOfItem({quantity: initialInventory.quantity, item: new Item(initialInventory.item)}))
+    })
+    console.log('warrior: ', state.toJSON())
+    this.warriors[sessionId] = new Warrior(client, state)
     this.state.warriors.set(sessionId, state)
   }
 
-  removeWarrior(sessionId:string) {
+  removeWarrior(client:Client) {
+    const sessionId = client.sessionId
     delete this.warriors[sessionId]
     this.state.warriors.delete(sessionId)
   }
 
   updateDestination(sessionId:string, {x, z}: {x:number,z:number}) {
     this.warriors[sessionId].setDestination(x, z)
+  }
+
+  playCard(sessionId:string, item: InventoryItem) {
+    this.warriors[sessionId]?.setItem(item)
   }
 
   spawnOneGump(position: {x:number, z:number}) {
@@ -174,6 +188,14 @@ class DelphsTableLogic {
           delete this.battles[w.id]
         })
         this.state.battles.delete(battle.id)
+      }
+    })
+  }
+
+  handleRecovers(_dt:number) {
+    Object.values(this.warriors).forEach((w) => {
+      if (w.state.state === State.move) {
+        w.recover(0.005)
       }
     })
   }

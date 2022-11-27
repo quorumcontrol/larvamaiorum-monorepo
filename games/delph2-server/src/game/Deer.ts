@@ -48,7 +48,17 @@ class Deer extends EventEmitter {
     // if we're chasing, get distracted by gump.
     if (this.state.state === State.chasing) {
       const gump = this.nearbyGump()
-      if (gump && randomInt(1000) < 5) {
+
+      // if the player has played a card while chasing, then start ignoring them.
+      if (this.chasing!.state.currentItem) {
+        this.stopChasing()
+        const gumpOrRandom = gump || this.randomGump()
+        if (gumpOrRandom) {
+          this.setDestination(gumpOrRandom.x, gumpOrRandom.y)
+        }
+      }
+
+      if (gump && randomInt(1000) < 10) {
         console.log('stopping chasing to go after gump')
         this.stopChasing()
         this.setDestination(gump.x, gump.y)
@@ -72,8 +82,9 @@ class Deer extends EventEmitter {
     }
     // if we're going after a gump, go after warriors that smell good
     const nearbyWarrior = this.nearbyLoadedUpWarrior()
-    if (nearbyWarrior && nearbyWarrior !== this.lastChased && randomInt(100) < 20) {
+    if (nearbyWarrior && nearbyWarrior !== this.lastChased && randomInt(100) < 5) {
       console.log('nearby warrior: ', nearbyWarrior.state.name)
+      nearbyWarrior.sendMessage("A reindeer is after you.")
       this.chasing = nearbyWarrior
       this.setDestination(nearbyWarrior.position.x, nearbyWarrior.position.y)
       this.setState(State.chasing)
@@ -110,7 +121,9 @@ class Deer extends EventEmitter {
 
   private nearbyLoadedUpWarrior():Warrior|undefined {
     return Object.values(this.warriors).find((warrior) => {
-      return warrior.state.wootgumpBalance > 10 && this.position.distance(warrior.position) < 6
+      return warrior.state.wootgumpBalance > 10 &&
+        this.position.distance(warrior.position) < 6 &&
+          !warrior.state.currentItem
     })
   }
 
@@ -139,7 +152,7 @@ class Deer extends EventEmitter {
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
     if (this.state.state === State.chasing && dist > 0.5) {
-      this.setSpeed(4.25)
+      this.setSpeed(4.15)
       return
     }
     if (dist > 2) {
