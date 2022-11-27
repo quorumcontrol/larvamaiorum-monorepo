@@ -13,7 +13,7 @@ type InventoryIdentifier = string
 
 export type Inventory = Record<InventoryIdentifier, {quantity: number, item: InventoryItem}>
 
-const zeroAddr = '0x0000000000000000000000000000000000000000'
+export const zeroAddr = '0x0000000000000000000000000000000000000000'
 
 export interface ItemDescription {
   identifier: InventoryIdentifier

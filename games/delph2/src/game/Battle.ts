@@ -1,4 +1,4 @@
-import { Entity, Application } from 'playcanvas'
+import { Entity, Application, SoundComponent } from 'playcanvas'
 import WarriorBehavior from '../characters/WarriorBehavior'
 import { State } from '../syncing/schema/DelphsTableState'
 import mustFindByName from '../utils/mustFindByName'
@@ -93,13 +93,26 @@ class Battle {
     }
     this.started = true
     this.setBattling()
-    const effect = mustFindByName(this.app.root, 'BattleEffect').clone()
+    const effect = mustFindByName(this.app.root, 'BattleEffects').clone()
     this.app.root.addChild(effect)
     effect.enabled = true
     effect.setPosition(this.warriors[0].getPosition().add(this.warriors[1].getPosition()).divScalar(2))
-    mustGetScript<any>(effect, 'effekseerEmitter').play()
     this.effect = effect
-    // this.moveToPositions()
+    this.playEffects()
+  }
+
+  private playEffects() {
+    if (!this.effect) {
+      throw new Error('no effect')
+    }
+    const battleSound = mustFindByName(this.effect, "BattleSound").findComponent('sound') as SoundComponent
+    Object.values(battleSound.slots).forEach((slot) => {
+      console.log('play sound', slot.name)
+      slot.play()
+    })
+
+    const emitter = mustFindByName(this.effect, 'BattleEffect')
+    mustGetScript<any>(emitter, 'effekseerEmitter').play()
   }
 
   private setBattling() {

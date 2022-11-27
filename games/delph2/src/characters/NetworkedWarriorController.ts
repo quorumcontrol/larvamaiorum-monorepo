@@ -14,6 +14,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
   anim: AnimComponent
   healthBar: Entity
   warrior: Warrior
+  cardText: Entity
 
   screen: Entity
   camera: Entity
@@ -28,6 +29,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.healthBar = mustFindByName(this.entity, 'HealthBar')
     this.camera = mustFindByName(this.app.root, 'Camera')
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
+    this.cardText = mustFindByName(this.entity, 'CardInPlay')
     this.entity.once('newWarrior', () => {
       const effect = mustFindByName(this.app.root, 'PlayerAppearEffect').clone()
       effect.name = `player-appear-${this.entity.getGuid()}`
@@ -88,6 +90,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
       // console.log("changes: ", changes)
       this.locomotion.setSpeed(player.speed)
       this.setState(player.state)
+      this.cardText.enabled = !!player.currentItem
     }
     player.destination.onChange = () => {
       // console.log("new destination: ", player.destination.toJSON())

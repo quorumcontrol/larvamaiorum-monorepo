@@ -3,13 +3,15 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
 import { Battle, Deer, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
-import Hud from '../game/Hud'
-import { Entity, RaycastResult, Vec3 } from "playcanvas";
+import Hud, { BERSERK_EVT } from '../game/Hud'
+import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
+import { InventoryItem, zeroAddr } from "../game/items";
+import { runInThisContext } from "vm";
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -39,12 +41,13 @@ class NetworkManager extends ScriptTypeBase {
         this.client = new Client("ws://localhost:2567")
       }
     } else {
+      this.user = "Unknown"
       this.client = new Client("ws://localhost:2567")
     }
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
 
-    this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: "bobby" });
+    this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: this.user });
     this.room.state.warriors.onAdd = (player, key) => {
       this.handlePlayerAdd(player, key)
     }
@@ -70,9 +73,19 @@ class NetworkManager extends ScriptTypeBase {
     this.room.state.deer.onAdd = (deer, key) => {
       this.handleDeerAdd(deer, key)
     }
+
+    this.room.onMessage('mainHUDMessage', (message:string) => {
+      this.app.fire('mainHUDMessage', message)
+    })
+
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
+    this.app.on(BERSERK_EVT, () => {
+      const item:InventoryItem = {id: 2, address: zeroAddr}
+      this.room?.send('playCard', item)
+    })
+
   }
 
   handleDeerAdd(deer:Deer, key: string) {
@@ -86,11 +99,12 @@ class NetworkManager extends ScriptTypeBase {
 
   handleBattleAdd(battle:Battle, key:string) {
     console.log('new battle: ', battle.toJSON())
-    const effect = mustFindByName(this.app.root, 'BattleEffect').clone()
+    const effect = mustFindByName(this.app.root, 'BattleEffects').clone()
     effect.name = `battle-effect-${key}`
     this.app.root.addChild(effect)
     effect.enabled = true
-    mustGetScript<any>(effect, 'effekseerEmitter').play()
+    this.playEffects(effect)
+
     const warriors = battle.warriorIds.map((id) => {
       return this.warriors[id]
     })
@@ -101,9 +115,24 @@ class NetworkManager extends ScriptTypeBase {
     })
   }
 
+  private playEffects(effects:Entity) {
+    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
+    Object.values(battleSound.slots).forEach((slot) => {
+      slot.play()
+    })
+
+    const emitter = mustFindByName(effects, 'BattleEffect')
+    mustGetScript<any>(emitter, 'effekseerEmitter').play()
+  }
+
   handleBattleRemove(key:string) {
+    const effects = mustFindByName(this.app.root, `battle-effect-${key}`)
     console.log('battle over', key)
-    mustFindByName(this.app.root, `battle-effect-${key}`).destroy()
+    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
+    Object.values(battleSound.slots).forEach((slot) => {
+      slot.stop()
+    })
+    effects.destroy()
   }
 
   handleGumpAdd(gumpLocation: Vec2, key: string) {
