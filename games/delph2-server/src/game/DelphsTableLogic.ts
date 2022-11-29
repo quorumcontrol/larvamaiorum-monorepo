@@ -1,11 +1,12 @@
 import { Client } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Music } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
-import { getIdentifier, InventoryItem } from './items';
+import { InventoryItem } from './items';
+import { getRandomTrack } from './music';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 
@@ -22,6 +23,8 @@ class DelphsTableLogic {
   deer: Record<string, Deer>
   battles: BattleList
   deerAttacks: Record<string, DeerAttackLogic>
+
+  timeSinceMusic = 0
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
@@ -54,6 +57,18 @@ class DelphsTableLogic {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
     }
+    this.setupMusic()
+  }
+
+  async setupMusic() {
+    const track = await getRandomTrack()
+    console.log('updating track to: ', track.title)
+    this.state.nowPlaying.assign({
+      name: track.title,
+      duration: track.duration,
+      url: track.url,
+    })
+    this.timeSinceMusic = 0
   }
 
   stop() {
@@ -74,6 +89,11 @@ class DelphsTableLogic {
     this.handleBattles(dt)
     this.handleDeerAttacks(dt)
     this.handleRecovers(dt)
+    this.timeSinceMusic += dt
+    if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
+      this.timeSinceMusic = 0
+      this.setupMusic()
+    }
   }
 
   addWarrior(client:Client, stats:WarriorStats) {

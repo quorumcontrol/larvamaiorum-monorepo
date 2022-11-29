@@ -12,6 +12,7 @@ import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import { InventoryItem, zeroAddr } from "../game/items";
 import { runInThisContext } from "vm";
+import MusicHandler from "../game/MusicHandler";
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -26,11 +27,13 @@ class NetworkManager extends ScriptTypeBase {
   warriors:Record<string, Entity>
   deer:Record<string, Entity>
   client: Client
+  musicScript:MusicHandler
 
   async initialize() {
     this.warriors = {}
     this.deer = {}
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
+    this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     if (typeof document !== 'undefined') {
       const params = new URLSearchParams(document.location.search);
       const userName = params.get('name')!
@@ -50,6 +53,12 @@ class NetworkManager extends ScriptTypeBase {
     this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: this.user });
     this.room.state.warriors.onAdd = (player, key) => {
       this.handlePlayerAdd(player, key)
+    }
+
+    this.room.state.nowPlaying.onChange = () => {
+      const el = mustFindByName(this.app.root, 'Music')
+      const script = mustGetScript<MusicHandler>(el, 'musicHandler')
+      script.setMusic(this.room!.state.nowPlaying)
     }
 
     this.room.state.warriors.onRemove = (player, key) => {
@@ -80,6 +89,7 @@ class NetworkManager extends ScriptTypeBase {
 
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
+      this.musicScript.start()
     })
     this.app.on(BERSERK_EVT, () => {
       const item:InventoryItem = {id: 2, address: zeroAddr}

@@ -17,15 +17,21 @@ class DelphsTable extends colyseus_1.Room {
             console.log(client.sessionId, 'updateDestination', destination);
             this.game.updateDestination(client.sessionId, destination);
         });
+        this.onMessage("playCard", (client, card) => {
+            this.game.playCard(client.sessionId, card);
+        });
     }
-    onJoin(client, options) {
+    onJoin(client, { name }) {
         console.log(client.sessionId, "joined!");
-        const random = (0, Warrior_1.generateFakeWarriors)(1, client.sessionId);
-        this.game.addWarrior(client.sessionId, random[0]);
+        const random = (0, Warrior_1.generateFakeWarriors)(1, client.sessionId)[0];
+        if (name) {
+            random.name = name;
+        }
+        this.game.addWarrior(client, random);
     }
     onLeave(client, consented) {
         //TODO: handle constented
-        this.game.removeWarrior(client.sessionId);
+        this.game.removeWarrior(client);
     }
     onDispose() {
         console.log("room", this.roomId, "disposing...");

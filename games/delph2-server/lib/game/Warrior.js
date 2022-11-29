@@ -28,12 +28,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateFakeWarriors = void 0;
 const events_1 = __importDefault(require("events"));
-const debug_1 = __importDefault(require("debug"));
 const items_1 = __importStar(require("./items"));
 const randoms_1 = require("./utils/randoms");
 const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const playcanvas_1 = require("playcanvas");
-const log = (0, debug_1.default)('Warrior');
+const log = console.log; //debug('Warrior')
+const berserkIdentifier = '0x0000000000000000000000000000000000000000-2';
 // export interface WarriorState extends WarriorStats {
 //   currentHealth: number;
 //   wootgumpBalance: number;
@@ -48,11 +48,11 @@ function generateFakeWarriors(count, seed) {
         warriors[i] = {
             id: `warrior-${i}-${seed}`,
             name: `Warius ${i}`,
-            attack: (0, randoms_1.deterministicRandom)(1000, `generateFakeWarriors-${i}-attack`, seed),
-            defense: (0, randoms_1.deterministicRandom)(800, `generateFakeWarriors-${i}-defense`, seed),
-            initialHealth: (0, randoms_1.deterministicRandom)(2000, `generateFakeWarriors-${i}-health`, seed),
+            attack: (0, randoms_1.deterministicRandom)(1500, `generateFakeWarriors-${i}-attack`, seed) + 500,
+            defense: (0, randoms_1.deterministicRandom)(500, `generateFakeWarriors-${i}-defense`, seed) + 400,
+            initialHealth: (0, randoms_1.deterministicRandom)(1000, `generateFakeWarriors-${i}-health`, seed) + 1000,
             initialGump: 0,
-            initialInventory: {},
+            initialInventory: items_1.defaultInitialInventory,
             autoPlay: false,
         };
     }
@@ -64,8 +64,10 @@ exports.generateFakeWarriors = generateFakeWarriors;
 // }
 class Warrior extends events_1.default {
     // destination?: Vec3;
-    constructor(state) {
+    constructor(client, state) {
         super();
+        this.timeWithoutCard = 0;
+        this.client = client;
         this.id = state.id;
         this.state = state;
         this.position = new playcanvas_1.Vec2(state.position.x, state.position.z);
@@ -91,8 +93,28 @@ class Warrior extends events_1.default {
                 return;
             }
         }
+        if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
+            this.timeWithoutCard += dt;
+            if (this.timeWithoutCard > 45) {
+                this.spawnBerserk();
+            }
+        }
+    }
+    spawnBerserk() {
+        this.state.inventory.get(berserkIdentifier).quantity += 1;
+        this.sendMessage('New Card!');
+    }
+    sendMessage(message) {
+        console.log('send mainhudmessage', message);
+        this.client.send('mainHUDMessage', message);
     }
     incGumpBalance(amount) {
+        if (amount !== 0) {
+            const message = amount < 0 ?
+                `Lost ${amount * -1} gump.` :
+                `+ ${amount} gump!`;
+            this.sendMessage(message);
+        }
         this.state.wootgumpBalance += amount;
     }
     setSpeed(speed) {
@@ -172,24 +194,33 @@ class Warrior extends events_1.default {
     //   this.setItem(available[i].item)
     // }
     setItem(item) {
-        log('setting item: ', item, ' existing: ', this.state.currentItem);
+        var _a;
+        log('setting item: ', item, ' existing: ', (_a = this.state.currentItem) === null || _a === void 0 ? void 0 : _a.toJSON(), 'inventory', this.state.inventory.toJSON());
         // find it in the inventory
-        const inventoryRecord = this.state.inventory.get((0, items_1.getIdentifier)(item));
+        const identifier = (0, items_1.getIdentifier)(item);
+        log('identifier: ', identifier);
+        const inventoryRecord = this.state.inventory.get(identifier);
+        log('record: ', inventoryRecord === null || inventoryRecord === void 0 ? void 0 : inventoryRecord.toJSON());
         if (!inventoryRecord || inventoryRecord.quantity <= 0) {
             console.error('no inventory left for this item, not playing');
             return;
         }
         inventoryRecord.quantity -= 1;
-        this.currentItem = item;
+        this.state.currentItem = new DelphsTableState_1.Item(item);
+        this.state.attack = this.currentAttack();
+        this.state.defense = this.currentDefense();
     }
     currentItemDetails() {
-        if (!this.currentItem) {
+        if (!this.state.currentItem) {
             return null;
         }
-        return items_1.default.find((i) => i.address == this.currentItem.address && i.id == this.currentItem.id);
+        return items_1.default.find((i) => i.address == this.state.currentItem.address && i.id == this.state.currentItem.id);
     }
     clearItem() {
-        this.currentItem = undefined;
+        this.state.currentItem = undefined;
+        this.state.attack = this.currentAttack();
+        this.state.defense = this.currentDefense();
+        this.timeWithoutCard = 0;
     }
 }
 exports.default = Warrior;

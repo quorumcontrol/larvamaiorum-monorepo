@@ -48,10 +48,13 @@ class BattleLogic {
             }
         }
         warriors.forEach((warrior, i) => {
+            warrior.clearItem();
             if (warrior.isAlive()) {
+                warrior.sendMessage("Winner!");
                 warrior.setState(DelphsTableState_1.State.move);
             }
             else {
+                warrior.sendMessage('You lose.');
                 const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5);
                 warrior.incGumpBalance(gumpTaken * -1);
                 warriors[(i + 1) % warriors.length].incGumpBalance(gumpTaken);
@@ -72,6 +75,7 @@ class BattleLogic {
     setBattling() {
         this.warriors.forEach((w, i) => {
             w.setState(DelphsTableState_1.State.battle);
+            w.sendMessage('Battle!');
         });
     }
 }

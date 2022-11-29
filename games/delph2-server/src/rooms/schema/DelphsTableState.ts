@@ -10,6 +10,13 @@ export enum State {
   deerAttack,
 }
 
+export class Music extends Schema {
+  @type("string") name:string
+  @type("string") description?:string
+  @type("string") url:string
+  @type("number") duration:number
+}
+
 export class Vec2 extends Schema {
   @type("number") x: number = 0;
   @type("number") z: number = 0;
@@ -73,4 +80,5 @@ export class DelphsTableState extends Schema {
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({});
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({});
   @type({ map: Deer }) deer = new MapSchema<Deer>({});
+  @type(Music) nowPlaying = new Music({})
 }

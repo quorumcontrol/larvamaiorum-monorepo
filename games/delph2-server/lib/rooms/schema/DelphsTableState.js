@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.State = void 0;
+exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.Music = exports.State = void 0;
 const schema_1 = require("@colyseus/schema");
 var State;
 (function (State) {
@@ -18,6 +18,21 @@ var State;
     State[State["chasing"] = 5] = "chasing";
     State[State["deerAttack"] = 6] = "deerAttack";
 })(State = exports.State || (exports.State = {}));
+class Music extends schema_1.Schema {
+}
+__decorate([
+    (0, schema_1.type)("string")
+], Music.prototype, "name", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Music.prototype, "description", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Music.prototype, "url", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Music.prototype, "duration", void 0);
+exports.Music = Music;
 class Vec2 extends schema_1.Schema {
     constructor() {
         super(...arguments);
@@ -38,14 +53,10 @@ __decorate([
     (0, schema_1.type)("string")
 ], Item.prototype, "address", void 0);
 __decorate([
-    (0, schema_1.type)("string")
+    (0, schema_1.type)("number")
 ], Item.prototype, "id", void 0);
 exports.Item = Item;
 class InventoryOfItem extends schema_1.Schema {
-    constructor() {
-        super(...arguments);
-        this.quantity = 0;
-    }
 }
 __decorate([
     (0, schema_1.type)(Item)
@@ -176,6 +187,7 @@ class DelphsTableState extends schema_1.Schema {
         this.wootgump = new schema_1.MapSchema({});
         this.trees = new schema_1.MapSchema({});
         this.deer = new schema_1.MapSchema({});
+        this.nowPlaying = new Music({});
     }
 }
 __decorate([
@@ -202,4 +214,7 @@ __decorate([
 __decorate([
     (0, schema_1.type)({ map: Deer })
 ], DelphsTableState.prototype, "deer", void 0);
+__decorate([
+    (0, schema_1.type)(Music)
+], DelphsTableState.prototype, "nowPlaying", void 0);
 exports.DelphsTableState = DelphsTableState;

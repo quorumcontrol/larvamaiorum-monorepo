@@ -40,7 +40,7 @@ exports.itemsByIdentifier = items.reduce((memo, item) => {
 }, {});
 exports.defaultInitialInventory = {
     [items[1].identifier]: { quantity: 1, item: { address: items[1].address, id: items[1].id } },
-    [items[2].identifier]: { quantity: 1, item: { address: items[2].address, id: items[2].id } }
+    // [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
 };
 function itemFromInventoryItem(inventoryItem) {
     const identifier = getIdentifier(inventoryItem);

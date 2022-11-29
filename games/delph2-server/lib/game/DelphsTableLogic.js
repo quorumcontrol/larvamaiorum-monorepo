@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,12 +18,14 @@ const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const BattleLogic_1 = __importDefault(require("./BattleLogic"));
 const Deer_1 = __importDefault(require("./Deer"));
 const DeerAttackLogic_1 = __importDefault(require("./DeerAttackLogic"));
+const music_1 = require("./music");
 const randoms_1 = require("./utils/randoms");
 const Warrior_1 = __importDefault(require("./Warrior"));
 class DelphsTableLogic {
     // for now assume a blank table at construction
     // TODO: handle a populated state with existing warriors, etc
     constructor(state) {
+        this.timeSinceMusic = 0;
         this.state = state;
         this.warriors = {};
         this.wootgump = {};
@@ -42,6 +53,19 @@ class DelphsTableLogic {
             const position = this.randomPosition();
             this.spawnDeer(new playcanvas_1.Vec2(position.x, position.z));
         }
+        this.setupMusic();
+    }
+    setupMusic() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const track = yield (0, music_1.getRandomTrack)();
+            console.log('updating track to: ', track.title);
+            this.state.nowPlaying.assign({
+                name: track.title,
+                duration: track.duration,
+                url: track.url,
+            });
+            this.timeSinceMusic = 0;
+        });
     }
     stop() {
         if (this.intervalHandle) {
@@ -59,23 +83,40 @@ class DelphsTableLogic {
         this.checkForHarvest();
         this.handleBattles(dt);
         this.handleDeerAttacks(dt);
+        this.handleRecovers(dt);
+        this.timeSinceMusic += dt;
+        if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
+            this.timeSinceMusic = 0;
+            this.setupMusic();
+        }
     }
-    addWarrior(sessionId, stats) {
+    addWarrior(client, stats) {
         console.log('add warrior', stats);
+        const sessionId = client.sessionId;
         const position = this.randomPosition();
         const state = new DelphsTableState_1.Warrior(Object.assign(Object.assign({}, stats), { id: sessionId, speed: 0, wootgumpBalance: stats.initialGump, currentHealth: stats.initialHealth }));
-        console.log("state: ", state.toJSON());
         state.position.assign(position);
         state.destination.assign(position);
-        this.warriors[sessionId] = new Warrior_1.default(state);
+        Object.keys(stats.initialInventory).forEach((key) => {
+            const initialInventory = stats.initialInventory[key];
+            state.initialInventory.set(key, new DelphsTableState_1.InventoryOfItem({ quantity: initialInventory.quantity, item: new DelphsTableState_1.Item(initialInventory.item) }));
+            state.inventory.set(key, new DelphsTableState_1.InventoryOfItem({ quantity: initialInventory.quantity, item: new DelphsTableState_1.Item(initialInventory.item) }));
+        });
+        console.log('warrior: ', state.toJSON());
+        this.warriors[sessionId] = new Warrior_1.default(client, state);
         this.state.warriors.set(sessionId, state);
     }
-    removeWarrior(sessionId) {
+    removeWarrior(client) {
+        const sessionId = client.sessionId;
         delete this.warriors[sessionId];
         this.state.warriors.delete(sessionId);
     }
     updateDestination(sessionId, { x, z }) {
         this.warriors[sessionId].setDestination(x, z);
+    }
+    playCard(sessionId, item) {
+        var _a;
+        (_a = this.warriors[sessionId]) === null || _a === void 0 ? void 0 : _a.setItem(item);
     }
     spawnOneGump(position) {
         const id = (0, crypto_1.randomUUID)();
@@ -148,6 +189,13 @@ class DelphsTableLogic {
             }
         });
     }
+    handleRecovers(_dt) {
+        Object.values(this.warriors).forEach((w) => {
+            if (w.state.state === DelphsTableState_1.State.move) {
+                w.recover(0.005);
+            }
+        });
+    }
     handleDeerAttacks(dt) {
         const eligibleDeer = Object.values(this.deer).filter((d) => [DelphsTableState_1.State.move, DelphsTableState_1.State.chasing].includes(d.state.state));
         const eligibleWarriors = Object.values(this.warriors).filter((w) => w.state.state === DelphsTableState_1.State.move);
@@ -189,13 +237,24 @@ class DelphsTableLogic {
             if ((0, randoms_1.randomInt)(100) <= 5) {
                 const xDiff = (0, randoms_1.randomBounded)(6);
                 const zDiff = (0, randoms_1.randomBounded)(6);
-                this.spawnOneGump({ x: gump.x + xDiff, z: gump.y + zDiff });
+                const x = this.positionModulo(gump.x + xDiff);
+                const z = this.positionModulo(gump.y + zDiff);
+                this.spawnOneGump({ x, z });
             }
         });
         // now let's see if we get a new area too
         if ((0, randoms_1.randomInt)(100) <= 10) {
             this.spawnOneGump(this.randomPosition());
         }
+    }
+    positionModulo(dimension) {
+        if (dimension < 0 && dimension < 37) {
+            return 36;
+        }
+        if (dimension > 37) {
+            return dimension % 35;
+        }
+        return dimension;
     }
     spawnTree(position) {
         const id = (0, crypto_1.randomUUID)();
@@ -215,8 +274,8 @@ class DelphsTableLogic {
     }
     randomPosition() {
         return {
-            x: (0, randoms_1.randomBounded)(38),
-            z: (0, randoms_1.randomBounded)(38),
+            x: (0, randoms_1.randomBounded)(37),
+            z: (0, randoms_1.randomBounded)(37),
         };
     }
 }
