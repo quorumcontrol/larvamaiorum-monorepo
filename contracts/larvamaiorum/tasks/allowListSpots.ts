@@ -1,5 +1,11 @@
 import { task } from 'hardhat/config'
-import { getAllowListSpot } from './helpers'
+import { getAllowListSpot, getLarvaMaiorum } from './helpers'
+
+task('howmany')
+  .setAction(async (_, hre) => {
+    const masks = await getLarvaMaiorum(hre)
+    console.log((await masks.totalSupply()).toNumber())
+  })
 
 task('add-presale-supply')
   .addParam('amount', 'the amount of spots to add')
@@ -26,6 +32,6 @@ task('get-buyers')
     const evts = await allowListSetter.queryFilter(filter)
     console.log("count: ", evts.length)
     evts.forEach((evt) => {
-      console.log(evt.args.account)
+      console.log(evt.blockNumber, evt.args.account)
     })
   })
