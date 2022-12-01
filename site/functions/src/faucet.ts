@@ -22,10 +22,12 @@ const singletonQueue = new SingletonQueue("faucet")
 const subFaucet = memoize(async (faucetKey: string) => {
   const mainFaucet = new Wallet(faucetKey).connect(skaleProvider)
   const subFaucet = Wallet.createRandom().connect(skaleProvider)
-  await mainFaucet.sendTransaction({
+  const tx = await mainFaucet.sendTransaction({
     to: subFaucet.address,
     value: highWaterForSFuel.mul(100),
   })
+  await tx.wait()
+  functions.logger.info('funded the sub faucet', tx.hash)
 
   return new NonceManager(subFaucet)
 })
