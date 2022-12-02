@@ -27,7 +27,7 @@ const subFaucet = memoize(async (faucetKey: string) => {
     value: highWaterForSFuel.mul(100),
   })
   await tx.wait()
-  functions.logger.info('funded the sub faucet', tx.hash)
+  functions.logger.info("funded the sub faucet", tx.hash)
 
   return new NonceManager(subFaucet)
 })

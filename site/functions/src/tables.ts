@@ -1,9 +1,8 @@
 import { randomUUID } from "crypto";
-import "./app";
+import { appFunctions, db } from "./app"
 import { BigNumber, BigNumberish, utils } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import * as functions from "firebase-functions";
-import { appFunctions, db } from "./app"
 import testnetBots from "../../contracts/bots-testnet"
 import mainnetBots from "../../contracts/bots-mainnet"
 import { isTestnet } from "../../src/utils/networks"

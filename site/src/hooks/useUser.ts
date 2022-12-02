@@ -58,8 +58,11 @@ export const useLogin = () => {
       const setUserNameAndOrTeam = async () => {
         if (username && team) {
           console.log('setting username and team: ', username, team)
+
+          const teamSet = await playerContract().populateTransaction.setTeam(team, {gasLimit: 200_000})
+          console.log("team set, tx")
           const userNameSet = await playerContract().populateTransaction.setUsername(username)
-          const teamSet = await playerContract().populateTransaction.setTeam(team)
+          console.log("username set, tx")
           const tx = await relayer.multisend([userNameSet, teamSet])
           console.log("username and team set tx: ", tx.hash)
           return tx.wait()
@@ -83,6 +86,7 @@ export const useLogin = () => {
           console.log("no need for faucet")
           return
         }
+        console.log("getting tokens from faucet")
         const resp = await faucet({
           userAddress: relayer.address!,
           relayerAddress: relayer.deviceWallet?.address!,
@@ -113,6 +117,7 @@ export const useLogin = () => {
         }
       }
 
+      await maybeGetFaucet()
       await setUserNameAndOrTeam()
 
       console.log('------------- firebase')
@@ -124,7 +129,6 @@ export const useLogin = () => {
       })
       console.log('resp: ', resp.data)
       await signInWithCustomToken(auth, (resp.data as any).firebaseToken)
-      maybeGetFaucet()
       setLoggedIn(true)
     } catch (err) {
       console.error('error login', err)
