@@ -24,4 +24,8 @@ describe("Player", function () {
     expect(await player.name(alice.address)).to.eq('alice')
   });
 
+  it.only('sets team', async () => {
+    await expect(player.setTeam(13)).to.not.be.reverted
+  })
+
 });
