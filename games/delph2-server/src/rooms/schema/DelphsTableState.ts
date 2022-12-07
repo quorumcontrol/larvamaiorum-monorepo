@@ -15,6 +15,7 @@ export class Music extends Schema {
   @type("string") description?:string
   @type("string") url:string
   @type("number") duration:number
+  @type("number") startedAt:number
 }
 
 export class Vec2 extends Schema {

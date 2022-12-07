@@ -21,6 +21,9 @@ export class DelphsTable extends Room<DelphsTableState> {
     this.onMessage("playCard", (client, card:InventoryItem) => {
       this.game.playCard(client.sessionId, card)
     })
+    this.onMessage("getLatency", (client) => {
+      client.send(new Date().getTime())
+    })
   }
 
   onJoin (client: Client, {name}: any) {

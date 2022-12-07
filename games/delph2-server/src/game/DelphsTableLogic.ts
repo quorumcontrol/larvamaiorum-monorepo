@@ -1,7 +1,7 @@
 import { Client } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Music } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
@@ -66,7 +66,8 @@ class DelphsTableLogic {
     this.state.nowPlaying.assign({
       name: track.title,
       duration: track.duration,
-      url: track.url,
+      url: track.streaming,
+      startedAt: new Date().getTime()
     })
     this.timeSinceMusic = 0
   }
