@@ -1,5 +1,4 @@
 import { sdk } from "@audius/sdk"
-import { randomInt } from "crypto"
 
 // export type ThenArg<T> = T extends PromiseLike<infer U> ? U : T
 
@@ -15,7 +14,7 @@ export interface Playable {
 }
 
 export const undergroundTracks = async ():Promise<Playable[]> => {
-  const tracks = await audiusSdk.tracks.getUndergroundTrendingTracks({limit: 50})
+  const tracks = await audiusSdk.tracks.getUndergroundTrendingTracks({limit: 25})
   return Promise.all(tracks.filter((t) => t.is_streamable).map(async (track) => {
     const streaming = await audiusSdk.tracks.streamTrack({trackId: track.id })
     return {
