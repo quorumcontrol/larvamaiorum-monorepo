@@ -15,6 +15,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@audius/sdk": "^1.0.24",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0"
   },
