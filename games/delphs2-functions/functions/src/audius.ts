@@ -1,8 +1,9 @@
 import { sdk } from "@audius/sdk"
+import { memoize } from "./utils/memoize";
 
-// export type ThenArg<T> = T extends PromiseLike<infer U> ? U : T
-
-const audiusSdk = sdk({ appName: "Crypto Colosseum: Delphs Table", ethWeb3Config: (undefined as any) })
+const audiusSdk = memoize(() => {
+  return sdk({ appName: "Crypto Colosseum: Delphs Table", ethWeb3Config: (undefined as any) })
+})
 
 export interface Playable {
   title: string
@@ -14,16 +15,16 @@ export interface Playable {
 }
 
 export const undergroundTracks = async ():Promise<Playable[]> => {
-  const tracks = await audiusSdk.tracks.getUndergroundTrendingTracks({limit: 25})
+  const tracks = await audiusSdk().tracks.getUndergroundTrendingTracks({limit: 25})
   return Promise.all(tracks.filter((t) => t.is_streamable).map(async (track) => {
-    const streaming = await audiusSdk.tracks.streamTrack({trackId: track.id })
+    const streaming = await audiusSdk().tracks.streamTrack({trackId: track.id })
     return {
       title: track.title,
       duration: track.duration,
       streaming,
 
       description: track.description,
-      artworok: track.artwork?._480x480,
+      artwork: track.artwork?._480x480,
     }
   }))
 }
