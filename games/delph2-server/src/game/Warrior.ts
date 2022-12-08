@@ -118,11 +118,13 @@ class Warrior extends EventEmitter {
 
   incGumpBalance(amount: number) {
     if (amount !== 0) {
-      const message = amount < 0 ?
-        `Lost ${amount * -1} gump.` :
-        `+ ${amount} gump!`
+      this.client.send('gumpDiff', amount)
 
-      this.sendMessage(message)
+      // const message = amount < 0 ?
+      //   `Lost ${amount * -1} gump.` :
+      //   `+ ${amount} gump!`
+
+      // this.sendMessage(message)
     }
 
     this.state.wootgumpBalance += amount

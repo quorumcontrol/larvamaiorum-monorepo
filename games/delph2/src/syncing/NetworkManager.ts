@@ -28,6 +28,7 @@ class NetworkManager extends ScriptTypeBase {
   client: Client
   musicScript:MusicHandler
   hudScript:Hud
+  gumpSounds:SoundComponent
 
   async initialize() {
     this.warriors = {}
@@ -35,6 +36,7 @@ class NetworkManager extends ScriptTypeBase {
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
     this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
+    this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
 
     if (typeof document !== 'undefined') {
       const params = new URLSearchParams(document.location.search);
@@ -87,6 +89,21 @@ class NetworkManager extends ScriptTypeBase {
 
     this.room.onMessage('mainHUDMessage', (message:string) => {
       this.app.fire('mainHUDMessage', message)
+    })
+
+    this.room.onMessage('gumpDiff', (amount:number) => {
+        const message = amount < 0 ?
+        `Lost ${amount * -1} gump.` :
+        `+ ${amount} gump!`
+        this.app.fire('mainHUDMessage', message)
+        if (amount > 0) {
+          for (let i = 0; i < Math.min(amount, 20); i++) {
+            setTimeout(() => {
+              this.gumpSounds.slots['Increase'].play()
+            }, i * 100)
+          }
+
+        }
     })
 
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
