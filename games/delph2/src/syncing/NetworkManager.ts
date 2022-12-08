@@ -4,14 +4,13 @@ import { Client, Room } from 'colyseus.js'
 import { Battle, Deer, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud, { BERSERK_EVT } from '../game/Hud'
-import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
+import { Entity, RaycastResult, SoundComponent } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import { InventoryItem, zeroAddr } from "../game/items";
-import { runInThisContext } from "vm";
 import MusicHandler from "../game/MusicHandler";
 
 @createScript("networkManager")
@@ -28,12 +27,15 @@ class NetworkManager extends ScriptTypeBase {
   deer:Record<string, Entity>
   client: Client
   musicScript:MusicHandler
+  hudScript:Hud
 
   async initialize() {
     this.warriors = {}
     this.deer = {}
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
     this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
+    this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
+
     if (typeof document !== 'undefined') {
       const params = new URLSearchParams(document.location.search);
       const userName = params.get('name')!
@@ -47,6 +49,7 @@ class NetworkManager extends ScriptTypeBase {
       this.user = "Unknown"
       this.client = new Client("ws://localhost:2567")
     }
+
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
 
@@ -56,9 +59,8 @@ class NetworkManager extends ScriptTypeBase {
     }
 
     this.room.state.nowPlaying.onChange = () => {
-      const el = mustFindByName(this.app.root, 'Music')
-      const script = mustGetScript<MusicHandler>(el, 'musicHandler')
-      script.setMusic(this.room!.state.nowPlaying)
+      this.musicScript.setMusic(this.room!.state.nowPlaying)
+      this.hudScript.setMusic(this.room!.state.nowPlaying)
     }
 
     this.room.state.warriors.onRemove = (player, key) => {
@@ -146,7 +148,7 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   handleGumpAdd(gumpLocation: Vec2, key: string) {
-    console.log('gump add', key, gumpLocation.toJSON())
+    // console.log('gump add', key, gumpLocation.toJSON())
     const gump = this.gumpTemplate.clone() as Entity
     gump.name = `gump-${key}`
     this.app.root.addChild(gump)
@@ -155,7 +157,7 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   handleTreeAdd(treeLocation: Vec2, key: string) {
-    console.log('tree add', key, treeLocation.toJSON())
+    // console.log('tree add', key, treeLocation.toJSON())
     const tree = this.treeTemplate.clone() as Entity
     tree.name = `tree-${key}`
     this.app.root.addChild(tree)

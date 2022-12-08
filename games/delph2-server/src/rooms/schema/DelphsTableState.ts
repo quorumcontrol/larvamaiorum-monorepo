@@ -12,10 +12,11 @@ export enum State {
 
 export class Music extends Schema {
   @type("string") name:string
-  @type("string") description?:string
   @type("string") url:string
   @type("number") duration:number
   @type("number") startedAt:number
+  @type("string") description?:string
+  @type("string") artwork?:string
 }
 
 export class Vec2 extends Schema {

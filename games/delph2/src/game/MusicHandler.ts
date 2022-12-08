@@ -1,6 +1,8 @@
+import { Entity } from "playcanvas";
 import { Music } from "../syncing/schema/DelphsTableState";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
+import mustFindByName from "../utils/mustFindByName";
 
 @createScript("musicHandler")
 class MusicHandler extends ScriptTypeBase {
@@ -12,6 +14,7 @@ class MusicHandler extends ScriptTypeBase {
     if (!this.existing) {
       return
     }
+    //TODO: make these UI controls
     if (this.app.keyboard.wasPressed(pc.KEY_1)) {
       this.existing.volume = this.existing.volume * 0.9
     }

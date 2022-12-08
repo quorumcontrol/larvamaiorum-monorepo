@@ -66,6 +66,7 @@ class DelphsTableLogic {
     this.state.nowPlaying.assign({
       name: track.title,
       duration: track.duration,
+      artwork: track.artwork,
       url: track.streaming,
       startedAt: new Date().getTime()
     })

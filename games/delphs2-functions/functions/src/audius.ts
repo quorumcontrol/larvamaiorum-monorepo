@@ -24,7 +24,7 @@ export const undergroundTracks = async ():Promise<Playable[]> => {
       streaming,
 
       description: track.description,
-      artwork: track.artwork?._480x480,
+      artwork: track.artwork ? (track.artwork as any)["480x480"] : undefined,
     }
   }))
 }
