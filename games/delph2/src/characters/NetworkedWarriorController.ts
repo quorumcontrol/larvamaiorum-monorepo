@@ -86,6 +86,15 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.warrior = player
     console.log('player set', player.toJSON())
     this.entity.setPosition(player.position.x, 0, player.position.z)
+
+    const torso = mustFindByName(this.entity, 'Torso')
+
+    const newMaterial = torso.render!.meshInstances[0].material.clone()
+    const color = player.color.toArray()
+    ;(newMaterial as any).diffuse.set(color[0], color[1], color[2])
+    newMaterial.update()
+    torso.render!.meshInstances[0].material = newMaterial
+
     player.onChange = (changes) => {
       // console.log("changes: ", changes)
       this.locomotion.setSpeed(player.speed)

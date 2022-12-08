@@ -59,7 +59,11 @@ export class Warrior extends Schema {
   @type({ map: InventoryOfItem }) initialInventory = new MapSchema<InventoryOfItem>({})
   @type({ map: InventoryOfItem }) inventory = new MapSchema<InventoryOfItem>({})
   @type(Item) currentItem:Item
+
   @type("boolean") autoPlay = false
+
+  @type("number") bodyType = 0
+  @type({array: "number"}) color = new ArraySchema<number>();
 }
 
 export class Battle extends Schema {

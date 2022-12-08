@@ -5,6 +5,7 @@ import { deterministicRandom } from "./utils/randoms";
 import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import { Client } from "colyseus";
+import randomColor from "./utils/randomColor";
 
 const log = console.log //debug('Warrior')
 
@@ -53,15 +54,6 @@ export function generateFakeWarriors(count: number, seed: string) {
 
 class Warrior extends EventEmitter {
   id: string;
-  // name: string = "DefaultName";
-  // attack: number = 200;
-  // defense: number = 100;
-  // initialHealth: number = 500;
-  // currentHealth: number = 500;
-  // initialGump: number = 0;
-  // initialInventory: Inventory
-  // inventory: Inventory
-  // autoPlay: boolean;
 
   state: WarriorState
 
@@ -80,6 +72,9 @@ class Warrior extends EventEmitter {
     this.id = state.id
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
+    const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `playerColor-${this.id}`, luminosity: 'light' }).map((c: number) => c / 255);
+    state.color.clear()
+    state.color.push(...color)
   }
 
   update(dt: number) {
