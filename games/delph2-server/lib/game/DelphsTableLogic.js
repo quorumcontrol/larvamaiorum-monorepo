@@ -97,7 +97,7 @@ class DelphsTableLogic {
         console.log('add warrior', stats);
         const sessionId = client.sessionId;
         const position = this.randomPosition();
-        const state = new DelphsTableState_1.Warrior(Object.assign(Object.assign({}, stats), { id: sessionId, speed: 0, wootgumpBalance: stats.initialGump, currentHealth: stats.initialHealth }));
+        const state = new DelphsTableState_1.Warrior(Object.assign(Object.assign({}, stats), { currentAttack: stats.attack, currentDefense: stats.defense, id: sessionId, speed: 0, wootgumpBalance: stats.initialGump, currentHealth: stats.initialHealth }));
         state.position.assign(position);
         state.destination.assign(position);
         Object.keys(stats.initialInventory).forEach((key) => {
@@ -166,7 +166,7 @@ class DelphsTableLogic {
                     return;
                 }
                 const distance = w.position.distance(new playcanvas_1.Vec2(trap.position.x, trap.position.z));
-                if (distance < 0.5) {
+                if (distance < 0.9) {
                     console.log(w.state.name, 'trapped');
                     w.state.assign({
                         currentHealth: w.state.currentHealth * 0.5

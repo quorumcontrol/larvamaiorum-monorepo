@@ -105,6 +105,8 @@ class DelphsTableLogic {
     const position = this.randomPosition()
     const state = new WarriorState({
       ...stats,
+      currentAttack: stats.attack,
+      currentDefense: stats.defense,
       id: sessionId,
       speed: 0,
       wootgumpBalance: stats.initialGump,
@@ -185,7 +187,7 @@ class DelphsTableLogic {
           return
         }
         const distance = w.position.distance(new Vec2(trap.position.x, trap.position.z))
-        if (distance < 0.5) {
+        if (distance < 0.9) {
           console.log(w.state.name, 'trapped')
           w.state.assign({
             currentHealth: w.state.currentHealth * 0.5

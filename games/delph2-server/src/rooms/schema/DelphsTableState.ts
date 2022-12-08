@@ -58,6 +58,8 @@ export class Warrior extends Schema {
   @type("string") name: string
   @type("number") attack:number
   @type("number") defense:number
+  @type("number") currentAttack:number
+  @type("number") currentDefense:number
   @type("number") initialHealth:number
   @type("number") currentHealth:number
   @type("number") initialGump:number

@@ -51,7 +51,7 @@ class Deer extends events_1.default {
                 this.setDestination(gump.x, gump.y);
                 return;
             }
-            if (this.chasing.state.state !== DelphsTableState_1.State.move) {
+            if (!this.chasing || this.chasing.state.state !== DelphsTableState_1.State.move) {
                 this.stopChasing();
                 const gump = this.nearbyGump() || this.randomGump();
                 if (gump) {

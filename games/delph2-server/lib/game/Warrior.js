@@ -208,8 +208,8 @@ class Warrior extends events_1.default {
         }
         inventoryRecord.quantity -= 1;
         this.state.currentItem = new DelphsTableState_1.Item(item);
-        this.state.attack = this.currentAttack();
-        this.state.defense = this.currentDefense();
+        this.state.currentAttack = this.currentAttack();
+        this.state.currentDefense = this.currentDefense();
     }
     currentItemDetails() {
         if (!this.state.currentItem) {
@@ -219,8 +219,8 @@ class Warrior extends events_1.default {
     }
     clearItem() {
         this.state.currentItem = undefined;
-        this.state.attack = this.currentAttack();
-        this.state.defense = this.currentDefense();
+        this.state.currentAttack = this.currentAttack();
+        this.state.currentDefense = this.currentDefense();
         this.timeWithoutCard = 0;
     }
 }

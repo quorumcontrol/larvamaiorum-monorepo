@@ -152,6 +152,12 @@ __decorate([
 ], Warrior.prototype, "defense", void 0);
 __decorate([
     (0, schema_1.type)("number")
+], Warrior.prototype, "currentAttack", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Warrior.prototype, "currentDefense", void 0);
+__decorate([
+    (0, schema_1.type)("number")
 ], Warrior.prototype, "initialHealth", void 0);
 __decorate([
     (0, schema_1.type)("number")

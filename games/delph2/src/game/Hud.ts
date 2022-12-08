@@ -95,7 +95,7 @@ class Hud extends ScriptTypeBase {
     this.berserk.enabled = hasBerserk
 
     this.stats.element!.text = `
-A: ${this.warrior.attack}   D: ${this.warrior.defense}
+A: ${this.warrior.currentAttack}   D: ${this.warrior.currentDefense}
 HP: ${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}
 
 dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})

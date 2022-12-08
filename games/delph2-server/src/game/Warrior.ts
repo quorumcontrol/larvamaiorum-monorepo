@@ -226,8 +226,8 @@ class Warrior extends EventEmitter {
     }
     inventoryRecord.quantity -= 1
     this.state.currentItem = new Item(item)
-    this.state.attack = this.currentAttack()
-    this.state.defense = this.currentDefense()
+    this.state.currentAttack = this.currentAttack()
+    this.state.currentDefense = this.currentDefense()
   }
 
   currentItemDetails() {
@@ -239,8 +239,8 @@ class Warrior extends EventEmitter {
 
   clearItem() {
     this.state.currentItem = undefined
-    this.state.attack = this.currentAttack()
-    this.state.defense = this.currentDefense()
+    this.state.currentAttack = this.currentAttack()
+    this.state.currentDefense = this.currentDefense()
     this.timeWithoutCard = 0
   }
 }
