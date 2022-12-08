@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.Music = exports.State = void 0;
+exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.Trap = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.Music = exports.State = void 0;
 const schema_1 = require("@colyseus/schema");
 var State;
 (function (State) {
@@ -25,13 +25,19 @@ __decorate([
 ], Music.prototype, "name", void 0);
 __decorate([
     (0, schema_1.type)("string")
-], Music.prototype, "description", void 0);
-__decorate([
-    (0, schema_1.type)("string")
 ], Music.prototype, "url", void 0);
 __decorate([
     (0, schema_1.type)("number")
 ], Music.prototype, "duration", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Music.prototype, "startedAt", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Music.prototype, "description", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Music.prototype, "artwork", void 0);
 exports.Music = Music;
 class Vec2 extends schema_1.Schema {
     constructor() {
@@ -65,6 +71,22 @@ __decorate([
     (0, schema_1.type)("number")
 ], InventoryOfItem.prototype, "quantity", void 0);
 exports.InventoryOfItem = InventoryOfItem;
+class Trap extends schema_1.Schema {
+    constructor() {
+        super(...arguments);
+        this.position = new Vec2();
+    }
+}
+__decorate([
+    (0, schema_1.type)("string")
+], Trap.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)(Vec2)
+], Trap.prototype, "position", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Trap.prototype, "plantedBy", void 0);
+exports.Trap = Trap;
 class Deer extends schema_1.Schema {
     constructor() {
         super(...arguments);
@@ -100,6 +122,8 @@ class Warrior extends schema_1.Schema {
         this.initialInventory = new schema_1.MapSchema({});
         this.inventory = new schema_1.MapSchema({});
         this.autoPlay = false;
+        this.bodyType = 0;
+        this.color = new schema_1.ArraySchema();
     }
 }
 __decorate([
@@ -150,6 +174,12 @@ __decorate([
 __decorate([
     (0, schema_1.type)("boolean")
 ], Warrior.prototype, "autoPlay", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Warrior.prototype, "bodyType", void 0);
+__decorate([
+    (0, schema_1.type)({ array: "number" })
+], Warrior.prototype, "color", void 0);
 exports.Warrior = Warrior;
 class Battle extends schema_1.Schema {
     constructor() {
@@ -187,6 +217,7 @@ class DelphsTableState extends schema_1.Schema {
         this.wootgump = new schema_1.MapSchema({});
         this.trees = new schema_1.MapSchema({});
         this.deer = new schema_1.MapSchema({});
+        this.traps = new schema_1.MapSchema({});
         this.nowPlaying = new Music({});
     }
 }
@@ -214,6 +245,9 @@ __decorate([
 __decorate([
     (0, schema_1.type)({ map: Deer })
 ], DelphsTableState.prototype, "deer", void 0);
+__decorate([
+    (0, schema_1.type)({ map: Trap })
+], DelphsTableState.prototype, "traps", void 0);
 __decorate([
     (0, schema_1.type)(Music)
 ], DelphsTableState.prototype, "nowPlaying", void 0);

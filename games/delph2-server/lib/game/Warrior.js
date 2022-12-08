@@ -32,6 +32,7 @@ const items_1 = __importStar(require("./items"));
 const randoms_1 = require("./utils/randoms");
 const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const playcanvas_1 = require("playcanvas");
+const randomColor_1 = __importDefault(require("./utils/randomColor"));
 const log = console.log; //debug('Warrior')
 const berserkIdentifier = '0x0000000000000000000000000000000000000000-2';
 // export interface WarriorState extends WarriorStats {
@@ -71,6 +72,9 @@ class Warrior extends events_1.default {
         this.id = state.id;
         this.state = state;
         this.position = new playcanvas_1.Vec2(state.position.x, state.position.z);
+        const color = (0, randomColor_1.default)({ format: 'rgbArray', seed: `playerColor-${this.id}`, luminosity: 'light' }).map((c) => c / 255);
+        state.color.clear();
+        state.color.push(...color);
     }
     update(dt) {
         if (this.state.state === DelphsTableState_1.State.move && this.state.speed > 0) {
@@ -110,10 +114,7 @@ class Warrior extends events_1.default {
     }
     incGumpBalance(amount) {
         if (amount !== 0) {
-            const message = amount < 0 ?
-                `Lost ${amount * -1} gump.` :
-                `+ ${amount} gump!`;
-            this.sendMessage(message);
+            this.client.send('gumpDiff', amount);
         }
         this.state.wootgumpBalance += amount;
     }
@@ -136,7 +137,7 @@ class Warrior extends events_1.default {
     }
     setSpeedBasedOnDestination() {
         const dist = this.distanceToDestination();
-        if (dist > 2) {
+        if (dist > 1.5) {
             this.setSpeed(4);
             return;
         }

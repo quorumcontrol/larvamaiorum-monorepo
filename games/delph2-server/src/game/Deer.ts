@@ -65,7 +65,7 @@ class Deer extends EventEmitter {
         return
       }
 
-      if (this.chasing!.state.state !== State.move) {
+      if (!this.chasing || this.chasing.state.state !== State.move) {
         this.stopChasing()
         const gump = this.nearbyGump() || this.randomGump()
         if (gump) {

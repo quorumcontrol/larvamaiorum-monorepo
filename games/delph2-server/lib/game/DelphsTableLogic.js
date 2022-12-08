@@ -62,7 +62,9 @@ class DelphsTableLogic {
             this.state.nowPlaying.assign({
                 name: track.title,
                 duration: track.duration,
-                url: track.url,
+                artwork: track.artwork,
+                url: track.streaming,
+                startedAt: new Date().getTime()
             });
             this.timeSinceMusic = 0;
         });
@@ -79,6 +81,7 @@ class DelphsTableLogic {
         Object.values(this.deer).forEach((d) => {
             d.update(dt);
         });
+        this.checkForTraps();
         this.spawnGump();
         this.checkForHarvest();
         this.handleBattles(dt);
@@ -118,6 +121,19 @@ class DelphsTableLogic {
         var _a;
         (_a = this.warriors[sessionId]) === null || _a === void 0 ? void 0 : _a.setItem(item);
     }
+    setTrap(sessionId) {
+        const warrior = this.warriors[sessionId];
+        if (!warrior) {
+            return;
+        }
+        const id = (0, crypto_1.randomUUID)();
+        const trap = new DelphsTableState_1.Trap({
+            id,
+            plantedBy: sessionId,
+        });
+        trap.position.assign({ x: warrior.position.x, z: warrior.position.y });
+        this.state.traps.set(id, trap);
+    }
     spawnOneGump(position) {
         const id = (0, crypto_1.randomUUID)();
         this.wootgump[id] = new playcanvas_1.Vec2(position.x, position.z);
@@ -141,6 +157,29 @@ class DelphsTableLogic {
                     this.state.wootgump.delete(gumpId);
                 }
             });
+        });
+    }
+    checkForTraps() {
+        Object.values(this.warriors).forEach((w) => {
+            for (const [id, trap] of this.state.traps.entries()) {
+                if (trap.plantedBy === w.id) {
+                    return;
+                }
+                const distance = w.position.distance(new playcanvas_1.Vec2(trap.position.x, trap.position.z));
+                if (distance < 0.5) {
+                    console.log(w.state.name, 'trapped');
+                    w.state.assign({
+                        currentHealth: w.state.currentHealth * 0.5
+                    });
+                    const gumpToLose = Math.floor(w.state.wootgumpBalance * 0.1);
+                    w.incGumpBalance(-1 * gumpToLose);
+                    if (trap.plantedBy && this.warriors[trap.plantedBy]) {
+                        this.warriors[trap.plantedBy].incGumpBalance(gumpToLose);
+                    }
+                    this.state.traps.delete(id);
+                    w.client.send('trapped', id);
+                }
+            }
         });
     }
     handleBattles(dt) {

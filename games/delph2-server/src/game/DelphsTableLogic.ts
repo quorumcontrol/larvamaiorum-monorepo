@@ -1,7 +1,7 @@
 import { Client } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
@@ -86,6 +86,7 @@ class DelphsTableLogic {
     Object.values(this.deer).forEach((d) => {
       d.update(dt)
     })
+    this.checkForTraps()
     this.spawnGump()
     this.checkForHarvest()
     this.handleBattles(dt)
@@ -135,6 +136,20 @@ class DelphsTableLogic {
     this.warriors[sessionId]?.setItem(item)
   }
 
+  setTrap(sessionId:string) {
+    const warrior = this.warriors[sessionId]
+    if (!warrior) {
+      return
+    }
+    const id = randomUUID()
+    const trap = new Trap({
+      id,
+      plantedBy: sessionId,
+    })
+    trap.position.assign({x: warrior.position.x, z: warrior.position.y})
+    this.state.traps.set(id, trap)
+  }
+
   spawnOneGump(position: {x:number, z:number}) {
     const id = randomUUID()
     this.wootgump[id] = new Vec2(position.x, position.z)
@@ -160,6 +175,30 @@ class DelphsTableLogic {
           this.state.wootgump.delete(gumpId)
         }
       })
+    })
+  }
+
+  checkForTraps() {
+    Object.values(this.warriors).forEach((w) => {
+      for (const [id, trap] of this.state.traps.entries()) {
+        if (trap.plantedBy === w.id) {
+          return
+        }
+        const distance = w.position.distance(new Vec2(trap.position.x, trap.position.z))
+        if (distance < 0.5) {
+          console.log(w.state.name, 'trapped')
+          w.state.assign({
+            currentHealth: w.state.currentHealth * 0.5
+          })
+          const gumpToLose = Math.floor(w.state.wootgumpBalance * 0.1)
+          w.incGumpBalance(-1 * gumpToLose)
+          if (trap.plantedBy && this.warriors[trap.plantedBy]) {
+            this.warriors[trap.plantedBy].incGumpBalance(gumpToLose)
+          }
+          this.state.traps.delete(id)
+          w.client.send('trapped', id)
+        }
+      }
     })
   }
 

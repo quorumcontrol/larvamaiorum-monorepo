@@ -1,9 +1,9 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, Deer, DelphsTableState, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, Deer, DelphsTableState, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
-import Hud, { BERSERK_EVT } from '../game/Hud'
+import Hud, { BERSERK_EVT, TRAP_EVT } from '../game/Hud'
 import { Entity, RaycastResult, SoundComponent } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
@@ -21,10 +21,13 @@ class NetworkManager extends ScriptTypeBase {
   gumpTemplate: Entity
   treeTemplate: Entity
   deerTemplate: Entity
+  trapTemplate: Entity
+
   player?: Entity
   playerSessionId?: string
   warriors:Record<string, Entity>
   deer:Record<string, Entity>
+  traps:Record<string, Entity>
   client: Client
   musicScript:MusicHandler
   hudScript:Hud
@@ -33,7 +36,10 @@ class NetworkManager extends ScriptTypeBase {
   async initialize() {
     this.warriors = {}
     this.deer = {}
+    this.traps = {}
+
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
+    this.trapTemplate = mustFindByName(this.app.root, "Trap")
     this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
@@ -45,7 +51,11 @@ class NetworkManager extends ScriptTypeBase {
       if (params.get('arena')) {
         this.client = new Client("wss://zh8smr.colyseus.de")
       } else {
-        this.client = new Client("ws://localhost:2567")
+        if (params.get('unf')) {
+          this.client = new Client('ws://51.15.114.122:2567')
+        } else {
+          this.client = new Client("ws://localhost:2567")
+        }
       }
     } else {
       this.user = "Unknown"
@@ -56,6 +66,14 @@ class NetworkManager extends ScriptTypeBase {
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
 
     this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: this.user });
+    
+    this.room.onError((error) => {
+      console.error("room error", error)
+    })
+    this.room.onLeave((code) => {
+      console.info("room leave", code)
+    })
+
     this.room.state.warriors.onAdd = (player, key) => {
       this.handlePlayerAdd(player, key)
     }
@@ -87,6 +105,13 @@ class NetworkManager extends ScriptTypeBase {
       this.handleDeerAdd(deer, key)
     }
 
+    this.room.state.traps.onAdd = (trap, key) => {
+      this.handleTrapAdd(trap, key)
+    }
+    this.room.state.traps.onRemove = (_trap, key) => {
+      this.handleTrapRemove(key)
+    }
+
     this.room.onMessage('mainHUDMessage', (message:string) => {
       this.app.fire('mainHUDMessage', message)
     })
@@ -110,20 +135,38 @@ class NetworkManager extends ScriptTypeBase {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
       this.musicScript.start()
     })
+
     this.app.on(BERSERK_EVT, () => {
       const item:InventoryItem = {id: 2, address: zeroAddr}
       this.room?.send('playCard', item)
     })
 
+    this.app.on(TRAP_EVT, () => {
+      this.room?.send('setTrap')
+    })
+
   }
 
-  handleDeerAdd(deer:Deer, key: string) {
+  handleDeerAdd(deer:Deer, _key: string) {
     const deerEntity = this.deerTemplate.clone()
     deerEntity.enabled = true
     deerEntity.setPosition(deer.position.x, 0, deer.position.z)
     this.app.root.addChild(deerEntity)
     mustGetScript<DeerLocomotion>(deerEntity, 'deerLocomotion').setDeerState(deer)
     this.deer[deer.id] = deerEntity
+  }
+
+  handleTrapAdd(trap:Trap, _key: string) {
+    const trapEntity = this.trapTemplate.clone()
+    trapEntity.enabled = true
+    trapEntity.setPosition(trap.position.x, 0, trap.position.z)
+    this.app.root.addChild(trapEntity)
+    this.traps[trap.id] = trapEntity
+  }
+
+  handleTrapRemove(key: string) {
+    this.traps[key].destroy()
+    delete this.traps[key]
   }
 
   handleBattleAdd(battle:Battle, key:string) {

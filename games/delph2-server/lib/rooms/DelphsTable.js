@@ -20,6 +20,12 @@ class DelphsTable extends colyseus_1.Room {
         this.onMessage("playCard", (client, card) => {
             this.game.playCard(client.sessionId, card);
         });
+        this.onMessage("setTrap", (client) => {
+            this.game.setTrap(client.sessionId);
+        });
+        this.onMessage("getLatency", (client) => {
+            client.send(new Date().getTime());
+        });
     }
     onJoin(client, { name }) {
         console.log(client.sessionId, "joined!");

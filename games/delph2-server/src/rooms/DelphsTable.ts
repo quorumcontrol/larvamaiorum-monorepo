@@ -1,5 +1,4 @@
 import { Room, Client } from "colyseus";
-import util from 'util'
 import { DelphsTableState } from "./schema/DelphsTableState";
 import DelphsTableLogic from "../game/DelphsTableLogic";
 import { generateFakeWarriors } from "../game/Warrior";
@@ -20,6 +19,9 @@ export class DelphsTable extends Room<DelphsTableState> {
     });
     this.onMessage("playCard", (client, card:InventoryItem) => {
       this.game.playCard(client.sessionId, card)
+    })
+    this.onMessage("setTrap", (client) => {
+      this.game.setTrap(client.sessionId)
     })
     this.onMessage("getLatency", (client) => {
       client.send(new Date().getTime())

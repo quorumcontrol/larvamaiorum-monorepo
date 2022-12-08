@@ -119,12 +119,6 @@ class Warrior extends EventEmitter {
   incGumpBalance(amount: number) {
     if (amount !== 0) {
       this.client.send('gumpDiff', amount)
-
-      // const message = amount < 0 ?
-      //   `Lost ${amount * -1} gump.` :
-      //   `+ ${amount} gump!`
-
-      // this.sendMessage(message)
     }
 
     this.state.wootgumpBalance += amount
@@ -151,7 +145,7 @@ class Warrior extends EventEmitter {
 
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
-    if (dist > 2) {
+    if (dist > 1.5) {
       this.setSpeed(4)
       return
     }

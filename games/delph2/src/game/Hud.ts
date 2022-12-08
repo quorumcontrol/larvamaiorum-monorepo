@@ -5,6 +5,7 @@ import mustFindByName from "../utils/mustFindByName";
 import { Music, Warrior } from '../syncing/schema/DelphsTableState'
 
 export const BERSERK_EVT = 'berserk'
+export const TRAP_EVT = 'setTrap'
 const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
 
 @createScript("hud")
@@ -32,6 +33,12 @@ class Hud extends ScriptTypeBase {
       this.app.fire(BERSERK_EVT)
       this.berserk.enabled = false
     })
+
+    mustFindByName(this.entity, 'SetTrap').element!.on('click', (evt:MouseEvent) => {
+      evt.stopPropagation()
+      this.app.fire(TRAP_EVT)
+    })
+    
     this.app.on('mainHUDMessage', this.handleMessage, this)
   }
 
