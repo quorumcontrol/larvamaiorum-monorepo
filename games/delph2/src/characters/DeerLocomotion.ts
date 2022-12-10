@@ -1,9 +1,9 @@
-import { Entity, Vec3 } from "playcanvas";
+import { Entity, Vec3, SoundComponent } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
-import PlayingField from "../game/PlayingField";
 import { Deer, State } from "../syncing/schema/DelphsTableState";
+import { randomInt } from "../utils/randoms";
 
 export const DEER_ARRIVED_EVT = 'deer:arrived'
 export const DEER_CLOSE_TO_DESTINATION_EVT = 'deerf:closeToDest'
@@ -15,12 +15,14 @@ class DeerLocomotion extends ScriptTypeBase {
   destination: Vec3
   serverPosition: Vec3
   state: State
+  sound: SoundComponent
 
   deer: Entity
 
   initialize() {
     this.deer = mustFindByName(this.entity, "deerModel")
     this.state = State.move
+    this.sound = mustFindByName(this.entity, "Sound").sound!
   }
 
   setSpeed(speed: number) {
@@ -47,6 +49,10 @@ class DeerLocomotion extends ScriptTypeBase {
 
   setState(newState:State) {
     this.deer.anim!.setBoolean('deerAttack', (newState === State.deerAttack))
+
+    if (newState === State.chasing) {
+      this.sound.slots[randomInt(2).toString()].play()
+    }
   }
 
   update(dt: number) {

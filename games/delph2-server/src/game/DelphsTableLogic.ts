@@ -1,4 +1,4 @@
-import { Client } from 'colyseus';
+import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
 import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap } from "../rooms/schema/DelphsTableState";
@@ -7,12 +7,15 @@ import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
 import { InventoryItem } from './items';
 import { getRandomTrack } from './music';
+import QuestLogic from './QuestLogic';
+import iterableToArray from './utils/iterableToArray';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 
 type BattleList = Record<string, BattleLogic> // guid to an existing battle
 
 class DelphsTableLogic {
+  room: Room
   state: DelphsTableState
 
   intervalHandle?:any
@@ -24,12 +27,18 @@ class DelphsTableLogic {
   battles: BattleList
   deerAttacks: Record<string, DeerAttackLogic>
 
+  currentQuest?: QuestLogic
+
   timeSinceMusic = 0
+
+  timeSinceLastQuest = 0
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
-  constructor(state:DelphsTableState) {
-    this.state = state
+  constructor(room:Room) {
+    this.room = room
+    this.state = room.state
+
     this.warriors = {}
     this.wootgump = {}
     this.trees = {}
@@ -97,6 +106,18 @@ class DelphsTableLogic {
       this.timeSinceMusic = 0
       this.setupMusic()
     }
+
+    if (this.currentQuest) {
+      this.currentQuest.update(dt)
+    } else {
+      this.timeSinceLastQuest += dt
+    }
+    if (!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1) {
+      this.startQuest()
+    }
+    if (this.currentQuest?.isOver()) {
+      this.stopQuest()
+    }
   }
 
   addWarrior(client:Client, stats:WarriorStats) {
@@ -128,6 +149,9 @@ class DelphsTableLogic {
     const sessionId = client.sessionId
     delete this.warriors[sessionId]
     this.state.warriors.delete(sessionId)
+    if (this.currentQuest && this.currentQuest.state.piggyId === sessionId) {
+      this.currentQuest.setNewRandomPiggy()
+    }
   }
 
   updateDestination(sessionId:string, {x, z}: {x:number,z:number}) {
@@ -141,6 +165,10 @@ class DelphsTableLogic {
   setTrap(sessionId:string) {
     const warrior = this.warriors[sessionId]
     if (!warrior) {
+      return
+    }
+    if (iterableToArray(this.state.traps.values()).length > 50) {
+      warrior.sendMessage("No more traps allowed")
       return
     }
     const id = randomUUID()
@@ -251,6 +279,20 @@ class DelphsTableLogic {
           delete this.battles[w.id]
         })
         this.state.battles.delete(battle.id)
+        if (this.currentQuest && this.currentQuest.state.piggyId) {
+          const piggyId = this.currentQuest.state.piggyId
+          const winner = battle.winner!
+          if (winner.id === piggyId) {
+            return // do nothing because the winner stays the piggy.
+          }
+          battle.losers.forEach((w) => {
+            if (w.id === piggyId) {
+              w.sendMessage("You lost the key!")
+              this.currentQuest.updatePiggy(winner.id)
+              winner.sendMessage("You got the key!")
+            }
+          })
+        }
       }
     })
   }
@@ -297,9 +339,31 @@ class DelphsTableLogic {
     })
   }
 
+  private startQuest() {
+    const quest = QuestLogic.randomQuest(this.warriors)
+    this.currentQuest = quest
+    this.state.assign({
+      questActive: true,
+      currentQuest: quest.state,
+    })
+  }
+
+  private stopQuest() {
+    if (this.currentQuest.winner) {
+      this.currentQuest.winner.client.send('mainHUDMessage', "You win!")
+    }
+    this.currentQuest = undefined
+    this.state.assign({
+      questActive: false,
+      currentQuest: undefined
+    })
+    this.timeSinceLastQuest = 0
+    this.room.broadcast('mainHUDMessage', 'Quest Over')
+  }
+
   private spawnGump() {
     const allGumps = Object.values(this.wootgump)
-    if (allGumps.length >= 100) {
+    if (allGumps.length >= 70) {
       return
     }
     allGumps.forEach((gump, i) => {
@@ -340,7 +404,7 @@ class DelphsTableLogic {
       x: position.x,
       z: position.y
     })
-    const deer = new Deer(deerState, this.wootgump, this.warriors)
+    const deer = new Deer(deerState, this.wootgump, this.warriors, this.state.traps)
     this.deer[id] = deer
     this.state.deer.set(id, deerState)
   }

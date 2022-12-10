@@ -11,7 +11,7 @@ const Warrior_1 = require("../game/Warrior");
 class DelphsTable extends colyseus_1.Room {
     onCreate(options) {
         this.setState(new DelphsTableState_1.DelphsTableState());
-        this.game = new DelphsTableLogic_1.default(this.state);
+        this.game = new DelphsTableLogic_1.default(this);
         this.game.start();
         this.onMessage("updateDestination", (client, destination) => {
             console.log(client.sessionId, 'updateDestination', destination);

@@ -19,14 +19,18 @@ const BattleLogic_1 = __importDefault(require("./BattleLogic"));
 const Deer_1 = __importDefault(require("./Deer"));
 const DeerAttackLogic_1 = __importDefault(require("./DeerAttackLogic"));
 const music_1 = require("./music");
+const QuestLogic_1 = __importDefault(require("./QuestLogic"));
+const iterableToArray_1 = __importDefault(require("./utils/iterableToArray"));
 const randoms_1 = require("./utils/randoms");
 const Warrior_1 = __importDefault(require("./Warrior"));
 class DelphsTableLogic {
     // for now assume a blank table at construction
     // TODO: handle a populated state with existing warriors, etc
-    constructor(state) {
+    constructor(room) {
         this.timeSinceMusic = 0;
-        this.state = state;
+        this.timeSinceLastQuest = 0;
+        this.room = room;
+        this.state = room.state;
         this.warriors = {};
         this.wootgump = {};
         this.trees = {};
@@ -75,6 +79,7 @@ class DelphsTableLogic {
         }
     }
     update(dt) {
+        var _a;
         Object.values(this.warriors).forEach((w) => {
             w.update(dt);
         });
@@ -91,6 +96,18 @@ class DelphsTableLogic {
         if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
             this.timeSinceMusic = 0;
             this.setupMusic();
+        }
+        if (this.currentQuest) {
+            this.currentQuest.update(dt);
+        }
+        else {
+            this.timeSinceLastQuest += dt;
+        }
+        if (!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && (0, randoms_1.randomInt)(10) === 1) {
+            this.startQuest();
+        }
+        if ((_a = this.currentQuest) === null || _a === void 0 ? void 0 : _a.isOver()) {
+            this.stopQuest();
         }
     }
     addWarrior(client, stats) {
@@ -124,6 +141,10 @@ class DelphsTableLogic {
     setTrap(sessionId) {
         const warrior = this.warriors[sessionId];
         if (!warrior) {
+            return;
+        }
+        if ((0, iterableToArray_1.default)(this.state.traps.values()).length > 50) {
+            warrior.sendMessage("No more traps allowed");
             return;
         }
         const id = (0, crypto_1.randomUUID)();
@@ -267,9 +288,27 @@ class DelphsTableLogic {
             }
         });
     }
+    startQuest() {
+        const quest = QuestLogic_1.default.randomQuest(this.warriors);
+        this.currentQuest = quest;
+        this.state.assign({
+            currentQuest: quest.state
+        });
+    }
+    stopQuest() {
+        if (this.currentQuest.winner) {
+            this.currentQuest.winner.client.send('mainHUDMessage', "You win!");
+        }
+        this.currentQuest = undefined;
+        this.state.assign({
+            currentQuest: undefined
+        });
+        this.timeSinceLastQuest = 0;
+        this.room.broadcast('mainHUDMessage', 'Quest Over');
+    }
     spawnGump() {
         const allGumps = Object.values(this.wootgump);
-        if (allGumps.length >= 100) {
+        if (allGumps.length >= 70) {
             return;
         }
         allGumps.forEach((gump, i) => {
@@ -307,7 +346,7 @@ class DelphsTableLogic {
             x: position.x,
             z: position.y
         });
-        const deer = new Deer_1.default(deerState, this.wootgump, this.warriors);
+        const deer = new Deer_1.default(deerState, this.wootgump, this.warriors, this.state.traps);
         this.deer[id] = deer;
         this.state.deer.set(id, deerState);
     }

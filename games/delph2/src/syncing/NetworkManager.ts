@@ -12,6 +12,8 @@ import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import { InventoryItem, zeroAddr } from "../game/items";
 import MusicHandler from "../game/MusicHandler";
+import vec2ToVec2 from "../utils/vec2ToVec2";
+import QuestLogic from "../game/QuestLogic";
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -32,6 +34,7 @@ class NetworkManager extends ScriptTypeBase {
   musicScript:MusicHandler
   hudScript:Hud
   gumpSounds:SoundComponent
+  currentQuest?:QuestLogic
 
   async initialize() {
     this.warriors = {}
@@ -112,10 +115,18 @@ class NetworkManager extends ScriptTypeBase {
       this.handleTrapRemove(key)
     }
 
+    this.room.state.onChange = (changes) => {
+      changes.forEach((change) => {
+        if (change.field === 'questActive') {
+          this.handleQuestActiveChange()
+        }
+      })
+    }
+
     this.room.onMessage('mainHUDMessage', (message:string) => {
       this.app.fire('mainHUDMessage', message)
     })
-
+    
     this.room.onMessage('gumpDiff', (amount:number) => {
         const message = amount < 0 ?
         `Lost ${amount * -1} gump.` :
@@ -147,6 +158,28 @@ class NetworkManager extends ScriptTypeBase {
 
   }
 
+  handleQuestActiveChange() {
+    if (!this.room) {
+      throw new Error('missing room')
+    }
+    const isActive = this.room.state.questActive
+    if (!isActive && !this.currentQuest) {
+      return
+    }
+    if (this.currentQuest) {
+      if (!isActive) {
+        this.currentQuest.destroy()
+        this.currentQuest = undefined
+      } else {
+        throw new Error('should not have had a change to positive while still having a current quest')
+      }
+      return
+    }
+    const quest = new QuestLogic(this.app, this.room.state, this.warriors)
+    this.currentQuest = quest
+    quest.go()
+  }
+
   handleDeerAdd(deer:Deer, _key: string) {
     const deerEntity = this.deerTemplate.clone()
     deerEntity.enabled = true
@@ -158,10 +191,10 @@ class NetworkManager extends ScriptTypeBase {
 
   handleTrapAdd(trap:Trap, _key: string) {
     const trapEntity = this.trapTemplate.clone()
-    trapEntity.enabled = true
     trapEntity.setPosition(trap.position.x, 0, trap.position.z)
     this.app.root.addChild(trapEntity)
     this.traps[trap.id] = trapEntity
+    trapEntity.enabled = true
   }
 
   handleTrapRemove(key: string) {

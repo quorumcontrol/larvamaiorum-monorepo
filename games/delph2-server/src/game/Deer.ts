@@ -1,8 +1,11 @@
 import EventEmitter from "events";
-import { deterministicRandom, randomInt } from "./utils/randoms";
-import { State, Deer as DeerState } from '../rooms/schema/DelphsTableState'
+import { randomInt } from "./utils/randoms";
+import { State, Deer as DeerState, DelphsTableState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import Warrior from "./Warrior";
+import vec2ToVec2 from "./utils/vec2ToVec2";
+
+type TrapHolder = DelphsTableState['traps']
 
 class Deer extends EventEmitter {
   id: string;
@@ -10,6 +13,7 @@ class Deer extends EventEmitter {
 
   gumps: Record<string,Vec2>
   warriors: Record<string, Warrior>
+  traps: TrapHolder
 
   chasing?: Warrior
   lastChased?: Warrior
@@ -17,13 +21,14 @@ class Deer extends EventEmitter {
   position:Vec2
   destination:Vec2
 
-  constructor(state:DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>) {
+  constructor(state:DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder ) {
     super()
     this.id = state.id
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
     this.gumps = wootgumps
     this.warriors = warriors
+    this.traps = traps
     const gump = Object.values(wootgumps)[randomInt(Object.values(wootgumps).length - 1)]
     this.setDestination(gump.x, gump.y)
   }
@@ -47,14 +52,23 @@ class Deer extends EventEmitter {
   updateDestination() {
     // if we're chasing, get distracted by gump.
     if (this.state.state === State.chasing) {
-      const gump = this.nearbyGump()
+      const gump = this.nearbyGump() || this.randomGump()
+      
+      // if we're not chasing or the warrior we're chasing died or started to fight, or if we're scared of a trap
+      // then just go after another gump.
+      if (!this.chasing || this.chasing.state.state !== State.move || this.isNearbyTrap()) {
+        this.stopChasing()
+        if (gump) {
+          this.setDestination(gump.x, gump.y)
+        }
+        return
+      }
 
       // if the player has played a card while chasing, then start ignoring them.
       if (this.chasing!.state.currentItem) {
         this.stopChasing()
-        const gumpOrRandom = gump || this.randomGump()
-        if (gumpOrRandom) {
-          this.setDestination(gumpOrRandom.x, gumpOrRandom.y)
+        if (gump) {
+          this.setDestination(gump.x, gump.y)
         }
       }
 
@@ -62,15 +76,6 @@ class Deer extends EventEmitter {
         console.log('stopping chasing to go after gump')
         this.stopChasing()
         this.setDestination(gump.x, gump.y)
-        return
-      }
-
-      if (!this.chasing || this.chasing.state.state !== State.move) {
-        this.stopChasing()
-        const gump = this.nearbyGump() || this.randomGump()
-        if (gump) {
-          this.setDestination(gump.x, gump.y)
-        }
         return
       }
       
@@ -110,6 +115,16 @@ class Deer extends EventEmitter {
 
   private randomGump():Vec2|undefined {
     return Object.values(this.gumps)[randomInt(Object.values(this.gumps).length)]
+  }
+
+  private isNearbyTrap():boolean {
+    for (const [_id, trap] of this.traps.entries()) {
+      if (vec2ToVec2(trap.position).distance(this.position) < 2) {
+       return true
+      }
+    }
+
+    return false
   }
 
   private nearbyGump():Vec2|undefined {

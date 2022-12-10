@@ -7,14 +7,16 @@ const events_1 = __importDefault(require("events"));
 const randoms_1 = require("./utils/randoms");
 const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const playcanvas_1 = require("playcanvas");
+const vec2ToVec2_1 = __importDefault(require("./utils/vec2ToVec2"));
 class Deer extends events_1.default {
-    constructor(state, wootgumps, warriors) {
+    constructor(state, wootgumps, warriors, traps) {
         super();
         this.id = state.id;
         this.state = state;
         this.position = new playcanvas_1.Vec2(state.position.x, state.position.z);
         this.gumps = wootgumps;
         this.warriors = warriors;
+        this.traps = traps;
         const gump = Object.values(wootgumps)[(0, randoms_1.randomInt)(Object.values(wootgumps).length - 1)];
         this.setDestination(gump.x, gump.y);
     }
@@ -36,27 +38,27 @@ class Deer extends events_1.default {
     updateDestination() {
         // if we're chasing, get distracted by gump.
         if (this.state.state === DelphsTableState_1.State.chasing) {
-            const gump = this.nearbyGump();
+            const gump = this.nearbyGump() || this.randomGump();
+            // if we're not chasing or the warrior we're chasing died or started to fight, or if we're scared of a trap
+            // then just go after another gump.
+            if (!this.chasing || this.chasing.state.state !== DelphsTableState_1.State.move || this.isNearbyTrap()) {
+                this.stopChasing();
+                if (gump) {
+                    this.setDestination(gump.x, gump.y);
+                }
+                return;
+            }
             // if the player has played a card while chasing, then start ignoring them.
             if (this.chasing.state.currentItem) {
                 this.stopChasing();
-                const gumpOrRandom = gump || this.randomGump();
-                if (gumpOrRandom) {
-                    this.setDestination(gumpOrRandom.x, gumpOrRandom.y);
+                if (gump) {
+                    this.setDestination(gump.x, gump.y);
                 }
             }
             if (gump && (0, randoms_1.randomInt)(1000) < 10) {
                 console.log('stopping chasing to go after gump');
                 this.stopChasing();
                 this.setDestination(gump.x, gump.y);
-                return;
-            }
-            if (!this.chasing || this.chasing.state.state !== DelphsTableState_1.State.move) {
-                this.stopChasing();
-                const gump = this.nearbyGump() || this.randomGump();
-                if (gump) {
-                    this.setDestination(gump.x, gump.y);
-                }
                 return;
             }
             // otherwise set the destination of the warrior
@@ -92,6 +94,14 @@ class Deer extends events_1.default {
     }
     randomGump() {
         return Object.values(this.gumps)[(0, randoms_1.randomInt)(Object.values(this.gumps).length)];
+    }
+    isNearbyTrap() {
+        for (const [_id, trap] of this.traps.entries()) {
+            if ((0, vec2ToVec2_1.default)(trap.position).distance(this.position) < 2) {
+                return true;
+            }
+        }
+        return false;
     }
     nearbyGump() {
         const eligible = Object.values(this.gumps).filter((gump) => {

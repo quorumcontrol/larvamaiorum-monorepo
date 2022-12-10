@@ -10,7 +10,7 @@ export class DelphsTable extends Room<DelphsTableState> {
 
   onCreate (options: any) {
     this.setState(new DelphsTableState());
-    this.game = new DelphsTableLogic(this.state)
+    this.game = new DelphsTableLogic(this)
     this.game.start()
 
     this.onMessage("updateDestination", (client, destination:{x:number,z:number}) => {

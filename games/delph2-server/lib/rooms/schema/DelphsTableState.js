@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DelphsTableState = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.Trap = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.Music = exports.State = void 0;
+exports.DelphsTableState = exports.Quest = exports.QuestObject = exports.DeerAttack = exports.Battle = exports.Warrior = exports.Deer = exports.Trap = exports.InventoryOfItem = exports.Item = exports.Vec2 = exports.Music = exports.QuestType = exports.QuestObjectKind = exports.State = void 0;
 const schema_1 = require("@colyseus/schema");
 var State;
 (function (State) {
@@ -18,6 +18,15 @@ var State;
     State[State["chasing"] = 5] = "chasing";
     State[State["deerAttack"] = 6] = "deerAttack";
 })(State = exports.State || (exports.State = {}));
+var QuestObjectKind;
+(function (QuestObjectKind) {
+    QuestObjectKind[QuestObjectKind["chest"] = 0] = "chest";
+})(QuestObjectKind = exports.QuestObjectKind || (exports.QuestObjectKind = {}));
+var QuestType;
+(function (QuestType) {
+    QuestType[QuestType["first"] = 0] = "first";
+    QuestType[QuestType["timed"] = 1] = "timed";
+})(QuestType = exports.QuestType || (exports.QuestType = {}));
 class Music extends schema_1.Schema {
 }
 __decorate([
@@ -212,6 +221,38 @@ __decorate([
     (0, schema_1.type)("string")
 ], DeerAttack.prototype, "deerId", void 0);
 exports.DeerAttack = DeerAttack;
+class QuestObject extends schema_1.Schema {
+    constructor() {
+        super(...arguments);
+        this.position = new Vec2();
+    }
+}
+__decorate([
+    (0, schema_1.type)("string")
+], QuestObject.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], QuestObject.prototype, "kind", void 0);
+__decorate([
+    (0, schema_1.type)(Vec2)
+], QuestObject.prototype, "position", void 0);
+exports.QuestObject = QuestObject;
+class Quest extends schema_1.Schema {
+    constructor() {
+        super(...arguments);
+        this.kind = 0;
+    }
+}
+__decorate([
+    (0, schema_1.type)(QuestObject)
+], Quest.prototype, "object", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Quest.prototype, "startedAt", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Quest.prototype, "kind", void 0);
+exports.Quest = Quest;
 class DelphsTableState extends schema_1.Schema {
     constructor() {
         super(...arguments);
@@ -233,6 +274,9 @@ __decorate([
 __decorate([
     (0, schema_1.type)("string")
 ], DelphsTableState.prototype, "seed", void 0);
+__decorate([
+    (0, schema_1.type)(Quest)
+], DelphsTableState.prototype, "currentQuest", void 0);
 __decorate([
     (0, schema_1.type)({ map: Warrior })
 ], DelphsTableState.prototype, "warriors", void 0);

@@ -21,7 +21,13 @@ class Hud extends ScriptTypeBase {
 
   mainMessage:Entity
 
+  messages:string[]
+
+  timeSinceLastMessage = 0
+
   initialize() {
+    this.messages = []
+    
     this.name = mustFindByName(this.entity, 'Name')
     this.stats = mustFindByName(this.entity, 'Stats')
     this.berserk = mustFindByName(this.entity, 'Berserk')
@@ -39,7 +45,32 @@ class Hud extends ScriptTypeBase {
       this.app.fire(TRAP_EVT)
     })
     
-    this.app.on('mainHUDMessage', this.handleMessage, this)
+    this.app.on('mainHUDMessage', this.queueMessage, this)
+  }
+
+  update(dt:number) {
+    this.timeSinceLastMessage += dt
+    if (this.timeSinceLastMessage >= 0.2 && this.messages.length >= 1) {
+      this.handleMessage(this.messages.shift()!)
+      this.timeSinceLastMessage = 0
+    }
+
+    if (!this.warrior) {
+      return
+    }
+    const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
+    this.berserk.enabled = hasBerserk
+
+    this.stats.element!.text = `
+A: ${this.warrior.currentAttack}   D: ${this.warrior.currentDefense}
+HP: ${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}
+
+dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})
+`.trim()
+  }
+
+  queueMessage(message:string) {
+    this.messages.push(message)
   }
 
   handleMessage(message:string) {
@@ -87,20 +118,6 @@ class Hud extends ScriptTypeBase {
     this.name.element!.text = warrior.name
   }
 
-  update() {
-    if (!this.warrior) {
-      return
-    }
-    const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
-    this.berserk.enabled = hasBerserk
-
-    this.stats.element!.text = `
-A: ${this.warrior.currentAttack}   D: ${this.warrior.currentDefense}
-HP: ${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}
-
-dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})
-`.trim()
-  }
 }
 
 export default Hud

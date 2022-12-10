@@ -13,10 +13,14 @@ class BattleLogic {
   completed = false
   wootgumpPot = 0
 
+  winner?: Warrior
+  losers: Warrior[]
+
   constructor(id:string, warriors: Warrior[], state:Battle) {
     this.id = id
     this.warriors = warriors
     this.state = state
+    this.losers = []
   }
 
   update(dt: number) {
@@ -64,7 +68,9 @@ class BattleLogic {
       if (warrior.isAlive()) {
         warrior.sendMessage("Winner!")
         warrior.setState(State.move)
+        this.winner = warrior
       } else {
+        this.losers.push(warrior)
         warrior.sendMessage('You lose.')
         const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5)
         warrior.incGumpBalance(gumpTaken * -1)
