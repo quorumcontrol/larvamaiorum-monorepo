@@ -11,8 +11,13 @@ interface Playable {
 
 const url = "https://us-central1-realtimedelphs.cloudfunctions.net/randomTrack"
 
-export const getRandomTrack = async ():Promise<Playable> => {
-  const resp = await fetch(url)
-  const track:Playable = await resp.json()
-  return track
+export const getRandomTrack = async ():Promise<Playable|undefined> => {
+  try {
+    const resp = await fetch(url)
+    const track:Playable = await resp.json()
+    return track
+  } catch (err) {
+    console.error('problem fetching tracK: ', err)
+    return undefined
+  }
 }

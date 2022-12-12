@@ -11,8 +11,8 @@ import NetworkedWarriorController from "../characters/NetworkedWarriorController
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import { InventoryItem, zeroAddr } from "../game/items";
+import TrapScript from "../game/Trap";
 import MusicHandler from "../game/MusicHandler";
-import vec2ToVec2 from "../utils/vec2ToVec2";
 import QuestLogic from "../game/QuestLogic";
 
 @createScript("networkManager")
@@ -198,7 +198,7 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   handleTrapRemove(key: string) {
-    this.traps[key].destroy()
+    mustGetScript<TrapScript>(this.traps[key], "trap").trigger()
     delete this.traps[key]
   }
 

@@ -54,13 +54,13 @@ class QuestLogic {
   start() {
     switch (this.state.kind) {
       case QuestType.first:
-        this.room.broadcast("mainHUDMessage", "First to the box wins!")
+        this.room.broadcast("mainHUDMessage", "First to the prize wins!")
         return
       case QuestType.keyCarrier:
         const piggy = this.warriors[this.state.piggyId]
         Object.values(this.warriors).forEach((w) => {
           if (w === piggy) {
-            return w.sendMessage("First to the box wins. You have the key. Run!")
+            return w.sendMessage("First to the prize wins. You have the key. Run!")
           }
           w.sendMessage(`${piggy.state.name} has the key. Get them.`)
         })
@@ -89,7 +89,7 @@ class QuestLogic {
       piggyId: id,
     })
     const newWarrior = this.warriors[id]
-    newWarrior?.sendMessage("You have the key. Get to the box.")
+    newWarrior?.sendMessage("You have the key. Get to the prize.")
     Object.values(this.warriors).forEach((w) => {
       if ([newWarrior.id, current].includes(w.id)) {
         return

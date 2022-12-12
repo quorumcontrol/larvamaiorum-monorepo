@@ -32,7 +32,11 @@ class QuestLogic {
   }
 
   destroy() {
-    this.treasure?.destroy()
+    console.log("destroying quest", this.treasure)
+    const start = this.treasure!.getLocalPosition()
+    this.treasure!.tween(start).to({x: start.x, y: -20, z: start.z}, 0.2).start().on('complete', () => {
+      this.treasure?.destroy()
+    })
     this.app.fire(QUEST_OVER_EVT)
     return
   }

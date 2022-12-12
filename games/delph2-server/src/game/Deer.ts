@@ -80,10 +80,12 @@ class Deer extends EventEmitter {
       }
       
       // otherwise set the destination of the warrior
-      const position = this.chasing!.position
-      console.log('distance to warrior: ', this.chasing.position.distance(position))
-      this.setDestination(position.x, position.y)
-      return
+      if (this.chasing) {
+        const position = this.chasing.position
+        this.setDestination(position.x, position.y)
+        return
+      }
+ 
     }
     // if we're going after a gump, go after warriors that smell good
     const nearbyWarrior = this.nearbyLoadedUpWarrior()

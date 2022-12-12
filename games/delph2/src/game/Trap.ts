@@ -1,11 +1,38 @@
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
+import mustFindByName from "../utils/mustFindByName";
+import mustGetScript from "../utils/mustGetScript";
 
 @createScript("trap")
 class Trap extends ScriptTypeBase {
 
   currentTween?:pc.Tween
   up: boolean = false
+
+  triggered = false
+  timeSinceTrigger = 0
+
+  update(dt:number) {
+    if (this.triggered) {
+      this.timeSinceTrigger += dt
+      if (this.timeSinceTrigger >= 2) {
+        this.entity.destroy()
+      }
+      return
+    }
+    const warriorsAndDeer = this.app.root.findByTag("warrior").concat(this.app.root.findByTag("deer"))
+    const trapPosition = this.entity.getPosition()
+    const isCloseEntity = warriorsAndDeer.some((warriorOrDeer) => {
+      return warriorOrDeer.getPosition().distance(trapPosition) < 3
+    })
+    this.riseOrFall(isCloseEntity)
+  }
+
+  trigger() {
+    this.triggered = true
+    this.riseOrFall(true)
+    mustGetScript<any>(mustFindByName(this.entity, "Effect"), 'effekseerEmitter').play()
+  }
 
   riseOrFall(shouldRise:boolean) {
     if (shouldRise === this.up) {
@@ -31,15 +58,6 @@ class Trap extends ScriptTypeBase {
         child.enabled = false
       })
     })
-  }
-
-  update() {
-    const warriorsAndDeer = this.app.root.findByTag("warrior").concat(this.app.root.findByTag("deer"))
-    const trapPosition = this.entity.getPosition()
-    const isCloseEntity = warriorsAndDeer.some((warriorOrDeer) => {
-      return warriorOrDeer.getPosition().distance(trapPosition) < 3
-    })
-    this.riseOrFall(isCloseEntity)
   }
 
 }

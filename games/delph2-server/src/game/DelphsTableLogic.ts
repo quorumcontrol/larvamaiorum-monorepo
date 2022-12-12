@@ -71,14 +71,16 @@ class DelphsTableLogic {
 
   async setupMusic() {
     const track = await getRandomTrack()
-    console.log('updating track to: ', track.title)
-    this.state.nowPlaying.assign({
-      name: track.title,
-      duration: track.duration,
-      artwork: track.artwork,
-      url: track.streaming,
-      startedAt: new Date().getTime()
-    })
+    if (track) {
+      console.log('updating track to: ', track.title)
+      this.state.nowPlaying.assign({
+        name: track.title,
+        duration: track.duration,
+        artwork: track.artwork,
+        url: track.streaming,
+        startedAt: new Date().getTime()
+      })
+    }
     this.timeSinceMusic = 0
   }
 
@@ -102,6 +104,11 @@ class DelphsTableLogic {
     this.handleDeerAttacks(dt)
     this.handleRecovers(dt)
     this.timeSinceMusic += dt
+    if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20) {
+      // try every 20s incase music is failing
+      this.timeSinceMusic = 0
+      this.setupMusic()
+    }
     if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
       this.timeSinceMusic = 0
       this.setupMusic()
@@ -229,8 +236,8 @@ class DelphsTableLogic {
           if (this.currentQuest && this.currentQuest.state.piggyId === w.id) {
             this.currentQuest.updatePiggy(trap.plantedBy)
           }
+          // w.client.send('trapped', id)
           this.state.traps.delete(id)
-          w.client.send('trapped', id)
         }
       }
     })
