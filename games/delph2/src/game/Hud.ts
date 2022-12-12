@@ -50,7 +50,7 @@ class Hud extends ScriptTypeBase {
 
   update(dt:number) {
     this.timeSinceLastMessage += dt
-    if (this.timeSinceLastMessage >= 0.2 && this.messages.length >= 1) {
+    if (this.timeSinceLastMessage >= 0.5 && this.messages.length >= 1) {
       this.handleMessage(this.messages.shift()!)
       this.timeSinceLastMessage = 0
     }
@@ -76,8 +76,8 @@ dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.wa
   handleMessage(message:string) {
     const msgEl = this.mainMessage.clone()
     msgEl.element!.text = message
-    msgEl.enabled = true
     this.entity.addChild(msgEl)
+    msgEl.enabled = true
     const start = msgEl.getLocalPosition()
 
     let opacityObj = {opacity: 1.0}

@@ -3,6 +3,7 @@ import { randomUUID } from "crypto"
 import { randomBounded, randomInt } from './utils/randoms'
 import Warrior from './Warrior'
 import vec2ToVec2 from './utils/vec2ToVec2'
+import { Room } from 'colyseus'
 
 function randomPosition() {
   return {
@@ -12,6 +13,7 @@ function randomPosition() {
 }
 
 class QuestLogic {
+  room: Room
   state: StateQuest
   warriors: Record<string,Warrior>
 
@@ -19,7 +21,7 @@ class QuestLogic {
 
   winner?:Warrior
 
-  static randomQuest(warriors:Record<string,Warrior>) {
+  static randomQuest(room:Room, warriors:Record<string,Warrior>) {
     //TODO: actually random
     const questObj = new QuestObject({
       id: randomUUID(),
@@ -32,7 +34,7 @@ class QuestLogic {
       startedAt: new Date().getTime(),
     })
 
-    const warriorIds =  Object.keys(warriors)
+    const warriorIds = Object.keys(warriors)
     if (randomInt(2) == 1 && warriorIds.length > 1) {
       state.assign({
         kind: QuestType.keyCarrier,
@@ -40,12 +42,30 @@ class QuestLogic {
       })
     }
 
-    return new QuestLogic(state, warriors)
+    return new QuestLogic(room, state, warriors)
   }
 
-  constructor(state:StateQuest, warriors:Record<string, Warrior>) {
+  constructor(room:Room, state:StateQuest, warriors:Record<string, Warrior>) {
     this.state = state
     this.warriors = warriors
+    this.room = room
+  }
+
+  start() {
+    switch (this.state.kind) {
+      case QuestType.first:
+        this.room.broadcast("mainHUDMessage", "First to the box wins!")
+        return
+      case QuestType.keyCarrier:
+        const piggy = this.warriors[this.state.piggyId]
+        Object.values(this.warriors).forEach((w) => {
+          if (w === piggy) {
+            return w.sendMessage("First to the box wins. You have the key. Run!")
+          }
+          w.sendMessage(`${piggy.state.name} has the key. Get them.`)
+        })
+        return
+    }
   }
 
   update(_dt:number) {
@@ -61,17 +81,27 @@ class QuestLogic {
   }
 
   updatePiggy(id:string) {
+    const current = this.state.piggyId
+    if (current) {
+      this.warriors[current]?.sendMessage("You lost the key!")
+    }
     this.state.assign({
       piggyId: id,
+    })
+    const newWarrior = this.warriors[id]
+    newWarrior?.sendMessage("You have the key. Get to the box.")
+    Object.values(this.warriors).forEach((w) => {
+      if ([newWarrior.id, current].includes(w.id)) {
+        return
+      }
+      w.sendMessage(`${newWarrior.state.name} has the key. Get them.`)
     })
   }
 
   setNewRandomPiggy() {
+    console.log("new random piggy")
     const ids = Object.keys(this.warriors)
-    const id = ids[randomInt(ids.length)]
-    this.state.assign({
-      piggyId: id,
-    })
+    this.updatePiggy(ids[randomInt(ids.length)])
   }
 
   isOver() {

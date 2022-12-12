@@ -50,10 +50,7 @@ class QuestLogic {
     chest.enabled = true
     this.treasure = chest
 
-    this.app.fire("mainHUDMessage", "Get to the chest.")
-
     this.app.fire("quest", this)
-    
   }
 
 }

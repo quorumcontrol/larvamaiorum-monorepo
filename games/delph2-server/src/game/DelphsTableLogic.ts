@@ -150,6 +150,7 @@ class DelphsTableLogic {
     delete this.warriors[sessionId]
     this.state.warriors.delete(sessionId)
     if (this.currentQuest && this.currentQuest.state.piggyId === sessionId) {
+      console.log('warrior leaving was the piggy')
       this.currentQuest.setNewRandomPiggy()
     }
   }
@@ -225,6 +226,9 @@ class DelphsTableLogic {
           if (trap.plantedBy && this.warriors[trap.plantedBy]) {
             this.warriors[trap.plantedBy].incGumpBalance(gumpToLose)
           }
+          if (this.currentQuest && this.currentQuest.state.piggyId === w.id) {
+            this.currentQuest.updatePiggy(trap.plantedBy)
+          }
           this.state.traps.delete(id)
           w.client.send('trapped', id)
         }
@@ -287,9 +291,7 @@ class DelphsTableLogic {
           }
           battle.losers.forEach((w) => {
             if (w.id === piggyId) {
-              w.sendMessage("You lost the key!")
               this.currentQuest.updatePiggy(winner.id)
-              winner.sendMessage("You got the key!")
             }
           })
         }
@@ -340,17 +342,26 @@ class DelphsTableLogic {
   }
 
   private startQuest() {
-    const quest = QuestLogic.randomQuest(this.warriors)
+    const quest = QuestLogic.randomQuest(this.room, this.warriors)
     this.currentQuest = quest
     this.state.assign({
       questActive: true,
       currentQuest: quest.state,
     })
+    quest.start()
   }
 
   private stopQuest() {
-    if (this.currentQuest.winner) {
-      this.currentQuest.winner.client.send('mainHUDMessage', "You win!")
+    this.room.broadcast('mainHUDMessage', 'Quest Over')
+    const winner = this.currentQuest.winner
+    if (winner) {
+      winner.client.send('mainHUDMessage', "You win!")
+      Object.values(this.warriors).forEach((w) => {
+        if (w === winner) {
+          return
+        }
+        w.sendMessage("You lose.")
+      })
     }
     this.currentQuest = undefined
     this.state.assign({
@@ -358,7 +369,6 @@ class DelphsTableLogic {
       currentQuest: undefined
     })
     this.timeSinceLastQuest = 0
-    this.room.broadcast('mainHUDMessage', 'Quest Over')
   }
 
   private spawnGump() {

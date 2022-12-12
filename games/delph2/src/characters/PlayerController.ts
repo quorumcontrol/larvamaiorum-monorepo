@@ -25,14 +25,14 @@ class PlayerController extends ScriptTypeBase {
 
   handleQuest(quest: QuestLogic) {
     this.quest = quest
-    switch (quest.kind()) {
-      case QuestType.keyCarrier:
-        if (quest.piggy() === this.entity) {
-          this.app.fire("mainHUDMessage", "You have the key.")
-          return
-        }
-        this.app.fire("mainHUDMessage", "Someone else has the key.")
-    }
+    // switch (quest.kind()) {
+    //   case QuestType.keyCarrier:
+    //     if (quest.piggy() === this.entity) {
+    //       this.app.fire("mainHUDMessage", "You have the key.")
+    //       return
+    //     }
+    //     this.app.fire("mainHUDMessage", "Someone else has the key.")
+    // }
   }
 
   handleQuestOver() {
