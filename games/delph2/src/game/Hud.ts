@@ -2,7 +2,7 @@ import { Asset, Entity } from 'playcanvas'
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
-import { Music, Warrior } from '../syncing/schema/DelphsTableState'
+import { MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
 
 export const BERSERK_EVT = 'berserk'
 export const TRAP_EVT = 'setTrap'
@@ -11,11 +11,21 @@ const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
 @createScript("hud")
 class Hud extends ScriptTypeBase {
   warrior?:Warrior
+  maxStats?:MaxStats
 
   name: Entity
-  stats: Entity
+  gumpStats: Entity
   berserk: Entity
   trackInfo: Entity
+
+  statElements: {
+    Attack: Entity
+    Defense: Entity
+    Health: Entity
+    AttackStat: Entity
+    DefenseStat: Entity
+    HealthStat: Entity
+  }
 
   previousArtwork?: Asset
 
@@ -29,7 +39,7 @@ class Hud extends ScriptTypeBase {
     this.messages = []
     
     this.name = mustFindByName(this.entity, 'Name')
-    this.stats = mustFindByName(this.entity, 'Stats')
+    this.gumpStats = mustFindByName(this.entity, 'Gump')
     this.berserk = mustFindByName(this.entity, 'Berserk')
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
@@ -40,12 +50,29 @@ class Hud extends ScriptTypeBase {
       this.berserk.enabled = false
     })
 
+    this.berserk.element!.on("mouseenter", () => {
+      mustFindByName(this.berserk, "CardDescription").enabled = true
+    })
+
+    this.berserk.element!.on("mouseleave", () => {
+      mustFindByName(this.berserk, "CardDescription").enabled = false
+    })
+
     mustFindByName(this.entity, 'SetTrap').element!.on('click', (evt:MouseEvent) => {
       evt.stopPropagation()
       this.app.fire(TRAP_EVT)
     })
     
     this.app.on('mainHUDMessage', this.queueMessage, this)
+
+    this.statElements = {
+      Attack: mustFindByName(this.entity, "Attack"),
+      Defense:  mustFindByName(this.entity, "Defense"),
+      Health:  mustFindByName(this.entity, "Health"),
+      AttackStat:  mustFindByName(this.entity, "AttackStat"),
+      DefenseStat:  mustFindByName(this.entity, "DefenseStat"),
+      HealthStat:  mustFindByName(this.entity, "HealthStat")
+    }
   }
 
   update(dt:number) {
@@ -55,18 +82,20 @@ class Hud extends ScriptTypeBase {
       this.timeSinceLastMessage = 0
     }
 
-    if (!this.warrior) {
+    if (!this.warrior || !this.maxStats) {
       return
     }
     const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
     this.berserk.enabled = hasBerserk
+    console.log("max: ", this.maxStats.toJSON(), "warrior: ", this.warrior.currentAttack, this.warrior.currentDefense)
+    this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
+    this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
+    this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
+    this.statElements.AttackStat.element!.text = this.warrior.currentAttack.toString()
+    this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
+    this.statElements.HealthStat.element!.text = `${this.warrior.currentHealth} / ${this.warrior.initialHealth}`
 
-    this.stats.element!.text = `
-A: ${this.warrior.currentAttack}   D: ${this.warrior.currentDefense}
-HP: ${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}
-
-dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})
-`.trim()
+    this.gumpStats.element!.text = `dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})`
   }
 
   queueMessage(message:string) {
@@ -113,8 +142,9 @@ dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.wa
     mustFindByName(this.trackInfo, 'Title').element!.text = music.name
   }
 
-  setWarrior(warrior:Warrior) {
+  setWarrior(warrior:Warrior, maxStats:MaxStats) {
     this.warrior = warrior
+    this.maxStats = maxStats
     this.name.element!.text = warrior.name
   }
 
