@@ -110,11 +110,19 @@ export class Quest extends Schema {
   @type("string") piggyId:string
 }
 
+export class MaxStats extends Schema {
+  @type("number") maxAttack:number
+  @type("number") maxDefense:number
+  @type("number") maxHealth:number
+}
+
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("string") seed: string = "todo:initialseed";
   @type(Quest) currentQuest?: Quest;
   @type("boolean") questActive = false
+
+  @type(MaxStats) maxStats = new MaxStats({})
 
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({})
   @type({ map: Battle }) battles = new MapSchema<Battle>({})

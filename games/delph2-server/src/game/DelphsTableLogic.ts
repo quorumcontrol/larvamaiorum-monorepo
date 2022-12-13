@@ -150,6 +150,7 @@ class DelphsTableLogic {
     console.log('warrior: ', state.toJSON())
     this.warriors[sessionId] = new Warrior(client, state)
     this.state.warriors.set(sessionId, state)
+    this.updateMaxStats()
   }
 
   removeWarrior(client:Client) {
@@ -160,6 +161,7 @@ class DelphsTableLogic {
       console.log('warrior leaving was the piggy')
       this.currentQuest.setNewRandomPiggy()
     }
+    this.updateMaxStats()
   }
 
   updateDestination(sessionId:string, {x, z}: {x:number,z:number}) {
@@ -345,6 +347,28 @@ class DelphsTableLogic {
         this.state.deerAttacks.delete(attack.id)
         delete this.deerAttacks[attack.id]
       }
+    })
+  }
+
+  private updateMaxStats() {
+    let maxAttack = 0
+    let maxDefense = 0
+    let maxHealth = 0
+    Object.values(this.warriors).forEach((w) => {
+      if (w.state.attack > maxAttack) {
+        maxAttack = w.state.attack
+      }
+      if (w.state.defense > maxDefense) {
+        maxDefense = w.state.defense
+      }
+      if (w.state.initialHealth > maxHealth) {
+        maxHealth = w.state.initialHealth
+      }
+    })
+    this.state.maxStats.assign({
+      maxAttack,
+      maxDefense,
+      maxHealth,
     })
   }
 

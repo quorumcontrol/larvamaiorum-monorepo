@@ -91,7 +91,7 @@ class Deer extends EventEmitter {
     const nearbyWarrior = this.nearbyLoadedUpWarrior()
     if (nearbyWarrior && nearbyWarrior !== this.lastChased && randomInt(100) < 5) {
       console.log('nearby warrior: ', nearbyWarrior.state.name)
-      nearbyWarrior.sendMessage("A reindeer is after you.")
+      nearbyWarrior.sendMessage("Reindeer is after you.")
       this.chasing = nearbyWarrior
       this.setDestination(nearbyWarrior.position.x, nearbyWarrior.position.y)
       this.setState(State.chasing)
