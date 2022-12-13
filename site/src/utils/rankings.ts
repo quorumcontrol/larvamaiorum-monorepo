@@ -10,6 +10,8 @@ import { TeamStats2, TeamStats2__factory } from "../../contracts/typechain"
 import { addresses } from "./networks"
 import { questTrackerContract } from "./questTracker"
 import { keccak256 } from "ethers/lib/utils"
+import { TypedEventFilter } from "../../contracts/typechain/common"
+import { TypedEvent } from "../../masks/typechain-types/common"
 
 const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
@@ -244,8 +246,17 @@ async function rank(from: number, to: number): Promise<Ranking> {
 
   const accts: Record<Address, RankingItem> = {}
 
-  const evts = await dgump.queryFilter(filter, from, to)
-  evts.forEach((evt) => {
+  let evts:any = []
+
+  // let cursor = from
+  const size = 50
+  for (let i = from; i < to; i+=size) {
+    evts = evts.concat(evts, await dgump.queryFilter(filter, i, i+size))
+  }
+
+
+  // const evts = await dgump.queryFilter(filter, from, to)
+  evts.forEach((evt:any) => {
     const account = evt.args.account
     const value = evt.args.value
 

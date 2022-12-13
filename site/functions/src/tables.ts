@@ -65,7 +65,8 @@ const txSingleton = new SingletonQueue()
 export const onLobbyWrite = functions
   .runWith({
     secrets: [delphsPrivateKey.name],
-    failurePolicy: true
+    failurePolicy: true,
+    maxInstances: 1,
   })
   .firestore
   .document("/delphsLobby/{player}")
@@ -78,6 +79,7 @@ export const onLobbyWrite = functions
       return
     }
     functions.logger.debug("write initiated by", playerUid)
+    throw new Error("nope, not gonna start a table right now.")
 
     // now let"s create the table
     return db.runTransaction(async (transaction) => {
@@ -300,7 +302,7 @@ async function _startTable(transaction: Transaction, delphs: DelphsTable, table:
   })
 }
 
-export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] })
+export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name], maxInstances: 2 })
   .firestore
   .document("rolls/{rollNumber}")
   .onCreate(async (roll, ctx) => {
@@ -322,7 +324,7 @@ export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] 
     })
   })
 
-export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name], memory: "1GB" })
+export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name], memory: "1GB", maxInstances: 5 })
   .firestore
   .document("rolls/{rollNumber}")
   .onCreate(async (_roll, { params }) => {
@@ -366,6 +368,7 @@ export const handleCompletedTables = functions
     secrets: [delphsPrivateKey.name],
     failurePolicy: true,
     memory: "1GB",
+    maxInstances: 2,
   })
   .firestore
   .document("tables/{tableId}")
@@ -375,6 +378,7 @@ export const handleCompletedTables = functions
     if (tableData.status !== TableStatus.COMPLETE) {
       return
     }
+    throw new Error("oops")
     const contracts = await walletAndContracts(process.env[delphsPrivateKey.name]!)
     return completeTheTable(contracts, table)
   })
@@ -536,12 +540,7 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
       status: TableStatus.PAID,
       results: {
         wootgump: rewards.wootgump,
-        ranked: rewards.ranked.map((w) => w.toWarriorState()),
-        quests: {
-          battlesWon: rewards.quests.battlesWon,
-          firstBlood: rewards.quests.firstBlood?.toWarriorState(),
-          firstGump: rewards.quests.firstGump?.toWarriorState(),
-        }
+        ranked: rewards.ranked.map((w) => w.id),
       }
     })
   })

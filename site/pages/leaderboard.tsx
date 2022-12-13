@@ -5,6 +5,7 @@ import {
   Tab,
   TabPanel,
   TabPanels,
+  Text,
 } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -22,20 +23,21 @@ const LeaderboardPage: NextPage = () => {
       <Tabs>
         <TabList>
           <Tab>Daily</Tab>
-          <Tab>Weekly</Tab>
+          {/* <Tab>Weekly</Tab>
           <Tab>Hourly</Tab>
           <Tab>Team</Tab>
           <Tab>First Gump</Tab>
           <Tab>First Blood</Tab>
           <Tab>Battles Won</Tab>
           <Tab>Gump Per Game</Tab>
-          <Tab>Battles Won Per Game</Tab>
+          <Tab>Battles Won Per Game</Tab> */}
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Leaderboard type="gump" timeframe="day" diff={diff} />
+            <Text>Leaderboard is experiencing higher than normal load. Please try again tomorrow.</Text>
+            {/* <Leaderboard type="gump" timeframe="day" diff={diff} /> */}
           </TabPanel>
-          <TabPanel>
+          {/* <TabPanel>
             <Leaderboard type="gump" timeframe="week" diff={diff} />
           </TabPanel>
           <TabPanel>
@@ -58,7 +60,7 @@ const LeaderboardPage: NextPage = () => {
           </TabPanel>
           <TabPanel>
             <Leaderboard type="battlesPerGame" timeframe="day" diff={diff} />
-          </TabPanel>
+          </TabPanel> */}
         </TabPanels>
       </Tabs>
     </Layout>
