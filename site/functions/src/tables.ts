@@ -533,7 +533,16 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
     functions.logger.debug("quest tracker tx: ", questTrackerTx.hash)
     await questTrackerTx.wait()
     db.doc(tableDoc.ref.path).update({
-      status: TableStatus.PAID
+      status: TableStatus.PAID,
+      results: {
+        wootgump: rewards.wootgump,
+        ranked: rewards.ranked.map((w) => w.toWarriorState()),
+        quests: {
+          battlesWon: rewards.quests.battlesWon,
+          firstBlood: rewards.quests.firstBlood?.toWarriorState(),
+          firstGump: rewards.quests.firstGump?.toWarriorState(),
+        }
+      }
     })
   })
 }
