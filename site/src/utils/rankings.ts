@@ -249,7 +249,7 @@ async function rank(from: number, to: number): Promise<Ranking> {
   let evts:any = []
 
   // let cursor = from
-  const size = 50
+  const size = 5000
   for (let i = from; i < to; i+=size) {
     evts = evts.concat(evts, await dgump.queryFilter(filter, i, i+size))
   }

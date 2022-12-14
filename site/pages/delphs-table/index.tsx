@@ -49,7 +49,7 @@ const Lobby: NextPage = () => {
         <Stack direction={["column", "row"]}>
           <VStack spacing="4" alignItems="left">
             <Heading>Delph&apos;s Table</Heading>
-            <Text textColor="brand.orange">$SKL rewards for playing!</Text>
+            <Text textColor="brand.orange">$SKL rewards are currently on pause.</Text>
             <Text>
               Delph&apos;s Table is a multiplayer board-game. Collect Wootgump.
               Battle other warriors. Use your wits to outsmart your competitors.

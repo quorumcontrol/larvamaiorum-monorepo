@@ -131,7 +131,6 @@ const Home: NextPage = () => {
             >
               <VStack maxW="22em" alignItems="left">
                 <Heading size={["xl", "2xl"]}>Delph&apos;s Table</Heading>
-                <Text>Weekly Prizes: 12,500 $SKL.</Text>
                 <Text>
                   The Oracle of Delphi is worried you are not prepared to
                   support your warriors in the Arctic Jungle. He released a

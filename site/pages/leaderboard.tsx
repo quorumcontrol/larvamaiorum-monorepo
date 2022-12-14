@@ -23,30 +23,29 @@ const LeaderboardPage: NextPage = () => {
       <Tabs>
         <TabList>
           <Tab>Daily</Tab>
-          {/* <Tab>Weekly</Tab>
+          {/* <Tab>Weekly</Tab> */}
           <Tab>Hourly</Tab>
-          <Tab>Team</Tab>
-          <Tab>First Gump</Tab>
+          {/* <Tab>Team</Tab> */}
+          {/* <Tab>First Gump</Tab>
           <Tab>First Blood</Tab>
-          <Tab>Battles Won</Tab>
-          <Tab>Gump Per Game</Tab>
-          <Tab>Battles Won Per Game</Tab> */}
+          <Tab>Battles Won</Tab> */}
+          {/* <Tab>Gump Per Game</Tab> */}
+          <Tab>Battles Won Per Game</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Text>Leaderboard is experiencing higher than normal load. Please try again tomorrow.</Text>
-            {/* <Leaderboard type="gump" timeframe="day" diff={diff} /> */}
+            <Leaderboard type="gump" timeframe="day" diff={diff} />
           </TabPanel>
           {/* <TabPanel>
             <Leaderboard type="gump" timeframe="week" diff={diff} />
-          </TabPanel>
+          </TabPanel> */}
           <TabPanel>
             <Leaderboard type="dgump" timeframe="hour" diff={diff} />
           </TabPanel>
-          <TabPanel>
+          {/* <TabPanel>
             <Leaderboard type="team" timeframe="week" diff={diff} />
-          </TabPanel>
-          <TabPanel>
+          </TabPanel> */}
+          {/* <TabPanel>
             <Leaderboard type="firstgump" timeframe="week" diff={diff} />
           </TabPanel>
           <TabPanel>
@@ -54,13 +53,13 @@ const LeaderboardPage: NextPage = () => {
           </TabPanel>
           <TabPanel>
             <Leaderboard type="battleswon" timeframe="week" diff={diff} />
-          </TabPanel>
-          <TabPanel>
+          </TabPanel> */}
+          {/* <TabPanel>
             <Leaderboard type="mostgump" timeframe="day" diff={diff} />
-          </TabPanel>
+          </TabPanel> */}
           <TabPanel>
             <Leaderboard type="battlesPerGame" timeframe="day" diff={diff} />
-          </TabPanel> */}
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Layout>

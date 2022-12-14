@@ -79,7 +79,6 @@ export const onLobbyWrite = functions
       return
     }
     functions.logger.debug("write initiated by", playerUid)
-    throw new Error("nope, not gonna start a table right now.")
 
     // now let"s create the table
     return db.runTransaction(async (transaction) => {
@@ -368,7 +367,7 @@ export const handleCompletedTables = functions
     secrets: [delphsPrivateKey.name],
     failurePolicy: true,
     memory: "1GB",
-    maxInstances: 2,
+    maxInstances: 1,
   })
   .firestore
   .document("tables/{tableId}")
@@ -378,7 +377,6 @@ export const handleCompletedTables = functions
     if (tableData.status !== TableStatus.COMPLETE) {
       return
     }
-    throw new Error("oops")
     const contracts = await walletAndContracts(process.env[delphsPrivateKey.name]!)
     return completeTheTable(contracts, table)
   })
@@ -394,6 +392,8 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
   if (!delphsGump || !accolades || !teamStats || !questTracker) {
     throw new Error("missing contracts")
   }
+  functions.logger.debug("complete the table internal function")
+
   const snapshot = await db.collection(`/tables/${tableDoc.id}/moves`).get()
   const moves: Record<string, any> = {}
   snapshot.forEach((moveDoc) => {
