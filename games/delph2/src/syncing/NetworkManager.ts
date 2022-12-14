@@ -290,7 +290,7 @@ class NetworkManager extends ScriptTypeBase {
 
       const script = mustGetScript<NetworkedWarriorController>(playerEntity, 'networkedWarriorController')
       script.setPlayer(warrior)
-      mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud').setWarrior(warrior, this.room!.state.maxStats)
+      mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud').setWarrior(warrior, this.room!.state)
 
       return
     }

@@ -2,7 +2,7 @@ import { Asset, Entity } from 'playcanvas'
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
-import { MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
+import { DelphsTableState, MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
 
 export const BERSERK_EVT = 'berserk'
 export const TRAP_EVT = 'setTrap'
@@ -12,11 +12,13 @@ const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
 class Hud extends ScriptTypeBase {
   warrior?:Warrior
   maxStats?:MaxStats
+  state?:DelphsTableState
 
   name: Entity
   gumpStats: Entity
   berserk: Entity
   trackInfo: Entity
+  persistantMessage: Entity
 
   statElements: {
     Attack: Entity
@@ -43,6 +45,7 @@ class Hud extends ScriptTypeBase {
     this.berserk = mustFindByName(this.entity, 'Berserk')
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
+    this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
 
     this.berserk.element!.on('click', (evt:MouseEvent) => {
       evt.stopPropagation()
@@ -95,6 +98,14 @@ class Hud extends ScriptTypeBase {
     if (!this.warrior || !this.maxStats) {
       return
     }
+
+    if (this.state?.persistantMessage) {
+      this.persistantMessage.enabled = true
+      this.persistantMessage.element!.text = this.state.persistantMessage
+    } else {
+      this.persistantMessage.enabled = false
+    }
+
     const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
     this.berserk.enabled = hasBerserk
     console.log("max: ", this.maxStats.toJSON(), "warrior: ", this.warrior.currentAttack, this.warrior.currentDefense)
@@ -152,9 +163,10 @@ class Hud extends ScriptTypeBase {
     mustFindByName(this.trackInfo, 'Title').element!.text = music.name
   }
 
-  setWarrior(warrior:Warrior, maxStats:MaxStats) {
+  setWarrior(warrior:Warrior, state:DelphsTableState) {
     this.warrior = warrior
-    this.maxStats = maxStats
+    this.maxStats = state.maxStats
+    this.state = state
     this.name.element!.text = warrior.name
   }
 

@@ -1,5 +1,10 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
+export enum RoomType {
+  continuous,
+  match,
+}
+
 export enum State {
   move,
   harvest,
@@ -116,13 +121,25 @@ export class MaxStats extends Schema {
   @type("number") maxHealth:number
 }
 
+export class Player extends Schema {
+  @type("string") id:string
+  @type("string") name:string
+  @type("string") token:string
+}
+
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
+  @type("number") roomType: RoomType = RoomType.continuous;
+  @type("boolean") acceptInput:boolean;
+  @type("string") persistantMessage: string = "";
   @type("string") seed: string = "todo:initialseed";
+
   @type(Quest) currentQuest?: Quest;
   @type("boolean") questActive = false
 
   @type(MaxStats) maxStats = new MaxStats({})
+
+  @type({ array: Player }) expectedPlayers = new ArraySchema<Player>()
 
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({})
   @type({ map: Battle }) battles = new MapSchema<Battle>({})

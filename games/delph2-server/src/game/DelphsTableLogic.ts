@@ -51,8 +51,9 @@ class DelphsTableLogic {
     let previous = new Date()
     this.update(0)
     this.intervalHandle = setInterval(() => {
-      const diff = (new Date().getTime()) - previous.getTime()
-      previous = new Date()
+      const now = new Date()
+      const diff = (now.getTime()) - previous.getTime()
+      previous = now
       this.update(diff/1000)
     }, 100)
     for (let i = 0; i < 10; i++) {

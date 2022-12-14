@@ -40,6 +40,7 @@ class QuestLogic {
         kind: QuestType.keyCarrier,
         piggyId: warriorIds[randomInt(warriorIds.length)],
       })
+      //TODO: make sure the goal isn't so close to the piggy
     }
 
     return new QuestLogic(room, state, warriors)
