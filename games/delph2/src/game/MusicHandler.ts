@@ -1,8 +1,6 @@
-import { Entity } from "playcanvas";
 import { Music } from "../syncing/schema/DelphsTableState";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
-import mustFindByName from "../utils/mustFindByName";
 
 @createScript("musicHandler")
 class MusicHandler extends ScriptTypeBase {
@@ -10,16 +8,21 @@ class MusicHandler extends ScriptTypeBase {
   existing?: HTMLAudioElement
   started: boolean
 
+  initialize() {
+    this.app.on("musicVolumeUp", this.volumeUp, this)
+    this.app.on("musicVolumeDown", this.volumeDown, this)
+  }
+
   update() {
     if (!this.existing) {
       return
     }
     //TODO: make these UI controls
-    if (this.app.keyboard.wasPressed(pc.KEY_1)) {
-      this.existing.volume = this.existing.volume * 0.9
+    if (this.app.keyboard.wasPressed(pc.KEY_ADD)) {
+      this.volumeUp()
     }
-    if (this.app.keyboard.wasPressed(pc.KEY_2)) {
-      this.existing.volume = this.existing.volume * 1.1
+    if (this.app.keyboard.wasPressed(pc.KEY_SUBTRACT)) {
+      this.volumeDown()
     }
   }
 
@@ -31,6 +34,20 @@ class MusicHandler extends ScriptTypeBase {
     if (this.existing) {
       this.existing.play()
     }
+  }
+
+  volumeDown() {
+    if (!this.existing) {
+      return
+    }
+    this.existing.volume = this.existing.volume * 0.9
+  }
+
+  volumeUp() {
+    if (!this.existing) {
+      return
+    }
+    this.existing.volume = this.existing.volume * 1.1
   }
 
   setMusic(music:Music) {

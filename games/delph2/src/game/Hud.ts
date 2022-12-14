@@ -62,6 +62,16 @@ class Hud extends ScriptTypeBase {
       evt.stopPropagation()
       this.app.fire(TRAP_EVT)
     })
+
+    mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt:MouseEvent) => {
+      evt.stopPropagation()
+      this.app.fire("musicVolumeUp")
+    })
+
+    mustFindByName(this.entity, "VolumeDown").element!.on("click", (evt:MouseEvent) => {
+      evt.stopPropagation()
+      this.app.fire("musicVolumeDown")
+    })
     
     this.app.on('mainHUDMessage', this.queueMessage, this)
 
@@ -95,7 +105,7 @@ class Hud extends ScriptTypeBase {
     this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
     this.statElements.HealthStat.element!.text = `${this.warrior.currentHealth} / ${this.warrior.initialHealth}`
 
-    this.gumpStats.element!.text = `dGump: ${this.warrior.wootgumpBalance} (${this.warrior.wootgumpBalance - this.warrior.initialGump})`
+    this.gumpStats.element!.text = `dGump: ${this.warrior.wootgumpBalance}`
   }
 
   queueMessage(message:string) {
