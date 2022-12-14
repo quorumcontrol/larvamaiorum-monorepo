@@ -1,9 +1,8 @@
 import { randomUUID } from "crypto";
-import "./app";
+import { appFunctions, db } from "./app"
 import { BigNumber, BigNumberish, utils } from "ethers";
 import { keccak256 } from "ethers/lib/utils";
 import * as functions from "firebase-functions";
-import { appFunctions, db } from "./app"
 import testnetBots from "../../contracts/bots-testnet"
 import mainnetBots from "../../contracts/bots-mainnet"
 import { isTestnet } from "../../src/utils/networks"
@@ -66,7 +65,8 @@ const txSingleton = new SingletonQueue()
 export const onLobbyWrite = functions
   .runWith({
     secrets: [delphsPrivateKey.name],
-    failurePolicy: true
+    failurePolicy: true,
+    maxInstances: 1,
   })
   .firestore
   .document("/delphsLobby/{player}")
@@ -301,7 +301,7 @@ async function _startTable(transaction: Transaction, delphs: DelphsTable, table:
   })
 }
 
-export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] })
+export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name], maxInstances: 2 })
   .firestore
   .document("rolls/{rollNumber}")
   .onCreate(async (roll, ctx) => {
@@ -323,7 +323,7 @@ export const startTables = functions.runWith({ secrets: [delphsPrivateKey.name] 
     })
   })
 
-export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name], memory: "1GB" })
+export const completeTables = functions.runWith({ secrets: [delphsPrivateKey.name], memory: "1GB", maxInstances: 5 })
   .firestore
   .document("rolls/{rollNumber}")
   .onCreate(async (_roll, { params }) => {
@@ -367,6 +367,7 @@ export const handleCompletedTables = functions
     secrets: [delphsPrivateKey.name],
     failurePolicy: true,
     memory: "1GB",
+    maxInstances: 1,
   })
   .firestore
   .document("tables/{tableId}")
@@ -391,6 +392,8 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
   if (!delphsGump || !accolades || !teamStats || !questTracker) {
     throw new Error("missing contracts")
   }
+  functions.logger.debug("complete the table internal function")
+
   const snapshot = await db.collection(`/tables/${tableDoc.id}/moves`).get()
   const moves: Record<string, any> = {}
   snapshot.forEach((moveDoc) => {
@@ -534,7 +537,11 @@ async function completeTheTable({ delphsGump, accolades, teamStats, questTracker
     functions.logger.debug("quest tracker tx: ", questTrackerTx.hash)
     await questTrackerTx.wait()
     db.doc(tableDoc.ref.path).update({
-      status: TableStatus.PAID
+      status: TableStatus.PAID,
+      results: {
+        wootgump: rewards.wootgump,
+        ranked: rewards.ranked.map((w) => w.id),
+      }
     })
   })
 }

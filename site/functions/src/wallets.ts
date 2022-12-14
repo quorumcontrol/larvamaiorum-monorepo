@@ -15,6 +15,8 @@ import { defineSecret } from "firebase-functions/params";
 export const delphsPrivateKey = defineSecret("DELPHS_PRIVATE_KEY")
 
 export const walletAndContracts = memoize(async (walletKey: string) => {
+  functions.logger.debug("wallet and contracts loading")
+
   if (!walletKey) {
     functions.logger.error("missing private key", process.env)
     throw new Error("must have a private key")
@@ -25,12 +27,11 @@ export const walletAndContracts = memoize(async (walletKey: string) => {
   functions.logger.info("Relay address: ", relayWallet.address)
 
   const delphsWallet = new Wallet(walletKey).connect(provider)
-  delphsWallet.getAddress().then((addr) => {
-    functions.logger.info("Delph's address: ", addr)
-  })
+  const delphsAddr = await delphsWallet.getAddress()
+  functions.logger.info("Delph's address: ", delphsAddr)
 
   const sendTx = await delphsWallet.sendTransaction({
-    value: utils.parseEther("0.1"),
+    value: utils.parseEther("0.2"),
     to: relayWallet.address,
   })
   functions.logger.info("funded relayer", { tx: sendTx.hash, relayer: relayWallet.address })
@@ -46,6 +47,7 @@ export const walletAndContracts = memoize(async (walletKey: string) => {
 
   const token = await getBytesAndCreateToken(trustedForwarder, delphsWallet, relayWallet)
   const kasumahRelayer = new KasumahRelayer(trustedForwarder.connect(relayWallet), relayWallet, delphsWallet, token)
+  functions.logger.debug("relayer ready")
 
   return {
     relayer: kasumahRelayer,

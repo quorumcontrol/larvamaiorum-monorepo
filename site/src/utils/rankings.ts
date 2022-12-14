@@ -10,12 +10,14 @@ import { TeamStats2, TeamStats2__factory } from "../../contracts/typechain"
 import { addresses } from "./networks"
 import { questTrackerContract } from "./questTracker"
 import { keccak256 } from "ethers/lib/utils"
+import { TypedEventFilter } from "../../contracts/typechain/common"
+import { TypedEvent } from "../../masks/typechain-types/common"
 
 const TIME_ZONE = "utc-12"
 const ONE = utils.parseEther('1')
 
-export type TimeFrames = 'day' | 'week'
-export type LeaderBoardType = 'gump' | 'team' | 'mostgump' | 'firstgump' | 'firstblood' | 'battleswon' | 'battlesPerGame'
+export type TimeFrames = 'day' | 'week' | 'hour'
+export type LeaderBoardType = 'gump' | 'team' | 'mostgump' | 'firstgump' | 'firstblood' | 'battleswon' | 'battlesPerGame' | 'dgump'
 
 const explorerUrl = memoize(() => {
   const explorerUrl = defaultNetwork().blockExplorers?.default.url
@@ -87,6 +89,11 @@ export async function closestBlockForTime(time: DateTime, beforeOrAfter: 'before
 
 export function startAndEnd(time: DateTime, timePeriod: TimeFrames) {
   const cryptoRomeDay = time.setZone(TIME_ZONE)
+  if (timePeriod === 'hour') {
+    const start = cryptoRomeDay.startOf('hour')
+    return [start, start.endOf('hour')]
+  }
+
   let start = cryptoRomeDay.startOf('day')
   let end = cryptoRomeDay.endOf('day')
   if (timePeriod === 'day') {
@@ -117,6 +124,8 @@ export async function timeRank(time: DateTime, type: LeaderBoardType, timePeriod
     closestBlockForTime(end, 'before'),
   ])
   switch (type) {
+    case "dgump":
+      return dGumpRank(startBlock, endBlock)
     case 'gump':
       return rank(startBlock, endBlock)
     case 'team':
@@ -237,9 +246,52 @@ async function rank(from: number, to: number): Promise<Ranking> {
 
   const accts: Record<Address, RankingItem> = {}
 
-  const evts = await dgump.queryFilter(filter, from, to)
-  evts.forEach((evt) => {
+  let evts:any = []
+
+  // let cursor = from
+  const size = 5000
+  for (let i = from; i < to; i+=size) {
+    evts = evts.concat(evts, await dgump.queryFilter(filter, i, i+size))
+  }
+
+
+  // const evts = await dgump.queryFilter(filter, from, to)
+  evts.forEach((evt:any) => {
     const account = evt.args.account
+    const value = evt.args.value
+
+    if (!IGNORED_ADDRESSES.includes(account.toLowerCase())) {
+      const existingFrom = accts[account] || { address: account, balance: constants.Zero }
+      existingFrom.balance = existingFrom.balance.add(value)
+      accts[account] = existingFrom
+    }
+  })
+
+  return {
+    start: from,
+    end: to,
+    ranked: Object.values(accts).sort((a, b) => {
+      if (a.balance.eq(b.balance)) {
+        return 0
+      }
+      if (b.balance.gt(a.balance)) {
+        return 1
+      }
+      return -1
+    }).slice(0, MAX_RANKINGS)
+  }
+}
+
+async function dGumpRank(from: number, to: number): Promise<Ranking> {
+  const dgump = delphsGumpContract()
+
+  const filter = dgump.filters.Transfer(constants.AddressZero, null, null)
+  const accts: Record<Address, RankingItem> = {}
+
+  const evts = await dgump.queryFilter(filter, from, to)
+  console.log(evts)
+  evts.forEach((evt) => {
+    const account = evt.args.to
     const value = evt.args.value
 
     if (!IGNORED_ADDRESSES.includes(account.toLowerCase())) {

@@ -12,7 +12,7 @@ export const useLeaderboard = (type: LeaderBoardType, timeFrame:TimeFrames, diff
     startTime = startTime.plus({[timeFrame]: parseInt(diff, 10)})
   }
   return useQuery(
-    ["wootgump-daily-leaderboard", type, timeFrame, startTime.startOf('day').toSeconds()],
+    ["wootgump-daily-leaderboard", type, timeFrame, startTime.startOf('hour').toSeconds()],
     async () => {
       return timeRank(startTime, type, timeFrame)
     },
