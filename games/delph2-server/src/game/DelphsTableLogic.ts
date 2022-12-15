@@ -1,7 +1,7 @@
 import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
@@ -32,6 +32,8 @@ class DelphsTableLogic {
   timeSinceMusic = 0
 
   timeSinceLastQuest = 0
+
+  private playerQuorumHasArrived = false
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
@@ -98,6 +100,7 @@ class DelphsTableLogic {
     Object.values(this.deer).forEach((d) => {
       d.update(dt)
     })
+    this.checkForPlayers()
     this.checkForTraps()
     this.spawnGump()
     this.checkForHarvest()
@@ -126,6 +129,26 @@ class DelphsTableLogic {
     if (this.currentQuest?.isOver()) {
       this.stopQuest()
     }
+  }
+
+  checkForPlayers() {
+    if (this.state.roomType === RoomType.continuous || this.playerQuorumHasArrived) {
+      return
+    }
+    const expectedPlayers = iterableToArray(this.state.expectedPlayers.values())
+    if (Object.values(this.warriors).length < expectedPlayers.length) {
+      this.state.assign({
+        acceptInput: false,
+        persistantMessage: "Waiting for players."
+      })
+      return
+    }
+
+    this.playerQuorumHasArrived = true
+    this.state.assign({
+      acceptInput: true,
+      persistantMessage: ""
+    })
   }
 
   addWarrior(client:Client, stats:WarriorStats) {
@@ -166,14 +189,23 @@ class DelphsTableLogic {
   }
 
   updateDestination(sessionId:string, {x, z}: {x:number,z:number}) {
+    if (!this.state.acceptInput) {
+      return
+    }
     this.warriors[sessionId].setDestination(x, z)
   }
 
   playCard(sessionId:string, item: InventoryItem) {
+    if (!this.state.acceptInput) {
+      return
+    }
     this.warriors[sessionId]?.setItem(item)
   }
 
   setTrap(sessionId:string) {
+    if (!this.state.acceptInput) {
+      return
+    }
     const warrior = this.warriors[sessionId]
     if (!warrior) {
       return

@@ -14,12 +14,34 @@ import { InventoryItem, zeroAddr } from "../game/items";
 import TrapScript from "../game/Trap";
 import MusicHandler from "../game/MusicHandler";
 import QuestLogic from "../game/QuestLogic";
+import { memoize } from "../utils/memoize";
+
+const client = memoize(() => {
+  if (typeof document !== 'undefined') {
+    const params = new URLSearchParams(document.location.search);
+    if (params.get('arena')) {
+      return new Client("wss://zh8smr.colyseus.de")
+    }
+  }
+  return new Client("ws://localhost:2567")
+})
+
+const roomParams = () => {
+  if (typeof document !== 'undefined') {
+    const params = new URLSearchParams(document.location.search);
+    const encodedMatchData = params.get("m")
+    if (encodedMatchData) {
+      return ["match", JSON.parse(atob(encodedMatchData))]
+    }
+    return ["delphs", { name: params.get("name") }]
+  }
+  return ["delphs", {}]
+}
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
 
   room?: Room<DelphsTableState>
-  user: string
   gumpTemplate: Entity
   treeTemplate: Entity
   deerTemplate: Entity
@@ -46,29 +68,13 @@ class NetworkManager extends ScriptTypeBase {
     this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
-
-    if (typeof document !== 'undefined') {
-      const params = new URLSearchParams(document.location.search);
-      const userName = params.get('name')!
-      this.user = userName
-      if (params.get('arena')) {
-        this.client = new Client("wss://zh8smr.colyseus.de")
-      } else {
-        if (params.get('unf')) {
-          this.client = new Client('ws://51.15.114.122:2567')
-        } else {
-          this.client = new Client("ws://localhost:2567")
-        }
-      }
-    } else {
-      this.user = "Unknown"
-      this.client = new Client("ws://localhost:2567")
-    }
+    this.client = client()
 
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
 
-    this.room = await this.client.joinOrCreate<DelphsTableState>("delphs", { name: this.user });
+    const [roomType, params] = roomParams()
+    this.room = await this.client.joinOrCreate<DelphsTableState>(roomType, params);
     
     this.room.onError((error) => {
       console.error("room error", error)
@@ -270,7 +276,6 @@ class NetworkManager extends ScriptTypeBase {
     this.warriors[key].destroy()
     delete this.warriors[key]
   }
-
 
   handlePlayerAdd(warrior: Warrior, key: string) {
     console.log("A player has joined! Their unique session id is", key, warrior.toJSON());
