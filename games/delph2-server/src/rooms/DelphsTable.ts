@@ -1,17 +1,21 @@
 import { Room, Client } from "colyseus";
-import { DelphsTableState } from "./schema/DelphsTableState";
+import { DelphsTableState, Player, RoomType } from "./schema/DelphsTableState";
 import DelphsTableLogic from "../game/DelphsTableLogic";
 import { generateFakeWarriors } from "../game/Warrior";
 import { InventoryItem } from "../game/items";
+import { IncomingMessage } from "http";
 
 interface JoinOptions {
-  name: string
+  name?: string
   id?: string
   token?: string
 }
 
 interface RoomOptions extends JoinOptions {
+  roomType: RoomType
 
+  matchId?: string
+  expectedPlayers?: JoinOptions[]
 }
 
 export class DelphsTable extends Room<DelphsTableState> {
@@ -19,7 +23,19 @@ export class DelphsTable extends Room<DelphsTableState> {
   game: DelphsTableLogic
 
   onCreate(options: RoomOptions) {
-    this.setState(new DelphsTableState());
+    this.setState(new DelphsTableState({matchId: options.matchId}))
+
+    if (options.expectedPlayers) {
+      console.log('creating with expected players')
+      this.state.expectedPlayers.push(...options.expectedPlayers.map((player) => new Player(player)))
+    } else {
+      console.log('normal create')
+    }
+
+    this.state.assign({
+      roomType: options.roomType,
+    })
+
     this.game = new DelphsTableLogic(this)
     this.game.start()
 
@@ -36,6 +52,18 @@ export class DelphsTable extends Room<DelphsTableState> {
     this.onMessage("getLatency", (client) => {
       client.send(new Date().getTime())
     })
+  }
+
+  onAuth(_client: Client, options: JoinOptions, _request?: IncomingMessage) {
+    console.log("on auth")
+    if (this.state.expectedPlayers.length == 0) {
+      return true
+    }
+    if (this.state.expectedPlayers && this.state.expectedPlayers.some((player) => player.id === options.id)) {
+      return true
+    }
+    console.log("no states matched, false")
+    return false
   }
 
   onJoin(client: Client, { name }: JoinOptions) {

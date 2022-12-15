@@ -130,6 +130,7 @@ export class Player extends Schema {
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("number") roomType: RoomType = RoomType.continuous;
+  @type("string") matchId:string;
   @type("boolean") acceptInput:boolean;
   @type("string") persistantMessage: string = "";
   @type("string") seed: string = "todo:initialseed";
