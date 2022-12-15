@@ -47,6 +47,14 @@ class DelphsTableLogic {
     this.battles = {}
     this.deer = {}
     this.deerAttacks = {}
+    if (this.state.roomType === RoomType.match) {
+      const quest = QuestLogic.randomQuest(this.room, this.warriors)
+      this.currentQuest = quest
+      this.state.assign({
+        questActive: false,
+        currentQuest: quest.state,
+      })
+    }
   }
 
   start() {
@@ -123,7 +131,7 @@ class DelphsTableLogic {
     } else {
       this.timeSinceLastQuest += dt
     }
-    if (!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1) {
+    if (this.state.acceptInput &&!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1) {
       this.startQuest()
     }
     if (this.currentQuest?.isOver()) {
@@ -146,9 +154,11 @@ class DelphsTableLogic {
 
     this.playerQuorumHasArrived = true
     this.state.assign({
+      questActive: true,
       acceptInput: true,
-      persistantMessage: ""
+      persistantMessage: "",
     })
+    this.currentQuest!.start()
   }
 
   addWarrior(client:Client, stats:WarriorStats) {
@@ -416,8 +426,25 @@ class DelphsTableLogic {
   }
 
   private stopQuest() {
-    this.room.broadcast('mainHUDMessage', 'Quest Over')
+
     const winner = this.currentQuest.winner
+    this.currentQuest = undefined
+    this.state.assign({
+      questActive: false,
+      currentQuest: undefined
+    })
+    this.timeSinceLastQuest = 0
+
+    if (this.state.roomType === RoomType.match) {
+      this.state.assign({
+        acceptInput: false,
+        persistantMessage: `${winner.state.name} wins!`
+      })
+      return
+    }
+    
+    this.room.broadcast('mainHUDMessage', 'Quest Over')
+
     if (winner) {
       winner.client.send('mainHUDMessage', "You win!")
       Object.values(this.warriors).forEach((w) => {
@@ -427,12 +454,6 @@ class DelphsTableLogic {
         w.sendMessage("You lose.")
       })
     }
-    this.currentQuest = undefined
-    this.state.assign({
-      questActive: false,
-      currentQuest: undefined
-    })
-    this.timeSinceLastQuest = 0
   }
 
   private spawnGump() {

@@ -108,7 +108,6 @@ class Hud extends ScriptTypeBase {
 
     const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
     this.berserk.enabled = hasBerserk
-    console.log("max: ", this.maxStats.toJSON(), "warrior: ", this.warrior.currentAttack, this.warrior.currentDefense)
     this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
     this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
     this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)

@@ -29,6 +29,7 @@ class DelphsTableLogic {
     constructor(room) {
         this.timeSinceMusic = 0;
         this.timeSinceLastQuest = 0;
+        this.playerQuorumHasArrived = false;
         this.room = room;
         this.state = room.state;
         this.warriors = {};
@@ -37,13 +38,22 @@ class DelphsTableLogic {
         this.battles = {};
         this.deer = {};
         this.deerAttacks = {};
+        if (this.state.roomType === DelphsTableState_1.RoomType.match) {
+            const quest = QuestLogic_1.default.randomQuest(this.room, this.warriors);
+            this.currentQuest = quest;
+            this.state.assign({
+                questActive: false,
+                currentQuest: quest.state,
+            });
+        }
     }
     start() {
         let previous = new Date();
         this.update(0);
         this.intervalHandle = setInterval(() => {
-            const diff = (new Date().getTime()) - previous.getTime();
-            previous = new Date();
+            const now = new Date();
+            const diff = (now.getTime()) - previous.getTime();
+            previous = now;
             this.update(diff / 1000);
         }, 100);
         for (let i = 0; i < 10; i++) {
@@ -62,14 +72,16 @@ class DelphsTableLogic {
     setupMusic() {
         return __awaiter(this, void 0, void 0, function* () {
             const track = yield (0, music_1.getRandomTrack)();
-            console.log('updating track to: ', track.title);
-            this.state.nowPlaying.assign({
-                name: track.title,
-                duration: track.duration,
-                artwork: track.artwork,
-                url: track.streaming,
-                startedAt: new Date().getTime()
-            });
+            if (track) {
+                console.log('updating track to: ', track.title);
+                this.state.nowPlaying.assign({
+                    name: track.title,
+                    duration: track.duration,
+                    artwork: track.artwork,
+                    url: track.streaming,
+                    startedAt: new Date().getTime()
+                });
+            }
             this.timeSinceMusic = 0;
         });
     }
@@ -86,6 +98,7 @@ class DelphsTableLogic {
         Object.values(this.deer).forEach((d) => {
             d.update(dt);
         });
+        this.checkForPlayers();
         this.checkForTraps();
         this.spawnGump();
         this.checkForHarvest();
@@ -93,6 +106,11 @@ class DelphsTableLogic {
         this.handleDeerAttacks(dt);
         this.handleRecovers(dt);
         this.timeSinceMusic += dt;
+        if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20) {
+            // try every 20s incase music is failing
+            this.timeSinceMusic = 0;
+            this.setupMusic();
+        }
         if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
             this.timeSinceMusic = 0;
             this.setupMusic();
@@ -103,12 +121,32 @@ class DelphsTableLogic {
         else {
             this.timeSinceLastQuest += dt;
         }
-        if (!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && (0, randoms_1.randomInt)(10) === 1) {
+        if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && (0, randoms_1.randomInt)(10) === 1) {
             this.startQuest();
         }
         if ((_a = this.currentQuest) === null || _a === void 0 ? void 0 : _a.isOver()) {
             this.stopQuest();
         }
+    }
+    checkForPlayers() {
+        if (this.state.roomType === DelphsTableState_1.RoomType.continuous || this.playerQuorumHasArrived) {
+            return;
+        }
+        const expectedPlayers = (0, iterableToArray_1.default)(this.state.expectedPlayers.values());
+        if (Object.values(this.warriors).length < expectedPlayers.length) {
+            this.state.assign({
+                acceptInput: false,
+                persistantMessage: "Waiting for players."
+            });
+            return;
+        }
+        this.playerQuorumHasArrived = true;
+        this.state.assign({
+            questActive: true,
+            acceptInput: true,
+            persistantMessage: "",
+        });
+        this.currentQuest.start();
     }
     addWarrior(client, stats) {
         console.log('add warrior', stats);
@@ -125,20 +163,35 @@ class DelphsTableLogic {
         console.log('warrior: ', state.toJSON());
         this.warriors[sessionId] = new Warrior_1.default(client, state);
         this.state.warriors.set(sessionId, state);
+        this.updateMaxStats();
     }
     removeWarrior(client) {
         const sessionId = client.sessionId;
         delete this.warriors[sessionId];
         this.state.warriors.delete(sessionId);
+        if (this.currentQuest && this.currentQuest.state.piggyId === sessionId) {
+            console.log('warrior leaving was the piggy');
+            this.currentQuest.setNewRandomPiggy();
+        }
+        this.updateMaxStats();
     }
     updateDestination(sessionId, { x, z }) {
+        if (!this.state.acceptInput) {
+            return;
+        }
         this.warriors[sessionId].setDestination(x, z);
     }
     playCard(sessionId, item) {
         var _a;
+        if (!this.state.acceptInput) {
+            return;
+        }
         (_a = this.warriors[sessionId]) === null || _a === void 0 ? void 0 : _a.setItem(item);
     }
     setTrap(sessionId) {
+        if (!this.state.acceptInput) {
+            return;
+        }
         const warrior = this.warriors[sessionId];
         if (!warrior) {
             return;
@@ -197,8 +250,11 @@ class DelphsTableLogic {
                     if (trap.plantedBy && this.warriors[trap.plantedBy]) {
                         this.warriors[trap.plantedBy].incGumpBalance(gumpToLose);
                     }
+                    if (this.currentQuest && this.currentQuest.state.piggyId === w.id) {
+                        this.currentQuest.updatePiggy(trap.plantedBy);
+                    }
+                    // w.client.send('trapped', id)
                     this.state.traps.delete(id);
-                    w.client.send('trapped', id);
                 }
             }
         });
@@ -246,6 +302,18 @@ class DelphsTableLogic {
                     delete this.battles[w.id];
                 });
                 this.state.battles.delete(battle.id);
+                if (this.currentQuest && this.currentQuest.state.piggyId) {
+                    const piggyId = this.currentQuest.state.piggyId;
+                    const winner = battle.winner;
+                    if (winner.id === piggyId) {
+                        return; // do nothing because the winner stays the piggy.
+                    }
+                    battle.losers.forEach((w) => {
+                        if (w.id === piggyId) {
+                            this.currentQuest.updatePiggy(winner.id);
+                        }
+                    });
+                }
             }
         });
     }
@@ -288,23 +356,61 @@ class DelphsTableLogic {
             }
         });
     }
-    startQuest() {
-        const quest = QuestLogic_1.default.randomQuest(this.warriors);
-        this.currentQuest = quest;
-        this.state.assign({
-            currentQuest: quest.state
+    updateMaxStats() {
+        let maxAttack = 0;
+        let maxDefense = 0;
+        let maxHealth = 0;
+        Object.values(this.warriors).forEach((w) => {
+            if (w.state.attack > maxAttack) {
+                maxAttack = w.state.attack;
+            }
+            if (w.state.defense > maxDefense) {
+                maxDefense = w.state.defense;
+            }
+            if (w.state.initialHealth > maxHealth) {
+                maxHealth = w.state.initialHealth;
+            }
+        });
+        this.state.maxStats.assign({
+            maxAttack,
+            maxDefense,
+            maxHealth,
         });
     }
+    startQuest() {
+        const quest = QuestLogic_1.default.randomQuest(this.room, this.warriors);
+        this.currentQuest = quest;
+        this.state.assign({
+            questActive: true,
+            currentQuest: quest.state,
+        });
+        quest.start();
+    }
     stopQuest() {
-        if (this.currentQuest.winner) {
-            this.currentQuest.winner.client.send('mainHUDMessage', "You win!");
-        }
+        const winner = this.currentQuest.winner;
         this.currentQuest = undefined;
         this.state.assign({
+            questActive: false,
             currentQuest: undefined
         });
         this.timeSinceLastQuest = 0;
+        if (this.state.roomType === DelphsTableState_1.RoomType.match) {
+            this.state.assign({
+                acceptInput: false,
+                persistantMessage: `${winner.state.name} wins!`
+            });
+            return;
+        }
         this.room.broadcast('mainHUDMessage', 'Quest Over');
+        if (winner) {
+            winner.client.send('mainHUDMessage', "You win!");
+            Object.values(this.warriors).forEach((w) => {
+                if (w === winner) {
+                    return;
+                }
+                w.sendMessage("You lose.");
+            });
+        }
     }
     spawnGump() {
         const allGumps = Object.values(this.wootgump);

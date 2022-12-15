@@ -12,6 +12,7 @@ class BattleLogic {
         this.id = id;
         this.warriors = warriors;
         this.state = state;
+        this.losers = [];
     }
     update(dt) {
         if (!this.started) {
@@ -52,8 +53,10 @@ class BattleLogic {
             if (warrior.isAlive()) {
                 warrior.sendMessage("Winner!");
                 warrior.setState(DelphsTableState_1.State.move);
+                this.winner = warrior;
             }
             else {
+                this.losers.push(warrior);
                 warrior.sendMessage('You lose.');
                 const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5);
                 warrior.incGumpBalance(gumpTaken * -1);
