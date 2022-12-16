@@ -18,6 +18,7 @@ const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const BattleLogic_1 = __importDefault(require("./BattleLogic"));
 const Deer_1 = __importDefault(require("./Deer"));
 const DeerAttackLogic_1 = __importDefault(require("./DeerAttackLogic"));
+const items_1 = require("./items");
 const music_1 = require("./music");
 const QuestLogic_1 = __importDefault(require("./QuestLogic"));
 const iterableToArray_1 = __importDefault(require("./utils/iterableToArray"));
@@ -38,14 +39,6 @@ class DelphsTableLogic {
         this.battles = {};
         this.deer = {};
         this.deerAttacks = {};
-        if (this.state.roomType === DelphsTableState_1.RoomType.match) {
-            const quest = QuestLogic_1.default.randomQuest(this.room, this.warriors);
-            this.currentQuest = quest;
-            this.state.assign({
-                questActive: false,
-                currentQuest: quest.state,
-            });
-        }
     }
     start() {
         let previous = new Date();
@@ -66,6 +59,11 @@ class DelphsTableLogic {
         for (let i = 0; i < 10; i++) {
             const position = this.randomPosition();
             this.spawnDeer(new playcanvas_1.Vec2(position.x, position.z));
+        }
+        if (this.state.roomType === DelphsTableState_1.RoomType.continuous) {
+            this.state.assign({
+                acceptInput: true
+            });
         }
         this.setupMusic();
     }
@@ -118,15 +116,18 @@ class DelphsTableLogic {
         if (this.currentQuest) {
             this.currentQuest.update(dt);
         }
-        else {
+        if (!this.currentQuest && this.state.acceptInput) {
             this.timeSinceLastQuest += dt;
         }
-        if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && (0, randoms_1.randomInt)(10) === 1) {
+        if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 60 && (this.isMatchRoom() || Math.floor(this.timeSinceLastQuest) % 10 === 0 && (0, randoms_1.randomInt)(10) === 1)) {
             this.startQuest();
         }
         if ((_a = this.currentQuest) === null || _a === void 0 ? void 0 : _a.isOver()) {
             this.stopQuest();
         }
+    }
+    isMatchRoom() {
+        return this.state.roomType === DelphsTableState_1.RoomType.match;
     }
     checkForPlayers() {
         if (this.state.roomType === DelphsTableState_1.RoomType.continuous || this.playerQuorumHasArrived) {
@@ -142,11 +143,9 @@ class DelphsTableLogic {
         }
         this.playerQuorumHasArrived = true;
         this.state.assign({
-            questActive: true,
             acceptInput: true,
             persistantMessage: "",
         });
-        this.currentQuest.start();
     }
     addWarrior(client, stats) {
         console.log('add warrior', stats);
@@ -157,10 +156,13 @@ class DelphsTableLogic {
         state.destination.assign(position);
         Object.keys(stats.initialInventory).forEach((key) => {
             const initialInventory = stats.initialInventory[key];
-            state.initialInventory.set(key, new DelphsTableState_1.InventoryOfItem({ quantity: initialInventory.quantity, item: new DelphsTableState_1.Item(initialInventory.item) }));
-            state.inventory.set(key, new DelphsTableState_1.InventoryOfItem({ quantity: initialInventory.quantity, item: new DelphsTableState_1.Item(initialInventory.item) }));
+            const itemDescription = (0, items_1.itemFromInventoryItem)(initialInventory.item);
+            const item = new DelphsTableState_1.Item(Object.assign(Object.assign({}, initialInventory.item), itemDescription));
+            const inventoryOfItem = new DelphsTableState_1.InventoryOfItem({ quantity: initialInventory.quantity, item: item });
+            state.initialInventory.set(key, inventoryOfItem);
+            state.inventory.set(key, inventoryOfItem.clone());
         });
-        console.log('warrior: ', state.toJSON());
+        console.log('added warrior: ', state.name);
         this.warriors[sessionId] = new Warrior_1.default(client, state);
         this.state.warriors.set(sessionId, state);
         this.updateMaxStats();
@@ -186,7 +188,10 @@ class DelphsTableLogic {
         if (!this.state.acceptInput) {
             return;
         }
-        (_a = this.warriors[sessionId]) === null || _a === void 0 ? void 0 : _a.setItem(item);
+        const result = (_a = this.warriors[sessionId]) === null || _a === void 0 ? void 0 : _a.playItem(item);
+        if ((result === null || result === void 0 ? void 0 : result.name) === "Trap") {
+            this.setTrap(sessionId);
+        }
     }
     setTrap(sessionId) {
         if (!this.state.acceptInput) {
@@ -240,7 +245,7 @@ class DelphsTableLogic {
                     return;
                 }
                 const distance = w.position.distance(new playcanvas_1.Vec2(trap.position.x, trap.position.z));
-                if (distance < 0.9) {
+                if (distance < 3) {
                     console.log(w.state.name, 'trapped');
                     w.state.assign({
                         currentHealth: w.state.currentHealth * 0.5
@@ -378,7 +383,8 @@ class DelphsTableLogic {
         });
     }
     startQuest() {
-        const quest = QuestLogic_1.default.randomQuest(this.room, this.warriors);
+        const type = (this.state.roomType === DelphsTableState_1.RoomType.continuous) ? DelphsTableState_1.QuestType.random : DelphsTableState_1.QuestType.keyCarrier;
+        const quest = QuestLogic_1.default.randomQuest(this.room, this.warriors, type);
         this.currentQuest = quest;
         this.state.assign({
             questActive: true,
@@ -394,7 +400,7 @@ class DelphsTableLogic {
             currentQuest: undefined
         });
         this.timeSinceLastQuest = 0;
-        if (this.state.roomType === DelphsTableState_1.RoomType.match) {
+        if (this.isMatchRoom()) {
             this.state.assign({
                 acceptInput: false,
                 persistantMessage: `${winner.state.name} wins!`
@@ -414,7 +420,7 @@ class DelphsTableLogic {
     }
     spawnGump() {
         const allGumps = Object.values(this.wootgump);
-        if (allGumps.length >= 70) {
+        if (allGumps.length >= 60) {
             return;
         }
         allGumps.forEach((gump, i) => {

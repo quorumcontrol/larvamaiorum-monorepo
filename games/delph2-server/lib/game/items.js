@@ -10,10 +10,10 @@ const items = [
     {
         address: zeroAddr,
         id: 1,
-        name: "Evade",
-        description: "Avoid the next battle you'll be in.",
-        avoidBattle: true,
-        takeGump: 0,
+        name: "Trap",
+        description: "Drop a trap on the board.",
+        costToPlay: 5,
+        appliesToWorld: true
     },
     {
         address: zeroAddr,
@@ -23,14 +23,16 @@ const items = [
         attack: 2000,
         defense: -400,
         hp: -100,
+        costToPlay: 20,
     },
     {
         address: zeroAddr,
         id: 3,
-        name: "Thieve",
-        description: "No need to battle, just steal 10% of your opponent's gump.",
-        avoidBattle: true,
-        takeGump: 0.10
+        name: "Speed",
+        description: "Increase the speed of your player for 15s.",
+        costToPlay: 10,
+        speed: 2,
+        timeLimit: 15,
     }
 ].map((i) => {
     return Object.assign({ identifier: getIdentifier(i) }, i);
@@ -39,8 +41,9 @@ exports.itemsByIdentifier = items.reduce((memo, item) => {
     return Object.assign({ [item.identifier]: item }, memo);
 }, {});
 exports.defaultInitialInventory = {
-    [items[1].identifier]: { quantity: 1, item: { address: items[1].address, id: items[1].id } },
-    // [items[2].identifier]: {quantity: 1, item: { address: items[2].address, id: items[2].id }}
+    [items[0].identifier]: { quantity: 20, item: { address: items[0].address, id: items[0].id } },
+    [items[1].identifier]: { quantity: 20, item: { address: items[1].address, id: items[1].id } },
+    [items[2].identifier]: { quantity: 20, item: { address: items[2].address, id: items[2].id } },
 };
 function itemFromInventoryItem(inventoryItem) {
     const identifier = getIdentifier(inventoryItem);

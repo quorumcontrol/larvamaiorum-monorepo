@@ -125,9 +125,12 @@ class DelphsTableLogic {
 
     if (this.currentQuest) {
       this.currentQuest.update(dt)
-    } else {
+    } 
+    
+    if (!this.currentQuest && this.state.acceptInput) {
       this.timeSinceLastQuest += dt
     }
+
     if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 60 && (this.isMatchRoom() || Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1)) {
       this.startQuest()
     }
@@ -180,8 +183,7 @@ class DelphsTableLogic {
       const itemDescription = itemFromInventoryItem(initialInventory.item)
       const item = new Item({
         ...initialInventory.item,
-        name: itemDescription.name,
-        description: itemDescription.description,
+        ...itemDescription,
       })
       const inventoryOfItem = new InventoryOfItem({ quantity: initialInventory.quantity, item: item })
       state.initialInventory.set(key, inventoryOfItem)
@@ -277,7 +279,7 @@ class DelphsTableLogic {
           return
         }
         const distance = w.position.distance(new Vec2(trap.position.x, trap.position.z))
-        if (distance < 0.9) {
+        if (distance < 3) {
           console.log(w.state.name, 'trapped')
           w.state.assign({
             currentHealth: w.state.currentHealth * 0.5
@@ -468,7 +470,7 @@ class DelphsTableLogic {
 
   private spawnGump() {
     const allGumps = Object.values(this.wootgump)
-    if (allGumps.length >= 70) {
+    if (allGumps.length >= 60) {
       return
     }
     allGumps.forEach((gump, i) => {

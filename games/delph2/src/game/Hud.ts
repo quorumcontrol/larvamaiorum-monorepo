@@ -95,9 +95,9 @@ class Hud extends ScriptTypeBase {
     this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
     this.statElements.AttackStat.element!.text = this.warrior.currentAttack.toString()
     this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
-    this.statElements.HealthStat.element!.text = `${this.warrior.currentHealth} / ${this.warrior.initialHealth}`
+    this.statElements.HealthStat.element!.text = `${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}`
 
-    this.gumpStats.element!.text = `dGump: ${this.warrior.wootgumpBalance}`
+    this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
   }
 
   private setupInventory() {

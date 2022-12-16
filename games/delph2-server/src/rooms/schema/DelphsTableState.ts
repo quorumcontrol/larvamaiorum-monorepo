@@ -41,10 +41,12 @@ export class Vec2 extends Schema {
 }
 
 export class Item extends Schema {
-  @type("string") name: string
-  @type("string") description: string
   @type("string") address: string
   @type("number") id: number
+
+  @type("string") name: string
+  @type("string") description: string
+  @type("number") costToPlay?:number
 }
 
 export class InventoryOfItem extends Schema {
@@ -137,7 +139,7 @@ export class DelphsTableState extends Schema {
   @type("string") matchId: string;
   @type("boolean") acceptInput: boolean;
   @type("string") persistantMessage: string = "";
-  @type("string") seed: string = "todo:initialseed";
+  @type("string") seed: string;
 
   @type(Quest) currentQuest?: Quest;
   @type("boolean") questActive = false

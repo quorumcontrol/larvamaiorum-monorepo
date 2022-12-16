@@ -16,6 +16,12 @@ class NonPlayerCharacter extends ScriptTypeBase {
   player?: Entity
   warrior?: Warrior
 
+  stats: {
+    Attack: Entity,
+    Defense: Entity,
+    Gump: Entity
+  }
+
   initialize() {
     this.nameScreen = mustFindByName(this.entity, 'PlayerNameScreen')
     this.statsScreen = mustFindByName(this.entity, 'StatsScreen')
@@ -26,6 +32,11 @@ class NonPlayerCharacter extends ScriptTypeBase {
       this.name.element!.text = warrior.name
       this.warrior = warrior
     })
+    this.stats = {
+      Attack: mustFindByName(this.statsScreen, "Attack"),
+      Defense: mustFindByName(this.statsScreen, "Defense"),
+      Gump: mustFindByName(this.statsScreen, "Gump"),
+    }
   }
 
   setPlayerEntity(player:Entity) {
@@ -45,9 +56,9 @@ class NonPlayerCharacter extends ScriptTypeBase {
       this.statsScreen.lookAt(this.camera.getPosition())
       this.statsScreen.rotateLocal(0, 180, 0)
       if (this.warrior) {
-        mustFindByName(this.statsScreen, 'Attack').element!.text = `A: ${this.warrior.attack}`
-        mustFindByName(this.statsScreen, 'Defense').element!.text = `D: ${this.warrior.defense}`
-        mustFindByName(this.statsScreen, 'Gump').element!.text = `G: ${this.warrior.wootgumpBalance}`
+        this.stats.Attack.element!.text = `A: ${this.warrior.attack}`
+        this.stats.Defense.element!.text = `D: ${this.warrior.defense}`
+        this.stats.Gump.element!.text = `G: ${this.warrior.wootgumpBalance}`
       }
     }
   }

@@ -38,10 +38,10 @@ export function generateFakeWarriors(count: number, seed: string) {
     warriors[i] = {
       id: `warrior-${i}-${seed}`,
       name: `Warius ${i}`,
-      attack: deterministicRandom(1500, `generateFakeWarriors-${i}-attack`, seed) + 500,
-      defense: deterministicRandom(500, `generateFakeWarriors-${i}-defense`, seed) + 400,
+      attack: deterministicRandom(150, `generateFakeWarriors-${i}-attack`, seed) + 1500,
+      defense: deterministicRandom(100, `generateFakeWarriors-${i}-defense`, seed) + 900,
       maxSpeed: 5,
-      initialHealth: deterministicRandom(1000, `generateFakeWarriors-${i}-health`, seed) + 1000,
+      initialHealth: deterministicRandom(300, `generateFakeWarriors-${i}-health`, seed) + 1000,
       initialGump: 0,
       initialInventory: defaultInitialInventory,
       autoPlay: false,
@@ -225,6 +225,13 @@ class Warrior extends EventEmitter {
     if (!inventoryRecord || inventoryRecord.quantity <= 0) {
       console.error('no inventory left for this item, not playing')
       return null
+    }
+    if (item.costToPlay > 0) {
+      if (this.state.wootgumpBalance < item.costToPlay) {
+        this.sendMessage("You need more gump to play that.")
+        return null
+      }
+      this.incGumpBalance(-1 * item.costToPlay)
     }
 
     inventoryRecord.quantity -= 1

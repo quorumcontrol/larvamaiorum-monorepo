@@ -17,9 +17,13 @@ const colyseus_1 = require("colyseus");
 const DelphsTableState_1 = require("./schema/DelphsTableState");
 const DelphsTableLogic_1 = __importDefault(require("../game/DelphsTableLogic"));
 const Warrior_1 = require("../game/Warrior");
+const randoms_1 = require("../game/utils/randoms");
 class DelphsTable extends colyseus_1.Room {
     onCreate(options) {
         this.setState(new DelphsTableState_1.DelphsTableState({ matchId: options.matchId }));
+        this.state.assign({
+            seed: (0, randoms_1.randomInt)(100000).toString()
+        });
         if (options.expectedPlayers) {
             console.log('creating with expected players');
             this.state.expectedPlayers.push(...options.expectedPlayers.map((player) => new DelphsTableState_1.Player(player)));
@@ -38,9 +42,6 @@ class DelphsTable extends colyseus_1.Room {
         });
         this.onMessage("playCard", (client, card) => {
             this.game.playCard(client.sessionId, card);
-        });
-        this.onMessage("setTrap", (client) => {
-            this.game.setTrap(client.sessionId);
         });
         this.onMessage("getLatency", (client) => {
             client.send(new Date().getTime());

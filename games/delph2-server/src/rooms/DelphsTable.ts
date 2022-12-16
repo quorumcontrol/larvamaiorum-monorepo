@@ -4,6 +4,7 @@ import DelphsTableLogic from "../game/DelphsTableLogic";
 import { generateFakeWarriors } from "../game/Warrior";
 import { InventoryItem } from "../game/items";
 import { IncomingMessage } from "http";
+import { randomInt } from "../game/utils/randoms";
 
 interface JoinOptions {
   name?: string
@@ -24,6 +25,9 @@ export class DelphsTable extends Room<DelphsTableState> {
 
   onCreate(options: RoomOptions) {
     this.setState(new DelphsTableState({matchId: options.matchId}))
+    this.state.assign({
+      seed: randomInt(100_000).toString()
+    })
 
     if (options.expectedPlayers) {
       console.log('creating with expected players')

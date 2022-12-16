@@ -32,6 +32,7 @@ var QuestType;
     QuestType[QuestType["first"] = 0] = "first";
     QuestType[QuestType["timed"] = 1] = "timed";
     QuestType[QuestType["keyCarrier"] = 2] = "keyCarrier";
+    QuestType[QuestType["random"] = 3] = "random";
 })(QuestType = exports.QuestType || (exports.QuestType = {}));
 class Music extends schema_1.Schema {
 }
@@ -76,6 +77,15 @@ __decorate([
 __decorate([
     (0, schema_1.type)("number")
 ], Item.prototype, "id", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Item.prototype, "name", void 0);
+__decorate([
+    (0, schema_1.type)("string")
+], Item.prototype, "description", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Item.prototype, "costToPlay", void 0);
 exports.Item = Item;
 class InventoryOfItem extends schema_1.Schema {
 }
@@ -165,6 +175,9 @@ __decorate([
 __decorate([
     (0, schema_1.type)("number")
 ], Warrior.prototype, "defense", void 0);
+__decorate([
+    (0, schema_1.type)("number")
+], Warrior.prototype, "maxSpeed", void 0);
 __decorate([
     (0, schema_1.type)("number")
 ], Warrior.prototype, "currentAttack", void 0);
@@ -292,7 +305,6 @@ class DelphsTableState extends schema_1.Schema {
         this.tick = 0;
         this.roomType = RoomType.continuous;
         this.persistantMessage = "";
-        this.seed = "todo:initialseed";
         this.questActive = false;
         this.maxStats = new MaxStats({});
         this.expectedPlayers = new schema_1.ArraySchema();

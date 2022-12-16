@@ -1,40 +1,16 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateFakeWarriors = void 0;
 const events_1 = __importDefault(require("events"));
-const items_1 = __importStar(require("./items"));
+const items_1 = require("./items");
 const randoms_1 = require("./utils/randoms");
 const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const playcanvas_1 = require("playcanvas");
 const randomColor_1 = __importDefault(require("./utils/randomColor"));
 const log = console.log; //debug('Warrior')
-const berserkIdentifier = '0x0000000000000000000000000000000000000000-2';
 // export interface WarriorState extends WarriorStats {
 //   currentHealth: number;
 //   wootgumpBalance: number;
@@ -49,9 +25,10 @@ function generateFakeWarriors(count, seed) {
         warriors[i] = {
             id: `warrior-${i}-${seed}`,
             name: `Warius ${i}`,
-            attack: (0, randoms_1.deterministicRandom)(1500, `generateFakeWarriors-${i}-attack`, seed) + 500,
-            defense: (0, randoms_1.deterministicRandom)(500, `generateFakeWarriors-${i}-defense`, seed) + 400,
-            initialHealth: (0, randoms_1.deterministicRandom)(1000, `generateFakeWarriors-${i}-health`, seed) + 1000,
+            attack: (0, randoms_1.deterministicRandom)(150, `generateFakeWarriors-${i}-attack`, seed) + 1500,
+            defense: (0, randoms_1.deterministicRandom)(100, `generateFakeWarriors-${i}-defense`, seed) + 900,
+            maxSpeed: 5,
+            initialHealth: (0, randoms_1.deterministicRandom)(300, `generateFakeWarriors-${i}-health`, seed) + 1000,
             initialGump: 0,
             initialInventory: items_1.defaultInitialInventory,
             autoPlay: false,
@@ -97,17 +74,17 @@ class Warrior extends events_1.default {
                 return;
             }
         }
-        if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
-            this.timeWithoutCard += dt;
-            if (this.timeWithoutCard > 45) {
-                this.spawnBerserk();
-            }
-        }
+        // if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
+        //   this.timeWithoutCard += dt
+        //   if (this.timeWithoutCard > 45) {
+        //     this.spawnBerserk()
+        //   }
+        // }
     }
-    spawnBerserk() {
-        this.state.inventory.get(berserkIdentifier).quantity += 1;
-        this.sendMessage('New Card!');
-    }
+    // spawnBerserk() {
+    //   this.state.inventory.get(berserkIdentifier).quantity += 1
+    //   this.sendMessage('New Card!')
+    // }
     sendMessage(message) {
         console.log('send mainhudmessage', message);
         this.client.send('mainHUDMessage', message);
@@ -138,7 +115,7 @@ class Warrior extends events_1.default {
     setSpeedBasedOnDestination() {
         const dist = this.distanceToDestination();
         if (dist > 1.5) {
-            this.setSpeed(4);
+            this.setSpeed(this.state.maxSpeed);
             return;
         }
         if (dist > 0.25) {
@@ -194,20 +171,36 @@ class Warrior extends events_1.default {
     //   const i = deterministicRandom(available.length - 1 , `${this.id}-${available.length}`, seed)
     //   this.setItem(available[i].item)
     // }
-    setItem(item) {
-        var _a;
-        log('setting item: ', item, ' existing: ', (_a = this.state.currentItem) === null || _a === void 0 ? void 0 : _a.toJSON(), 'inventory', this.state.inventory.toJSON());
-        // find it in the inventory
+    playItem(inventoryItem) {
+        const item = (0, items_1.itemFromInventoryItem)(inventoryItem);
         const identifier = (0, items_1.getIdentifier)(item);
         log('identifier: ', identifier);
         const inventoryRecord = this.state.inventory.get(identifier);
         log('record: ', inventoryRecord === null || inventoryRecord === void 0 ? void 0 : inventoryRecord.toJSON());
         if (!inventoryRecord || inventoryRecord.quantity <= 0) {
             console.error('no inventory left for this item, not playing');
-            return;
+            return null;
+        }
+        if (item.costToPlay > 0) {
+            if (this.state.wootgumpBalance < item.costToPlay) {
+                this.sendMessage("You need more gump to play that.");
+                return null;
+            }
+            this.incGumpBalance(-1 * item.costToPlay);
         }
         inventoryRecord.quantity -= 1;
-        this.state.currentItem = new DelphsTableState_1.Item(item);
+        if (item.appliesToWorld) {
+            return item;
+        }
+        this.setItem(inventoryItem);
+        return item;
+    }
+    setItem(item) {
+        var _a;
+        log('setting item: ', item, ' existing: ', (_a = this.state.currentItem) === null || _a === void 0 ? void 0 : _a.toJSON(), 'inventory', this.state.inventory.toJSON());
+        // find it in the inventory
+        const description = (0, items_1.itemFromInventoryItem)(item);
+        this.state.currentItem = new DelphsTableState_1.Item(Object.assign(Object.assign({}, item), { name: description.name, description: description.description }));
         this.state.currentAttack = this.currentAttack();
         this.state.currentDefense = this.currentDefense();
     }
@@ -215,7 +208,7 @@ class Warrior extends events_1.default {
         if (!this.state.currentItem) {
             return null;
         }
-        return items_1.default.find((i) => i.address == this.state.currentItem.address && i.id == this.state.currentItem.id);
+        return (0, items_1.itemFromInventoryItem)(this.state.currentItem);
     }
     clearItem() {
         this.state.currentItem = undefined;

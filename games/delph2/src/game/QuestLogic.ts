@@ -49,7 +49,7 @@ class QuestLogic {
     const chest = mustFindByName(this.app.root, 'Chest').clone()
     chest.name = QUEST_OBJECT_NAME
     const position = vec2ToVec2(this.state.currentQuest.object.position)
-    chest.setPosition(position.x, 0, position.y)
+    chest.setPosition(position.x, 1, position.y)
     this.app.root.addChild(chest)
     chest.enabled = true
     this.treasure = chest

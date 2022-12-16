@@ -10,7 +10,6 @@ import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
-import { InventoryItem, zeroAddr } from "../game/items";
 import TrapScript from "../game/Trap";
 import MusicHandler from "../game/MusicHandler";
 import QuestLogic from "../game/QuestLogic";
@@ -135,7 +134,7 @@ class NetworkManager extends ScriptTypeBase {
     
     this.room.onMessage('gumpDiff', (amount:number) => {
         const message = amount < 0 ?
-        `Lost ${amount * -1} gump.` :
+        `- ${amount * -1} gump.` :
         `+ ${amount} gump!`
         this.app.fire('mainHUDMessage', message)
         if (amount > 0) {

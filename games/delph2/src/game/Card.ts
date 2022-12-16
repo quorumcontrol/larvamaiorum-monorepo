@@ -31,6 +31,11 @@ class CardHandler extends ScriptTypeBase {
 
   setItem(item:Item) {
     this.item = item
+    if (item.costToPlay) {
+      const costToPlayEntity = mustFindByName(this.entity, "CostToPlayBackground")
+      mustFindByName(costToPlayEntity, "CostToPlay").element!.text = `${item.costToPlay} $GUMP`
+      costToPlayEntity.enabled = true
+    }
   }
 }
 
