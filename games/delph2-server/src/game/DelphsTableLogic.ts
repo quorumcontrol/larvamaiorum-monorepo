@@ -1,11 +1,11 @@
 import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
-import { InventoryItem } from './items';
+import { InventoryItem, itemFromInventoryItem } from './items';
 import { getRandomTrack } from './music';
 import QuestLogic from './QuestLogic';
 import iterableToArray from './utils/iterableToArray';
@@ -18,7 +18,7 @@ class DelphsTableLogic {
   room: Room
   state: DelphsTableState
 
-  intervalHandle?:any
+  intervalHandle?: any
 
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
@@ -37,7 +37,7 @@ class DelphsTableLogic {
 
   // for now assume a blank table at construction
   // TODO: handle a populated state with existing warriors, etc
-  constructor(room:Room) {
+  constructor(room: Room) {
     this.room = room
     this.state = room.state
 
@@ -47,14 +47,6 @@ class DelphsTableLogic {
     this.battles = {}
     this.deer = {}
     this.deerAttacks = {}
-    if (this.state.roomType === RoomType.match) {
-      const quest = QuestLogic.randomQuest(this.room, this.warriors)
-      this.currentQuest = quest
-      this.state.assign({
-        questActive: false,
-        currentQuest: quest.state,
-      })
-    }
   }
 
   start() {
@@ -64,7 +56,7 @@ class DelphsTableLogic {
       const now = new Date()
       const diff = (now.getTime()) - previous.getTime()
       previous = now
-      this.update(diff/1000)
+      this.update(diff / 1000)
     }, 100)
     for (let i = 0; i < 10; i++) {
       this.spawnOneGump(this.randomPosition())
@@ -76,6 +68,11 @@ class DelphsTableLogic {
     for (let i = 0; i < 10; i++) {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
+    }
+    if (this.state.roomType === RoomType.continuous) {
+      this.state.assign({
+        acceptInput: true
+      })
     }
     this.setupMusic()
   }
@@ -101,7 +98,7 @@ class DelphsTableLogic {
     }
   }
 
-  update(dt:number) {
+  update(dt: number) {
     Object.values(this.warriors).forEach((w) => {
       w.update(dt)
     })
@@ -131,12 +128,16 @@ class DelphsTableLogic {
     } else {
       this.timeSinceLastQuest += dt
     }
-    if (this.state.acceptInput &&!this.state.currentQuest && this.timeSinceLastQuest > 30 && Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1) {
+    if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 60 && (this.isMatchRoom() || Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1)) {
       this.startQuest()
     }
     if (this.currentQuest?.isOver()) {
       this.stopQuest()
     }
+  }
+
+  private isMatchRoom() {
+    return this.state.roomType === RoomType.match
   }
 
   checkForPlayers() {
@@ -154,14 +155,12 @@ class DelphsTableLogic {
 
     this.playerQuorumHasArrived = true
     this.state.assign({
-      questActive: true,
       acceptInput: true,
       persistantMessage: "",
     })
-    this.currentQuest!.start()
   }
 
-  addWarrior(client:Client, stats:WarriorStats) {
+  addWarrior(client: Client, stats: WarriorStats) {
     console.log('add warrior', stats)
     const sessionId = client.sessionId
     const position = this.randomPosition()
@@ -178,16 +177,23 @@ class DelphsTableLogic {
     state.destination.assign(position)
     Object.keys(stats.initialInventory).forEach((key) => {
       const initialInventory = stats.initialInventory[key]
-      state.initialInventory.set(key, new InventoryOfItem({quantity: initialInventory.quantity, item: new Item(initialInventory.item)}))
-      state.inventory.set(key, new InventoryOfItem({quantity: initialInventory.quantity, item: new Item(initialInventory.item)}))
+      const itemDescription = itemFromInventoryItem(initialInventory.item)
+      const item = new Item({
+        ...initialInventory.item,
+        name: itemDescription.name,
+        description: itemDescription.description,
+      })
+      const inventoryOfItem = new InventoryOfItem({ quantity: initialInventory.quantity, item: item })
+      state.initialInventory.set(key, inventoryOfItem)
+      state.inventory.set(key, inventoryOfItem.clone())
     })
-    console.log('warrior: ', state.toJSON())
+    console.log('added warrior: ', state.name)
     this.warriors[sessionId] = new Warrior(client, state)
     this.state.warriors.set(sessionId, state)
     this.updateMaxStats()
   }
 
-  removeWarrior(client:Client) {
+  removeWarrior(client: Client) {
     const sessionId = client.sessionId
     delete this.warriors[sessionId]
     this.state.warriors.delete(sessionId)
@@ -198,21 +204,24 @@ class DelphsTableLogic {
     this.updateMaxStats()
   }
 
-  updateDestination(sessionId:string, {x, z}: {x:number,z:number}) {
+  updateDestination(sessionId: string, { x, z }: { x: number, z: number }) {
     if (!this.state.acceptInput) {
       return
     }
     this.warriors[sessionId].setDestination(x, z)
   }
 
-  playCard(sessionId:string, item: InventoryItem) {
+  playCard(sessionId: string, item: InventoryItem) {
     if (!this.state.acceptInput) {
       return
     }
-    this.warriors[sessionId]?.setItem(item)
+    const result = this.warriors[sessionId]?.playItem(item)
+    if (result?.name === "Trap") {
+      this.setTrap(sessionId)
+    }
   }
 
-  setTrap(sessionId:string) {
+  private setTrap(sessionId: string) {
     if (!this.state.acceptInput) {
       return
     }
@@ -229,11 +238,11 @@ class DelphsTableLogic {
       id,
       plantedBy: sessionId,
     })
-    trap.position.assign({x: warrior.position.x, z: warrior.position.y})
+    trap.position.assign({ x: warrior.position.x, z: warrior.position.y })
     this.state.traps.set(id, trap)
   }
 
-  spawnOneGump(position: {x:number, z:number}) {
+  spawnOneGump(position: { x: number, z: number }) {
     const id = randomUUID()
     this.wootgump[id] = new Vec2(position.x, position.z)
     this.state.wootgump.set(id, new StateVec2().assign(position))
@@ -289,7 +298,7 @@ class DelphsTableLogic {
   }
 
   handleBattles(dt: number) {
-    const pairs:[Warrior, Warrior][] = []
+    const pairs: [Warrior, Warrior][] = []
 
     const warriors = Object.values(this.warriors)
 
@@ -351,7 +360,7 @@ class DelphsTableLogic {
     })
   }
 
-  handleRecovers(_dt:number) {
+  handleRecovers(_dt: number) {
     Object.values(this.warriors).forEach((w) => {
       if (w.state.state === State.move) {
         w.recover(0.005)
@@ -359,7 +368,7 @@ class DelphsTableLogic {
     })
   }
 
-  handleDeerAttacks(dt:number) {
+  handleDeerAttacks(dt: number) {
     const eligibleDeer = Object.values(this.deer).filter((d) => [State.move, State.chasing].includes(d.state.state))
     const eligibleWarriors = Object.values(this.warriors).filter((w) => w.state.state === State.move)
     eligibleDeer.forEach((deer) => {
@@ -374,7 +383,7 @@ class DelphsTableLogic {
           const attackState = new DeerAttack({
             id,
             warriorId: w.id,
-            deerId: deer.id 
+            deerId: deer.id
           })
           this.state.deerAttacks.set(id, attackState)
           const attack = new DeerAttackLogic(id, deer, w)
@@ -416,7 +425,8 @@ class DelphsTableLogic {
   }
 
   private startQuest() {
-    const quest = QuestLogic.randomQuest(this.room, this.warriors)
+    const type = (this.state.roomType === RoomType.continuous) ? QuestType.random : QuestType.keyCarrier
+    const quest = QuestLogic.randomQuest(this.room, this.warriors, type)
     this.currentQuest = quest
     this.state.assign({
       questActive: true,
@@ -435,14 +445,14 @@ class DelphsTableLogic {
     })
     this.timeSinceLastQuest = 0
 
-    if (this.state.roomType === RoomType.match) {
+    if (this.isMatchRoom()) {
       this.state.assign({
         acceptInput: false,
         persistantMessage: `${winner.state.name} wins!`
       })
       return
     }
-    
+
     this.room.broadcast('mainHUDMessage', 'Quest Over')
 
     if (winner) {
@@ -467,7 +477,7 @@ class DelphsTableLogic {
         const zDiff = randomBounded(6)
         const x = this.positionModulo(gump.x + xDiff)
         const z = this.positionModulo(gump.y + zDiff)
-        this.spawnOneGump({x, z })
+        this.spawnOneGump({ x, z })
       }
     })
     // now let's see if we get a new area too
@@ -486,13 +496,13 @@ class DelphsTableLogic {
     return dimension
   }
 
-  private spawnTree(position:Vec2) {
+  private spawnTree(position: Vec2) {
     const id = randomUUID()
     this.trees[id] = position
-    this.state.trees.set(id, new StateVec2().assign({x: position.x, z: position.y}))
+    this.state.trees.set(id, new StateVec2().assign({ x: position.x, z: position.y }))
   }
 
-  private spawnDeer(position:Vec2) {
+  private spawnDeer(position: Vec2) {
     const id = randomUUID()
     const deerState = new DeerState()
     deerState.position.assign({

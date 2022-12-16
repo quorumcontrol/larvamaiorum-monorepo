@@ -21,7 +21,7 @@ class QuestLogic {
 
   winner?:Warrior
 
-  static randomQuest(room:Room, warriors:Record<string,Warrior>) {
+  static randomQuest(room:Room, warriors:Record<string,Warrior>, type: QuestType) {
     //TODO: actually random
     const questObj = new QuestObject({
       id: randomUUID(),
@@ -35,7 +35,7 @@ class QuestLogic {
     })
 
     const warriorIds = Object.keys(warriors)
-    if (randomInt(2) == 1 && warriorIds.length > 1) {
+    if (warriorIds.length > 1 && (type === QuestType.keyCarrier || (type === QuestType.random && randomInt(2) === 1))) {
       state.assign({
         kind: QuestType.keyCarrier,
         piggyId: warriorIds[randomInt(warriorIds.length)],

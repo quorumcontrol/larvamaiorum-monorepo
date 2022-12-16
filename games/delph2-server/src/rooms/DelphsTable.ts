@@ -46,9 +46,6 @@ export class DelphsTable extends Room<DelphsTableState> {
     this.onMessage("playCard", (client, card: InventoryItem) => {
       this.game.playCard(client.sessionId, card)
     })
-    this.onMessage("setTrap", (client) => {
-      this.game.setTrap(client.sessionId)
-    })
     this.onMessage("getLatency", (client) => {
       client.send(new Date().getTime())
     })

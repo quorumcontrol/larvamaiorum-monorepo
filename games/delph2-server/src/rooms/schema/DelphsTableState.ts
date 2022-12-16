@@ -23,6 +23,7 @@ export enum QuestType {
   first,
   timed,
   keyCarrier,
+  random,
 }
 
 export class Music extends Schema {
@@ -40,6 +41,8 @@ export class Vec2 extends Schema {
 }
 
 export class Item extends Schema {
+  @type("string") name: string
+  @type("string") description: string
   @type("string") address: string
   @type("number") id: number
 }
@@ -73,6 +76,7 @@ export class Warrior extends Schema {
   @type("string") name: string
   @type("number") attack: number
   @type("number") defense: number
+  @type("number") maxSpeed: number
   @type("number") currentAttack: number
   @type("number") currentDefense: number
   @type("number") initialHealth: number
@@ -110,28 +114,28 @@ export class Quest extends Schema {
   @type("number") startedAt: number
 
   @type("number") kind: QuestType = 0
-  @type(QuestObject) object:QuestObject
+  @type(QuestObject) object: QuestObject
   // the player everyone is trying to get
-  @type("string") piggyId:string
+  @type("string") piggyId: string
 }
 
 export class MaxStats extends Schema {
-  @type("number") maxAttack:number
-  @type("number") maxDefense:number
-  @type("number") maxHealth:number
+  @type("number") maxAttack: number
+  @type("number") maxDefense: number
+  @type("number") maxHealth: number
 }
 
 export class Player extends Schema {
-  @type("string") id:string
-  @type("string") name:string
-  @type("string") token:string
+  @type("string") id: string
+  @type("string") name: string
+  @type("string") token: string
 }
 
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("number") roomType: RoomType = RoomType.continuous;
-  @type("string") matchId:string;
-  @type("boolean") acceptInput:boolean;
+  @type("string") matchId: string;
+  @type("boolean") acceptInput: boolean;
   @type("string") persistantMessage: string = "";
   @type("string") seed: string = "todo:initialseed";
 

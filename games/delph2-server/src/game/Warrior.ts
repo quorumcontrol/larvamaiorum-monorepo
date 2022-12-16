@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import debug from 'debug'
-import items, { defaultInitialInventory, getIdentifier, Inventory, InventoryItem } from './items'
+import items, { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
 import { deterministicRandom } from "./utils/randoms";
 import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
@@ -9,13 +9,14 @@ import randomColor from "./utils/randomColor";
 
 const log = console.log //debug('Warrior')
 
-const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
+// const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
 
 export interface WarriorStats {
   id: string;
   name: string;
   attack: number;
   defense: number;
+  maxSpeed: number;
   initialHealth: number;
   initialGump: number;
   initialInventory: Inventory;
@@ -39,6 +40,7 @@ export function generateFakeWarriors(count: number, seed: string) {
       name: `Warius ${i}`,
       attack: deterministicRandom(1500, `generateFakeWarriors-${i}-attack`, seed) + 500,
       defense: deterministicRandom(500, `generateFakeWarriors-${i}-defense`, seed) + 400,
+      maxSpeed: 5,
       initialHealth: deterministicRandom(1000, `generateFakeWarriors-${i}-health`, seed) + 1000,
       initialGump: 0,
       initialInventory: defaultInitialInventory,
@@ -98,18 +100,18 @@ class Warrior extends EventEmitter {
         return
       }
     }
-    if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
-      this.timeWithoutCard += dt
-      if (this.timeWithoutCard > 45) {
-        this.spawnBerserk()
-      }
-    }
+    // if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
+    //   this.timeWithoutCard += dt
+    //   if (this.timeWithoutCard > 45) {
+    //     this.spawnBerserk()
+    //   }
+    // }
   }
 
-  spawnBerserk() {
-    this.state.inventory.get(berserkIdentifier).quantity += 1
-    this.sendMessage('New Card!')
-  }
+  // spawnBerserk() {
+  //   this.state.inventory.get(berserkIdentifier).quantity += 1
+  //   this.sendMessage('New Card!')
+  // }
 
   sendMessage(message:string) {
     console.log('send mainhudmessage', message)
@@ -146,7 +148,7 @@ class Warrior extends EventEmitter {
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
     if (dist > 1.5) {
-      this.setSpeed(4)
+      this.setSpeed(this.state.maxSpeed)
       return
     }
     if (dist > 0.25) {
@@ -213,19 +215,35 @@ class Warrior extends EventEmitter {
   //   this.setItem(available[i].item)
   // }
 
-  setItem(item: InventoryItem) {
-    log('setting item: ', item, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
-    // find it in the inventory
+  playItem(inventoryItem:InventoryItem):ItemDescription|null {
+    const item = itemFromInventoryItem(inventoryItem)
+
     const identifier = getIdentifier(item)
     log('identifier: ', identifier)
     const inventoryRecord = this.state.inventory.get(identifier)
     log('record: ', inventoryRecord?.toJSON())
     if (!inventoryRecord || inventoryRecord.quantity <= 0) {
       console.error('no inventory left for this item, not playing')
-      return
+      return null
     }
+
     inventoryRecord.quantity -= 1
-    this.state.currentItem = new Item(item)
+    if (item.appliesToWorld) {
+      return item
+    }
+    this.setItem(inventoryItem)
+    return item
+  }
+
+  setItem(item: InventoryItem) {
+    log('setting item: ', item, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
+    // find it in the inventory
+    const description = itemFromInventoryItem(item)
+    this.state.currentItem = new Item({
+      ...item,
+      name: description.name,
+      description: description.description,
+    })
     this.state.currentAttack = this.currentAttack()
     this.state.currentDefense = this.currentDefense()
   }
@@ -234,7 +252,7 @@ class Warrior extends EventEmitter {
     if (!this.state.currentItem) {
       return null
     }
-    return items.find((i) => i.address == this.state.currentItem.address && i.id == this.state.currentItem.id)
+    return itemFromInventoryItem(this.state.currentItem)
   }
 
   clearItem() {

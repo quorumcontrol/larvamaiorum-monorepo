@@ -1,9 +1,9 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, Deer, DelphsTableState, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, Deer, DelphsTableState, Item, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
-import Hud, { BERSERK_EVT, TRAP_EVT } from '../game/Hud'
+import Hud, { PLAY_CARD_EVT } from '../game/Hud'
 import { Entity, RaycastResult, SoundComponent } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
@@ -153,13 +153,9 @@ class NetworkManager extends ScriptTypeBase {
       this.musicScript.start()
     })
 
-    this.app.on(BERSERK_EVT, () => {
-      const item:InventoryItem = {id: 2, address: zeroAddr}
-      this.room?.send('playCard', item)
-    })
-
-    this.app.on(TRAP_EVT, () => {
-      this.room?.send('setTrap')
+    this.app.on(PLAY_CARD_EVT, (item:Item) => {
+      console.log("playing card: ", item.toJSON())
+      this.room?.send('playCard', item.toJSON())
     })
 
   }

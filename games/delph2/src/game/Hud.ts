@@ -3,10 +3,10 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { DelphsTableState, MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
+import mustGetScript from '../utils/mustGetScript';
+import CardHandler from './Card';
 
-export const BERSERK_EVT = 'berserk'
-export const TRAP_EVT = 'setTrap'
-const berserkIdentifier = '0x0000000000000000000000000000000000000000-2'
+export const PLAY_CARD_EVT = "playCard"
 
 @createScript("hud")
 class Hud extends ScriptTypeBase {
@@ -16,7 +16,9 @@ class Hud extends ScriptTypeBase {
 
   name: Entity
   gumpStats: Entity
-  berserk: Entity
+
+  cardHolder:Entity
+  
   trackInfo: Entity
   persistantMessage: Entity
 
@@ -40,31 +42,12 @@ class Hud extends ScriptTypeBase {
   initialize() {
     this.messages = []
     
+    this.cardHolder = mustFindByName(this.entity, "Cards")
     this.name = mustFindByName(this.entity, 'Name')
     this.gumpStats = mustFindByName(this.entity, 'Gump')
-    this.berserk = mustFindByName(this.entity, 'Berserk')
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
-
-    this.berserk.element!.on('click', (evt:MouseEvent) => {
-      evt.stopPropagation()
-      this.app.fire(BERSERK_EVT)
-      this.berserk.enabled = false
-    })
-
-    this.berserk.element!.on("mouseenter", () => {
-      mustFindByName(this.berserk, "CardDescription").enabled = true
-    })
-
-    this.berserk.element!.on("mouseleave", () => {
-      mustFindByName(this.berserk, "CardDescription").enabled = false
-    })
-
-    mustFindByName(this.entity, 'SetTrap').element!.on('click', (evt:MouseEvent) => {
-      evt.stopPropagation()
-      this.app.fire(TRAP_EVT)
-    })
 
     mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt:MouseEvent) => {
       evt.stopPropagation()
@@ -98,6 +81,7 @@ class Hud extends ScriptTypeBase {
     if (!this.warrior || !this.maxStats) {
       return
     }
+    this.updateInventoryGraphics()
 
     if (this.state?.persistantMessage) {
       this.persistantMessage.enabled = true
@@ -106,8 +90,6 @@ class Hud extends ScriptTypeBase {
       this.persistantMessage.enabled = false
     }
 
-    const hasBerserk = this.warrior.inventory.get(berserkIdentifier)!.quantity > 0
-    this.berserk.enabled = hasBerserk
     this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
     this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
     this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
@@ -116,6 +98,34 @@ class Hud extends ScriptTypeBase {
     this.statElements.HealthStat.element!.text = `${this.warrior.currentHealth} / ${this.warrior.initialHealth}`
 
     this.gumpStats.element!.text = `dGump: ${this.warrior.wootgumpBalance}`
+  }
+
+  private setupInventory() {
+    if (!this.warrior) {
+      throw new Error('must have warrior set to setup inventory')
+    }
+    this.warrior.inventory.forEach((inventory) => {
+      if (inventory.quantity > 0) {
+        const el = this.cardHolder.findByName(`${inventory.item.name}Card`) as Entity | undefined
+        if (el) {
+          el.enabled = true
+          mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
+        }
+      }
+    })
+  }
+
+  private updateInventoryGraphics() {
+    if (!this.warrior) {
+      throw new Error('must have warrior set to setup inventory')
+    }
+    this.warrior.inventory.forEach((inventory) => {
+      const el = this.cardHolder.findByName(`${inventory.item.name}Card`) as Entity | undefined
+      if (!el) {
+        return
+      }
+      el.enabled = (inventory.quantity > 0)
+    })
   }
 
   queueMessage(message:string) {
@@ -167,6 +177,7 @@ class Hud extends ScriptTypeBase {
     this.maxStats = state.maxStats
     this.state = state
     this.name.element!.text = warrior.name
+    this.setupInventory()
   }
 
 }
