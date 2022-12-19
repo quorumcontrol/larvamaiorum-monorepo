@@ -19,6 +19,7 @@ contract MatchResults is AccessControl, ERC2771Context {
     }
 
     function registerResults(bytes32 matchId, string calldata winner) public onlyRole(SENDER_ROLE) {
+      require(bytes(winners[matchId]).length == 0, "matchId already assigned");
       winners[matchId] = winner;
       emit MatchComplete(matchId, winner);
     }
