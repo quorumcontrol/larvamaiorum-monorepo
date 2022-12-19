@@ -109,6 +109,12 @@ class Deer extends EventEmitter {
     }
   }
 
+  chase(warrior:Warrior) {
+    this.chasing = warrior
+    this.setDestination(warrior.position.x, warrior.position.y)
+    this.setState(State.chasing)
+  }
+
   private stopChasing() {
     this.setState(State.move)
     this.lastChased = this.chasing

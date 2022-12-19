@@ -436,6 +436,11 @@ class DelphsTableLogic {
       questActive: true,
       currentQuest: quest.state,
     })
+    if (quest.state.piggyId) {
+      Object.values(this.deer).forEach((deer) => {
+        deer.chase(this.warriors[quest.state.piggyId])
+      })
+    }
     quest.start()
   }
 
