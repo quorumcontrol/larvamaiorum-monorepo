@@ -439,13 +439,13 @@ class DelphsTableLogic {
     quest.start()
   }
 
-  private async writeWinner() {
-    return await backOff(() => {
-      return writeWinner(this.state.matchId, this.currentQuest!.winner.id)
+  private writeWinner(winner:string) {
+    return backOff(() => {
+      return writeWinner(this.state.matchId, winner)
     }, {
-      numOfAttempts: 200,
+      numOfAttempts: 100,
       jitter: "full",
-      timeMultiple: 4,
+      timeMultiple: 5,
     })
   }
 
@@ -465,7 +465,11 @@ class DelphsTableLogic {
         persistantMessage: `${winner.state.name} wins!`
       })
       console.log(this.state.matchId, "game over, writing winner")
-      this.writeWinner()
+      this.writeWinner(winner.id).catch((err) => {
+        console.error("error writing winner", err)
+      }).then((res) => {
+        console.log("winner wrte, ", res)
+      })
       return
     }
 
