@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
+const exponential_backoff_1 = require("exponential-backoff");
 const playcanvas_1 = require("playcanvas");
 const DelphsTableState_1 = require("../rooms/schema/DelphsTableState");
 const BattleLogic_1 = __importDefault(require("./BattleLogic"));
@@ -24,6 +25,7 @@ const QuestLogic_1 = __importDefault(require("./QuestLogic"));
 const iterableToArray_1 = __importDefault(require("./utils/iterableToArray"));
 const randoms_1 = require("./utils/randoms");
 const Warrior_1 = __importDefault(require("./Warrior"));
+const winnerWriter_1 = __importDefault(require("./winnerWriter"));
 class DelphsTableLogic {
     // for now assume a blank table at construction
     // TODO: handle a populated state with existing warriors, etc
@@ -392,6 +394,17 @@ class DelphsTableLogic {
         });
         quest.start();
     }
+    writeWinner() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (0, exponential_backoff_1.backOff)(() => {
+                return (0, winnerWriter_1.default)(this.state.matchId, this.currentQuest.winner.id);
+            }, {
+                numOfAttempts: 200,
+                jitter: "full",
+                timeMultiple: 4,
+            });
+        });
+    }
     stopQuest() {
         const winner = this.currentQuest.winner;
         this.currentQuest = undefined;
@@ -405,6 +418,8 @@ class DelphsTableLogic {
                 acceptInput: false,
                 persistantMessage: `${winner.state.name} wins!`
             });
+            console.log(this.state.matchId, "game over, writing winner");
+            this.writeWinner();
             return;
         }
         this.room.broadcast('mainHUDMessage', 'Quest Over');

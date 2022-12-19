@@ -1,5 +1,6 @@
 import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
+import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
 import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
@@ -11,6 +12,7 @@ import QuestLogic from './QuestLogic';
 import iterableToArray from './utils/iterableToArray';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
+import writeWinner from './winnerWriter';
 
 type BattleList = Record<string, BattleLogic> // guid to an existing battle
 
@@ -437,6 +439,16 @@ class DelphsTableLogic {
     quest.start()
   }
 
+  private async writeWinner() {
+    return await backOff(() => {
+      return writeWinner(this.state.matchId, this.currentQuest!.winner.id)
+    }, {
+      numOfAttempts: 200,
+      jitter: "full",
+      timeMultiple: 4,
+    })
+  }
+
   private stopQuest() {
 
     const winner = this.currentQuest.winner
@@ -452,6 +464,8 @@ class DelphsTableLogic {
         acceptInput: false,
         persistantMessage: `${winner.state.name} wins!`
       })
+      console.log(this.state.matchId, "game over, writing winner")
+      this.writeWinner()
       return
     }
 

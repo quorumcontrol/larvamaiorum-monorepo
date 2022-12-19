@@ -91,7 +91,7 @@ export class DelphsTable extends Room<DelphsTableState> {
 
   onDispose() {
     console.log("room", this.roomId, "disposing...");
-    this.game.stop()
+    this.game.stop()  
   }
 
 }
