@@ -87,8 +87,9 @@ class DelphsTableLogic {
         name: track.title,
         duration: track.duration,
         artwork: track.artwork,
+        artist: track.artist,
         url: track.streaming,
-        startedAt: new Date().getTime()
+        startedAt: new Date().getTime(),
       })
     }
     this.timeSinceMusic = 0
@@ -133,12 +134,30 @@ class DelphsTableLogic {
       this.timeSinceLastQuest += dt
     }
 
-    if (this.state.acceptInput && !this.state.currentQuest && this.timeSinceLastQuest > 60 && (this.isMatchRoom() || Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1)) {
+    if (this.shouldStartQuest()) {
       this.startQuest()
     }
     if (this.currentQuest?.isOver()) {
       this.stopQuest()
     }
+  }
+
+  private shouldStartQuest() {
+    if (this.state.currentQuest || !this.state.acceptInput) {
+      return false
+    }
+
+    if (this.isMatchRoom()) {
+      return !!this.warriorWith50()
+    }
+
+    return this.timeSinceLastQuest > 60 && (Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1)
+  }
+
+  private warriorWith50() {
+    return Object.values(this.warriors).find((w) => {
+      return w.state.wootgumpBalance >= 50
+    })
   }
 
   private isMatchRoom() {
@@ -163,6 +182,7 @@ class DelphsTableLogic {
       acceptInput: true,
       persistantMessage: "",
     })
+    this.room.broadcast('mainHUDMessage', "First to 50 gump gets the key. Go.")
   }
 
   addWarrior(client: Client, stats: WarriorStats) {
@@ -218,6 +238,10 @@ class DelphsTableLogic {
   playCard(sessionId: string, item: InventoryItem) {
     if (!this.state.acceptInput) {
       return
+    }
+    if (this.currentQuest?.state.piggyId === this.warriors[sessionId]?.id) {
+      this.warriors[sessionId].sendMessage("You have the key. No cards allowed.")
+      return  
     }
     const result = this.warriors[sessionId]?.playItem(item)
     if (result?.name === "Trap") {
@@ -428,17 +452,29 @@ class DelphsTableLogic {
     })
   }
 
+  private getQuest() {
+    if (this.isMatchRoom()) {
+      const w = this.warriorWith50()
+      if (!w) {
+        return
+      }
+      return QuestLogic.matchQuest(this.room, this.warriors, w)
+    }
+    return QuestLogic.randomQuest(this.room, this.warriors, QuestType.random)
+  }
+
   private startQuest() {
-    const type = (this.state.roomType === RoomType.continuous) ? QuestType.random : QuestType.keyCarrier
-    const quest = QuestLogic.randomQuest(this.room, this.warriors, type)
+    const quest = this.getQuest()
     this.currentQuest = quest
     this.state.assign({
       questActive: true,
       currentQuest: quest.state,
     })
     if (quest.state.piggyId) {
+      const warrior = this.warriors[quest.state.piggyId]
+      warrior.clearItem()
       Object.values(this.deer).forEach((deer) => {
-        deer.chase(this.warriors[quest.state.piggyId])
+        deer.chase(warrior)
       })
     }
     quest.start()
@@ -541,8 +577,8 @@ class DelphsTableLogic {
 
   randomPosition() {
     return {
-      x: randomBounded(37),
-      z: randomBounded(37),
+      x: randomBounded(36.5),
+      z: randomBounded(36.5),
     }
   }
 

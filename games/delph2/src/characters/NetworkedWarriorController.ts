@@ -99,7 +99,12 @@ class NetworkedWarriorController extends ScriptTypeBase {
       // console.log("changes: ", changes)
       this.locomotion.setSpeed(player.speed)
       this.setState(player.state)
-      this.cardText.enabled = !!player.currentItem
+      if (!!player.currentItem) {
+        this.cardText.enabled = true
+        this.cardText.element!.text = `(${player.currentItem.name})`
+      } else {
+        this.cardText.enabled = false
+      }
     }
     player.destination.onChange = () => {
       // console.log("new destination: ", player.destination.toJSON())

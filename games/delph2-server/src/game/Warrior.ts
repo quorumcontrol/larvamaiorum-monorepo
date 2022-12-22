@@ -1,6 +1,5 @@
 import EventEmitter from "events";
-import debug from 'debug'
-import items, { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
+import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
 import { deterministicRandom } from "./utils/randoms";
 import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
@@ -23,15 +22,6 @@ export interface WarriorStats {
   autoPlay: boolean;
 }
 
-// export interface WarriorState extends WarriorStats {
-//   currentHealth: number;
-//   wootgumpBalance: number;
-//   location?: [number,number];
-//   inventory: Inventory;
-//   currentItem?: InventoryItem;
-//   destination?: [number,number]
-// }
-
 export function generateFakeWarriors(count: number, seed: string) {
   const warriors: WarriorStats[] = [];
   for (let i = 0; i < count; i++) {
@@ -40,7 +30,7 @@ export function generateFakeWarriors(count: number, seed: string) {
       name: `Warius ${i}`,
       attack: deterministicRandom(150, `generateFakeWarriors-${i}-attack`, seed) + 1500,
       defense: deterministicRandom(100, `generateFakeWarriors-${i}-defense`, seed) + 900,
-      maxSpeed: 5,
+      maxSpeed: 4.5,
       initialHealth: deterministicRandom(300, `generateFakeWarriors-${i}-health`, seed) + 1000,
       initialGump: 0,
       initialInventory: defaultInitialInventory,
@@ -50,23 +40,18 @@ export function generateFakeWarriors(count: number, seed: string) {
   return warriors;
 }
 
-// function deepClone<T>(obj:T):T {
-//   return JSON.parse(JSON.stringify(obj)) as T
-// }
-
 class Warrior extends EventEmitter {
   id: string;
 
   state: WarriorState
 
   position: Vec2
-  // currentItem?: InventoryItem
-
   client: Client
 
   timeWithoutCard = 0
+  timeWithCard = 0
 
-  // destination?: Vec3;
+  isPiggy = false
 
   constructor(client: Client, state: WarriorState) {
     super()
@@ -80,6 +65,10 @@ class Warrior extends EventEmitter {
   }
 
   update(dt: number) {
+    if (this.state.currentItem) {
+      this.timeWithCard += dt
+      this.checkForCardTimeout()
+    }
     if (this.state.state === State.move && this.state.speed > 0) {
       const current = new Vec2(this.state.position.x, this.state.position.z)
       const dest = new Vec2(this.state.destination.x, this.state.destination.z)
@@ -100,18 +89,13 @@ class Warrior extends EventEmitter {
         return
       }
     }
-    // if (!this.state.currentItem && this.state.inventory.get(berserkIdentifier).quantity === 0) {
-    //   this.timeWithoutCard += dt
-    //   if (this.timeWithoutCard > 45) {
-    //     this.spawnBerserk()
-    //   }
-    // }
   }
 
-  // spawnBerserk() {
-  //   this.state.inventory.get(berserkIdentifier).quantity += 1
-  //   this.sendMessage('New Card!')
-  // }
+  setIsPiggy(isPiggy:boolean) {
+    this.isPiggy = isPiggy
+    this.updateAttackAndDefenseState()
+    this.setSpeedBasedOnDestination()
+  }
 
   sendMessage(message:string) {
     console.log('send mainhudmessage', message)
@@ -127,6 +111,18 @@ class Warrior extends EventEmitter {
   }
 
   setSpeed(speed: number) {
+    const currentItem = this.currentItemDetails()
+    if (speed >= (this.state.maxSpeed - 0.5)) {
+      let additionalSpeed = 0
+      if (currentItem?.speed) {
+        additionalSpeed += currentItem.speed
+      }
+      if (this.isPiggy) {
+        additionalSpeed -= 0.5
+      }
+      this.state.speed = speed + additionalSpeed
+      return
+    }
     this.state.speed = speed
   }
 
@@ -176,18 +172,26 @@ class Warrior extends EventEmitter {
 
   currentAttack() {
     const item = this.currentItemDetails()
-    if (!item) {
-      return this.state.attack
+    let additionalAttack = 0
+    if (item?.attack) {
+      additionalAttack += item.attack
     }
-    return this.state.attack + (item.attack || 0)
+    if (this.isPiggy) {
+      additionalAttack -= (this.state.attack / 2)
+    }
+    return this.state.attack + additionalAttack
   }
 
   currentDefense() {
     const item = this.currentItemDetails()
-    if (!item) {
-      return this.state.defense
+    let additionalDefense = 0
+    if (item?.defense) {
+      additionalDefense += item.defense
     }
-    return this.state.defense + (item.defense || 0)
+    if (this.isPiggy) {
+      additionalDefense -= (this.state.defense / 2)
+    }
+    return this.state.defense + additionalDefense
   }
 
   // amount to add to health as a decimal percentage (ie 0.10 is 10%) of initialHealth
@@ -205,15 +209,6 @@ class Warrior extends EventEmitter {
     this.state.currentHealth += amountToUp;
     return amountToUp;
   }
-
-  // randomItem(seed:string) {
-  //   const available = Object.values(this.inventory).filter((i) => i.quantity > 0)
-  //   if (available.length === 0) {
-  //     return
-  //   }
-  //   const i = deterministicRandom(available.length - 1 , `${this.id}-${available.length}`, seed)
-  //   this.setItem(available[i].item)
-  // }
 
   playItem(inventoryItem:InventoryItem):ItemDescription|null {
     const item = itemFromInventoryItem(inventoryItem)
@@ -251,6 +246,17 @@ class Warrior extends EventEmitter {
       name: description.name,
       description: description.description,
     })
+    this.updateAttackAndDefenseState()
+  }
+
+  private checkForCardTimeout() {
+    const details = this.currentItemDetails()
+    if (details?.timeLimit && this.timeWithCard > details.timeLimit) {
+      this.clearItem()
+    }
+  }
+
+  private updateAttackAndDefenseState() {
     this.state.currentAttack = this.currentAttack()
     this.state.currentDefense = this.currentDefense()
   }
@@ -267,6 +273,7 @@ class Warrior extends EventEmitter {
     this.state.currentAttack = this.currentAttack()
     this.state.currentDefense = this.currentDefense()
     this.timeWithoutCard = 0
+    this.timeWithCard = 0
   }
 }
 

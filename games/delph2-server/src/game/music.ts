@@ -7,6 +7,7 @@ interface Playable {
 
   description?: string
   artwork?: string
+  artist: string
 }
 
 const url = "https://us-central1-realtimedelphs.cloudfunctions.net/randomTrack"

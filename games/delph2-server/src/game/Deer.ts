@@ -175,15 +175,15 @@ class Deer extends EventEmitter {
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
     if (this.state.state === State.chasing && dist > 0.5) {
-      this.setSpeed(4.15)
+      this.setSpeed(4.65)
       return
     }
     if (dist > 2) {
-      this.setSpeed(4)
+      this.setSpeed(4.5)
       return
     }
     if (dist > 0.25) {
-      this.setSpeed(1)
+      this.setSpeed(1.25)
       return
     }
     this.setSpeed(0)

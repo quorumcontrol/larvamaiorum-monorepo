@@ -1,6 +1,8 @@
+import { randomUUID } from "crypto"
+
 
 const game = {
-  matchId: "cryptocolosseumtestroom",
+  matchId: randomUUID().toString(),
   expectedPlayers: [
     {
       id: "0x123",
@@ -11,5 +13,7 @@ const game = {
   ]
 }
 
-console.log("player 1: ", Buffer.from(JSON.stringify({...game, id: "0x123", name: "tobowers"})).toString("base64url"))
-console.log("player 2: ", Buffer.from(JSON.stringify({...game, id: "0xabc", name: "nifab"})).toString("base64url"))
+console.log("match: ", game.matchId)
+
+console.log("player tobowers: ", `https://playcanv.as/p/3eqyo9QZ/?arena=true&m=${Buffer.from(JSON.stringify({...game, id: "0x123", name: "tobowers"})).toString("base64url")}`)
+console.log("player nifab: ", `https://playcanv.as/p/3eqyo9QZ/?arena=true&m=${Buffer.from(JSON.stringify({...game, id: "0xabc", name: "nifab"})).toString("base64url")}`)

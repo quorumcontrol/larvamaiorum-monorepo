@@ -33,6 +33,7 @@ export class Music extends Schema {
   @type("number") startedAt: number
   @type("string") description?: string
   @type("string") artwork?: string
+  @type("string") artist: string
 }
 
 export class Vec2 extends Schema {

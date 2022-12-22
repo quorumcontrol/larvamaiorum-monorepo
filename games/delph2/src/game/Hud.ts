@@ -170,6 +170,7 @@ class Hud extends ScriptTypeBase {
       this.app.assets.load(musicArtwork)
     }
     mustFindByName(this.trackInfo, 'Title').element!.text = music.name
+    mustFindByName(this.trackInfo, 'Artist').element!.text = `by ${music.artist}`
   }
 
   setWarrior(warrior:Warrior, state:DelphsTableState) {

@@ -43,11 +43,12 @@ const items:ItemDescription[] = [
     address: zeroAddr,
     id: 2,
     name: "Berserk",
-    description: 'Gives your warrior +2000 attack at the cost of 400 defense and 100 health points.',
+    description: 'Gives warrior +2000 attack and +1 speed at the cost of 400 defense and 100 health points.',
     attack: 2000,
     defense: -400,
     hp: -100,
-    costToPlay: 20,
+    costToPlay: 10,
+    speed: 1,
   },
   {
     address: zeroAddr,
@@ -55,7 +56,7 @@ const items:ItemDescription[] = [
     name: "Speed",
     description: "Increase the speed of your player for 15s.",
     costToPlay: 10,
-    speed: 2,
+    speed: 3,
     timeLimit: 15,
   }
 ].map((i) => {

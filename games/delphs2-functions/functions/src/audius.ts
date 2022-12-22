@@ -12,6 +12,7 @@ export interface Playable {
 
   description?: string
   artwork?: string
+  artist?:string
 }
 
 export const undergroundTracks = async ():Promise<Playable[]> => {
@@ -22,6 +23,8 @@ export const undergroundTracks = async ():Promise<Playable[]> => {
       title: track.title,
       duration: track.duration,
       streaming,
+
+      artist: track.user.name,
 
       description: track.description,
       artwork: track.artwork ? (track.artwork as any)["480x480"] : undefined,
