@@ -21,6 +21,7 @@ class Hud extends ScriptTypeBase {
   
   trackInfo: Entity
   persistantMessage: Entity
+  questIndicator: Entity
 
   statElements: {
     Attack: Entity
@@ -48,6 +49,7 @@ class Hud extends ScriptTypeBase {
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
+    this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
 
     mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt:MouseEvent) => {
       evt.stopPropagation()
@@ -81,6 +83,9 @@ class Hud extends ScriptTypeBase {
     if (!this.warrior || !this.maxStats) {
       return
     }
+
+    this.questIndicator.enabled = !!this.state?.currentQuest
+
     this.updateInventoryGraphics()
 
     if (this.state?.persistantMessage) {

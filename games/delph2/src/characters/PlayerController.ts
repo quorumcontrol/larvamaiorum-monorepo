@@ -51,11 +51,12 @@ class PlayerController extends ScriptTypeBase {
     }
     switch (this.quest.kind()) {
       case QuestType.first:
-        return this.quest.treasure
+        // return this.quest.treasure
+        return
       case QuestType.keyCarrier:
         const piggy = this.quest.piggy()
         if (piggy === this.entity) {
-          return this.quest.treasure
+          return // don't point at the treasure
         }
         return piggy
     }
