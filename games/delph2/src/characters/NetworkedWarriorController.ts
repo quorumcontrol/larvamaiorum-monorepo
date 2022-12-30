@@ -1,31 +1,34 @@
 import { AnimComponent, Entity, Vec3 } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
-import WarriorLocomotion from "./WarriorLocomotion";
 import mustFindByName from "../utils/mustFindByName";
-// import WarriorBehavior from "./WarriorBehavior";
 import { State, Warrior } from "../syncing/schema/DelphsTableState";
 import mustGetScript from "../utils/mustGetScript";
+import { loadGlbContainerFromUrl } from "../utils/glbUtils";
+import { randomInt } from "../utils/randoms";
 
 @createScript("networkedWarriorController")
 class NetworkedWarriorController extends ScriptTypeBase {
-  locomotion: WarriorLocomotion
   state: State
   anim: AnimComponent
   healthBar: Entity
   warrior: Warrior
   cardText: Entity
 
+  viking: Entity
+
+  speed: number = 0
+
+  destination: Vec3
+  serverPosition: Vec3
+
   screen: Entity
   camera: Entity
 
   initialize() {
-    const locomotion = this.getScript<WarriorLocomotion>(this.entity, 'warriorLocomotion')
-    if (!locomotion) {
-      throw new Error('player controller requries locomotion')
-    }
-    this.locomotion = locomotion
-    this.anim = mustFindByName(this.entity, 'viking').anim!
+    this.viking = mustFindByName(this.entity, 'viking')
+    this.anim = this.viking.anim!
+
     this.healthBar = mustFindByName(this.entity, 'HealthBar')
     this.camera = mustFindByName(this.app.root, 'Camera')
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
@@ -41,13 +44,25 @@ class NetworkedWarriorController extends ScriptTypeBase {
 
   }
 
-  update() {
+  update(dt:number) {
     if (!this.warrior) {
       return
     }
     this.screen.lookAt(this.camera.getPosition())
     this.screen.rotateLocal(0, 180, 0)
     this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
+
+    if (this.entity.getPosition().distance(this.serverPosition) > 1.5) {
+      this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
+    }
+    if (this.speed > 0 && this.serverPosition && this.entity.getPosition().distance(this.serverPosition) > 0.1) {
+      const current = this.entity.getPosition()
+      const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(this.speed * dt)
+      vector.y = 0
+      const newPosition = current.add(vector)
+      // console.log(this.serverPosition, newPosition)
+      this.entity.setPosition(newPosition)
+    }
   }
 
   setState(newState:State) {
@@ -67,7 +82,6 @@ class NetworkedWarriorController extends ScriptTypeBase {
         this.anim.setFloat('health', 100)
         return
       case State.taunt:
-        //TODO this should be an animation, but for now idle it
         this.anim.setFloat('health', 100)
         return
       case State.dead:
@@ -82,22 +96,92 @@ class NetworkedWarriorController extends ScriptTypeBase {
     }
   }
 
+  setDestination(dest: Vec3) {
+    this.destination = dest
+    if (this.entity.getPosition().distance(dest) > 0.1) {
+      this.entity.lookAt(dest.x, 0, dest.z)
+    }
+  }
+
+  setServerPosition(point: Vec3) {
+    this.serverPosition = point
+  }
+
+  setSpeed(speed: number) {
+    if (speed > 0 && this.destination) {
+      this.entity.lookAt(this.destination.x, 0, this.destination.z)
+    }
+    this.speed = speed
+    if (!this.viking) {
+      console.error('here we are', this.entity.name, this.entity.getGuid(), this)
+    }
+    console.log("viking: ", this.viking, this.viking.anim)
+    this.anim.setFloat('speed', speed)
+  }
+
+  private handleAvatar() {
+    console.log("handle avatar")
+    const name = `RPM_${this.warrior.id}`
+    const url = `${this.warrior.avatar}?quality=low&cacheBuster=${randomInt(10000)}`
+    const rpm = mustFindByName(this.app.root, "ReadyPlayerMeTemplate").clone()
+    rpm.name = `avatar_${this.warrior.id}`
+    const axe = mustFindByName(rpm, "Axe")
+    const shield = mustFindByName(rpm, "Shield")
+    this.entity.addChild(rpm)
+    rpm.setLocalPosition(0,0.1,0)
+    rpm.setLocalEulerAngles(0, 180, 0)
+
+    loadGlbContainerFromUrl(this.app, url, null, name, (err:any, asset:pc.Asset) => {
+      console.log("avatar loaded")
+      if (err) {
+        console.error("error loading avatar: ", err)
+        return //TODO: retry?
+      }
+      const renderRootEntity = asset.resource.instantiateRenderEntity();
+      rpm.addChild(renderRootEntity);
+
+      mustFindByName(renderRootEntity, "RightHand").addChild(axe)
+      mustFindByName(renderRootEntity, "LeftForeArm").addChild(shield)
+
+      const old = this.viking
+
+      rpm.enabled = true
+      axe.enabled = true
+      shield.enabled = true
+      if (!rpm.anim) {
+        console.error(rpm, rpm.anim)
+        throw new Error("missing anim")
+      }
+      rpm.anim.enabled = true
+      // rpm.anim!.reset()
+
+      this.anim = rpm.anim
+      this.viking = rpm
+
+      old.destroy()
+    })
+  }
+
   setPlayer(player:Warrior) {
     this.warrior = player
     console.log('player set', player.toJSON())
     this.entity.setPosition(player.position.x, 0, player.position.z)
 
-    const torso = mustFindByName(this.entity, 'Torso')
+    if (player.avatar) {
+      this.handleAvatar()
+    } else {
+      const torso = mustFindByName(this.entity, 'Torso')
 
-    const newMaterial = torso.render!.meshInstances[0].material.clone()
-    const color = player.color.toArray()
-    ;(newMaterial as any).diffuse.set(color[0], color[1], color[2])
-    newMaterial.update()
-    torso.render!.meshInstances[0].material = newMaterial
+      const newMaterial = torso.render!.meshInstances[0].material.clone()
+      const color = player.color.toArray()
+      ;(newMaterial as any).diffuse.set(color[0], color[1], color[2])
+      newMaterial.update()
+      torso.render!.meshInstances[0].material = newMaterial
+    }
 
-    player.onChange = (changes) => {
-      // console.log("changes: ", changes)
-      this.locomotion.setSpeed(player.speed)
+    player.onChange = (_changes) => {
+      // console.log("changes: ", _changes)
+      this.setSpeed(player.speed)
       this.setState(player.state)
       if (!!player.currentItem) {
         this.cardText.enabled = true
@@ -108,12 +192,10 @@ class NetworkedWarriorController extends ScriptTypeBase {
     }
     player.destination.onChange = () => {
       // console.log("new destination: ", player.destination.toJSON())
-      this.locomotion.setDestination(new Vec3(player.destination.x, 0, player.destination.z))
-      // this.locomotion.setDestination(player.destination.x, player.destination.z)
+      this.setDestination(new Vec3(player.destination.x, 0, player.destination.z))
     }
     player.position.onChange = () => {
-      // console.log(' new position: ', player.position.toJSON())
-      this.locomotion.setServerPosition(new Vec3(player.position.x, 0, player.position.z))
+      this.setServerPosition(new Vec3(player.position.x, 0, player.position.z))
     }
     this.entity.fire('newWarrior', player)
   }

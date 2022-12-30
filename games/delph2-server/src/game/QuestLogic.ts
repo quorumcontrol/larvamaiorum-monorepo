@@ -82,7 +82,7 @@ constructor(room: Room, state: StateQuest, warriors: Record<string, Warrior>) {
 start() {
   switch (this.state.kind) {
     case QuestType.first:
-      this.room.broadcast("mainHUDMessage", "First to the prize wins!")
+      this.room.broadcast("mainHUDMessage", "First to find the prize wins!")
       return
     case QuestType.keyCarrier:
       const piggy = this.warriors[this.state.piggyId]

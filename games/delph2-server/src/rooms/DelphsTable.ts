@@ -10,6 +10,7 @@ interface JoinOptions {
   name?: string
   id?: string
   token?: string
+  avatar?: string
 }
 
 interface RoomOptions extends JoinOptions {
@@ -67,11 +68,14 @@ export class DelphsTable extends Room<DelphsTableState> {
     return false
   }
 
-  onJoin(client: Client, { name }: JoinOptions) {
+  onJoin(client: Client, { name, avatar }: JoinOptions) {
     console.log(client.sessionId, "joined!");
     const random = generateFakeWarriors(1, client.sessionId)[0]
     if (name) {
       random.name = name
+    }
+    if (avatar) {
+      random.avatar = avatar
     }
     this.game.addWarrior(client, random)
   }

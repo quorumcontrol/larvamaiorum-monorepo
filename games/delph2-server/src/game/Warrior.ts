@@ -20,6 +20,7 @@ export interface WarriorStats {
   initialGump: number;
   initialInventory: Inventory;
   autoPlay: boolean;
+  avatar?:string;
 }
 
 export function generateFakeWarriors(count: number, seed: string) {

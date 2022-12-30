@@ -92,8 +92,9 @@ export class Warrior extends Schema {
 
   @type("boolean") autoPlay = false
 
-  @type("number") bodyType = 0
   @type({ array: "number" }) color = new ArraySchema<number>();
+
+  @type("string") avatar?:string
 }
 
 export class Battle extends Schema {

@@ -181,8 +181,9 @@ class NetworkManager extends ScriptTypeBase {
     quest.go()
   }
 
-  handleDeerAdd(deer:Deer, _key: string) {
+  handleDeerAdd(deer:Deer, key: string) {
     const deerEntity = this.deerTemplate.clone()
+    deerEntity.name = `deer-${key}`
     deerEntity.enabled = true
     deerEntity.setPosition(deer.position.x, 0, deer.position.z)
     this.app.root.addChild(deerEntity)
@@ -190,8 +191,9 @@ class NetworkManager extends ScriptTypeBase {
     this.deer[deer.id] = deerEntity
   }
 
-  handleTrapAdd(trap:Trap, _key: string) {
+  handleTrapAdd(trap:Trap, key: string) {
     const trapEntity = this.trapTemplate.clone()
+    trapEntity.name = `trap-${key}`
     trapEntity.setPosition(trap.position.x, 0, trap.position.z)
     this.app.root.addChild(trapEntity)
     this.traps[trap.id] = trapEntity
