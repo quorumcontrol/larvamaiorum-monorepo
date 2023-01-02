@@ -149,6 +149,7 @@ export class DelphsTableState extends Schema {
   @type(MaxStats) maxStats = new MaxStats({})
 
   @type({ array: Player }) expectedPlayers = new ArraySchema<Player>()
+  @type("number") playerCount?:number
 
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({})
   @type({ map: Battle }) battles = new MapSchema<Battle>({})

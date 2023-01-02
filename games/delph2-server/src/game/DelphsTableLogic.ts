@@ -164,12 +164,20 @@ class DelphsTableLogic {
     return this.state.roomType === RoomType.match
   }
 
+  private hasRightNumberOfPlayers() {
+    const warriorLength = Object.values(this.warriors).length
+    if (this.state.playerCount && (warriorLength >= this.state.playerCount)) {
+      return true
+    }
+    const expectedPlayers = iterableToArray(this.state.expectedPlayers.values())
+    return warriorLength >= expectedPlayers.length
+  }
+
   checkForPlayers() {
     if (this.state.roomType === RoomType.continuous || this.playerQuorumHasArrived) {
       return
     }
-    const expectedPlayers = iterableToArray(this.state.expectedPlayers.values())
-    if (Object.values(this.warriors).length < expectedPlayers.length) {
+    if (!this.hasRightNumberOfPlayers()) {
       this.state.assign({
         acceptInput: false,
         persistantMessage: "Waiting for players."

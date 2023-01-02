@@ -18,6 +18,7 @@ interface RoomOptions extends JoinOptions {
 
   matchId?: string
   expectedPlayers?: JoinOptions[]
+  playerCount?: number
 }
 
 export class DelphsTable extends Room<DelphsTableState> {
@@ -27,19 +28,15 @@ export class DelphsTable extends Room<DelphsTableState> {
   onCreate(options: RoomOptions) {
     this.setState(new DelphsTableState({matchId: options.matchId}))
     this.state.assign({
-      seed: randomInt(100_000).toString()
+      seed: randomInt(100_000).toString(),
+      playerCount: options.playerCount, // can be undefined and that's ok
+      roomType: options.roomType,
     })
 
     if (options.expectedPlayers) {
       console.log('creating with expected players')
       this.state.expectedPlayers.push(...options.expectedPlayers.map((player) => new Player(player)))
-    } else {
-      console.log('normal create')
     }
-
-    this.state.assign({
-      roomType: options.roomType,
-    })
 
     this.game = new DelphsTableLogic(this)
     this.game.start()
@@ -58,7 +55,15 @@ export class DelphsTable extends Room<DelphsTableState> {
 
   onAuth(_client: Client, options: JoinOptions, _request?: IncomingMessage) {
     console.log("on auth")
+    if (this.state.playerCount > 0 && this.state.warriors.size >= this.state.playerCount) {
+      console.log("player tried to join full table")
+      return false
+    }
     if (this.state.expectedPlayers.length == 0) {
+      if (this.state.playerCount > 0 && this.state.acceptInput) {
+        console.log("player tried to join a table already in progress")
+        return false
+      }
       return true
     }
     if (this.state.expectedPlayers && this.state.expectedPlayers.some((player) => player.id === options.id)) {
