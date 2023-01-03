@@ -2,14 +2,16 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
 import { InventoryItem, itemFromInventoryItem } from './items';
 import { getRandomTrack } from './music';
 import QuestLogic from './QuestLogic';
+import RovingAreaAttackLogic from './RovingAreaAttackLogic';
 import iterableToArray from './utils/iterableToArray';
+import randomPosition from './utils/randomPosition';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
 import writeWinner from './winnerWriter';
@@ -28,6 +30,7 @@ class DelphsTableLogic {
   deer: Record<string, Deer>
   battles: BattleList
   deerAttacks: Record<string, DeerAttackLogic>
+  rovingAttacks: Record<string,RovingAreaAttackLogic>
 
   currentQuest?: QuestLogic
 
@@ -49,6 +52,7 @@ class DelphsTableLogic {
     this.battles = {}
     this.deer = {}
     this.deerAttacks = {}
+    this.rovingAttacks = {}
   }
 
   start() {
@@ -59,7 +63,7 @@ class DelphsTableLogic {
       const diff = (now.getTime()) - previous.getTime()
       previous = now
       this.update(diff / 1000)
-    }, 100)
+    }, 75)
     for (let i = 0; i < 10; i++) {
       this.spawnOneGump(this.randomPosition())
     }
@@ -70,6 +74,9 @@ class DelphsTableLogic {
     for (let i = 0; i < 10; i++) {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
+    }
+    for (let i = 0; i < 2; i++) {
+      this.spawnRovingAttack()
     }
     if (this.state.roomType === RoomType.continuous) {
       this.state.assign({
@@ -115,6 +122,9 @@ class DelphsTableLogic {
     this.handleBattles(dt)
     this.handleDeerAttacks(dt)
     this.handleRecovers(dt)
+    Object.values(this.rovingAttacks).forEach((attack) => {
+      attack.update(dt)
+    })
     this.timeSinceMusic += dt
     if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20) {
       // try every 20s incase music is failing
@@ -399,7 +409,7 @@ class DelphsTableLogic {
   handleRecovers(_dt: number) {
     Object.values(this.warriors).forEach((w) => {
       if (w.state.state === State.move) {
-        w.recover(0.005)
+        w.recover(0.002)
       }
     })
   }
@@ -421,10 +431,10 @@ class DelphsTableLogic {
             warriorId: w.id,
             deerId: deer.id
           })
-          this.state.deerAttacks.set(id, attackState)
           const attack = new DeerAttackLogic(id, deer, w)
           this.deerAttacks[id] = attack
           attack.go()
+          this.state.deerAttacks.set(id, attackState)
         }
       })
     })
@@ -571,6 +581,13 @@ class DelphsTableLogic {
     this.state.trees.set(id, new StateVec2().assign({ x: position.x, z: position.y }))
   }
 
+  private spawnRovingAttack() {
+    const id = randomUUID()
+    const state = new RovingAreaAttack()
+    this.rovingAttacks[id] = new RovingAreaAttackLogic(state, this.warriors)
+    this.state.rovingAreaAttacks.set(id, state)
+  }
+
   private spawnDeer(position: Vec2) {
     const id = randomUUID()
     const deerState = new DeerState()
@@ -584,12 +601,8 @@ class DelphsTableLogic {
   }
 
   randomPosition() {
-    return {
-      x: randomBounded(36.5),
-      z: randomBounded(36.5),
-    }
+    return randomPosition()
   }
-
 
 }
 

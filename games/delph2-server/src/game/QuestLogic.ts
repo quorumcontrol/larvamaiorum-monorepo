@@ -1,17 +1,11 @@
 import { Quest as StateQuest, QuestObject, QuestObjectKind, QuestType } from '../rooms/schema/DelphsTableState'
 import { randomUUID } from "crypto"
-import { randomBounded, randomInt } from './utils/randoms'
+import { randomInt } from './utils/randoms'
 import Warrior from './Warrior'
 import vec2ToVec2 from './utils/vec2ToVec2'
 import { Room } from 'colyseus'
 import { Vec2 } from 'playcanvas'
-
-function randomPosition() {
-  return {
-    x: randomBounded(37),
-    z: randomBounded(37),
-  }
-}
+import randomPosition from './utils/randomPosition'
 
 class QuestLogic {
   room: Room

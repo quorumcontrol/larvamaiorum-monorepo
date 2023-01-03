@@ -17,6 +17,7 @@ export default Arena({
          */
         gameServer.define('delphs', DelphsTable, { roomType: RoomType.continuous });
         gameServer.define('match', DelphsTable, { roomType: RoomType.match }).filterBy(["matchId"]);
+        gameServer.define('open-match', DelphsTable, { roomType: RoomType.match }).filterBy(["playerCount"]);
     },
 
     initializeExpress: (app) => {

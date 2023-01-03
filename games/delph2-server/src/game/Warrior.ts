@@ -5,6 +5,7 @@ import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTabl
 import { Vec2 } from "playcanvas";
 import { Client } from "colyseus";
 import randomColor from "./utils/randomColor";
+import randomPosition from "./utils/randomPosition";
 
 const log = console.log //debug('Warrior')
 
@@ -52,6 +53,9 @@ class Warrior extends EventEmitter {
   timeWithoutCard = 0
   timeWithCard = 0
 
+  timeSinceDeath = 0
+  deathSentenceTime = 0
+
   isPiggy = false
 
   constructor(client: Client, state: WarriorState) {
@@ -70,16 +74,18 @@ class Warrior extends EventEmitter {
       this.timeWithCard += dt
       this.checkForCardTimeout()
     }
+    if (this.state.state === State.dead) {
+      this.timeSinceDeath += dt
+      if (this.timeSinceDeath >= this.deathSentenceTime) {
+        this.recoverFromDeath()
+      }
+    }
     if (this.state.state === State.move && this.state.speed > 0) {
       const current = new Vec2(this.state.position.x, this.state.position.z)
       const dest = new Vec2(this.state.destination.x, this.state.destination.z)
       const vector = new Vec2().sub2(dest, current).normalize().mulScalar(this.state.speed * dt)
       current.add(vector)
-      this.state.position.assign({
-        x: current.x,
-        z: current.y,
-      })
-      this.position = current
+      this.setPosition(current)
       const distance = current.distance(dest)
       if (distance <= 0.25) {
         this.setSpeed(0)
@@ -90,6 +96,33 @@ class Warrior extends EventEmitter {
         return
       }
     }
+  }
+
+  recoverFromDeath() {
+    this.timeSinceDeath = 0
+    this.deathSentenceTime = 0
+    this.recover(1.00)
+    const { x, z } = randomPosition()
+    this.setPosition(new Vec2(x, z))
+    this.state.destination.assign({ x, z })
+    this.setSpeed(0)
+    this.setState(State.move)
+    this.client.send('playAppearEffect', this.id, { afterNextPatch: true })
+  }
+
+  setPosition(newPosition:Vec2) {
+    this.state.position.assign({
+      x: newPosition.x,
+      z: newPosition.y,
+    })
+    this.position = newPosition
+  }
+
+  dieForTime(seconds:number, message = "you died") {
+    this.timeSinceDeath = 0
+    this.deathSentenceTime = seconds
+    this.setState(State.dead)
+    this.sendMessage(message)
   }
 
   setIsPiggy(isPiggy:boolean) {

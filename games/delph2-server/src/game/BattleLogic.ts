@@ -28,7 +28,8 @@ class BattleLogic {
       return
     }
     this.clock += dt
-    if (this.clock > 1 && !this.over) {
+
+    if (this.clock > 2 && !this.over) {
       if (!this.over) {
         return this.endIt()
       }
@@ -36,16 +37,8 @@ class BattleLogic {
 
     if (this.clock > 5 && !this.completed) {
       console.log('completing battle')
-      this.warriors.forEach((b, i) => {
-        if (!b.isAlive()) {
-          b.recover(1.00)
-        }
-        console.log('recovering warrior: ', b.id)
-        b.setState(State.move)
-      })
       this.completed = true
     }
-
   }
 
   endIt() {
@@ -71,11 +64,11 @@ class BattleLogic {
         this.winner = warrior
       } else {
         this.losers.push(warrior)
-        warrior.sendMessage('You lose.')
         const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5)
         warrior.incGumpBalance(gumpTaken * -1)
         warriors[(i+1) % warriors.length].incGumpBalance(gumpTaken)
-        warrior.setState(State.dead)
+        console.log("warrior dead from battle")
+        warrior.dieForTime(6, "You lose.")
       }
     })
 

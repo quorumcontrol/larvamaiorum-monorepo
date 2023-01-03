@@ -33,9 +33,9 @@ class DeerAttackLogic {
     }
     this.clock += dt
     // 3 seconds later, let the player run free but take 25% of their gump
-    if (this.clock > 3 && !this.over) {
+    if (this.clock > 2 && !this.over) {
       this.over = true
-      this.warrior.setState(State.move)
+      this.warrior.dieForTime(5, "the deer got you.")
       this.warrior.incGumpBalance(-1 * Math.floor(this.warrior.state.wootgumpBalance * 0.25))
       return
     }

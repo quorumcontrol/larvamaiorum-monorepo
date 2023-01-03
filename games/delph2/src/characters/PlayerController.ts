@@ -4,11 +4,15 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import mustFindByName from "../utils/mustFindByName";
 import QuestLogic from "../game/QuestLogic";
 import { QuestType } from "../syncing/schema/DelphsTableState";
+import mustGetScript from "../utils/mustGetScript";
 
 @createScript("playerController")
 class PlayerController extends ScriptTypeBase {
   camera: Entity
   screen: Entity
+
+  // footStepEntity:Entity
+  // footStepEffect:any
 
   questArrow: Entity
 
@@ -21,6 +25,14 @@ class PlayerController extends ScriptTypeBase {
     this.questArrow.enabled = true
     this.app.on('questOver', this.handleQuestOver, this)
     this.app.on('quest', this.handleQuest, this)
+    // this.footStepEntity = mustFindByName(this.entity, "FootImpact")
+    // this.footStepEffect = mustGetScript(this.footStepEntity, "effekseerEmitter")
+    // mustFindByName(this.entity, "viking").anim?.on("foot_step", (_evt) => {
+    //   console.log("foot step")
+    //   // const foot = mustFindByName(this.entity, "foot_r")
+    //   // this.footStepEntity.setPosition(foot.getPosition())
+    //   this.footStepEffect.play()
+    // })
   }
 
   handleQuest(quest: QuestLogic) {

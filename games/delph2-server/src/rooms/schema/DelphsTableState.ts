@@ -41,6 +41,11 @@ export class Vec2 extends Schema {
   @type("number") z: number = 0;
 }
 
+export class RovingAreaAttack extends Schema {
+  @type("string") id:string;
+  @type(Vec2) position: Vec2 = new Vec2();
+}
+
 export class Item extends Schema {
   @type("string") address: string
   @type("number") id: number
@@ -153,6 +158,7 @@ export class DelphsTableState extends Schema {
 
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({})
   @type({ map: Battle }) battles = new MapSchema<Battle>({})
+  @type({ map: RovingAreaAttack }) rovingAreaAttacks = new MapSchema<RovingAreaAttack>({})
   @type({ map: DeerAttack }) deerAttacks = new MapSchema<DeerAttack>({})
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({})
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({})

@@ -16,7 +16,6 @@ class DeerLocomotion extends ScriptTypeBase {
   serverPosition: Vec3
   state: State
   sound: SoundComponent
-
   deer: Entity
 
   initialize() {
@@ -50,7 +49,7 @@ class DeerLocomotion extends ScriptTypeBase {
   setState(newState:State) {
     this.deer.anim!.setBoolean('deerAttack', (newState === State.deerAttack))
 
-    if (newState === State.chasing) {
+    if ([State.chasing, State.deerAttack].includes(newState)) {
       this.sound.slots[randomInt(2).toString()].play()
     }
   }
@@ -76,7 +75,7 @@ class DeerLocomotion extends ScriptTypeBase {
     // this.deer = deerstate
     console.log('deer set', deerstate.toJSON())
     this.entity.setPosition(deerstate.position.x, 0, deerstate.position.z)
-    deerstate.onChange = (changes) => {
+    deerstate.onChange = (_changes) => {
       // console.log("changes: ", changes)
       this.setSpeed(deerstate.speed)
       this.setState(deerstate.state)

@@ -14,6 +14,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
   healthBar: Entity
   warrior: Warrior
   cardText: Entity
+  appearEffect: Entity
 
   viking: Entity
 
@@ -25,7 +26,12 @@ class NetworkedWarriorController extends ScriptTypeBase {
   screen: Entity
   camera: Entity
 
+  private gameTime = 0
+  jobs:{time:number, job:()=>any}[]
+
   initialize() {
+    this.jobs = []
+
     this.viking = mustFindByName(this.entity, 'viking')
     this.anim = this.viking.anim!
 
@@ -33,29 +39,30 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.camera = mustFindByName(this.app.root, 'Camera')
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
     this.cardText = mustFindByName(this.entity, 'CardInPlay')
+    this.appearEffect = mustFindByName(this.app.root, 'PlayerAppearEffect')
     this.entity.once('newWarrior', () => {
-      const effect = mustFindByName(this.app.root, 'PlayerAppearEffect').clone()
-      effect.name = `player-appear-${this.entity.getGuid()}`
-      this.app.root.addChild(effect)
-      effect.setPosition(this.entity.getPosition())
-      effect.enabled = true
-      mustGetScript<any>(effect, 'effekseerEmitter').play()
+      this.playAppearEffect()
     })
-
+    this.entity.on('playAppearEffect', () => {
+      this.playAppearEffect()
+    })
   }
 
-  update(dt:number) {
+  update(dt: number) {
     if (!this.warrior) {
       return
     }
+    this.gameTime += dt
+    this.executeJobs()
+
     this.screen.lookAt(this.camera.getPosition())
     this.screen.rotateLocal(0, 180, 0)
     this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
-
-    if (this.entity.getPosition().distance(this.serverPosition) > 1.5) {
+    const position = this.entity.getPosition()
+    if (position.distance(this.serverPosition) > 1.5) {
       this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
     }
-    if (this.speed > 0 && this.serverPosition && this.entity.getPosition().distance(this.serverPosition) > 0.1) {
+    if (this.speed > 0 && this.serverPosition && position.distance(this.serverPosition) > 0.1) {
       const current = this.entity.getPosition()
       const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(this.speed * dt)
       vector.y = 0
@@ -65,7 +72,41 @@ class NetworkedWarriorController extends ScriptTypeBase {
     }
   }
 
-  setState(newState:State) {
+  playAppearEffect() {
+    if (this.serverPosition) {
+      this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
+    }
+
+    const effect = this.appearEffect.clone()
+    effect.name = `player-appear-${this.entity.getGuid()}-${randomInt(100_000)}`
+    this.app.root.addChild(effect)
+    effect.setPosition(this.entity.getPosition())
+    effect.enabled = true
+    mustGetScript<any>(effect, 'effekseerEmitter').play()
+    this.jobs.push({
+      time: this.gameTime + 6,
+      job: () => {
+        effect.destroy()
+      }
+    })
+  }
+
+  executeJobs() {
+    if (this.jobs.length > 0) {
+      const toDelete:number[] = []
+      this.jobs.forEach((job, i) => {
+        if (job.time <= this.gameTime) {
+          toDelete.push(i)
+          job.job()
+        }
+      })
+      toDelete.forEach((i) => {
+        this.jobs = this.jobs.splice(i,1)
+      })
+    }
+  }
+
+  setState(newState: State) {
     if (this.state === newState) {
       return
     }
@@ -115,7 +156,6 @@ class NetworkedWarriorController extends ScriptTypeBase {
     if (!this.viking) {
       console.error('here we are', this.entity.name, this.entity.getGuid(), this)
     }
-    console.log("viking: ", this.viking, this.viking.anim)
     this.anim.setFloat('speed', speed)
   }
 
@@ -128,10 +168,10 @@ class NetworkedWarriorController extends ScriptTypeBase {
     const axe = mustFindByName(rpm, "Axe")
     const shield = mustFindByName(rpm, "Shield")
     this.entity.addChild(rpm)
-    rpm.setLocalPosition(0,0.1,0)
+    rpm.setLocalPosition(0, 0.1, 0)
     rpm.setLocalEulerAngles(0, 180, 0)
 
-    loadGlbContainerFromUrl(this.app, url, null, name, (err:any, asset:pc.Asset) => {
+    loadGlbContainerFromUrl(this.app, url, null, name, (err: any, asset: pc.Asset) => {
       console.log("avatar loaded")
       if (err) {
         console.error("error loading avatar: ", err)
@@ -153,7 +193,6 @@ class NetworkedWarriorController extends ScriptTypeBase {
         throw new Error("missing anim")
       }
       rpm.anim.enabled = true
-      // rpm.anim!.reset()
 
       this.anim = rpm.anim
       this.viking = rpm
@@ -162,7 +201,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
     })
   }
 
-  setPlayer(player:Warrior) {
+  setPlayer(player: Warrior) {
     this.warrior = player
     console.log('player set', player.toJSON())
     this.entity.setPosition(player.position.x, 0, player.position.z)
@@ -174,7 +213,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
 
       const newMaterial = torso.render!.meshInstances[0].material.clone()
       const color = player.color.toArray()
-      ;(newMaterial as any).diffuse.set(color[0], color[1], color[2])
+        ; (newMaterial as any).diffuse.set(color[0], color[1], color[2])
       newMaterial.update()
       torso.render!.meshInstances[0].material = newMaterial
     }

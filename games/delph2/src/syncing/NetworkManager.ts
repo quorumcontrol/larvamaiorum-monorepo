@@ -1,10 +1,10 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, Deer, DelphsTableState, Item, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, Deer, DeerAttack, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud, { PLAY_CARD_EVT } from '../game/Hud'
-import { Entity, RaycastResult, SoundComponent } from "playcanvas";
+import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
@@ -14,6 +14,7 @@ import TrapScript from "../game/Trap";
 import MusicHandler from "../game/MusicHandler";
 import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
+import RovingAttack from "../game/RovingAttack";
 
 const client = memoize(() => {
   if (typeof document !== 'undefined') {
@@ -46,16 +47,18 @@ class NetworkManager extends ScriptTypeBase {
   deerTemplate: Entity
   trapTemplate: Entity
 
+  battleEffect: Entity
+
   player?: Entity
   playerSessionId?: string
-  warriors:Record<string, Entity>
-  deer:Record<string, Entity>
-  traps:Record<string, Entity>
+  warriors: Record<string, Entity>
+  deer: Record<string, Entity>
+  traps: Record<string, Entity>
   client: Client
-  musicScript:MusicHandler
-  hudScript:Hud
-  gumpSounds:SoundComponent
-  currentQuest?:QuestLogic
+  musicScript: MusicHandler
+  hudScript: Hud
+  gumpSounds: SoundComponent
+  currentQuest?: QuestLogic
 
   async initialize() {
     this.warriors = {}
@@ -67,6 +70,7 @@ class NetworkManager extends ScriptTypeBase {
     this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
+    this.battleEffect = mustFindByName(this.app.root, 'BattleEffects')
     this.client = client()
 
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
@@ -74,7 +78,7 @@ class NetworkManager extends ScriptTypeBase {
 
     const [roomType, params] = roomParams()
     this.room = await this.client.joinOrCreate<DelphsTableState>(roomType, params);
-    
+
     this.room.onError((error) => {
       console.error("room error", error)
     })
@@ -109,8 +113,20 @@ class NetworkManager extends ScriptTypeBase {
     this.room.state.battles.onAdd = (battle, key) => {
       this.handleBattleAdd(battle, key)
     }
+
+    this.room.state.deerAttacks.onAdd = (attack, key) => {
+      this.handleDeerAttackAdd(attack, key)
+    }
+
+    this.room.state.deerAttacks.onRemove = (_attack, key) => {
+      this.handleDeerAttackRemove(key)
+    }
+
     this.room.state.deer.onAdd = (deer, key) => {
       this.handleDeerAdd(deer, key)
+    }
+    this.room.state.rovingAreaAttacks.onAdd = (attack, key) => {
+      this.handleRovingAreaAttack(attack,key)
     }
 
     this.room.state.traps.onAdd = (trap, key) => {
@@ -128,23 +144,27 @@ class NetworkManager extends ScriptTypeBase {
       })
     }
 
-    this.room.onMessage('mainHUDMessage', (message:string) => {
+    this.room.onMessage('mainHUDMessage', (message: string) => {
       this.app.fire('mainHUDMessage', message)
     })
-    
-    this.room.onMessage('gumpDiff', (amount:number) => {
-        const message = amount < 0 ?
+
+    this.room.onMessage('playAppearEffect', (warriorId: string) => {
+      this.warriors[warriorId]?.fire("playAppearEffect")
+    })
+
+    this.room.onMessage('gumpDiff', (amount: number) => {
+      const message = amount < 0 ?
         `- ${amount * -1} gump.` :
         `+ ${amount} gump!`
-        this.app.fire('mainHUDMessage', message)
-        if (amount > 0) {
-          for (let i = 0; i < Math.min(amount, 20); i++) {
-            setTimeout(() => {
-              this.gumpSounds.slots['Increase'].play()
-            }, i * 100)
-          }
-
+      this.app.fire('mainHUDMessage', message)
+      if (amount > 0) {
+        for (let i = 0; i < Math.min(amount, 20); i++) {
+          setTimeout(() => {
+            this.gumpSounds.slots['Increase'].play()
+          }, i * 100)
         }
+
+      }
     })
 
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
@@ -152,7 +172,7 @@ class NetworkManager extends ScriptTypeBase {
       this.musicScript.start()
     })
 
-    this.app.on(PLAY_CARD_EVT, (item:Item) => {
+    this.app.on(PLAY_CARD_EVT, (item: Item) => {
       console.log("playing card: ", item.toJSON())
       this.room?.send('playCard', item.toJSON())
     })
@@ -181,7 +201,7 @@ class NetworkManager extends ScriptTypeBase {
     quest.go()
   }
 
-  handleDeerAdd(deer:Deer, key: string) {
+  handleDeerAdd(deer: Deer, key: string) {
     const deerEntity = this.deerTemplate.clone()
     deerEntity.name = `deer-${key}`
     deerEntity.enabled = true
@@ -191,7 +211,7 @@ class NetworkManager extends ScriptTypeBase {
     this.deer[deer.id] = deerEntity
   }
 
-  handleTrapAdd(trap:Trap, key: string) {
+  handleTrapAdd(trap: Trap, key: string) {
     const trapEntity = this.trapTemplate.clone()
     trapEntity.name = `trap-${key}`
     trapEntity.setPosition(trap.position.x, 0, trap.position.z)
@@ -205,9 +225,30 @@ class NetworkManager extends ScriptTypeBase {
     delete this.traps[key]
   }
 
-  handleBattleAdd(battle:Battle, key:string) {
+  handleDeerAttackAdd(attack: DeerAttack, key: string) {
+    const effect = this.battleEffect.clone()
+    effect.name = `deer-attack-effect-${key}`
+    this.app.root.addChild(effect)
+
+    const position = this.warriors[attack.warriorId].getPosition().clone().add(this.deer[attack.deerId].getPosition()).divScalar(2)
+    effect.setPosition(position)
+    effect.enabled = true
+    this.playEffects(effect)
+  }
+
+  handleDeerAttackRemove(key: string) {
+    const effects = mustFindByName(this.app.root, `deer-attack-effect-${key}`)
+    console.log('deer attack over', key)
+    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
+    Object.values(battleSound.slots).forEach((slot) => {
+      slot.stop()
+    })
+    effects.destroy()
+  }
+
+  handleBattleAdd(battle: Battle, key: string) {
     console.log('new battle: ', battle.toJSON())
-    const effect = mustFindByName(this.app.root, 'BattleEffects').clone()
+    const effect = this.battleEffect.clone()
     effect.name = `battle-effect-${key}`
     this.app.root.addChild(effect)
     effect.enabled = true
@@ -223,7 +264,7 @@ class NetworkManager extends ScriptTypeBase {
     })
   }
 
-  private playEffects(effects:Entity) {
+  private playEffects(effects: Entity) {
     const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
     Object.values(battleSound.slots).forEach((slot) => {
       slot.play()
@@ -233,7 +274,7 @@ class NetworkManager extends ScriptTypeBase {
     mustGetScript<any>(emitter, 'effekseerEmitter').play()
   }
 
-  handleBattleRemove(key:string) {
+  handleBattleRemove(key: string) {
     const effects = mustFindByName(this.app.root, `battle-effect-${key}`)
     console.log('battle over', key)
     const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
@@ -241,6 +282,14 @@ class NetworkManager extends ScriptTypeBase {
       slot.stop()
     })
     effects.destroy()
+  }
+
+  handleRovingAreaAttack(attack:RovingAreaAttack, key:string) {
+    const attackEntity = mustFindByName(this.app.root, "RovingAttack").clone()
+    attackEntity.name = `roving-attack-${key}`
+    this.app.root.addChild(attackEntity)
+    mustGetScript<RovingAttack>(attackEntity, "rovingAttack").setState(attack)
+    attackEntity.enabled = true
   }
 
   handleGumpAdd(gumpLocation: Vec2, key: string) {
