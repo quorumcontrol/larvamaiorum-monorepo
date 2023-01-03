@@ -84,6 +84,21 @@ export async function getAccoladeContract(
   return Accolades__factory.connect(deploy.address, delph)
 }
 
+export async function getMatchResultsContract(
+  hre: HardhatRuntimeEnvironment
+) {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/MatchResults.json`
+  );
+  const delph = await getDelph(hre)
+  if (!delph) {
+    throw new Error('no delph')
+  }
+  const { MatchResults__factory } = await import("../typechain");
+
+  return MatchResults__factory.connect(deploy.address, delph)
+}
+
 export async function getLobbyContract(
   hre: HardhatRuntimeEnvironment
 ) {

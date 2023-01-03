@@ -5,6 +5,7 @@ import './listKeeper'
 import "./gump"
 import "./accolades"
 import "./assignMinter"
+import "./matchResults"
 import { getDelphsGumpContract } from './helpers'
 import { utils } from 'ethers'
 
