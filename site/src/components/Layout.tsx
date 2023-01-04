@@ -32,7 +32,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (lastAddress && address !== lastAddress) {
       console.log("account change from ", lastAddress, "to", address)
       // not sure, but there's been a bug in the app where not everything resets on account change, so this fixes it.
-      window.location.reload()
+      // window.location.reload()
       return
     }
     setLastAddress(address)

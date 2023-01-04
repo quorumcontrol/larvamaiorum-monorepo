@@ -1,5 +1,5 @@
 import { Web3AuthCore } from "@web3auth/core"
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base"
+import { ADAPTER_EVENTS, CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base"
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter"
 
 const web3auth = new Web3AuthCore({
@@ -31,20 +31,37 @@ web3auth.configureAdapter(openloginAdapter)
 class Web3AuthWrapper {
 
   private initPromise:ReturnType<Web3AuthCore['init']>
+  instance:Web3AuthCore
+
+  connected = false
 
   constructor() {
+    web3auth.once(ADAPTER_EVENTS.CONNECTED, () => {
+      console.log("web3auth already connected")
+      this.connected = true
+    })
     this.initPromise = web3auth.init()
+    this.instance = web3auth
   }
 
   waitForReady() {
     return this.initPromise
   }
 
+  isAuthorized() {
+    return this.connected
+  }
+
   async connectTo(loginType:string) {
     await this.waitForReady()
-    return web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+    if (this.isAuthorized()) {
+      console.log("already authorized")
+      return true
+    }
+    await this.instance.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: loginType,
     })
+    return true
   }
 
 }

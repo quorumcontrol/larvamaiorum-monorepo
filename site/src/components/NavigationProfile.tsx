@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react"
 
 import { ConnectButton } from "@rainbow-me/rainbowkit"
-import { useAccount } from "wagmi"
+import { chain, useAccount, useConnect, useDisconnect } from "wagmi"
 import NextLink from "next/link"
 import { useUsername } from "../hooks/Player"
 import useIsClientSide from "../hooks/useIsClientSide"
@@ -30,7 +30,8 @@ import web3auth from "../utils/web3auth"
 
 const NavigationProfile: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
-
+  const { disconnect } = useDisconnect()
+  const { connect, connectors } = useConnect()
   const { address, isConnected } = useAccount()
   const { data: username } = useUsername(address)
   const isClient = useIsClientSide()
@@ -45,12 +46,17 @@ const NavigationProfile: React.FC = () => {
     console.log("connect")
     await web3auth.connectTo(loginType)
     console.log("connected")
+    console.log("connectors: ", connectors)
+    connect({
+      connector: connectors[0],
+    })
+    setShowModal(false)
   }
 
   if (!isClient || !username || !isConnected) {
     return (
       <>
-        <Modal isOpen={showModal} onClose={() => true}>
+        <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <ModalOverlay />
           <ModalContent p="6" bg="brand.background" maxW="600px">
             <ModalBody backgroundImage={border} p="6">
@@ -79,11 +85,11 @@ const NavigationProfile: React.FC = () => {
                 Have a crypto wallet?
               </Heading>
               <Button as={"div"} variant="primary">
-                <ConnectButton
+                {/* <ConnectButton
                   showBalance={false}
                   chainStatus={"none"}
                   accountStatus="avatar"
-                />
+                /> */}
               </Button>
             </ModalBody>
           </ModalContent>
@@ -110,11 +116,12 @@ const NavigationProfile: React.FC = () => {
           </HStack>
         </VStack>
         <Box>
-          <ConnectButton
+          {/* <ConnectButton
             showBalance={false}
             chainStatus={"none"}
             accountStatus="avatar"
-          />
+          /> */}
+          <Button onClick={()=> disconnect()}>Disconnect</Button>
         </Box>
       </HStack>
     </LinkBox>

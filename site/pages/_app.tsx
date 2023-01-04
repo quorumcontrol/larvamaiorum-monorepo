@@ -11,7 +11,7 @@ import {
   Theme,
 } from "@rainbow-me/rainbowkit";
 import merge from "lodash.merge";
-import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
+import { configureChains, createClient, WagmiConfig, chain, Connector } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Script from "next/script";
@@ -19,6 +19,7 @@ import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
 import "../src/utils/firebase";
 import "../styles/video-background.css";
 import "video.js/dist/video-js.css";
+import { Web3AuthConnector } from "../src/utils/web3AuthConnector";
 
 const { chains, provider } = configureChains(
   [
@@ -50,10 +51,17 @@ const { chains, provider } = configureChains(
   ]
 );
 
-const { connectors } = getDefaultWallets({
-  appName: "Crypto Colosseum",
-  chains,
-});
+const connectors = () => {
+  const { connectors:defaultConnectors } = getDefaultWallets({
+    appName: "Crypto Colosseum",
+    chains,
+  });
+
+  return defaultConnectors().concat([new Web3AuthConnector({chains: [chain.mainnet], options: {}})])
+  // return ([new Web3AuthConnector({chains: [chain.mainnet], options: {}})] as Connector[]).concat(defaultConnectors())
+}
+
+
 
 const wagmiClient = createClient({
   autoConnect: true,
@@ -144,7 +152,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider chains={chains} theme={rainbowTheme}>
+        {/* <RainbowKitProvider chains={chains} theme={rainbowTheme}> */}
           <ChakraProvider theme={theme}>
             <Head>
               <title>Crypto Colosseum: Larva Maiorum</title>
@@ -220,7 +228,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             />
             <Component {...pageProps} />
           </ChakraProvider>
-        </RainbowKitProvider>
+        {/* </RainbowKitProvider> */}
       </WagmiConfig>
     </QueryClientProvider>
   );
