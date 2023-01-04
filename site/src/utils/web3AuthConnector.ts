@@ -34,7 +34,7 @@ export class Web3AuthConnector extends Connector {
 
   constructor(config: { chains?: Chain[]; options: any }) {
     super(config);
-    console.log("options: ", config.options)
+    console.log("ready?", this.ready)
     // this.web3AuthOptions = config.options;
     this.web3AuthInstance = web3auth.instance
     // const chainId = config.options.chainId ? parseInt(config.options.chainId, 16) : 1;
@@ -203,6 +203,7 @@ export class Web3AuthConnector extends Connector {
 
   async isAuthorized() {
     try {
+      await web3auth.waitForReady()
       const account = await this.getAccount();
       return !!(account && this.provider);
     } catch {

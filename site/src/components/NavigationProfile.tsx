@@ -48,7 +48,7 @@ const NavigationProfile: React.FC = () => {
     console.log("connected")
     console.log("connectors: ", connectors)
     connect({
-      connector: connectors[0],
+      connector: connectors.find((c) => c.id === "web3Auth"),
     })
     setShowModal(false)
   }
@@ -67,29 +67,29 @@ const NavigationProfile: React.FC = () => {
                 />
                 <Text>Or use</Text>
                 <HStack spacing="12">
-                  <VStack>
-                    <LinkBox onClick={() => onSocialLoginClick("google")}>
+                  <LinkBox onClick={() => onSocialLoginClick("google")} cursor="pointer">
+                    <VStack alignItems="center">
                       <Icon as={FcGoogle} boxSize="12" />
                       <Text>Google</Text>
-                    </LinkBox>
-                  </VStack>
-                  <VStack>
-                    <LinkBox onClick={() => onSocialLoginClick("twitter")}>
+                    </VStack>
+                  </LinkBox>
+                  <LinkBox onClick={() => onSocialLoginClick("twitter")} cursor="pointer">
+                    <VStack>
                       <SocialIcon network="twitter" />
                       <Text>Twitter</Text>
-                    </LinkBox>
-                  </VStack>
+                    </VStack>
+                  </LinkBox>
                 </HStack>
               </VStack>
               <Heading size="lg" my="8" mt="12">
                 Have a crypto wallet?
               </Heading>
               <Button as={"div"} variant="primary">
-                {/* <ConnectButton
+                <ConnectButton
                   showBalance={false}
                   chainStatus={"none"}
                   accountStatus="avatar"
-                /> */}
+                />
               </Button>
             </ModalBody>
           </ModalContent>
@@ -116,12 +116,11 @@ const NavigationProfile: React.FC = () => {
           </HStack>
         </VStack>
         <Box>
-          {/* <ConnectButton
+          <ConnectButton
             showBalance={false}
             chainStatus={"none"}
             accountStatus="avatar"
-          /> */}
-          <Button onClick={()=> disconnect()}>Disconnect</Button>
+          />
         </Box>
       </HStack>
     </LinkBox>

@@ -1,10 +1,10 @@
 import { Box, Image, Text } from "@chakra-ui/react";
 import React from "react";
-import { MetadataWithId } from "../hooks/BadgeOfAssembly";
+import { Metadata } from "../hooks/BadgeOfAssembly";
 import ipfsToWeb from "../utils/ipfsToWeb";
 import Video, { typeFromUrl } from "./Video";
 
-const NFTCard: React.FC<{ metadata: MetadataWithId }> = ({
+const NFTCard: React.FC<{ metadata: Metadata }> = ({
   metadata: { name, description, image, animationUrl },
 }) => {
   return (

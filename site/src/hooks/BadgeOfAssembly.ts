@@ -34,4 +34,5 @@ export const useBadgeMetadata = (tokenId?: BigNumberish) => {
   })
 }
 
-export type MetadataWithId = ThenArg<ReturnType<BadgeOfAssembly['metadata']>> & { id: BigNumber }
+export type Metadata = ThenArg<ReturnType<BadgeOfAssembly['metadata']>>
+export type MetadataWithId = Metadata & { id: BigNumber }

@@ -1,25 +1,35 @@
-import type { AppProps } from "next/app";
-import Head from "next/head";
-import { extendTheme, ChakraProvider } from "@chakra-ui/react";
-import "@fontsource/cairo";
-import "@fontsource/bebas-neue";
-import "@rainbow-me/rainbowkit/styles.css";
+import type { AppProps } from "next/app"
+import Head from "next/head"
+import { extendTheme, ChakraProvider } from "@chakra-ui/react"
+import "@fontsource/cairo"
+import "@fontsource/bebas-neue"
+import "@rainbow-me/rainbowkit/styles.css"
 import {
-  getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
   Theme,
-} from "@rainbow-me/rainbowkit";
-import merge from "lodash.merge";
-import { configureChains, createClient, WagmiConfig, chain, Connector } from "wagmi";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { QueryClient, QueryClientProvider } from "react-query";
-import Script from "next/script";
-import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
-import "../src/utils/firebase";
-import "../styles/video-background.css";
-import "video.js/dist/video-js.css";
-import { Web3AuthConnector } from "../src/utils/web3AuthConnector";
+  connectorsForWallets,
+} from "@rainbow-me/rainbowkit"
+import {
+  braveWallet,
+  coinbaseWallet,
+  injectedWallet,
+  metaMaskWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import merge from "lodash.merge"
+import { configureChains, createClient, WagmiConfig, chain } from "wagmi"
+
+
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
+import { QueryClient, QueryClientProvider } from "react-query"
+import Script from "next/script"
+import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains"
+import "../src/utils/firebase"
+import "../styles/video-background.css"
+import "video.js/dist/video-js.css"
+import { Web3AuthConnector } from "../src/utils/web3AuthConnector"
 
 const { chains, provider } = configureChains(
   [
@@ -38,36 +48,44 @@ const { chains, provider } = configureChains(
       rpc: (chain) => {
         switch (chain.id) {
           case skaleTestnet.id:
-            return { http: chain.rpcUrls.default };
+            return { http: chain.rpcUrls.default }
           case skaleMainnet.id:
-            return { http: chain.rpcUrls.default };
+            return { http: chain.rpcUrls.default }
           default:
             return {
               http: chain.rpcUrls.default,
-            };
+            }
         }
       },
     }),
   ]
-);
+)
 
 const connectors = () => {
-  const { connectors:defaultConnectors } = getDefaultWallets({
-    appName: "Crypto Colosseum",
-    chains,
-  });
+  const connects = connectorsForWallets([
+    {
+      groupName: 'Recommended',
+      wallets: [
+        injectedWallet({ chains, shimDisconnect: true }),
+        metaMaskWallet({ chains, shimDisconnect: true }),
+        coinbaseWallet({ appName: "Crypto Colosseum", chains }),
+        walletConnectWallet({ chains }),
+        braveWallet({ chains, shimDisconnect: true}),
+        rainbowWallet({ chains }),
+      ],
+    },
+  ])
 
-  return defaultConnectors().concat([new Web3AuthConnector({chains: [chain.mainnet], options: {}})])
-  // return ([new Web3AuthConnector({chains: [chain.mainnet], options: {}})] as Connector[]).concat(defaultConnectors())
+  return connects().concat([
+    new Web3AuthConnector({ chains: [chain.mainnet], options: {} }),
+  ])
 }
-
-
 
 const wagmiClient = createClient({
   autoConnect: true,
   connectors,
   provider,
-});
+})
 
 const theme = extendTheme({
   config: {
@@ -132,9 +150,9 @@ const theme = extendTheme({
       },
     },
   },
-});
+})
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const rainbowTheme = merge(darkTheme(), {
   colors: {
@@ -146,13 +164,13 @@ const rainbowTheme = merge(darkTheme(), {
   radii: {
     connectButton: "0px",
   },
-} as Theme);
+} as Theme)
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <WagmiConfig client={wagmiClient}>
-        {/* <RainbowKitProvider chains={chains} theme={rainbowTheme}> */}
+        <RainbowKitProvider chains={chains} theme={rainbowTheme}>
           <ChakraProvider theme={theme}>
             <Head>
               <title>Crypto Colosseum: Larva Maiorum</title>
@@ -228,10 +246,10 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
             />
             <Component {...pageProps} />
           </ChakraProvider>
-        {/* </RainbowKitProvider> */}
+        </RainbowKitProvider>
       </WagmiConfig>
     </QueryClientProvider>
-  );
+  )
 }
 
-export default MyApp;
+export default MyApp

@@ -8,55 +8,62 @@ import {
   Button,
   Wrap,
   WrapItem,
-} from "@chakra-ui/react";
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import Layout from "../../src/components/Layout";
-import NFTCard from "../../src/components/NFTCard";
-import { useUserBadges } from "../../src/hooks/BadgeOfAssembly";
-import { useTeam, useUsername } from "../../src/hooks/Player";
-import { emojiAvatarForAddress } from "../../src/utils/emojiAvatarForAddress";
-import profileBackground from "../../assets/images/profileBackground.png";
-import { useWootgumpBalance } from "../../src/hooks/useWootgump";
-import border from "../../src/utils/dashedBorder";
-import SignupModal from "../../src/components/SignupModal";
-import humanFormatted from "../../src/utils/humanFormatted";
-import { usePlayerAccolades } from "../../src/hooks/useAccolades";
-import AccoladesDisplay from "../../src/components/AccoladesDisplay";
-import { useMasksOfTheAncients } from "../../src/hooks/useMasksOfTheAncients";
-import MaskCard from "../../src/components/MaskCard";
+} from "@chakra-ui/react"
+import type { NextPage } from "next"
+import Head from "next/head"
+import { useRouter } from "next/router"
+import { useMemo, useState } from "react"
+import Layout from "../../src/components/Layout"
+import NFTCard from "../../src/components/NFTCard"
+import { useUserBadges } from "../../src/hooks/BadgeOfAssembly"
+import { useTeam, useUsername } from "../../src/hooks/Player"
+import { emojiAvatarForAddress } from "../../src/utils/emojiAvatarForAddress"
+import profileBackground from "../../assets/images/profileBackground.png"
+import { useWootgumpBalance } from "../../src/hooks/useWootgump"
+import border from "../../src/utils/dashedBorder"
+import SignupModal from "../../src/components/SignupModal"
+import humanFormatted from "../../src/utils/humanFormatted"
+import { usePlayerAccolades } from "../../src/hooks/useAccolades"
+import AccoladesDisplay from "../../src/components/AccoladesDisplay"
+import { useMasksOfTheAncients } from "../../src/hooks/useMasksOfTheAncients"
+import MaskCard from "../../src/components/MaskCard"
+import { useAccount, useDisconnect } from "wagmi"
 
 const Profile: NextPage = () => {
-  const router = useRouter();
-  const { address } = router.query;
+  const router = useRouter()
+
+  const { address: userAddress } = useAccount()
+  const { disconnect } = useDisconnect()
+
+  const { address } = router.query
+
+  const isUserProfilePage =
+    ((address as string) || "").toLowerCase() === userAddress?.toLowerCase()
+
   const { data: badges, isLoading } = useUserBadges(
     address as string | undefined
-  );
-  const { data: accolades } = usePlayerAccolades(address as string | undefined);
+  )
+  const { data: accolades } = usePlayerAccolades(address as string | undefined)
   const { data: team, isLoading: isTeamLoading } = useTeam(
     address as string | undefined
-  );
+  )
 
   const { data: masks, isLoading: isMasksLoading } = useMasksOfTheAncients(
     address as string | undefined
-  );
-  const { data: username } = useUsername(address as string | undefined);
+  )
+  const { data: username } = useUsername(address as string | undefined)
   const { data: gumpBalance } = useWootgumpBalance(
     address as string | undefined
-  );
+  )
 
-  console.log("profile page team: ", team);
-
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false)
 
   const avatar = useMemo(() => {
     if (!address) {
-      return { color: "#000", emoji: "❓" };
+      return { color: "#000", emoji: "❓" }
     }
-    return emojiAvatarForAddress(address as string);
-  }, [address]);
+    return emojiAvatarForAddress(address as string)
+  }, [address])
 
   if (!address) {
     return (
@@ -74,7 +81,7 @@ const Profile: NextPage = () => {
           <Spinner />
         </Layout>
       </>
-    );
+    )
   }
 
   return (
@@ -165,13 +172,18 @@ const Profile: NextPage = () => {
               <Text pt="0" fontSize={["11px", "sm"]}>
                 {address}
               </Text>
-              <Button
-                mt="2"
-                variant="secondary"
-                onClick={() => setShowModal(true)}
-              >
-                Edit
-              </Button>
+              {isUserProfilePage && (
+                <VStack>
+                  <Button
+                    mt="2"
+                    variant="secondary"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Edit
+                  </Button>
+                  <Button variant="link" onClick={() => disconnect()}>disconnect</Button>
+                </VStack>
+              )}
             </Box>
           </Box>
         </Box>
@@ -192,7 +204,7 @@ const Profile: NextPage = () => {
                   <WrapItem key={`nftcard-${i}`}>
                     <MaskCard metadata={metadata} />
                   </WrapItem>
-                );
+                )
               })}
             </Wrap>
           </Box>
@@ -225,13 +237,13 @@ const Profile: NextPage = () => {
                 <WrapItem key={`nftcard-${i}`}>
                   <NFTCard metadata={metadata} />
                 </WrapItem>
-              );
+              )
             })}
           </Wrap>
         </Box>
       </Layout>
     </>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
