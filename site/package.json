@@ -22,7 +22,7 @@
     "@faker-js/faker": "^7.3.0",
     "@fontsource/bebas-neue": "^4.5.8",
     "@fontsource/cairo": "^4.5.10",
-    "@rainbow-me/rainbowkit": "0.4.5",
+    "@rainbow-me/rainbowkit": "^0.8.0",
     "@web3auth/base": "^4.0.0",
     "@web3auth/core": "^4.0.0",
     "@web3auth/openlogin-adapter": "^4.2.0",
@@ -45,7 +45,7 @@
     "react-swipeable": "^7.0.0",
     "skale-relayer-contracts": "0.0.10",
     "video.js": "^7.20.1",
-    "wagmi": "^0.5.3"
+    "wagmi": "^0.8.0"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^4.29.2",
