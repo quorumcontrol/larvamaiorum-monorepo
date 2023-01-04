@@ -17,6 +17,7 @@ import { useAccount, useWaitForTransaction } from "wagmi";
 import Layout from "../../../src/components/Layout";
 import Video from "../../../src/components/Video";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import { HexString } from "../../../src/utils/hexType";
 import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
 const ClaimButton: React.FC<{
@@ -47,7 +48,7 @@ const ClaimButton: React.FC<{
   );
 
   const txStatus = useWaitForTransaction({
-    hash: transactionId,
+    hash: transactionId as HexString,
     enabled: !!transactionId,
     chainId: defaultNetwork().id,
     onSettled: (data) => {
