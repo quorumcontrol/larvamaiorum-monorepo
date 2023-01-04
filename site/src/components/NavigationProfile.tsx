@@ -26,6 +26,7 @@ import border from "../utils/dashedBorder"
 import { SocialIcon } from "react-social-icons"
 import { FcGoogle } from "react-icons/fc"
 import { DiscordLoginButton } from "react-social-login-buttons"
+import web3auth from "../utils/web3auth"
 
 const NavigationProfile: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
@@ -37,8 +38,13 @@ const NavigationProfile: React.FC = () => {
   const { data: dgumpBalance } = useDelphsGumpBalance(address)
 
   const onLoginClick = () => {
-    console.log("click")
     setShowModal(true)
+  }
+
+  const onSocialLoginClick = async (loginType: string) => {
+    console.log("connect")
+    await web3auth.connectTo(loginType)
+    console.log("connected")
   }
 
   if (!isClient || !username || !isConnected) {
@@ -50,16 +56,22 @@ const NavigationProfile: React.FC = () => {
             <ModalBody backgroundImage={border} p="6">
               <Heading size="lg">Sign up or Sign in</Heading>
               <VStack alignItems="left" spacing="6">
-                <DiscordLoginButton />
+                <DiscordLoginButton
+                  onClick={() => onSocialLoginClick("discord")}
+                />
                 <Text>Or use</Text>
                 <HStack spacing="12">
                   <VStack>
-                    <Icon as={FcGoogle} boxSize="12" />
-                    <Text>Google</Text>
+                    <LinkBox onClick={() => onSocialLoginClick("google")}>
+                      <Icon as={FcGoogle} boxSize="12" />
+                      <Text>Google</Text>
+                    </LinkBox>
                   </VStack>
                   <VStack>
-                    <SocialIcon network="twitter" />
-                    <Text>Twitter</Text>
+                    <LinkBox onClick={() => onSocialLoginClick("twitter")}>
+                      <SocialIcon network="twitter" />
+                      <Text>Twitter</Text>
+                    </LinkBox>
                   </VStack>
                 </HStack>
               </VStack>

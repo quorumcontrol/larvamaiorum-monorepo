@@ -57,7 +57,7 @@ const { chains, provider } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "Delph's Table",
+  appName: "Crypto Colosseum",
   chains,
 });
 
