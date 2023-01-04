@@ -62,7 +62,7 @@ const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) =>
       }
     }
 
-    iframe.current.src = `https://delphs.readyplayer.me?frameApi`
+    iframe.current.src = "https://delphs.readyplayer.me?frameApi"
     setShowIFrame(true)
 
     return () => {
