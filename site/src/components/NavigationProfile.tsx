@@ -25,6 +25,7 @@ import { useState } from "react"
 import border from "../utils/dashedBorder"
 import { SocialIcon } from "react-social-icons"
 import { FcGoogle } from "react-icons/fc"
+import { FaApple } from "react-icons/fa"
 import { DiscordLoginButton } from "react-social-login-buttons"
 import web3auth from "../utils/web3auth"
 
@@ -79,6 +80,12 @@ const NavigationProfile: React.FC = () => {
                       <Text>Twitter</Text>
                     </VStack>
                   </LinkBox>
+                  <LinkBox onClick={() => onSocialLoginClick("apple")} cursor="pointer">
+                    <VStack>
+                      <Icon as={FaApple} boxSize="12" color={"white"} />
+                      <Text>Apple</Text>
+                    </VStack>
+                  </LinkBox>
                 </HStack>
               </VStack>
               <Heading size="lg" my="8" mt="12">
@@ -95,7 +102,7 @@ const NavigationProfile: React.FC = () => {
           </ModalContent>
         </Modal>
         <Button variant="primary" onClick={onLoginClick}>
-          Login
+          Sign in
         </Button>
       </>
     )
