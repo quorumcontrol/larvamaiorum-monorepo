@@ -24,7 +24,7 @@ describe("testing your Colyseus app", () => {
     assert.strictEqual(client1.sessionId, room.clients[0].sessionId);
 
     // wait for state sync
-    await room.waitForNextPatch();
+    await client1.waitForNextPatch();
 
     assert.equal(RoomType.continuous, client1.state.roomType);
   });
