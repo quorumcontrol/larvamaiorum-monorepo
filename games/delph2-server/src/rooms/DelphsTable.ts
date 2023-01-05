@@ -40,7 +40,6 @@ export class DelphsTable extends Room<DelphsTableState> {
     }
 
     if (options.expectedPlayers) {
-      this.setPrivate(true)
       console.log('creating with expected players')
       this.state.expectedPlayers.push(...options.expectedPlayers.map((player) => new Player(player)))
     }
