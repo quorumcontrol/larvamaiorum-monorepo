@@ -29,7 +29,7 @@ describe("testing your Colyseus app", () => {
     assert.equal(RoomType.continuous, client1.state.roomType);
   });
 
-  it("connects into a match room", async () => {
+  it.only("connects into a match room", async () => {
     const client = await colyseus.sdk.joinOrCreate<DelphsTableState>("match", {matchId: "test", id: "alice", roomType: RoomType.match, expectedPlayers: [{id: "alice"}, {id: "bob"}]})
     assert.ok(client.sessionId);
 

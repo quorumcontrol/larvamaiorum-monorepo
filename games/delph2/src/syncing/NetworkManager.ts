@@ -26,6 +26,18 @@ const client = memoize(() => {
   return new Client("ws://localhost:2567")
 })
 
+const reservation = () => {
+  if (typeof document === "undefined") {
+    return undefined
+  }
+    const params = new URLSearchParams(document.location.search);
+    const encodedReservation = params.get("om")
+    if (encodedReservation) {
+      return JSON.parse(atob(encodedReservation))
+    }
+    return undefined
+}
+
 const roomParams = () => {
   if (typeof document !== 'undefined') {
     const params = new URLSearchParams(document.location.search);
@@ -75,9 +87,16 @@ class NetworkManager extends ScriptTypeBase {
 
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
-
-    const [roomType, params] = roomParams()
-    this.room = await this.client.joinOrCreate<DelphsTableState>(roomType, params);
+    
+    const res = reservation()
+    if (res) {
+      console.log("found reservation: ", reservation)
+      this.room = await this.client.consumeSeatReservation<DelphsTableState>(res.reservation)
+    } else {
+      const [roomType, params] = roomParams()
+      console.log("room type: ", roomType, params)
+      this.room = await this.client.joinOrCreate<DelphsTableState>(roomType, params);
+    }
 
     this.room.onError((error) => {
       console.error("room error", error)

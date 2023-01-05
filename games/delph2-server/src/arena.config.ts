@@ -1,5 +1,6 @@
 import Arena from "@colyseus/arena";
 import { monitor } from "@colyseus/monitor";
+import { LobbyRoom } from "./rooms/Lobby";
 
 /**
  * Import your Room files
@@ -17,7 +18,8 @@ export default Arena({
          */
         gameServer.define('delphs', DelphsTable, { roomType: RoomType.continuous });
         gameServer.define('match', DelphsTable, { roomType: RoomType.match }).filterBy(["matchId"]);
-        gameServer.define('open-match', DelphsTable, { roomType: RoomType.match }).filterBy(["playerCount"]);
+        // gameServer.define('open-match', DelphsTable, { roomType: RoomType.match }).filterBy(["playerCount"])
+        // gameServer.define("lobby", LobbyRoom);
     },
 
     initializeExpress: (app) => {

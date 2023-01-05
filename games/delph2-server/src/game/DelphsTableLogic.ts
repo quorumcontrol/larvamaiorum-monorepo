@@ -22,7 +22,7 @@ class DelphsTableLogic {
   room: Room
   state: DelphsTableState
 
-  intervalHandle?: any
+  // intervalHandle?: any
 
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
@@ -56,14 +56,7 @@ class DelphsTableLogic {
   }
 
   start() {
-    let previous = new Date()
     this.update(0)
-    this.intervalHandle = setInterval(() => {
-      const now = new Date()
-      const diff = (now.getTime()) - previous.getTime()
-      previous = now
-      this.update(diff / 1000)
-    }, 75)
     for (let i = 0; i < 10; i++) {
       this.spawnOneGump(this.randomPosition())
     }
@@ -79,6 +72,7 @@ class DelphsTableLogic {
       this.spawnRovingAttack()
     }
     if (this.state.roomType === RoomType.continuous) {
+      console.log("accepting input because continuous room")
       this.state.assign({
         acceptInput: true
       })
@@ -103,9 +97,7 @@ class DelphsTableLogic {
   }
 
   stop() {
-    if (this.intervalHandle) {
-      clearInterval(this.intervalHandle)
-    }
+    //todo
   }
 
   update(dt: number) {
@@ -176,8 +168,8 @@ class DelphsTableLogic {
 
   private hasRightNumberOfPlayers() {
     const warriorLength = Object.values(this.warriors).length
-    if (this.state.playerCount && (warriorLength >= this.state.playerCount)) {
-      return true
+    if (this.state.playerCount) {
+      return (warriorLength >= this.state.playerCount)
     }
     const expectedPlayers = iterableToArray(this.state.expectedPlayers.values())
     return warriorLength >= expectedPlayers.length
@@ -194,12 +186,14 @@ class DelphsTableLogic {
       })
       return
     }
+    console.log("accepting input because player quorum has arrived")
 
     this.playerQuorumHasArrived = true
     this.state.assign({
       acceptInput: true,
       persistantMessage: "",
     })
+    this.room.lock()
     this.room.broadcast('mainHUDMessage', "First to 50 gump gets the key. Go.")
   }
 

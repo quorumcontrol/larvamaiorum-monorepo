@@ -11,4 +11,3 @@ export const client = memoize(() => {
   return new Client("wss://zh8smr.colyseus.de")
 })
 
-
