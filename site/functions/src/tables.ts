@@ -84,110 +84,119 @@ export const onLobbyWrite = functions
     // now let"s create the table
     return db.runTransaction(async (transaction) => {
       // get all the players waiting
-
-      const snapshot = await db.collection("/delphsLobby").get()
-      const playerUids: string[] = []
-      snapshot.forEach((doc) => {
-        playerUids.push(doc.id)
-      })
-
-      if (playerUids.length === 0) {
-        return
-      }
-      const tableId = hashString(randomUUID())
-      const { delphs, player, delphsGump, delphsAddress } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
-
-      functions.logger.debug("player uids: ", playerUids)
-
-      const waiting = playerUids.map((uid) => uid.match(/w:(.+)/)![1])
-
-      const botNumber = Math.max(10 - playerUids.length, 0)
-      const id = tableId
-
-      const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
-        const [name, onchainTeam, gump] = await Promise.all([
-          player.name(address),
-          player.team(address),
-          delphsGump.balanceOf(address),
-        ])
-        if (!name) {
-          functions.logger.debug(`${address} has no name`)
-          return undefined
-        }
-
-        // if the address is a bot, then leave number 13, otherwise if the address is human, use team #13 (Novus Ludio)
-        const team = onchainTeam.eq(0) ? BigNumber.from(isBot ? 0 : 13) : onchainTeam
-
-        return {
-          name,
-          address,
-          delphsGump: gump,
-          team: team.toNumber(),
-          seed: hashString(`${id}-${player!.name}-${player!.address}`),
-          isBot: isBot,
-        }
-      }
-
-      const playersWithNamesAndSeeds = (await Promise.all([
-        ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
-        ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
-      ])).filter((p) => !!p)
-
-      const tx = await txSingleton.push(async () => {
-        functions.logger.debug("doing create and start tx", { tableId })
-
-        const startTx = await delphs.createAndStart({
-          id,
-          players: playersWithNamesAndSeeds.map((p) => p!.address),
-          seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
-          gameLength: NUMBER_OF_ROUNDS,
-          owner: delphsAddress,
-          startedAt: 0,
-          tableSize: TABLE_SIZE,
-          wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
-          initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
-          attributes: [],
-          autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
-        }, { gasLimit: 3_000_000 })
-        return startTx
-      })
-      functions.logger.debug("waiting for create and start", { tableId })
-      await tx.wait()
-
-      functions.logger.debug("all players", { tableId, playerUids })
-      const newDoc = db.doc(`/tables/${tableId}`)
-      transaction.create(newDoc, {
-        players: playerUids,
-        seeds: playersWithNamesAndSeeds.reduce((memo, seed) => {
-          return {
-            ...memo,
-            [seed!.address]: {
-              ...seed,
-              delphsGump: Math.floor(parseFloat(utils.formatEther(seed!.delphsGump)))
+      try {
+        await backOff(async () => {
+          const snapshot = await db.collection("/delphsLobby").get()
+          const playerUids: string[] = []
+          snapshot.forEach((doc) => {
+            playerUids.push(doc.id)
+          })
+  
+          if (playerUids.length === 0) {
+            return
+          }
+          const tableId = hashString(randomUUID())
+          const { delphs, player, delphsGump, delphsAddress } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
+  
+          functions.logger.debug("player uids: ", playerUids)
+  
+          const waiting = playerUids.map((uid) => uid.match(/w:(.+)/)![1])
+  
+          const botNumber = Math.max(10 - playerUids.length, 0)
+          const id = tableId
+  
+          const addressToPlayerWithSeed = async (address: string, isBot: boolean) => {
+            const [name, onchainTeam, gump] = await Promise.all([
+              player.name(address),
+              player.team(address),
+              delphsGump.balanceOf(address),
+            ])
+            if (!name) {
+              functions.logger.debug(`${address} has no name`)
+              return undefined
+            }
+  
+            // if the address is a bot, then leave number 13, otherwise if the address is human, use team #13 (Novus Ludio)
+            const team = onchainTeam.eq(0) ? BigNumber.from(isBot ? 0 : 13) : onchainTeam
+  
+            return {
+              name,
+              address,
+              delphsGump: gump,
+              team: team.toNumber(),
+              seed: hashString(`${id}-${player!.name}-${player!.address}`),
+              isBot: isBot,
             }
           }
-        }, {}),
-        tableSize: TABLE_SIZE,
-        rounds: NUMBER_OF_ROUNDS,
-        wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
-        round: 0,
-        status: TableStatus.UNSTARTED,
-      })
-
-      playersWithNamesAndSeeds.forEach((seed) => {
-        if (!seed?.isBot) {
-          transaction.create(db.doc(`tables/${tableId}/moves/${addressToUid(seed!.address)}`), {})
-        }
-      })
-
-      playerUids.forEach((player) => {
-        const lobbyRef = db.doc(`delphsLobby/${player}`)
-        const playerTableRef = db.doc(`playerLocations/${player}`)
-        transaction.delete(lobbyRef)
-        transaction.create(playerTableRef, {
-          table: tableId,
+  
+          const playersWithNamesAndSeeds = (await Promise.all([
+            ...waiting.map((addr) => addressToPlayerWithSeed(addr, false)),
+            ...(await getBots(botNumber)).map((bot) => addressToPlayerWithSeed(bot.address, true))
+          ])).filter((p) => !!p)
+  
+          const tx = await txSingleton.push(async () => {
+            functions.logger.debug("doing create and start tx", { tableId })
+  
+            const startTx = await delphs.createAndStart({
+              id,
+              players: playersWithNamesAndSeeds.map((p) => p!.address),
+              seeds: playersWithNamesAndSeeds.map((p) => p!.seed),
+              gameLength: NUMBER_OF_ROUNDS,
+              owner: delphsAddress,
+              startedAt: 0,
+              tableSize: TABLE_SIZE,
+              wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
+              initialGump: playersWithNamesAndSeeds.map((p) => p!.delphsGump),
+              attributes: [],
+              autoPlay: playersWithNamesAndSeeds.map((p) => p!.isBot)
+            }, { gasLimit: 3_000_000 })
+            return startTx
+          })
+          functions.logger.debug("waiting for create and start", { tableId })
+          await tx.wait()
+  
+          functions.logger.debug("all players", { tableId, playerUids })
+          const newDoc = db.doc(`/tables/${tableId}`)
+          transaction.create(newDoc, {
+            players: playerUids,
+            seeds: playersWithNamesAndSeeds.reduce((memo, seed) => {
+              return {
+                ...memo,
+                [seed!.address]: {
+                  ...seed,
+                  delphsGump: Math.floor(parseFloat(utils.formatEther(seed!.delphsGump)))
+                }
+              }
+            }, {}),
+            tableSize: TABLE_SIZE,
+            rounds: NUMBER_OF_ROUNDS,
+            wootgumpMultiplier: WOOTGUMP_MULTIPLIER,
+            round: 0,
+            status: TableStatus.UNSTARTED,
+          })
+  
+          playersWithNamesAndSeeds.forEach((seed) => {
+            if (!seed?.isBot) {
+              transaction.create(db.doc(`tables/${tableId}/moves/${addressToUid(seed!.address)}`), {})
+            }
+          })
+  
+          playerUids.forEach((player) => {
+            const lobbyRef = db.doc(`delphsLobby/${player}`)
+            const playerTableRef = db.doc(`playerLocations/${player}`)
+            transaction.delete(lobbyRef)
+            transaction.create(playerTableRef, {
+              table: tableId,
+            })
+          })
+        }, {
+          numOfAttempts: 2,
+          startingDelay: 1000,
         })
-      })
+      } catch (err) {
+        functions.logger.error("error starting table", err)
+        process.exit(1)
+      }
     })
   })
 
