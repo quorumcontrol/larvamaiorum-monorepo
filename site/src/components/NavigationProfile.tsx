@@ -126,7 +126,7 @@ const NavigationProfile: React.FC = () => {
     )
   }
 
-  if (!isClient || !username || !isConnected) {
+  if (!isClient || !isConnected) {
     return (
       <>
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
