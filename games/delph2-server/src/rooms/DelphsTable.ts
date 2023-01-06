@@ -47,9 +47,8 @@ export class DelphsTable extends Room<DelphsTableState> {
     this.game = new DelphsTableLogic(this)
     this.game.start()
     this.setSimulationInterval((dt) => {
-      console.log('up: ', dt / 1000)
       this.game.update(dt / 1000)
-    }, 75)
+    }, 50)
 
     this.onMessage("updateDestination", (client, destination: { x: number, z: number }) => {
       console.log(client.sessionId, 'updateDestination', destination)

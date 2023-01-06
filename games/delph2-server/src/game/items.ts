@@ -22,6 +22,11 @@ export interface ItemDescription {
   name: string
   description: string
   costToPlay:number
+  art:string
+
+  field?: boolean
+  battle?: boolean
+
   attack?:number
   defense?:number
   hp?:number
@@ -37,7 +42,9 @@ const items:ItemDescription[] = [
     name: "Trap",
     description: "Drop a trap on the board.",
     costToPlay: 5,
-    appliesToWorld: true
+    appliesToWorld: true,
+    field: true,
+    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/trap.png"
   },
   {
     address: zeroAddr,
@@ -47,8 +54,10 @@ const items:ItemDescription[] = [
     attack: 2000,
     defense: -400,
     hp: -100,
-    costToPlay: 10,
+    costToPlay: 15,
     speed: 1,
+    field: true,
+    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/berserk.png"
   },
   {
     address: zeroAddr,
@@ -58,6 +67,8 @@ const items:ItemDescription[] = [
     costToPlay: 10,
     speed: 3,
     timeLimit: 15,
+    field: true,
+    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/speed.png"
   }
 ].map((i) => {
   return {

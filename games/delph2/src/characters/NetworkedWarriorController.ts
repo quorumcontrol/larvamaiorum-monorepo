@@ -59,7 +59,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.screen.rotateLocal(0, 180, 0)
     this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
     const position = this.entity.getPosition()
-    if (position.distance(this.serverPosition) > 1.5) {
+    if (position.distance(this.serverPosition) > 1) {
       this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
     }
     if (this.speed > 0 && this.serverPosition && position.distance(this.serverPosition) > 0.1) {

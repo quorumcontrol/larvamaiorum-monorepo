@@ -343,15 +343,15 @@ class DelphsTableLogic {
     const warriors = Object.values(this.warriors)
 
     warriors.forEach((w) => {
-      if (this.battles[w.id]) {
+      if (this.battles[w.id] || w.state.state !== State.move) {
         return
       }
       // otherwise find warriors we should battle
       warriors.forEach((potentialOpponent) => {
-        if (potentialOpponent.id === w.id) {
+        if (potentialOpponent.id === w.id || potentialOpponent.state.state !== State.move) {
           return
         }
-        if (w.position.distance(potentialOpponent.position) < 1) {
+        if (w.position.distance(potentialOpponent.position) < 2) {
           pairs.push([w, potentialOpponent])
         }
       })
