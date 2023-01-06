@@ -5,20 +5,21 @@ import mustFindByName from "../utils/mustFindByName";
 import { DelphsTableState, MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
 import mustGetScript from '../utils/mustGetScript';
 import CardHandler from './Card';
+import mapToValues from '../utils/mapToValues';
 
 export const PLAY_CARD_EVT = "playCard"
 
 @createScript("hud")
 class Hud extends ScriptTypeBase {
-  warrior?:Warrior
-  maxStats?:MaxStats
-  state?:DelphsTableState
+  warrior?: Warrior
+  maxStats?: MaxStats
+  state?: DelphsTableState
 
   name: Entity
   gumpStats: Entity
 
-  cardHolder:Entity
-  
+  cardHolder: Entity
+
   trackInfo: Entity
   persistantMessage: Entity
   questIndicator: Entity
@@ -34,15 +35,15 @@ class Hud extends ScriptTypeBase {
 
   previousArtwork?: Asset
 
-  mainMessage:Entity
+  mainMessage: Entity
 
-  messages:string[]
+  messages: string[]
 
   timeSinceLastMessage = 0
 
   initialize() {
     this.messages = []
-    
+
     this.cardHolder = mustFindByName(this.entity, "Cards")
     this.name = mustFindByName(this.entity, 'Name')
     this.gumpStats = mustFindByName(this.entity, 'Gump')
@@ -51,29 +52,29 @@ class Hud extends ScriptTypeBase {
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
     this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
 
-    mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt:MouseEvent) => {
+    mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt: MouseEvent) => {
       evt.stopPropagation()
       this.app.fire("musicVolumeUp")
     })
 
-    mustFindByName(this.entity, "VolumeDown").element!.on("click", (evt:MouseEvent) => {
+    mustFindByName(this.entity, "VolumeDown").element!.on("click", (evt: MouseEvent) => {
       evt.stopPropagation()
       this.app.fire("musicVolumeDown")
     })
-    
+
     this.app.on('mainHUDMessage', this.queueMessage, this)
 
     this.statElements = {
       Attack: mustFindByName(this.entity, "Attack"),
-      Defense:  mustFindByName(this.entity, "Defense"),
-      Health:  mustFindByName(this.entity, "Health"),
-      AttackStat:  mustFindByName(this.entity, "AttackStat"),
-      DefenseStat:  mustFindByName(this.entity, "DefenseStat"),
-      HealthStat:  mustFindByName(this.entity, "HealthStat")
+      Defense: mustFindByName(this.entity, "Defense"),
+      Health: mustFindByName(this.entity, "Health"),
+      AttackStat: mustFindByName(this.entity, "AttackStat"),
+      DefenseStat: mustFindByName(this.entity, "DefenseStat"),
+      HealthStat: mustFindByName(this.entity, "HealthStat")
     }
   }
 
-  update(dt:number) {
+  update(dt: number) {
     this.timeSinceLastMessage += dt
     if (this.timeSinceLastMessage >= 0.5 && this.messages.length >= 1) {
       this.handleMessage(this.messages.shift()!)
@@ -109,13 +110,15 @@ class Hud extends ScriptTypeBase {
     if (!this.warrior) {
       throw new Error('must have warrior set to setup inventory')
     }
-    this.warrior.inventory.forEach((inventory) => {
-      if (inventory.quantity > 0) {
-        const el = this.cardHolder.findByName(`${inventory.item.name}Card`) as Entity | undefined
-        if (el) {
-          el.enabled = true
-          mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
-        }
+    const fieldInventory = mapToValues(this.warrior.inventory).filter((i) => i.item.field && i.quantity > 0)
+    if (fieldInventory.length > 3) {
+      throw new Error('too many inventory items')
+    }
+    fieldInventory.forEach((inventory, i) => {
+      const el = this.cardHolder.findByName(`Slot${i}`) as Entity | undefined
+      if (el) {
+        el.enabled = true
+        mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
       }
     })
   }
@@ -133,29 +136,29 @@ class Hud extends ScriptTypeBase {
     })
   }
 
-  queueMessage(message:string) {
+  queueMessage(message: string) {
     this.messages.push(message)
   }
 
-  handleMessage(message:string) {
+  handleMessage(message: string) {
     const msgEl = this.mainMessage.clone()
     msgEl.element!.text = message
     this.entity.addChild(msgEl)
     msgEl.enabled = true
     const start = msgEl.getLocalPosition()
 
-    let opacityObj = {opacity: 1.0}
+    let opacityObj = { opacity: 1.0 }
     // the duration of this tween must be less than the next one because the next one destroys
-    this.entity.tween(opacityObj).to({opacity: 0.05}, 3, pc.SineInOut).on('update', () => {
+    this.entity.tween(opacityObj).to({ opacity: 0.05 }, 3, pc.SineInOut).on('update', () => {
       msgEl.element!.opacity = opacityObj.opacity
     }).start()
 
-    msgEl.tween(start).to({x: start.x, y: start.y + 600, z: start.z}, 4, pc.SineOut).start().on('complete', () => {
+    msgEl.tween(start).to({ x: start.x, y: start.y + 600, z: start.z }, 4, pc.SineOut).start().on('complete', () => {
       msgEl.destroy()
     })
   }
 
-  setMusic(music:Music) {
+  setMusic(music: Music) {
     this.trackInfo.enabled = true
     if (music.artwork) {
       console.log("loading ", music.artwork)
@@ -178,7 +181,7 @@ class Hud extends ScriptTypeBase {
     mustFindByName(this.trackInfo, 'Artist').element!.text = `by ${music.artist}`
   }
 
-  setWarrior(warrior:Warrior, state:DelphsTableState) {
+  setWarrior(warrior: Warrior, state: DelphsTableState) {
     this.warrior = warrior
     this.maxStats = state.maxStats
     this.state = state

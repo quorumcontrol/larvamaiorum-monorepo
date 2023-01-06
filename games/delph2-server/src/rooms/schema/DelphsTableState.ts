@@ -26,6 +26,12 @@ export enum QuestType {
   random,
 }
 
+export enum GameNags {
+  deer,
+  roving,
+  traps,
+}
+
 export class Music extends Schema {
   @type("string") name: string
   @type("string") url: string
@@ -53,7 +59,10 @@ export class Item extends Schema {
   @type("string") name: string
   @type("string") description: string
   @type("string") art:string
+  @type("boolean") field?: boolean
+  @type("boolean") battle?: boolean
   @type("number") costToPlay?:number
+  @type({ array: "number" }) repels = new ArraySchema<GameNags>()
 }
 
 export class InventoryOfItem extends Schema {

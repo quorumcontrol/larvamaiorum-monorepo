@@ -1,3 +1,4 @@
+import { GameNags } from "../rooms/schema/DelphsTableState"
 
 export interface InventoryItem {
   address: string
@@ -33,6 +34,7 @@ export interface ItemDescription {
   speed?:number
   timeLimit?:number
   appliesToWorld?:boolean
+  repels?: GameNags[],
 }
 
 const items:ItemDescription[] = [
@@ -44,7 +46,7 @@ const items:ItemDescription[] = [
     costToPlay: 5,
     appliesToWorld: true,
     field: true,
-    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/trap.png"
+    art: "https://delphsart.s3.fr-par.scw.cloud/trap.png"
   },
   {
     address: zeroAddr,
@@ -57,7 +59,8 @@ const items:ItemDescription[] = [
     costToPlay: 15,
     speed: 1,
     field: true,
-    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/berserk.png"
+    repels: [GameNags.deer],
+    art: "https://delphsart.s3.fr-par.scw.cloud/berserk.png"
   },
   {
     address: zeroAddr,
@@ -68,7 +71,7 @@ const items:ItemDescription[] = [
     speed: 3,
     timeLimit: 15,
     field: true,
-    art: "https://skynet-backup.s3.fr-par.scw.cloud/cards/speed.png"
+    art: "https://delphsart.s3.fr-par.scw.cloud/speed.png"
   }
 ].map((i) => {
   return {

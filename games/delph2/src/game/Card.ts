@@ -29,12 +29,27 @@ class CardHandler extends ScriptTypeBase {
     })
   }
 
+  loadArt(artUrl:string) {
+    const art = new pc.Asset(artUrl, "texture", {
+      url: artUrl,
+    })
+    art.on('error', (err) => {
+      console.error(`error loading card artwork ${artUrl}: `, err)
+    })
+    art.on('load', () => {
+      this.entity.element!.texture = art.resource
+    })
+    this.app.assets.load(art)
+  }
+
   setItem(item:Item) {
+    this.loadArt(item.art)
     this.item = item
     if (item.costToPlay) {
       const costToPlayEntity = mustFindByName(this.entity, "CostToPlayBackground")
       mustFindByName(costToPlayEntity, "CostToPlay").element!.text = `${item.costToPlay} $GUMP`
       costToPlayEntity.enabled = true
+      
     }
   }
 }
