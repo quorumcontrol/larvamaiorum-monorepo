@@ -52,6 +52,7 @@ export class Item extends Schema {
 
   @type("string") name: string
   @type("string") description: string
+  @type("string") art:string
   @type("number") costToPlay?:number
 }
 
