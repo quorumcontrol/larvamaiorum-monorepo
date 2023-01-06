@@ -16,6 +16,7 @@
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "preserveSymlinks": true,
+    "jsx": "react-jsx",
     "typeRoots": ["src/types", "./node_modules/@types"]
   }
 }
