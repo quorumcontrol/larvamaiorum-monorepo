@@ -1,39 +1,44 @@
-import type { AppProps } from "next/app";
-import Head from "next/head";
-import { extendTheme, ChakraProvider } from "@chakra-ui/react";
-import "@fontsource/cairo";
-import "@fontsource/bebas-neue";
-import "@rainbow-me/rainbowkit/styles.css";
+import type { AppProps } from "next/app"
+import Head from "next/head"
+import { extendTheme, ChakraProvider } from "@chakra-ui/react"
+import "@fontsource/cairo"
+import "@fontsource/bebas-neue"
+import "@rainbow-me/rainbowkit/styles.css"
 import {
-  getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
   Theme,
-} from "@rainbow-me/rainbowkit";
-import merge from "lodash.merge";
-import { configureChains, createClient, WagmiConfig, chain } from "wagmi";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-import { QueryClient, QueryClientProvider } from "react-query";
-import Script from "next/script";
-import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains";
-import "../src/utils/firebase";
-import "../styles/video-background.css";
-import "video.js/dist/video-js.css";
+  connectorsForWallets,
+} from "@rainbow-me/rainbowkit"
+import {
+  braveWallet,
+  coinbaseWallet,
+  injectedWallet,
+  metaMaskWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import merge from "lodash.merge"
+import { configureChains, createClient, WagmiConfig, chain } from "wagmi"
+
+
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc"
+import { QueryClient, QueryClientProvider } from "react-query"
+import Script from "next/script"
+import { skaleTestnet, skaleMainnet } from "../src/utils/SkaleChains"
+import "../src/utils/firebase"
+import "../styles/video-background.css"
+import "video.js/dist/video-js.css"
+import { Web3AuthConnector } from "../src/utils/web3AuthConnector"
 
 const { chains, provider } = configureChains(
   [
     skaleMainnet,
     chain.mainnet,
     chain.polygon,
-    chain.ropsten,
-    chain.rinkeby,
-    chain.goerli,
-    chain.kovan,
     chain.optimism,
-    chain.optimismKovan,
     chain.polygonMumbai,
     chain.arbitrum,
-    chain.arbitrumRinkeby,
     chain.localhost,
     chain.hardhat,
     skaleTestnet,
@@ -43,29 +48,44 @@ const { chains, provider } = configureChains(
       rpc: (chain) => {
         switch (chain.id) {
           case skaleTestnet.id:
-            return { http: chain.rpcUrls.default };
+            return { http: chain.rpcUrls.default }
           case skaleMainnet.id:
-            return { http: chain.rpcUrls.default };
+            return { http: chain.rpcUrls.default }
           default:
             return {
               http: chain.rpcUrls.default,
-            };
+            }
         }
       },
     }),
   ]
-);
+)
 
-const { connectors } = getDefaultWallets({
-  appName: "Delph's Table",
-  chains,
-});
+const connectors = () => {
+  const connects = connectorsForWallets([
+    {
+      groupName: 'Recommended',
+      wallets: [
+        injectedWallet({ chains, shimDisconnect: true }),
+        metaMaskWallet({ chains, shimDisconnect: true }),
+        coinbaseWallet({ appName: "Crypto Colosseum", chains }),
+        walletConnectWallet({ chains }),
+        braveWallet({ chains, shimDisconnect: true}),
+        rainbowWallet({ chains }),
+      ],
+    },
+  ])
+
+  return connects().concat([
+    new Web3AuthConnector({ chains: [chain.mainnet], options: {} }),
+  ])
+}
 
 const wagmiClient = createClient({
   autoConnect: true,
   connectors,
   provider,
-});
+})
 
 const theme = extendTheme({
   config: {
@@ -130,9 +150,9 @@ const theme = extendTheme({
       },
     },
   },
-});
+})
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const rainbowTheme = merge(darkTheme(), {
   colors: {
@@ -144,7 +164,7 @@ const rainbowTheme = merge(darkTheme(), {
   radii: {
     connectButton: "0px",
   },
-} as Theme);
+} as Theme)
 
 function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
@@ -229,7 +249,7 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
         </RainbowKitProvider>
       </WagmiConfig>
     </QueryClientProvider>
-  );
+  )
 }
 
-export default MyApp;
+export default MyApp

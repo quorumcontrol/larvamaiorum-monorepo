@@ -44,7 +44,7 @@ const BadgeCard: React.FC<{ tokenId?: string; variant: Variants }> = ({
     );
   }
 
-  return <NFTCard metadata={{ ...metadata, id: BigNumber.from(tokenId) }} />;
+  return <NFTCard metadata={metadata} />;
 };
 
 export default BadgeCard;

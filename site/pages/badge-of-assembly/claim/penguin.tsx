@@ -20,6 +20,7 @@ import Video from "../../../src/components/Video";
 import { useUserBadges } from "../../../src/hooks/BadgeOfAssembly";
 import { useHasPudgy } from "../../../src/hooks/badgeOfAssembly/useHasPudgy";
 import useIsClientSide from "../../../src/hooks/useIsClientSide";
+import { HexString } from "../../../src/utils/hexType";
 import { isTestnet } from "../../../src/utils/networks";
 import { defaultNetwork } from "../../../src/utils/SkaleChains";
 
@@ -62,7 +63,7 @@ const ClaimButton: React.FC<{
   );
 
   const txStatus = useWaitForTransaction({
-    hash: transactionId,
+    hash: transactionId as HexString,
     enabled: !!transactionId,
     chainId: defaultNetwork().id,
     onSettled: (data) => {

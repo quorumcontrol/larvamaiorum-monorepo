@@ -21,6 +21,7 @@ import useIsClientSide from "../../../src/hooks/useIsClientSide";
 import useSKLBalance from "../../../src/hooks/badgeOfAssembly/useSKLBalance";
 import humanFormatted from "../../../src/utils/humanFormatted";
 import { defaultNetwork } from "../../../src/utils/SkaleChains";
+import { HexString } from '../../../src/utils/hexType'
 
 const threshold = parseEther("1000");
 
@@ -52,7 +53,7 @@ const ClaimButton: React.FC<{
   );
 
   const txStatus = useWaitForTransaction({
-    hash: transactionId,
+    hash: transactionId as HexString,
     enabled: !!transactionId,
     chainId: defaultNetwork().id,
     onSettled: (data) => {
