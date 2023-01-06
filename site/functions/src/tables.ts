@@ -15,6 +15,7 @@ import { TableStatus } from "../../src/utils/tables"
 import { addressToUid, uidToAddress } from "../../src/utils/firebaseHelpers"
 import Grid from "../../src/boardLogic/Grid";
 import { delphsPrivateKey, walletAndContracts } from "./wallets";
+import { backOff } from "exponential-backoff"
 
 type QueryDoc = FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>
 
@@ -115,7 +116,7 @@ export const onLobbyWrite = functions
         }
 
         // if the address is a bot, then leave number 13, otherwise if the address is human, use team #13 (Novus Ludio)
-        const team = onchainTeam.eq(0) ? BigNumber.from(isBot ? 0: 13) : onchainTeam
+        const team = onchainTeam.eq(0) ? BigNumber.from(isBot ? 0 : 13) : onchainTeam
 
         return {
           name,
@@ -201,10 +202,17 @@ const _roller = async () => {
     const { delphs } = await walletAndContracts(process.env[delphsPrivateKey.name]!)
 
     functions.logger.debug("roller rolling")
-    const tx = await txSingleton.push(async () => {
-      return delphs.rollTheDice()
+    await backOff(async () => {
+      const tx = await txSingleton.push(async () => {
+        return delphs.rollTheDice()
+      })
+      await tx.wait()
+      return
+    }, {
+      maxDelay: 2000,
+      numOfAttempts: 5,
+      startingDelay: 1000,
     })
-    await tx.wait()
     functions.logger.debug("roller complete")
     const latest = await delphs.latestRoll()
     const randomness = await delphs.rolls(latest)
@@ -216,6 +224,9 @@ const _roller = async () => {
     await batch.commit()
   } catch (err) {
     functions.logger.error("error rolling", err)
+    await enqueueRoll()
+    //fail the process completely to restore the wallet process above.
+    process.exit(1)
   } finally {
     functions.logger.debug("done")
     const doc = await db.doc("_internal/stopRolling").get()
@@ -377,8 +388,19 @@ export const handleCompletedTables = functions
     if (tableData.status !== TableStatus.COMPLETE) {
       return
     }
-    const contracts = await walletAndContracts(process.env[delphsPrivateKey.name]!)
-    return completeTheTable(contracts, table)
+    try {
+      return await backOff(async () => {
+        const contracts = await walletAndContracts(process.env[delphsPrivateKey.name]!)
+        return await completeTheTable(contracts, table)
+      }, {
+        numOfAttempts: 2,
+        maxDelay: 5000,
+        startingDelay: 2000,
+      })
+    } catch (err) {
+      functions.logger.error("error completing table: ", err)
+      process.exit(1)
+    }
   })
 
 interface CompleteTableContracts {
