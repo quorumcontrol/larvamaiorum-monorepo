@@ -14,7 +14,7 @@
     "copy-secrets": "scp .env.local mrunfucker@51.15.92.5:~/larvamaiorum-monorepo/site/ && scp contracts/bots-*.ts mrunfucker@51.15.92.5:~/larvamaiorum-monorepo/site/contracts/"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.0.8",
+    "@chakra-ui/icons": "^2.0.15",
     "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
@@ -23,6 +23,8 @@
     "@fontsource/bebas-neue": "^4.5.8",
     "@fontsource/cairo": "^4.5.10",
     "@rainbow-me/rainbowkit": "0.4.5",
+    "@web3auth/base": "^4.0.0",
+    "@web3auth/core": "^4.0.0",
     "cross-fetch": "^3.1.5",
     "ethers": "5.6.8",
     "exponential-backoff": "^3.1.0",
@@ -35,8 +37,10 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.32.1",
+    "react-icons": "^4.7.1",
     "react-query": "^3.39.1",
     "react-social-icons": "^5.14.0",
+    "react-social-login-buttons": "^3.6.1",
     "react-swipeable": "^7.0.0",
     "skale-relayer-contracts": "0.0.10",
     "video.js": "^7.20.1",
