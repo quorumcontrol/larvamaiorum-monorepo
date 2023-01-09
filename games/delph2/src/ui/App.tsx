@@ -1,10 +1,12 @@
 import React from "react"
-import { ChakraProvider, extendTheme, Text } from "@chakra-ui/react"
-import { PlayCanvasApplicationProvider } from "./components/appProvider"
-import { Global } from '@emotion/react'
+import { ChakraProvider, VStack } from "@chakra-ui/react"
+import { AppProvider } from "./components/appProvider"
+import { Global } from "@emotion/react"
 import { Room } from "colyseus.js"
 import { DelphsTableState } from "../syncing/schema/DelphsTableState"
 import NowPlaying from "./components/NowPlaying"
+import theme from "../main-site-components/theme"
+import CardPicker from "./components/CardPicker"
 
 const Fonts = () => (
   <Global
@@ -29,78 +31,19 @@ const Fonts = () => (
   />
 )
 
-const theme = extendTheme({
-  config: {
-    initialColorMode: "dark",
-  },
-  styles: {
-    global: {
-      body: {
-        fontSize: "22px",
-        bg: "brand.background",
-        fontWeight: "400",
-      },
-    },
-  },
-  fonts: {
-    heading: "Bebas Neue, cursive",
-    body: "Cairo, sans-serif",
-  },
-  colors: {
-    brand: {
-      background: "#101010",
-      orange: "#D14509",
-      accoladeBackground: "#1F1816",
-    },
-  },
-  components: {
-    Button: {
-      variants: {
-        primary: {
-          textTransform: "uppercase",
-          fontWeight: "700",
-          bg: "brand.orange",
-          borderRadius: "0",
-        },
-        secondary: {
-          borderRadius: "0",
-          textTransform: "uppercase",
-          fontWeight: "700",
-          background: "rgba(209, 69, 9, 0.05)",
-          border: "1px solid rgba(233, 108, 55, 0.5)",
-        },
-      },
-    },
-    Heading: {
-      baseStyle: {},
-      sizes: {
-        lg: {
-          fontSize: "3xl",
-          lineHeight: "50px",
-          letterSpacing: "0.025em",
-        },
-        xl: {
-          fontSize: "5xl",
-          lineHeight: "80px",
-          letterSpacing: "0.025em",
-        },
-        "2xl": {
-          fontSize: "7xl",
-          lineHeight: "99px",
-          letterSpacing: "0.025em",
-        },
-      },
-    },
-  },
-})
-
-const App: React.FC<{app: pc.Application, room: Room<DelphsTableState>}> = ({ app, room }) => {
+const App: React.FC<{ app: pc.Application; room: Room<DelphsTableState> }> = ({
+  app,
+  room,
+}) => {
   return (
     <ChakraProvider theme={theme}>
       <Fonts />
-      <PlayCanvasApplicationProvider value={{ app, room }}>
-        <NowPlaying />
-      </PlayCanvasApplicationProvider>
+      <AppProvider app={app} room={room}>
+        <VStack alignItems="left" paddingRight="10px">
+          <CardPicker />
+          <NowPlaying />
+        </VStack>
+      </AppProvider>
     </ChakraProvider>
   )
 }

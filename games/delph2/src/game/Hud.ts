@@ -22,7 +22,7 @@ class Hud extends ScriptTypeBase {
 
   trackInfo: Entity
   persistantMessage: Entity
-  questIndicator: Entity
+  // questIndicator: Entity
 
   statElements: {
     Attack: Entity
@@ -50,7 +50,7 @@ class Hud extends ScriptTypeBase {
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
-    this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
+    // this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
 
     mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt: MouseEvent) => {
       evt.stopPropagation()
@@ -85,7 +85,7 @@ class Hud extends ScriptTypeBase {
       return
     }
 
-    this.questIndicator.enabled = !!this.state?.currentQuest
+    // this.questIndicator.enabled = !!this.state?.currentQuest
 
     this.updateInventoryGraphics()
 
@@ -106,22 +106,22 @@ class Hud extends ScriptTypeBase {
     this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
   }
 
-  private setupInventory() {
-    if (!this.warrior) {
-      throw new Error('must have warrior set to setup inventory')
-    }
-    const fieldInventory = mapToValues(this.warrior.inventory).filter((i) => i.item.field && i.quantity > 0)
-    if (fieldInventory.length > 3) {
-      throw new Error('too many inventory items')
-    }
-    fieldInventory.forEach((inventory, i) => {
-      const el = this.cardHolder.findByName(`Slot${i}`) as Entity | undefined
-      if (el) {
-        el.enabled = true
-        mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
-      }
-    })
-  }
+  // private setupInventory() {
+  //   if (!this.warrior) {
+  //     throw new Error('must have warrior set to setup inventory')
+  //   }
+  //   const fieldInventory = mapToValues(this.warrior.inventory).filter((i) => i.item.field && i.quantity > 0)
+  //   if (fieldInventory.length > 3) {
+  //     throw new Error('too many inventory items')
+  //   }
+  //   fieldInventory.forEach((inventory, i) => {
+  //     const el = this.cardHolder.findByName(`Slot${i}`) as Entity | undefined
+  //     if (el) {
+  //       el.enabled = true
+  //       mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
+  //     }
+  //   })
+  // }
 
   private updateInventoryGraphics() {
     if (!this.warrior) {
@@ -158,35 +158,35 @@ class Hud extends ScriptTypeBase {
     })
   }
 
-  setMusic(music: Music) {
-    this.trackInfo.enabled = true
-    if (music.artwork) {
-      console.log("loading ", music.artwork)
-      const musicArtwork = new pc.Asset(music.artwork, "texture", {
-        url: music.artwork,
-      })
-      if (this.previousArtwork) {
-        this.app.assets.remove(this.previousArtwork)
-        this.previousArtwork = musicArtwork
-      }
-      musicArtwork.on('error', (err) => {
-        console.error('error loading artwork: ', err)
-      })
-      musicArtwork.on('load', () => {
-        mustFindByName(this.trackInfo, 'Artwork').element!.texture = musicArtwork.resource
-      })
-      this.app.assets.load(musicArtwork)
-    }
-    mustFindByName(this.trackInfo, 'Title').element!.text = music.name
-    mustFindByName(this.trackInfo, 'Artist').element!.text = `by ${music.artist}`
-  }
+  // setMusic(music: Music) {
+  //   this.trackInfo.enabled = true
+  //   if (music.artwork) {
+  //     console.log("loading ", music.artwork)
+  //     const musicArtwork = new pc.Asset(music.artwork, "texture", {
+  //       url: music.artwork,
+  //     })
+  //     if (this.previousArtwork) {
+  //       this.app.assets.remove(this.previousArtwork)
+  //       this.previousArtwork = musicArtwork
+  //     }
+  //     musicArtwork.on('error', (err) => {
+  //       console.error('error loading artwork: ', err)
+  //     })
+  //     musicArtwork.on('load', () => {
+  //       mustFindByName(this.trackInfo, 'Artwork').element!.texture = musicArtwork.resource
+  //     })
+  //     this.app.assets.load(musicArtwork)
+  //   }
+  //   mustFindByName(this.trackInfo, 'Title').element!.text = music.name
+  //   mustFindByName(this.trackInfo, 'Artist').element!.text = `by ${music.artist}`
+  // }
 
   setWarrior(warrior: Warrior, state: DelphsTableState) {
     this.warrior = warrior
     this.maxStats = state.maxStats
     this.state = state
     this.name.element!.text = warrior.name
-    this.setupInventory()
+    // this.setupInventory()
   }
 
 }

@@ -1,6 +1,5 @@
 import { Box, Heading, HStack, Image, Text, VStack } from '@chakra-ui/react'
-import React, { useContext, useEffect, useState } from 'react'
-import { PlayCanvasApplication } from './appProvider'
+import React, { useEffect, useState } from 'react'
 import useMusic from './hooks/useMusic'
 
 const NowPlaying:React.FC = () => {

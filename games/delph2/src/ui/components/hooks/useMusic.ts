@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react"
 import { DelphsTableState } from "../../../syncing/schema/DelphsTableState"
-import { PlayCanvasApplication } from "../appProvider"
+import { PlayCanvasApplicationContext } from "../appProvider"
 
 const useMusic = () => {
-  const { room } = useContext(PlayCanvasApplication)
+  const { room } = useContext(PlayCanvasApplicationContext)
   const [nowPlaying, setNowPlaying] = useState<Partial<DelphsTableState['nowPlaying']>>(room?.state.nowPlaying.toJSON() || {})
 
   useEffect(() => {

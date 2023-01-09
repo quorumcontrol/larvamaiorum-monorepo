@@ -8,7 +8,7 @@ const CardPicker:React.FC = () => {
     <Box>
       <HStack spacing="8">
         {Object.values(itemsByIdentifier).map((item) => {
-          return <Card card={item} key={item.identifier} />
+          return <Card card={item} key={item.identifier} width="100px" />
         })}
       </HStack>
     </Box>

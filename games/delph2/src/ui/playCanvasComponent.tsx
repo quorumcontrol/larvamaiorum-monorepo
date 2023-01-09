@@ -17,8 +17,8 @@ class ReactUI extends ScriptTypeBase {
      style.innerHTML = `
       #ui-root {
        position: fixed;
-       width: 20vw;
-       bottom: 0;
+       width: 22vw;
+       bottom: 10px;
        right: 0;
       }
       `
