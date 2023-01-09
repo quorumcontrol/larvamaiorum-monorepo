@@ -1,7 +1,7 @@
 import { useQuery } from "react-query"
 import { client } from "../utils/colyseus"
-import { LobbyState, ReservationRequest } from "../delphs-schema/LobbyState"
-import { useCallback, useEffect, useState } from "react"
+import { LobbyState, ReservationRequest } from "../delphs-state/LobbyState"
+import { useCallback, useState } from "react"
 import { RoomAvailable } from 'colyseus.js'
 import { useUsername } from "./Player"
 import { useAccount } from "wagmi"

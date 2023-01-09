@@ -59,10 +59,12 @@ export class Item extends Schema {
   @type("string") name: string
   @type("string") description: string
   @type("string") art:string
+  @type("string") frameColor:string
   @type("boolean") field?: boolean
   @type("boolean") battle?: boolean
   @type("number") costToPlay?:number
   @type({ array: "number" }) repels = new ArraySchema<GameNags>()
+  @type("boolean") affectsAllPlayers?: boolean
 }
 
 export class InventoryOfItem extends Schema {

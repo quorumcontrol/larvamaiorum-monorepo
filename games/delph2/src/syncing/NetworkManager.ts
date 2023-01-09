@@ -11,7 +11,7 @@ import NetworkedWarriorController from "../characters/NetworkedWarriorController
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import TrapScript from "../game/Trap";
-import MusicHandler from "../game/MusicHandler";
+// import MusicHandler from "../game/MusicHandler";
 import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
 import RovingAttack from "../game/RovingAttack";
@@ -67,7 +67,7 @@ class NetworkManager extends ScriptTypeBase {
   deer: Record<string, Entity>
   traps: Record<string, Entity>
   client: Client
-  musicScript: MusicHandler
+  // musicScript: MusicHandler
   hudScript: Hud
   gumpSounds: SoundComponent
   currentQuest?: QuestLogic
@@ -79,7 +79,7 @@ class NetworkManager extends ScriptTypeBase {
 
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
     this.trapTemplate = mustFindByName(this.app.root, "Trap")
-    this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
+    // this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
     this.battleEffect = mustFindByName(this.app.root, 'BattleEffects')
@@ -98,6 +98,8 @@ class NetworkManager extends ScriptTypeBase {
       this.room = await this.client.joinOrCreate<DelphsTableState>(roomType, params);
     }
 
+    this.app.fire("newRoom", this.room)
+
     this.room.onError((error) => {
       console.error("room error", error)
     })
@@ -109,10 +111,10 @@ class NetworkManager extends ScriptTypeBase {
       this.handlePlayerAdd(player, key)
     }
 
-    this.room.state.nowPlaying.onChange = () => {
-      this.musicScript.setMusic(this.room!.state.nowPlaying)
-      this.hudScript.setMusic(this.room!.state.nowPlaying)
-    }
+    // this.room.state.nowPlaying.onChange = () => {
+    //   this.musicScript.setMusic(this.room!.state.nowPlaying)
+    //   this.hudScript.setMusic(this.room!.state.nowPlaying)
+    // }
 
     this.room.state.warriors.onRemove = (player, key) => {
       this.handlePlayerRemoved(key)
@@ -161,6 +163,7 @@ class NetworkManager extends ScriptTypeBase {
           this.handleQuestActiveChange()
         }
       })
+      this.app.fire("stateChange", this.room!.state)
     }
 
     this.room.onMessage('mainHUDMessage', (message: string) => {
@@ -188,7 +191,7 @@ class NetworkManager extends ScriptTypeBase {
 
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
-      this.musicScript.start()
+      // this.musicScript.start()
     })
 
     this.app.on(PLAY_CARD_EVT, (item: Item) => {

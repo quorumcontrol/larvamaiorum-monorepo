@@ -20,7 +20,9 @@
       "outDir": ".build",
       "moduleResolution": "node",
       "lib": ["es2015", "dom"],
-      "rootDir": "./"
+      "rootDir": "./",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
     }
   },
 
@@ -40,6 +42,8 @@
     "jsx": "preserve",
     "incremental": true,
     "preserveSymlinks": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
   },
   "include": ["next-env.d.ts", "pages", "src", "contracts/typechain"],
   "exclude": ["node_modules"]

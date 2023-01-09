@@ -1,33 +1,4 @@
-import React from "react"
-import { ChakraProvider, extendTheme, Text } from "@chakra-ui/react"
-import { PlayCanvasApplicationProvider } from "./components/appProvider"
-import { Global } from '@emotion/react'
-import { Room } from "colyseus.js"
-import { DelphsTableState } from "../syncing/schema/DelphsTableState"
-import NowPlaying from "./components/NowPlaying"
-
-const Fonts = () => (
-  <Global
-    styles={`
-      /* latin */
-      @font-face {
-        font-family: 'Bebas Neue';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url('https://delphsart.s3.fr-par.scw.cloud/BebasNeue-Regular.ttf');
-      }
-      /* latin */
-      @font-face {
-        font-family: 'Cairo';
-        font-style: normal;
-        font-weight: 400;
-        font-display: swap;
-        src: url('https://delphsart.s3.fr-par.scw.cloud/Cairo-Regular.ttf');
-      }
-      `}
-  />
-)
+import { extendTheme } from "@chakra-ui/react"
 
 const theme = extendTheme({
   config: {
@@ -51,6 +22,7 @@ const theme = extendTheme({
       background: "#101010",
       orange: "#D14509",
       accoladeBackground: "#1F1816",
+      cardBorder: "#BC9460"
     },
   },
   components: {
@@ -94,15 +66,4 @@ const theme = extendTheme({
   },
 })
 
-const App: React.FC<{app: pc.Application, room: Room<DelphsTableState>}> = ({ app, room }) => {
-  return (
-    <ChakraProvider theme={theme}>
-      <Fonts />
-      <PlayCanvasApplicationProvider value={{ app, room }}>
-        <NowPlaying />
-      </PlayCanvasApplicationProvider>
-    </ChakraProvider>
-  )
-}
-
-export default App
+export default theme

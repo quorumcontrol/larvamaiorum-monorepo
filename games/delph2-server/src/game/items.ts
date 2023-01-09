@@ -24,6 +24,7 @@ export interface ItemDescription {
   description: string
   costToPlay:number
   art:string
+  frameColor:string
 
   field?: boolean
   battle?: boolean
@@ -35,6 +36,7 @@ export interface ItemDescription {
   timeLimit?:number
   appliesToWorld?:boolean
   repels?: GameNags[],
+  affectsAllPlayers?: boolean
 }
 
 const items:ItemDescription[] = [
@@ -46,7 +48,8 @@ const items:ItemDescription[] = [
     costToPlay: 5,
     appliesToWorld: true,
     field: true,
-    art: "https://delphsart.s3.fr-par.scw.cloud/trap.png"
+    art: "https://delphsart.s3.fr-par.scw.cloud/trap.png",
+    frameColor: "#432E22",
   },
   {
     address: zeroAddr,
@@ -60,7 +63,8 @@ const items:ItemDescription[] = [
     speed: 1,
     field: true,
     repels: [GameNags.deer],
-    art: "https://delphsart.s3.fr-par.scw.cloud/berserk.png"
+    art: "https://delphsart.s3.fr-par.scw.cloud/berserk.png",
+    frameColor: "#869897",
   },
   {
     address: zeroAddr,
@@ -71,7 +75,21 @@ const items:ItemDescription[] = [
     speed: 3,
     timeLimit: 15,
     field: true,
-    art: "https://delphsart.s3.fr-par.scw.cloud/speed.png"
+    art: "https://delphsart.s3.fr-par.scw.cloud/speed.png",
+    frameColor: "#432E22",
+  },
+  {
+    address: zeroAddr,
+    id: 4,
+    name: "Kindness",
+    description: "Protects the entire board from the gods.",
+    costToPlay: 10,
+    speed: 0,
+    timeLimit: 60,
+    field: true,
+    art: "https://delphsart.s3.fr-par.scw.cloud/gift.png",
+    frameColor: "#37363B",
+    repels: [GameNags.roving],
   }
 ].map((i) => {
   return {
