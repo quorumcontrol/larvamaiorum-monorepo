@@ -251,11 +251,11 @@ class NetworkManager extends ScriptTypeBase {
     const effect = this.battleEffect.clone()
     effect.name = `deer-attack-effect-${key}`
     this.app.root.addChild(effect)
-
-    const position = this.warriors[attack.warriorId].getPosition().clone().add(this.deer[attack.deerId].getPosition()).divScalar(2)
-    effect.setPosition(position)
     effect.enabled = true
     this.playEffects(effect)
+
+    const position = this.warriors[attack.warriorId].getPosition().add(this.deer[attack.deerId].getPosition()).divScalar(2)
+    effect.setPosition(position)
   }
 
   handleDeerAttackRemove(key: string) {

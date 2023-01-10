@@ -1,10 +1,25 @@
-import { Box, Heading, HStack, Image, Text, VStack } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import useMusic from './hooks/useMusic'
+import {
+  Box,
+  Heading,
+  HStack,
+  Image,
+  Text,
+  VStack,
+  Icon,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  Stack,
+} from "@chakra-ui/react"
+import React, { useEffect, useState } from "react"
+import useMusic from "./hooks/useMusic"
+import { AiOutlineSound } from "react-icons/ai"
 
-const NowPlaying:React.FC = () => {
+const NowPlaying: React.FC = () => {
   const nowPlaying = useMusic()
   const [audio, setAudio] = useState<HTMLAudioElement>()
+  const [sliderValue, setSliderValue] = useState(50)
 
   useEffect(() => {
     if (audio) {
@@ -12,31 +27,55 @@ const NowPlaying:React.FC = () => {
       audio.remove()
     }
     const nextAudio = new Audio(nowPlaying.url)
-    nextAudio.volume = 0.05
+    nextAudio.volume = 0.05 * (sliderValue / 50)
 
     nextAudio.play()
     setAudio(nextAudio)
   }, [nowPlaying])
 
-  return (
-    <Box p={4} m={4} borderRadius={"lg"} bgColor="#000" opacity={0.6}>
-      <VStack alignItems="left">
-      <Heading size="sm">
-        Now Playing
-      </Heading>
-      <HStack alignItems={"top"}>
-        <Image src={nowPlaying.artwork} h="64px" w="64px" />
-        <VStack alignItems="left">
-          <Text fontSize='sm'>
-            {nowPlaying.name}
-          </Text>
-          <Text fontSize="xs">
-            by {nowPlaying.artist}
-          </Text>
-        </VStack>
-      </HStack>
-      </VStack>
+  useEffect(() => {
+    if (!audio) {
+      return
+    }
+    audio.volume = 0.05 * (sliderValue / 50)
+  }, [sliderValue, audio])
 
+  return (
+    <Box p={[2,2,2,4]} m={4} borderRadius={"lg"} bgColor="#000" opacity={0.6}>
+      <VStack alignItems="left">
+        <Heading size="sm" display={["none", "none", "none", "block"]}>
+          Now Playing
+        </Heading>
+        <HStack alignItems={"top"}>
+          <Image
+            src={nowPlaying.artwork}
+            h="64px"
+            w="64px"
+            display={["none", "none", "none", "block"]}
+          />
+          <Text fontSize="sm" maxWidth="200px">
+            {nowPlaying.name} by {nowPlaying.artist}
+          </Text>
+        </HStack>
+        <HStack>
+          <Icon as={AiOutlineSound} boxSize="4" />
+
+          <Slider
+            aria-label="slider-ex-5"
+            value={sliderValue}
+            focusThumbOnChange={false}
+            defaultValue={50}
+            min={0}
+            max={125}
+            onChange={(v) => setSliderValue(v)}
+          >
+            <SliderTrack>
+              <SliderFilledTrack />
+            </SliderTrack>
+            <SliderThumb />
+          </Slider>
+        </HStack>
+      </VStack>
     </Box>
   )
 }

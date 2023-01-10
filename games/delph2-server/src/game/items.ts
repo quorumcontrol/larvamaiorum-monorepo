@@ -36,7 +36,9 @@ export interface ItemDescription {
   timeLimit?:number
   appliesToWorld?:boolean
   repels?: GameNags[],
-  affectsAllPlayers?: boolean
+  affectsAllPlayers?: boolean,
+  beats?: string[],
+  flipsAgainst?: string[],
 }
 
 const items:ItemDescription[] = [
@@ -90,7 +92,64 @@ const items:ItemDescription[] = [
     art: "https://delphsart.s3.fr-par.scw.cloud/gift.png",
     frameColor: "#37363B",
     repels: [GameNags.roving],
-  }
+  },
+  {
+    address: zeroAddr,
+    id: 5,
+    name: "Aggressive",
+    description: "Focus on attack over defense at all costs.",
+    battle: true,
+    costToPlay:0,
+    art: "https://delphsart.s3.fr-par.scw.cloud/aggressive.png",
+    frameColor: "#37363B",
+    beats: ["balanced", "snake fu"]
+  },
+  {
+    address: zeroAddr,
+    id: 6,
+    name: "Defensive",
+    description: "Focus on defense over attack at all costs.",
+    battle: true,
+    costToPlay:0,
+    art: "https://delphsart.s3.fr-par.scw.cloud/defensive.png",
+    frameColor: "#37363B",
+    beats: ["aggressive", "evasive"]
+  },
+  {
+    address: zeroAddr,
+    id: 7,
+    name: "Snake Fu",
+    description: "An ancient style of combat based on the movement of snakes.",
+    battle: true,
+    costToPlay:0,
+    art: "https://delphsart.s3.fr-par.scw.cloud/snake.png",
+    frameColor: "#37363B",
+    beats: ["defensive", "evasive"]
+  },
+  {
+    address: zeroAddr,
+    id: 8,
+    name: "Evasive",
+    description: "Attempt to dodge your opponent whenever possible.",
+    battle: true,
+    costToPlay:0,
+    art: "https://delphsart.s3.fr-par.scw.cloud/evasive.png",
+    frameColor: "#37363B",
+    beats: ["aggressive"],
+    flipsAgainst: ["balanced"]
+  },
+  {
+    address: zeroAddr,
+    id: 9,
+    name: "Balanced",
+    description: "A balanced strategy of attack and defense.",
+    battle: true,
+    costToPlay:0,
+    art: "https://delphsart.s3.fr-par.scw.cloud/balanced.png",
+    frameColor: "#37363B",
+    beats: ["defensive", "snake fu"],
+    flipsAgainst: ["evasive"]
+  },
 ].map((i) => {
   return {
     identifier: getIdentifier(i),

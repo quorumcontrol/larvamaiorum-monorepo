@@ -1,13 +1,26 @@
-import { Box, Image, Heading, AspectRatio, BoxProps } from "@chakra-ui/react"
+import {
+  Box,
+  Image,
+  Heading,
+  AspectRatio,
+  BoxProps,
+  Tag,
+  TagLeftIcon,
+  TagLabel,
+} from "@chakra-ui/react"
+import { AiOutlineThunderbolt } from "react-icons/ai"
 
 export interface CardProps {
   name: string
   art: string
   frameColor: string
+  costToPlay?: number
 }
 
-export const Card: React.FC<BoxProps & { card: CardProps }> = (props) => {
-  const { card, ...boxProps } = props
+export const Card: React.FC<
+  BoxProps & { card: CardProps; showCost?: boolean }
+> = (props) => {
+  const { card, showCost, ...boxProps } = props
   const frameColor = card.frameColor
 
   return (
@@ -29,11 +42,24 @@ export const Card: React.FC<BoxProps & { card: CardProps }> = (props) => {
         />
       </AspectRatio>
 
-      <Box position="absolute" bottom="20px" left="0" width="100%" px="4">
+      <Box position="absolute" bottom={["0px", "0px", "0px", "20px"]} left="0" width="100%" px={[0,0,0,4]}>
         <Box bgColor={frameColor} borderRadius="10px" textAlign="center" py="3">
           <Heading size="md">{card.name}</Heading>
         </Box>
       </Box>
+      {showCost && (
+        <Tag
+          variant={"solid"}
+          bgColor={"brand.orange"}
+          size="lg"
+          position="absolute"
+          top="-10px"
+          right="-10px"
+        >
+          <TagLeftIcon boxSize="12px" as={AiOutlineThunderbolt} />
+          <TagLabel> {card.costToPlay}</TagLabel>
+        </Tag>
+      )}
     </Box>
   )
 }
