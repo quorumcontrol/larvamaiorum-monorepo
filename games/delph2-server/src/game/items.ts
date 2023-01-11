@@ -93,6 +93,8 @@ const items:ItemDescription[] = [
     frameColor: "#37363B",
     repels: [GameNags.roving],
   },
+
+
   {
     address: zeroAddr,
     id: 5,
@@ -164,11 +166,10 @@ export const itemsByIdentifier = items.reduce((memo, item) => {
   }
 }, {} as Record<string,ItemDescription>)
 
-export const defaultInitialInventory:Inventory = {
-  [items[0].identifier]: {quantity: 20, item: { address: items[0].address, id: items[0].id }},
-  [items[1].identifier]: {quantity: 20, item: { address: items[1].address, id: items[1].id }},
-  [items[2].identifier]: {quantity: 20, item: { address: items[2].address, id: items[2].id }},
-}
+export const defaultInitialInventory:Inventory = [0,1,2,4,5,8].reduce((inventory, itemsId) => {
+  inventory[items[itemsId].identifier] = {quantity: -1, item: { address: items[itemsId].address, id: items[itemsId].id }}
+  return inventory
+}, {} as Inventory) 
 
 export function itemFromInventoryItem(inventoryItem:InventoryItem) {
   const identifier = getIdentifier(inventoryItem)

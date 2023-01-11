@@ -10,7 +10,6 @@ import {
   SliderTrack,
   SliderFilledTrack,
   SliderThumb,
-  Stack,
 } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import useMusic from "./hooks/useMusic"
@@ -41,7 +40,7 @@ const NowPlaying: React.FC = () => {
   }, [sliderValue, audio])
 
   return (
-    <Box p={[2,2,2,4]} m={4} borderRadius={"lg"} bgColor="#000" opacity={0.6}>
+    <Box p={[2, 2, 2, 4]} m={4} borderRadius={"lg"} bgColor="rgba(0,0,0,0.6)">
       <VStack alignItems="left">
         <Heading size="sm" display={["none", "none", "none", "block"]}>
           Now Playing

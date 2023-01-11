@@ -17,19 +17,21 @@ class ReactUI extends ScriptTypeBase {
      style.innerHTML = `
       #ui-root {
        position: fixed;
-       max-width: 20vw;
-       min-width: 300px;
-       bottom: 10px;
+       width: 100vw;
+       height: 100vh;
+       top: 0;
        right: 0;
       }
       `
      const div = document.createElement("div")
      div.id = "ui-root"
+     div.addEventListener("contextmenu", (evt) => evt.preventDefault())
      document.body.appendChild(div)
      const root = ReactDOM.createRoot(div)
      const element = <App app={this.app} room={room} />
      root.render(element)
      this.entity.on('destroy', () => {
+       root.unmount(); 
        document.body.removeChild(div);
        document.head.removeChild(style);
      })

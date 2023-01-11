@@ -1,20 +1,22 @@
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { DelphsTableState } from "../../../syncing/schema/DelphsTableState"
-import { PlayCanvasApplicationContext } from "../appProvider"
+import { usePlayCanvasContext } from "../appProvider"
 
 const useMusic = () => {
-  const { room } = useContext(PlayCanvasApplicationContext)
-  const [nowPlaying, setNowPlaying] = useState<Partial<DelphsTableState['nowPlaying']>>(room?.state.nowPlaying.toJSON() || {})
+  const { state } = usePlayCanvasContext()
+  const [nowPlaying, setNowPlaying] = useState<Partial<DelphsTableState['nowPlaying']>>(state?.nowPlaying.toJSON() || {})
 
   useEffect(() => {
-    if (!room) {
+    if (!state) {
       return
     }
 
-    room.state.nowPlaying.onChange = () => {
-      setNowPlaying(room.state.nowPlaying.toJSON())
-    }
-  }, [room])
+    const unsub = state.nowPlaying.listen('name', () => {
+      setNowPlaying(state.nowPlaying.toJSON())
+    })
+    
+    return unsub
+  }, [state])
 
   return nowPlaying
 }

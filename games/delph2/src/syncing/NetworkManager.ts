@@ -3,7 +3,7 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
 import { Battle, Deer, DeerAttack, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
-import Hud, { PLAY_CARD_EVT } from '../game/Hud'
+import Hud, { CHOOSE_STRATEGY_EVT, PLAY_CARD_EVT } from '../game/Hud'
 import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
@@ -15,6 +15,7 @@ import TrapScript from "../game/Trap";
 import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
 import RovingAttack from "../game/RovingAttack";
+import { BATTLE_CHANGE, WARRIOR_CHANGE } from "./changeEvents";
 
 const client = memoize(() => {
   if (typeof document !== 'undefined') {
@@ -108,15 +109,12 @@ class NetworkManager extends ScriptTypeBase {
     })
 
     this.room.state.warriors.onAdd = (player, key) => {
+      this.app.fire(WARRIOR_CHANGE)
       this.handlePlayerAdd(player, key)
     }
 
-    // this.room.state.nowPlaying.onChange = () => {
-    //   this.musicScript.setMusic(this.room!.state.nowPlaying)
-    //   this.hudScript.setMusic(this.room!.state.nowPlaying)
-    // }
-
     this.room.state.warriors.onRemove = (player, key) => {
+      this.app.fire(WARRIOR_CHANGE)
       this.handlePlayerRemoved(key)
     }
     this.room.state.wootgump.onAdd = (location, key) => {
@@ -129,9 +127,12 @@ class NetworkManager extends ScriptTypeBase {
       this.handleGumpRemove(key)
     }
     this.room.state.battles.onRemove = (_loc, key) => {
+      this.app.fire(BATTLE_CHANGE)
       this.handleBattleRemove(key)
     }
     this.room.state.battles.onAdd = (battle, key) => {
+      console.log('firing battle change')
+      this.app.fire(BATTLE_CHANGE)
       this.handleBattleAdd(battle, key)
     }
 
@@ -163,7 +164,6 @@ class NetworkManager extends ScriptTypeBase {
           this.handleQuestActiveChange()
         }
       })
-      this.app.fire("stateChange", this.room!.state)
     }
 
     this.room.onMessage('mainHUDMessage', (message: string) => {
@@ -197,6 +197,10 @@ class NetworkManager extends ScriptTypeBase {
     this.app.on(PLAY_CARD_EVT, (item: Item) => {
       console.log("playing card: ", item.toJSON())
       this.room?.send('playCard', item.toJSON())
+    })
+
+    this.app.on(CHOOSE_STRATEGY_EVT, (item: Item) => {
+      this.room?.send(CHOOSE_STRATEGY_EVT, item.toJSON())
     })
 
   }

@@ -123,6 +123,7 @@ class Warrior extends EventEmitter {
     this.deathSentenceTime = seconds
     this.setState(State.dead)
     this.sendMessage(message)
+    this.clearItem()
   }
 
   setIsPiggy(isPiggy:boolean) {
@@ -248,10 +249,9 @@ class Warrior extends EventEmitter {
     const item = itemFromInventoryItem(inventoryItem)
 
     const identifier = getIdentifier(item)
-    log('identifier: ', identifier)
-    const inventoryRecord = this.state.inventory.get(identifier)
-    log('record: ', inventoryRecord?.toJSON())
-    if (!inventoryRecord || inventoryRecord.quantity <= 0) {
+    log('play item identifier: ', identifier)
+    // looking for zero equality means that we allow -1 to mean "unlimited items"
+    if (!this.hasCard(item)) {
       console.error('no inventory left for this item, not playing')
       return null
     }
@@ -263,15 +263,27 @@ class Warrior extends EventEmitter {
       this.incGumpBalance(-1 * item.costToPlay)
     }
 
+    const inventoryRecord = this.state.inventory.get(identifier)
+
     inventoryRecord.quantity -= 1
+    // if the item is a trap or equivalent (appliesToWorld), don't actually set it on the player
     if (item.appliesToWorld) {
       return item
     }
-    this.setItem(inventoryItem)
+    this.setItemInState(inventoryItem)
     return item
   }
 
-  setItem(item: InventoryItem) {
+  hasCard(item:ItemDescription) {
+    const inventoryRecord = this.state.inventory.get(item.identifier)
+    if (!inventoryRecord || inventoryRecord.quantity === 0) {
+      return false
+    }
+    // anything less than zero means "unlimited" and anything above zero means they have one
+    return true
+  }
+
+  private setItemInState(item: InventoryItem) {
     log('setting item: ', item, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
     // find it in the inventory
     const description = itemFromInventoryItem(item)

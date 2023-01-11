@@ -1,5 +1,5 @@
 import { Room } from "colyseus.js";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { DelphsTableState } from "../../syncing/schema/DelphsTableState";
 
 interface PlayCanvasProps {
@@ -10,17 +10,13 @@ interface PlayCanvasProps {
 
 export const PlayCanvasApplicationContext = createContext<PlayCanvasProps>({} as any)
 
+export const usePlayCanvasContext = () => {
+  return useContext(PlayCanvasApplicationContext)
+}
+
 export const AppProvider:React.FC<PlayCanvasProps & { children: React.ReactNode }> = ({ room, app, children }) => {
-  const [val, setVal] = useState<PlayCanvasProps>({app, room, state:room.state})
-
-  useEffect(() => {
-    app.on('stateChange', (state:DelphsTableState) => {
-      setVal({app, room, state})
-    })
-  }, [app])
-
   return (
-    <PlayCanvasApplicationContext.Provider value={val}>
+    <PlayCanvasApplicationContext.Provider value={{ app, room, state: room.state }}>
       {children}
     </PlayCanvasApplicationContext.Provider>
   )

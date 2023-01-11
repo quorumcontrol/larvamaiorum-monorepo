@@ -1,12 +1,12 @@
 import React from "react"
-import { ChakraProvider, VStack } from "@chakra-ui/react"
+import { ChakraProvider } from "@chakra-ui/react"
 import { AppProvider } from "./components/appProvider"
 import { Global } from "@emotion/react"
 import { Room } from "colyseus.js"
 import { DelphsTableState } from "../syncing/schema/DelphsTableState"
-import NowPlaying from "./components/NowPlaying"
 import theme from "../main-site-components/theme"
-import CardPicker from "./components/CardPicker"
+import RightSideUI from "./components/RightSideUI"
+import BattleStrategyPicker from "./components/BattleStrategyPicker"
 
 const Fonts = () => (
   <Global
@@ -39,10 +39,8 @@ const App: React.FC<{ app: pc.Application; room: Room<DelphsTableState> }> = ({
     <ChakraProvider theme={theme}>
       <Fonts />
       <AppProvider app={app} room={room}>
-        <VStack alignItems="left" paddingRight="10px">
-          <CardPicker />
-          <NowPlaying />
-        </VStack>
+        <BattleStrategyPicker />
+        <RightSideUI />
       </AppProvider>
     </ChakraProvider>
   )

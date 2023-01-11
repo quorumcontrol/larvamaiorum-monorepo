@@ -2,7 +2,7 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, State, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase } from "../rooms/schema/DelphsTableState";
 import BattleLogic from './BattleLogic';
 import Deer from './Deer';
 import DeerAttackLogic from './DeerAttackLogic';
@@ -22,8 +22,7 @@ class DelphsTableLogic {
   room: Room
   state: DelphsTableState
 
-  // intervalHandle?: any
-
+  //sessionId to warrior
   warriors: Record<string, Warrior>
   wootgump: Record<string, Vec2>
   trees: Record<string, Vec2>
@@ -195,6 +194,20 @@ class DelphsTableLogic {
     })
     this.room.lock()
     this.room.broadcast('mainHUDMessage', "First to 50 gump gets the key. Go.")
+  }
+
+  chooseStrategy(client:Client, strategyCard:InventoryItem) {
+    const warrior = this.warriors[client.sessionId]
+    if (!warrior) {
+      console.error("no warrior for client")
+      return
+    }
+    const battle = this.battles[warrior.id]
+    if (!battle) {
+      console.error('no battle for warrior: ', warrior.state.name)
+      return
+    }
+    battle.setCardPick(warrior, itemFromInventoryItem(strategyCard))
   }
 
   addWarrior(client: Client, stats: WarriorStats) {
@@ -378,7 +391,7 @@ class DelphsTableLogic {
     new Set(Object.values(this.battles)).forEach((battle) => {
       battle.update(dt) // update first so that new battles that are not started can ignore the time
       battle.go()
-      if (battle.completed) {
+      if (battle.isPhase(BattlePhase.completed)) {
         console.log('battle complete')
         battle.warriors.forEach((w) => {
           delete this.battles[w.id]

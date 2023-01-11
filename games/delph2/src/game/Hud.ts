@@ -2,12 +2,10 @@ import { Asset, Entity } from 'playcanvas'
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
-import { DelphsTableState, MaxStats, Music, Warrior } from '../syncing/schema/DelphsTableState'
-import mustGetScript from '../utils/mustGetScript';
-import CardHandler from './Card';
-import mapToValues from '../utils/mapToValues';
+import { DelphsTableState, MaxStats, Warrior } from '../syncing/schema/DelphsTableState'
 
 export const PLAY_CARD_EVT = "playCard"
+export const CHOOSE_STRATEGY_EVT = "chooseStrategy"
 
 @createScript("hud")
 class Hud extends ScriptTypeBase {
@@ -106,23 +104,6 @@ class Hud extends ScriptTypeBase {
     this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
   }
 
-  // private setupInventory() {
-  //   if (!this.warrior) {
-  //     throw new Error('must have warrior set to setup inventory')
-  //   }
-  //   const fieldInventory = mapToValues(this.warrior.inventory).filter((i) => i.item.field && i.quantity > 0)
-  //   if (fieldInventory.length > 3) {
-  //     throw new Error('too many inventory items')
-  //   }
-  //   fieldInventory.forEach((inventory, i) => {
-  //     const el = this.cardHolder.findByName(`Slot${i}`) as Entity | undefined
-  //     if (el) {
-  //       el.enabled = true
-  //       mustGetScript<CardHandler>(el, "cardHandler").setItem(inventory.item)
-  //     }
-  //   })
-  // }
-
   private updateInventoryGraphics() {
     if (!this.warrior) {
       throw new Error('must have warrior set to setup inventory')
@@ -157,30 +138,7 @@ class Hud extends ScriptTypeBase {
       msgEl.destroy()
     })
   }
-
-  // setMusic(music: Music) {
-  //   this.trackInfo.enabled = true
-  //   if (music.artwork) {
-  //     console.log("loading ", music.artwork)
-  //     const musicArtwork = new pc.Asset(music.artwork, "texture", {
-  //       url: music.artwork,
-  //     })
-  //     if (this.previousArtwork) {
-  //       this.app.assets.remove(this.previousArtwork)
-  //       this.previousArtwork = musicArtwork
-  //     }
-  //     musicArtwork.on('error', (err) => {
-  //       console.error('error loading artwork: ', err)
-  //     })
-  //     musicArtwork.on('load', () => {
-  //       mustFindByName(this.trackInfo, 'Artwork').element!.texture = musicArtwork.resource
-  //     })
-  //     this.app.assets.load(musicArtwork)
-  //   }
-  //   mustFindByName(this.trackInfo, 'Title').element!.text = music.name
-  //   mustFindByName(this.trackInfo, 'Artist').element!.text = `by ${music.artist}`
-  // }
-
+  
   setWarrior(warrior: Warrior, state: DelphsTableState) {
     this.warrior = warrior
     this.maxStats = state.maxStats

@@ -1,5 +1,12 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
+export enum BattlePhase {
+  pending,
+  strategySelect,
+  battling,
+  completed
+}
+
 export enum RoomType {
   continuous,
   match,
@@ -116,7 +123,9 @@ export class Warrior extends Schema {
 
 export class Battle extends Schema {
   @type("string") id: string
+  @type("number") phase: BattlePhase
   @type({ array: "string" }) warriorIds = new ArraySchema<string>();
+  @type({ map: Item}) strategies = new MapSchema<Item>({});
 }
 
 export class DeerAttack extends Schema {
