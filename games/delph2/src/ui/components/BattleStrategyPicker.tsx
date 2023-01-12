@@ -58,7 +58,7 @@ const BattleStrategyPicker: React.FC = () => {
   return (
     <Modal isOpen={isOpen} onClose={() => console.log("onclose")}>
       <ModalOverlay />
-      <ModalContent p="6">
+      <ModalContent p="6" bgColor="rgba(0,0,0,0.6)">
         <ModalHeader>
           <Heading>Pick Your Strategy</Heading>
         </ModalHeader>

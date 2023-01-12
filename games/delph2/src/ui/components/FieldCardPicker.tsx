@@ -21,7 +21,7 @@ const FieldCardPicker: React.FC = () => {
   return (
     <HStack w="100%">
       {inventory.map((i) => {
-        return <Card showCost={true} card={i} key={`card-${i.name}`} minW={["90px", "90px", "90px", "110px"]} onMouseDown={(evt) => onCardClick(evt, i)}/>
+        return <Card showCost={true} card={i} key={`card-${i.name}`} minW={["90px", "90px", "90px", "100px"]} onMouseDown={(evt) => onCardClick(evt, i)}/>
       })}
     </HStack>
   )
