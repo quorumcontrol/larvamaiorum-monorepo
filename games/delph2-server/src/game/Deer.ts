@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import { randomInt } from "./utils/randoms";
-import { State, Deer as DeerState, DelphsTableState } from '../rooms/schema/DelphsTableState'
+import { State, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import Warrior from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
@@ -65,7 +65,7 @@ class Deer extends EventEmitter {
       }
 
       // if the player has played a card while chasing, then start ignoring them.
-      if (this.chasing!.state.currentItem) {
+      if (this.chasing!.state.currentItem?.repels.includes(GameNags.deer)) {
         this.stopChasing()
         if (gump) {
           this.setDestination(gump.x, gump.y)
@@ -175,11 +175,11 @@ class Deer extends EventEmitter {
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
     if (this.state.state === State.chasing && dist > 0.5) {
-      this.setSpeed(4.65)
+      this.setSpeed(6.6)
       return
     }
     if (dist > 2) {
-      this.setSpeed(4.5)
+      this.setSpeed(6.5)
       return
     }
     if (dist > 0.25) {

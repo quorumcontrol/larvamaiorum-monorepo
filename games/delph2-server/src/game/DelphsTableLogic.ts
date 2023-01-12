@@ -63,7 +63,7 @@ class DelphsTableLogic {
       const position = this.randomPosition()
       this.spawnTree(new Vec2(position.x, position.z))
     }
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
     }
@@ -573,12 +573,18 @@ class DelphsTableLogic {
   }
 
   private positionModulo(dimension: number) {
-    if (dimension < 0 && dimension < 37) {
-      return 36
+    if (dimension < 0 && dimension < -28) {
+      return -27
     }
-    if (dimension > 37) {
-      return dimension % 35
+    if (dimension > 27) {
+      return dimension % 27
     }
+    // if (dimension < 0 && dimension < 37) {
+    //   return 36
+    // }
+    // if (dimension > 37) {
+    //   return dimension % 35
+    // }
     return dimension
   }
 

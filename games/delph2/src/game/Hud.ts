@@ -16,9 +16,6 @@ class Hud extends ScriptTypeBase {
   name: Entity
   gumpStats: Entity
 
-  cardHolder: Entity
-
-  trackInfo: Entity
   persistantMessage: Entity
   // questIndicator: Entity
 
@@ -42,23 +39,11 @@ class Hud extends ScriptTypeBase {
   initialize() {
     this.messages = []
 
-    this.cardHolder = mustFindByName(this.entity, "Cards")
     this.name = mustFindByName(this.entity, 'Name')
     this.gumpStats = mustFindByName(this.entity, 'Gump')
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
-    this.trackInfo = mustFindByName(this.entity, 'TrackInfo')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
     // this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
-
-    mustFindByName(this.entity, "VolumeUp").element!.on("click", (evt: MouseEvent) => {
-      evt.stopPropagation()
-      this.app.fire("musicVolumeUp")
-    })
-
-    mustFindByName(this.entity, "VolumeDown").element!.on("click", (evt: MouseEvent) => {
-      evt.stopPropagation()
-      this.app.fire("musicVolumeDown")
-    })
 
     this.app.on('mainHUDMessage', this.queueMessage, this)
 
@@ -85,8 +70,6 @@ class Hud extends ScriptTypeBase {
 
     // this.questIndicator.enabled = !!this.state?.currentQuest
 
-    this.updateInventoryGraphics()
-
     if (this.state?.persistantMessage) {
       this.persistantMessage.enabled = true
       this.persistantMessage.element!.text = this.state.persistantMessage
@@ -102,19 +85,6 @@ class Hud extends ScriptTypeBase {
     this.statElements.HealthStat.element!.text = `${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}`
 
     this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
-  }
-
-  private updateInventoryGraphics() {
-    if (!this.warrior) {
-      throw new Error('must have warrior set to setup inventory')
-    }
-    this.warrior.inventory.forEach((inventory) => {
-      const el = this.cardHolder.findByName(`${inventory.item.name}Card`) as Entity | undefined
-      if (!el) {
-        return
-      }
-      el.enabled = (inventory.quantity > 0)
-    })
   }
 
   queueMessage(message: string) {
@@ -138,13 +108,12 @@ class Hud extends ScriptTypeBase {
       msgEl.destroy()
     })
   }
-  
+
   setWarrior(warrior: Warrior, state: DelphsTableState) {
     this.warrior = warrior
     this.maxStats = state.maxStats
     this.state = state
     this.name.element!.text = warrior.name
-    // this.setupInventory()
   }
 
 }

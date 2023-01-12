@@ -1,0 +1,29 @@
+{
+    "CORSRules": [
+        {
+            "AllowedHeaders": [
+                "*"
+            ],
+            "AllowedMethods": [
+                "GET",
+                "HEAD"
+            ],
+            "AllowedOrigins": [
+                "https://*.cryptocolosseum.com",
+                "https://arena.cryptocolosseum.com",
+                "http://arena.cryptocolosseum.com",
+                "https://cryptocolosseum.com",
+                "http://localhost:3000",
+                "http://localhost",
+                "https://launch.playcanvas.com",
+                "https://*.playcanvas.com",
+                "https://playcanv.as",
+                "https://*.playcanv.as"
+            ],
+            "ExposeHeaders": [
+                "Etag"
+            ],
+            "MaxAgeSeconds": 3000
+        }
+    ]
+}

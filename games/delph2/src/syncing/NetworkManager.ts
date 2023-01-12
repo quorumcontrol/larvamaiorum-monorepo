@@ -11,7 +11,6 @@ import NetworkedWarriorController from "../characters/NetworkedWarriorController
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
 import DeerLocomotion from "../characters/DeerLocomotion";
 import TrapScript from "../game/Trap";
-// import MusicHandler from "../game/MusicHandler";
 import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
 import RovingAttack from "../game/RovingAttack";
@@ -31,12 +30,12 @@ const reservation = () => {
   if (typeof document === "undefined") {
     return undefined
   }
-    const params = new URLSearchParams(document.location.search);
-    const encodedReservation = params.get("om")
-    if (encodedReservation) {
-      return JSON.parse(atob(encodedReservation))
-    }
-    return undefined
+  const params = new URLSearchParams(document.location.search);
+  const encodedReservation = params.get("om")
+  if (encodedReservation) {
+    return JSON.parse(atob(encodedReservation))
+  }
+  return undefined
 }
 
 const roomParams = () => {
@@ -68,7 +67,6 @@ class NetworkManager extends ScriptTypeBase {
   deer: Record<string, Entity>
   traps: Record<string, Entity>
   client: Client
-  // musicScript: MusicHandler
   hudScript: Hud
   gumpSounds: SoundComponent
   currentQuest?: QuestLogic
@@ -80,7 +78,6 @@ class NetworkManager extends ScriptTypeBase {
 
     this.deerTemplate = mustFindByName(this.app.root, "Deer")
     this.trapTemplate = mustFindByName(this.app.root, "Trap")
-    // this.musicScript = mustGetScript<MusicHandler>(mustFindByName(this.app.root, 'Music'), 'musicHandler')
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
     this.battleEffect = mustFindByName(this.app.root, 'BattleEffects')
@@ -88,7 +85,15 @@ class NetworkManager extends ScriptTypeBase {
 
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
     this.treeTemplate = mustFindByName(this.app.root, 'Tree')
-    
+    const playButton = mustFindByName(this.app.root, "PlayButton")
+    playButton.element!.once("mousedown", () => {
+      playButton.enabled = false
+      this.go()
+    })
+  }
+
+  async go() {
+
     const res = reservation()
     if (res) {
       console.log("found reservation: ", reservation)
@@ -148,7 +153,7 @@ class NetworkManager extends ScriptTypeBase {
       this.handleDeerAdd(deer, key)
     }
     this.room.state.rovingAreaAttacks.onAdd = (attack, key) => {
-      this.handleRovingAreaAttack(attack,key)
+      this.handleRovingAreaAttack(attack, key)
     }
 
     this.room.state.traps.onAdd = (trap, key) => {
@@ -191,7 +196,6 @@ class NetworkManager extends ScriptTypeBase {
 
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
-      // this.musicScript.start()
     })
 
     this.app.on(PLAY_CARD_EVT, (item: Item) => {
@@ -310,7 +314,7 @@ class NetworkManager extends ScriptTypeBase {
     effects.destroy()
   }
 
-  handleRovingAreaAttack(attack:RovingAreaAttack, key:string) {
+  handleRovingAreaAttack(attack: RovingAreaAttack, key: string) {
     const attackEntity = mustFindByName(this.app.root, "RovingAttack").clone()
     attackEntity.name = `roving-attack-${key}`
     this.app.root.addChild(attackEntity)
@@ -384,11 +388,7 @@ class NetworkManager extends ScriptTypeBase {
       mustGetScript<NonPlayerCharacter>(warriorEntity, 'nonPlayerCharacter').setPlayerEntity(this.player)
     }
     this.warriors[key] = warriorEntity
-
   }
-
-
-
 }
 
 export default NetworkManager

@@ -27,19 +27,9 @@ class RovingAttack extends ScriptTypeBase {
       throw new Error("missing state")
     }
     if (this.existingEffect) {
-      // if (this.existingDustCloud) {
-      //   this.existingDustCloud.destroy()
-      // }
-      // const cloud = this.dustCloudTemplate.clone()
-      // cloud.setPosition(this.existingEffect.getPosition())
-      // cloud.translate(0,2,0)
-      // cloud.enabled = true
-      // this.app.root.addChild(cloud)
-      // this.existingDustCloud = cloud
-
       this.existingEffect.destroy()
     }
-    this.entity.setPosition(this.state.position.x, 0, this.state.position.z)
+    this.entity.setPosition(this.state.position.x, 0.1, this.state.position.z)
     const effect = this.effectTemplate.clone()
     this.entity.addChild(effect)
     effect.enabled = true

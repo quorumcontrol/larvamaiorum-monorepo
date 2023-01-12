@@ -32,7 +32,7 @@ export function generateFakeWarriors(count: number, seed: string) {
       name: `Warius ${i}`,
       attack: deterministicRandom(150, `generateFakeWarriors-${i}-attack`, seed) + 1500,
       defense: deterministicRandom(100, `generateFakeWarriors-${i}-defense`, seed) + 900,
-      maxSpeed: 4.5,
+      maxSpeed: 6.5,
       initialHealth: deterministicRandom(300, `generateFakeWarriors-${i}-health`, seed) + 1000,
       initialGump: 0,
       initialInventory: defaultInitialInventory,
