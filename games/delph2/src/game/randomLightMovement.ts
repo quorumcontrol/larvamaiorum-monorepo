@@ -19,7 +19,7 @@ class RandomRuneMover extends ScriptTypeBase {
   }
 
   spinRandomly() {
-    this.entity.tween(this.entity.getLocalEulerAngles()).rotate(new pc.Vec3(0,20 + randomBounded(55),0), 30, pc.SineInOut).on("complete", () => {
+    this.entity.tween(this.entity.getLocalEulerAngles()).rotate(new pc.Vec3(0,50 + randomBounded(360),0), 20, pc.SineInOut).on("complete", () => {
       this.spinRandomly()
     }).start()
   }
@@ -27,7 +27,7 @@ class RandomRuneMover extends ScriptTypeBase {
   goToRandomLocation() {
     const {x, z} = this.getRandomLocation()
     const position = this.entity.getLocalPosition()
-    this.entity.tween(position).to({ x, y: position.y, z }, 20, pc.SineInOut).on("complete", () => {
+    this.entity.tween(position).to({ x, y: position.y, z }, 15, pc.SineInOut).on("complete", () => {
       this.goToRandomLocation()
     }).start()
   }
