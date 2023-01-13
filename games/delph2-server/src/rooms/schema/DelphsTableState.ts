@@ -7,6 +7,12 @@ export enum BattlePhase {
   completed
 }
 
+export enum BattleRoundPhase {
+  strategySelect,
+  battling,
+  reveal,
+}
+
 export enum RoomType {
   continuous,
   match,
@@ -126,6 +132,7 @@ export class Battle extends Schema {
   @type("number") phase: BattlePhase
   @type({ array: "string" }) warriorIds = new ArraySchema<string>();
   @type({ map: Item}) strategies = new MapSchema<Item>({});
+  @type("number") round:number
 }
 
 export class DeerAttack extends Schema {

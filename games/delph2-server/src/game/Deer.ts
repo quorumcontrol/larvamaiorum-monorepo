@@ -1,4 +1,3 @@
-import EventEmitter from "events";
 import { randomInt } from "./utils/randoms";
 import { State, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
@@ -7,7 +6,7 @@ import vec2ToVec2 from "./utils/vec2ToVec2";
 
 type TrapHolder = DelphsTableState['traps']
 
-class Deer extends EventEmitter {
+class Deer {
   id: string;
   state: DeerState
 
@@ -22,7 +21,6 @@ class Deer extends EventEmitter {
   destination:Vec2
 
   constructor(state:DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder ) {
-    super()
     this.id = state.id
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
@@ -175,11 +173,11 @@ class Deer extends EventEmitter {
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
     if (this.state.state === State.chasing && dist > 0.5) {
-      this.setSpeed(6.6)
+      this.setSpeed(6.5)
       return
     }
     if (dist > 2) {
-      this.setSpeed(6.5)
+      this.setSpeed(6)
       return
     }
     if (dist > 0.25) {

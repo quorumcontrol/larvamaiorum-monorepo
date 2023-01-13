@@ -4,8 +4,8 @@ import randomPosition from "./utils/randomPosition"
 import { randomBounded } from "./utils/randoms"
 import Warrior from "./Warrior"
 
-const DEFAULT_TIME_IN_ONE_PLACE = 4
-const RADIUS = 6
+const DEFAULT_TIME_IN_ONE_PLACE = 7
+const RADIUS = 5.8
 
 class RovingAreaAttackLogic {
   timeSinceMove = 0

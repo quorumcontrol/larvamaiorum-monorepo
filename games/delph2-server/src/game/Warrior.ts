@@ -1,6 +1,5 @@
-import EventEmitter from "events";
 import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
-import { deterministicRandom } from "./utils/randoms";
+import { deterministicRandom, randomInt } from "./utils/randoms";
 import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import { Client } from "colyseus";
@@ -21,34 +20,30 @@ export interface WarriorStats {
   initialGump: number;
   initialInventory: Inventory;
   autoPlay: boolean;
-  avatar?:string;
+  avatar?: string;
 }
 
-export function generateFakeWarriors(count: number, seed: string) {
-  const warriors: WarriorStats[] = [];
-  for (let i = 0; i < count; i++) {
-    warriors[i] = {
-      id: `warrior-${i}-${seed}`,
-      name: `Warius ${i}`,
-      attack: deterministicRandom(150, `generateFakeWarriors-${i}-attack`, seed) + 1500,
-      defense: deterministicRandom(100, `generateFakeWarriors-${i}-defense`, seed) + 900,
-      maxSpeed: 6.5,
-      initialHealth: deterministicRandom(300, `generateFakeWarriors-${i}-health`, seed) + 1000,
-      initialGump: 0,
-      initialInventory: defaultInitialInventory,
-      autoPlay: false,
-    }
+export function generateWarrior(seed: string, name?:string): WarriorStats {
+  return {
+    id: `warrior-${seed}`,
+    name: name || `Warius${randomInt(1000)}`,
+    attack: deterministicRandom(150, `generateFakeWarriors-${seed}-attack`, seed) + 1500,
+    defense: deterministicRandom(100, `generateFakeWarriors-${seed}-defense`, seed) + 900,
+    maxSpeed: 6.5,
+    initialHealth: deterministicRandom(300, `generateFakeWarriors-${seed}-health`, seed) + 1000,
+    initialGump: 0,
+    initialInventory: defaultInitialInventory,
+    autoPlay: false,
   }
-  return warriors;
 }
 
-class Warrior extends EventEmitter {
+class Warrior {
   id: string;
 
   state: WarriorState
 
   position: Vec2
-  client: Client
+  client?: Client
 
   timeWithoutCard = 0
   timeWithCard = 0
@@ -58,8 +53,7 @@ class Warrior extends EventEmitter {
 
   isPiggy = false
 
-  constructor(client: Client, state: WarriorState) {
-    super()
+  constructor(state: WarriorState, client?: Client) {
     this.client = client
     this.id = state.id
     this.state = state
@@ -107,10 +101,10 @@ class Warrior extends EventEmitter {
     this.state.destination.assign({ x, z })
     this.setSpeed(0)
     this.setState(State.move)
-    this.client.send('playAppearEffect', this.id, { afterNextPatch: true })
+    this.client?.send('playAppearEffect', this.id, { afterNextPatch: true })
   }
 
-  setPosition(newPosition:Vec2) {
+  setPosition(newPosition: Vec2) {
     this.state.position.assign({
       x: newPosition.x,
       z: newPosition.y,
@@ -118,7 +112,7 @@ class Warrior extends EventEmitter {
     this.position = newPosition
   }
 
-  dieForTime(seconds:number, message = "you died") {
+  dieForTime(seconds: number, message = "you died") {
     this.timeSinceDeath = 0
     this.deathSentenceTime = seconds
     this.setState(State.dead)
@@ -126,20 +120,20 @@ class Warrior extends EventEmitter {
     this.clearItem()
   }
 
-  setIsPiggy(isPiggy:boolean) {
+  setIsPiggy(isPiggy: boolean) {
     this.isPiggy = isPiggy
     this.updateAttackAndDefenseState()
     this.setSpeedBasedOnDestination()
   }
 
-  sendMessage(message:string) {
+  sendMessage(message: string) {
     console.log('send mainhudmessage', message)
-    this.client.send('mainHUDMessage', message)
+    this.client?.send('mainHUDMessage', message)
   }
 
   incGumpBalance(amount: number) {
     if (amount !== 0) {
-      this.client.send('gumpDiff', amount)
+      this.client?.send('gumpDiff', amount)
     }
 
     this.state.wootgumpBalance += amount
@@ -245,7 +239,7 @@ class Warrior extends EventEmitter {
     return amountToUp;
   }
 
-  playItem(inventoryItem:InventoryItem):ItemDescription|null {
+  playItem(inventoryItem: InventoryItem): ItemDescription | null {
     const item = itemFromInventoryItem(inventoryItem)
 
     const identifier = getIdentifier(item)
@@ -274,7 +268,7 @@ class Warrior extends EventEmitter {
     return item
   }
 
-  hasCard(item:ItemDescription) {
+  hasCard(item: ItemDescription) {
     const inventoryRecord = this.state.inventory.get(item.identifier)
     if (!inventoryRecord || inventoryRecord.quantity === 0) {
       return false

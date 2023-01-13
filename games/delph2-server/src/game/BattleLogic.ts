@@ -82,6 +82,9 @@ class BattleLogic {
     const warriorTwo = this.warriors[1]
     const cardOne = this.cardPicks[warriorOne.id]
     const cardTwo = this.cardPicks[warriorTwo.id]
+    if (cardOne.identifier === cardTwo.identifier) {
+      return [undefined, cardOne, cardTwo]
+    }
     if (!cardOne && !cardTwo) {
       return [undefined, 'nothing', 'nothing']
     }
@@ -98,7 +101,6 @@ class BattleLogic {
   }
 
   endIt() {
-
     const warriors = this.warriors
    
     const [cardWinner, winningCard, losingCard] = this.getCardWinner()
@@ -113,7 +115,7 @@ class BattleLogic {
       })
     } else {
       warriors.forEach((w) => {
-        w.sendMessage("No strategies played.")
+        w.sendMessage("No winning strategy played.")
       })
     }
 

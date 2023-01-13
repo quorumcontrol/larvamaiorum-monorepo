@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 import { DelphsTableState, Player, RoomType } from "./schema/DelphsTableState";
 import DelphsTableLogic from "../game/DelphsTableLogic";
-import { generateFakeWarriors } from "../game/Warrior";
+import { generateWarrior } from "../game/Warrior";
 import { InventoryItem } from "../game/items";
 import { IncomingMessage } from "http";
 import { randomInt } from "../game/utils/randoms";
@@ -87,14 +87,14 @@ export class DelphsTable extends Room<DelphsTableState> {
 
   onJoin(client: Client, { name, avatar }: JoinOptions) {
     console.log(this.roomId, client.sessionId, "joined!");
-    const random = generateFakeWarriors(1, client.sessionId)[0]
+    const random = generateWarrior(client.sessionId, name)
     if (name) {
       random.name = name
     }
     if (avatar) {
       random.avatar = avatar
     }
-    this.game.addWarrior(client, random)
+    this.game.addWarrior(random, client)
   }
 
   async onLeave(client: Client, consented: boolean) {

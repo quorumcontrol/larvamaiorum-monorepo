@@ -210,9 +210,9 @@ class DelphsTableLogic {
     battle.setCardPick(warrior, itemFromInventoryItem(strategyCard))
   }
 
-  addWarrior(client: Client, stats: WarriorStats) {
+  addWarrior(stats: WarriorStats, client?: Client) {
     console.log('add warrior', stats)
-    const sessionId = client.sessionId
+    const sessionId = client?.sessionId || randomUUID()
     const position = this.randomPosition()
     const state = new WarriorState({
       ...stats,
@@ -237,7 +237,7 @@ class DelphsTableLogic {
       state.inventory.set(key, inventoryOfItem.clone())
     })
     console.log('added warrior: ', state.name)
-    this.warriors[sessionId] = new Warrior(client, state)
+    this.warriors[sessionId] = new Warrior(state, client)
     this.state.warriors.set(sessionId, state)
     this.updateMaxStats()
   }
@@ -376,7 +376,8 @@ class DelphsTableLogic {
       }
       const id = randomUUID()
       const state = new Battle({
-        id
+        id,
+        round: 0,
       })
       state.warriorIds.push(...pair.map((p) => p.id))
       // otherwise setup a battle
