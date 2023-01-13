@@ -1,8 +1,9 @@
 import { randomInt } from "./utils/randoms";
-import { State, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
+import { BehavioralState, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import Warrior from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
+import LocomotionLogic from "./LocomotionLogic";
 
 type TrapHolder = DelphsTableState['traps']
 
@@ -17,44 +18,33 @@ class Deer {
   chasing?: Warrior
   lastChased?: Warrior
 
-  position:Vec2
-  destination:Vec2
+  locomotion: LocomotionLogic
 
   constructor(state:DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder ) {
     this.id = state.id
     this.state = state
-    this.position = new Vec2(state.position.x, state.position.z)
     this.gumps = wootgumps
     this.warriors = warriors
     this.traps = traps
-    const gump = Object.values(wootgumps)[randomInt(Object.values(wootgumps).length - 1)]
-    this.setDestination(gump.x, gump.y)
+    this.locomotion = new LocomotionLogic(this.state.locomotion)
+    // const gump = Object.values(wootgumps)[randomInt(Object.values(wootgumps).length - 1)]
   }
 
   update(dt:number) {
-    if ([State.move, State.chasing].includes(this.state.state) && this.state.speed > 0) {
-      const current = new Vec2(this.state.position.x, this.state.position.z)
-      const dest = new Vec2(this.state.destination.x, this.state.destination.z)
-      const vector = new Vec2().sub2(dest, current).normalize().mulScalar(this.state.speed * dt)
-      current.add(vector)
-      this.state.position.assign({
-        x: current.x,
-        z: current.y,
-      })
-      this.position = current
-      this.setSpeedBasedOnDestination()
+    this.locomotion.update(dt)
+    if ([BehavioralState.move, BehavioralState.chasing].includes(this.state.behavioralState) && this.locomotion.speed() > 0) {
       this.updateDestination()
     }
   }
 
   updateDestination() {
     // if we're chasing, get distracted by gump.
-    if (this.state.state === State.chasing) {
+    if (this.state.behavioralState === BehavioralState.chasing) {
       const gump = this.nearbyGump() || this.randomGump()
       
       // if we're not chasing or the warrior we're chasing died or started to fight, or if we're scared of a trap
       // then just go after another gump.
-      if (!this.chasing || this.chasing.state.state !== State.move || this.isNearbyTrap()) {
+      if (!this.chasing || this.chasing.state.behavioralState !== BehavioralState.move || this.isNearbyTrap()) {
         this.stopChasing()
         if (gump) {
           this.setDestination(gump.x, gump.y)
@@ -79,7 +69,7 @@ class Deer {
       
       // otherwise set the destination of the warrior
       if (this.chasing) {
-        const position = this.chasing.position
+        const position = this.chasing.locomotion.position
         this.setDestination(position.x, position.y)
         return
       }
@@ -91,12 +81,12 @@ class Deer {
       console.log('nearby warrior: ', nearbyWarrior.state.name)
       nearbyWarrior.sendMessage("Reindeer is after you.")
       this.chasing = nearbyWarrior
-      this.setDestination(nearbyWarrior.position.x, nearbyWarrior.position.y)
-      this.setState(State.chasing)
+      this.setDestination(nearbyWarrior.locomotion.position.x, nearbyWarrior.locomotion.position.y)
+      this.setState(BehavioralState.chasing)
       return
     }
     // otherwise let's just go where we're going until we get there
-    const distance = this.position.distance(this.destination)
+    const distance = this.locomotion.distanceToDestination()
 
     if (distance <= 0.5) {
       this.lastChased = undefined
@@ -109,12 +99,12 @@ class Deer {
 
   chase(warrior:Warrior) {
     this.chasing = warrior
-    this.setDestination(warrior.position.x, warrior.position.y)
-    this.setState(State.chasing)
+    this.setDestination(warrior.locomotion.position.x, warrior.locomotion.position.y)
+    this.setState(BehavioralState.chasing)
   }
 
   private stopChasing() {
-    this.setState(State.move)
+    this.setState(BehavioralState.move)
     this.lastChased = this.chasing
     this.chasing = undefined
   }
@@ -125,7 +115,7 @@ class Deer {
 
   private isNearbyTrap():boolean {
     for (const [_id, trap] of this.traps.entries()) {
-      if (vec2ToVec2(trap.position).distance(this.position) < 2) {
+      if (vec2ToVec2(trap.position).distance(this.locomotion.position) < 2) {
        return true
       }
     }
@@ -135,7 +125,7 @@ class Deer {
 
   private nearbyGump():Vec2|undefined {
     const eligible = Object.values(this.gumps).filter((gump) => {
-      return this.position.distance(gump) < 5
+      return this.locomotion.position.distance(gump) < 5
     })
     return eligible[randomInt(eligible.length)]
   }
@@ -143,61 +133,27 @@ class Deer {
   private nearbyLoadedUpWarrior():Warrior|undefined {
     return Object.values(this.warriors).find((warrior) => {
       return warrior.state.wootgumpBalance > 10 &&
-        this.position.distance(warrior.position) < 6 &&
+        this.locomotion.position.distance(warrior.locomotion.position) < 6 &&
           !warrior.state.currentItem
     })
   }
 
-  setSpeed(speed:number) {
-    this.state.speed = speed
-  }
-  
-  setState(state: State) {
-    this.state.state = state // state state state statey state
+  setState(state: BehavioralState) {
+    this.state.behavioralState = state // state state state statey state
     switch (state) {
-      case State.move:
-        this.setSpeedBasedOnDestination()
+      case BehavioralState.move:
+        this.locomotion.unfreeze()
         return
-      case State.chasing:
-        this.setSpeedBasedOnDestination()
+      case BehavioralState.chasing:
         return
-      case State.battle:
-        this.setSpeed(0)
-        return
-      case State.deerAttack:
-        this.setSpeed(0)
+      case BehavioralState.dead:
+        this.locomotion.freeze()
         return
     }
-  }
-
-  private setSpeedBasedOnDestination() {
-    const dist = this.distanceToDestination()
-    if (this.state.state === State.chasing && dist > 0.5) {
-      this.setSpeed(6.5)
-      return
-    }
-    if (dist > 2) {
-      this.setSpeed(6)
-      return
-    }
-    if (dist > 0.25) {
-      this.setSpeed(1.25)
-      return
-    }
-    this.setSpeed(0)
   }
 
   setDestination(x: number, z:number) {
-    this.state.destination.assign({
-      x,
-      z,
-    })
-    this.destination = new Vec2(x, z)
-    this.setSpeedBasedOnDestination()
-  }
-
-  private distanceToDestination() {
-    return new Vec2(this.state.position.x, this.state.position.z).distance(new Vec2(this.state.destination.x, this.state.destination.z))
+    this.locomotion.setDestination(x,z)
   }
 
 }

@@ -1,5 +1,5 @@
 import { Vec2 } from "playcanvas"
-import { RovingAreaAttack, State } from "../rooms/schema/DelphsTableState"
+import { RovingAreaAttack, BehavioralState } from "../rooms/schema/DelphsTableState"
 import randomPosition from "./utils/randomPosition"
 import { randomBounded } from "./utils/randoms"
 import Warrior from "./Warrior"
@@ -40,8 +40,8 @@ class RovingAreaAttackLogic {
 
   findCloseWarriorsAndKillThem() {
     Object.values(this.warriors).forEach((w) => {
-      if (w.position.distance(this.position) <= RADIUS) {
-        if (w.state.state === State.move) {
+      if (w.locomotion.position.distance(this.position) <= RADIUS) {
+        if (w.state.behavioralState === BehavioralState.move) {
           w.dieForTime(this.timeInOnePlace, "The gods do not favor you.")
         }
       }

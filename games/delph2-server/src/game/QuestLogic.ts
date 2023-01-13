@@ -34,7 +34,7 @@ class QuestLogic {
     })
 
     let position = randomPosition()
-    while (piggy.position.distance(new Vec2(position.x, position.z)) < 30) {
+    while (piggy.locomotion.position.distance(new Vec2(position.x, position.z)) < 30) {
       position = randomPosition()
     }
     questObj.position.assign(position)
@@ -95,7 +95,7 @@ update(_dt: number) {
     if (this.state.piggyId && w.id !== this.state.piggyId) {
       return
     }
-    if (w.position.distance(vec2ToVec2(this.state.object.position)) <= 2) {
+    if (w.locomotion.position.distance(vec2ToVec2(this.state.object.position)) <= 2) {
       this.winner = w
       this._over = true
     }

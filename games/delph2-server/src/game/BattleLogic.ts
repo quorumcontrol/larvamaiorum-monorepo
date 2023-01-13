@@ -1,4 +1,4 @@
-import { Battle, BattlePhase, Item, State } from '../rooms/schema/DelphsTableState'
+import { Battle, BattlePhase, Item, BehavioralState } from '../rooms/schema/DelphsTableState'
 import { ItemDescription } from './items'
 import { randomFloat, randomInt } from './utils/randoms'
 import Warrior from './Warrior'
@@ -82,9 +82,6 @@ class BattleLogic {
     const warriorTwo = this.warriors[1]
     const cardOne = this.cardPicks[warriorOne.id]
     const cardTwo = this.cardPicks[warriorTwo.id]
-    if (cardOne.identifier === cardTwo.identifier) {
-      return [undefined, cardOne, cardTwo]
-    }
     if (!cardOne && !cardTwo) {
       return [undefined, 'nothing', 'nothing']
     }
@@ -93,6 +90,9 @@ class BattleLogic {
     }
     if (cardTwo && !cardOne) {
       return [warriorTwo, cardTwo.name, 'nothing']
+    }
+    if (cardOne.identifier === cardTwo.identifier) {
+      return [undefined, cardOne, cardTwo]
     }
     if (cardOne.beats!.includes(cardTwo.name.toLowerCase())) {
       return [warriorOne, cardOne.name, cardTwo.name]
@@ -134,7 +134,7 @@ class BattleLogic {
       warrior.clearItem()
       if (warrior.isAlive()) {
         warrior.sendMessage("Winner!")
-        warrior.setState(State.move)
+        warrior.setState(BehavioralState.move)
         this.winner = warrior
       } else {
         this.losers.push(warrior)
@@ -155,7 +155,7 @@ class BattleLogic {
     console.log('battle started')
     this.started = true
     this.warriors.forEach((w, i) => {
-      w.setState(State.battle)
+      w.setState(BehavioralState.battle)
       w.sendMessage('Battle!')
     })
     this.setPhase(BattlePhase.strategySelect)

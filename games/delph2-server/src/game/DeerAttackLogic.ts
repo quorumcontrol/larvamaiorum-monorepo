@@ -1,4 +1,4 @@
-import { State } from "../rooms/schema/DelphsTableState";
+import { BehavioralState } from "../rooms/schema/DelphsTableState";
 import Deer from "./Deer";
 import Warrior from "./Warrior";
 
@@ -23,8 +23,8 @@ class DeerAttackLogic {
       return
     }
     this.started = true
-    this.deer.setState(State.deerAttack)
-    this.warrior.setState(State.deerAttack)
+    this.deer.setState(BehavioralState.battle)
+    this.warrior.setState(BehavioralState.battle)
   }
 
   update(dt:number) {
@@ -43,7 +43,7 @@ class DeerAttackLogic {
     // let the deer graze for 4 seconds before chasing the player again
     if (this.clock > 7 && !this.complete) {
       this.complete = true
-      this.deer.setState(State.move)
+      this.deer.setState(BehavioralState.move)
     } 
   }
 

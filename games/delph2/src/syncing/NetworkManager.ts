@@ -9,7 +9,7 @@ import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import NetworkedWarriorController from "../characters/NetworkedWarriorController";
 import NonPlayerCharacter from "../characters/NonPlayerCharacter";
-import DeerLocomotion from "../characters/DeerLocomotion";
+import DeerBehavior from "../characters/DeerBehavior";
 import TrapScript from "../game/Trap";
 import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
@@ -235,9 +235,8 @@ class NetworkManager extends ScriptTypeBase {
     const deerEntity = this.deerTemplate.clone()
     deerEntity.name = `deer-${key}`
     deerEntity.enabled = true
-    deerEntity.setPosition(deer.position.x, 0, deer.position.z)
     this.app.root.addChild(deerEntity)
-    mustGetScript<DeerLocomotion>(deerEntity, 'deerLocomotion').setDeerState(deer)
+    mustGetScript<DeerBehavior>(deerEntity, 'deerBehavior').setDeerState(deer)
     this.deer[deer.id] = deerEntity
   }
 

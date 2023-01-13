@@ -7,25 +7,23 @@ export enum BattlePhase {
   completed
 }
 
-export enum BattleRoundPhase {
-  strategySelect,
-  battling,
-  reveal,
-}
-
 export enum RoomType {
   continuous,
   match,
 }
 
-export enum State {
+export enum LocomotionState {
   move,
-  harvest,
+  arrived,
+  frozen,
+}
+
+export enum BehavioralState {
+  move,
   battle,
   dead,
   taunt,
   chasing,
-  deerAttack,
 }
 
 export enum QuestObjectKind {
@@ -91,25 +89,33 @@ export class Trap extends Schema {
   @type("string") plantedBy: string
 }
 
+export class Locomotion extends Schema {
+  @type(Vec2) position: Vec2 = new Vec2();
+  @type("number") speed: number = 0
+  @type(Vec2) destination: Vec2 = new Vec2();
+  @type("number") locomotionState: LocomotionState = 0;
+  @type(Vec2) focus: Vec2 = new Vec2();
+
+  @type("number") maxSpeed: number
+  @type("number") walkSpeed: number
+}
+
 export class Deer extends Schema {
   @type("string") id: string
-  @type(Vec2) position: Vec2 = new Vec2();
-  @type(Vec2) destination: Vec2 = new Vec2();
-  @type("number") state: State = 0
-  @type("number") speed: number = 0
+  @type("number") behavioralState: BehavioralState = 0
+
+  @type(Locomotion) locomotion = new Locomotion()
 }
 
 export class Warrior extends Schema {
-  @type(Vec2) position: Vec2 = new Vec2();
-  @type(Vec2) destination: Vec2 = new Vec2();
-  @type("number") state: State = 0
-  @type("number") speed: number = 0
+  @type(Locomotion) locomotion = new Locomotion()
+
+  @type("number") behavioralState: BehavioralState = 0
 
   @type("string") id: string
   @type("string") name: string
   @type("number") attack: number
   @type("number") defense: number
-  @type("number") maxSpeed: number
   @type("number") currentAttack: number
   @type("number") currentDefense: number
   @type("number") initialHealth: number

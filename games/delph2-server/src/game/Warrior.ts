@@ -1,10 +1,11 @@
 import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
 import { deterministicRandom, randomInt } from "./utils/randoms";
-import { Item, State, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
+import { Item, BehavioralState, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import { Client } from "colyseus";
 import randomColor from "./utils/randomColor";
 import randomPosition from "./utils/randomPosition";
+import LocomotionLogic from './LocomotionLogic';
 
 const log = console.log //debug('Warrior')
 
@@ -16,6 +17,7 @@ export interface WarriorStats {
   attack: number;
   defense: number;
   maxSpeed: number;
+  walkSpeed: number;
   initialHealth: number;
   initialGump: number;
   initialInventory: Inventory;
@@ -23,13 +25,14 @@ export interface WarriorStats {
   avatar?: string;
 }
 
-export function generateWarrior(seed: string, name?:string): WarriorStats {
+export function generateWarrior(seed: string, name?: string): WarriorStats {
   return {
     id: `warrior-${seed}`,
     name: name || `Warius${randomInt(1000)}`,
     attack: deterministicRandom(150, `generateFakeWarriors-${seed}-attack`, seed) + 1500,
     defense: deterministicRandom(100, `generateFakeWarriors-${seed}-defense`, seed) + 900,
     maxSpeed: 6.5,
+    walkSpeed: 2,
     initialHealth: deterministicRandom(300, `generateFakeWarriors-${seed}-health`, seed) + 1000,
     initialGump: 0,
     initialInventory: defaultInitialInventory,
@@ -42,7 +45,9 @@ class Warrior {
 
   state: WarriorState
 
-  position: Vec2
+  locomotion: LocomotionLogic
+
+  // position: Vec2
   client?: Client
 
   timeWithoutCard = 0
@@ -57,37 +62,24 @@ class Warrior {
     this.client = client
     this.id = state.id
     this.state = state
-    this.position = new Vec2(state.position.x, state.position.z)
+    this.locomotion = new LocomotionLogic(state.locomotion)
     const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `playerColor-${this.id}`, luminosity: 'light' }).map((c: number) => c / 255);
     state.color.clear()
     state.color.push(...color)
   }
 
   update(dt: number) {
+    this.locomotion.update(dt)
+
     if (this.state.currentItem) {
       this.timeWithCard += dt
       this.checkForCardTimeout()
+      this.setAdditionalSpeed()
     }
-    if (this.state.state === State.dead) {
+    if (this.state.behavioralState === BehavioralState.dead) {
       this.timeSinceDeath += dt
       if (this.timeSinceDeath >= this.deathSentenceTime) {
         this.recoverFromDeath()
-      }
-    }
-    if (this.state.state === State.move && this.state.speed > 0) {
-      const current = new Vec2(this.state.position.x, this.state.position.z)
-      const dest = new Vec2(this.state.destination.x, this.state.destination.z)
-      const vector = new Vec2().sub2(dest, current).normalize().mulScalar(this.state.speed * dt)
-      current.add(vector)
-      this.setPosition(current)
-      const distance = current.distance(dest)
-      if (distance <= 0.25) {
-        this.setSpeed(0)
-        return
-      }
-      if (distance <= 2) {
-        this.setSpeed(2)
-        return
       }
     }
   }
@@ -97,25 +89,18 @@ class Warrior {
     this.deathSentenceTime = 0
     this.recover(1.00)
     const { x, z } = randomPosition()
-    this.setPosition(new Vec2(x, z))
-    this.state.destination.assign({ x, z })
-    this.setSpeed(0)
-    this.setState(State.move)
+    this.locomotion.setPosition(x, z)
+    this.locomotion.setDestination(x, z)
+    this.locomotion.unfreeze()
+    this.setState(BehavioralState.move)
     this.client?.send('playAppearEffect', this.id, { afterNextPatch: true })
-  }
-
-  setPosition(newPosition: Vec2) {
-    this.state.position.assign({
-      x: newPosition.x,
-      z: newPosition.y,
-    })
-    this.position = newPosition
   }
 
   dieForTime(seconds: number, message = "you died") {
     this.timeSinceDeath = 0
     this.deathSentenceTime = seconds
-    this.setState(State.dead)
+    this.locomotion.freeze()
+    this.setState(BehavioralState.dead)
     this.sendMessage(message)
     this.clearItem()
   }
@@ -123,7 +108,6 @@ class Warrior {
   setIsPiggy(isPiggy: boolean) {
     this.isPiggy = isPiggy
     this.updateAttackAndDefenseState()
-    this.setSpeedBasedOnDestination()
   }
 
   sendMessage(message: string) {
@@ -139,60 +123,29 @@ class Warrior {
     this.state.wootgumpBalance += amount
   }
 
-  setSpeed(speed: number) {
+  setAdditionalSpeed() {
     const currentItem = this.currentItemDetails()
-    if (speed >= (this.state.maxSpeed - 0.5)) {
-      let additionalSpeed = 0
-      if (currentItem?.speed) {
-        additionalSpeed += currentItem.speed
-      }
-      if (this.isPiggy) {
-        additionalSpeed -= 0.5
-      }
-      this.state.speed = speed + additionalSpeed
-      return
+
+    let additionalSpeed = 0
+    if (currentItem?.speed) {
+      additionalSpeed += currentItem.speed
     }
-    this.state.speed = speed
+    if (this.isPiggy) {
+      additionalSpeed -= 0.5
+    }
+    this.locomotion.setAdditionalSpeed(additionalSpeed)
   }
 
-  setState(state: State) {
-    this.state.state = state // state state state statey state
-    switch (state) {
-      case State.move:
-        this.setSpeedBasedOnDestination()
-        return
-      case State.battle:
-        this.setSpeed(0)
-        return
-      case State.deerAttack:
-        this.setSpeed(0)
-        return
-    }
-  }
-
-  private setSpeedBasedOnDestination() {
-    const dist = this.distanceToDestination()
-    if (dist > 1.5) {
-      this.setSpeed(this.state.maxSpeed)
-      return
-    }
-    if (dist > 0.25) {
-      this.setSpeed(2)
-      return
-    }
-    this.setSpeed(0)
-  }
-
-  setDestination(x: number, z: number) {
-    this.state.destination.assign({
-      x,
-      z,
-    })
-    this.setSpeedBasedOnDestination()
-  }
-
-  private distanceToDestination() {
-    return new Vec2(this.state.position.x, this.state.position.z).distance(new Vec2(this.state.destination.x, this.state.destination.z))
+  setState(state: BehavioralState) {
+    this.state.behavioralState = state // state state state statey state
+    // switch (state) {
+    //   case BehavioralState.move:
+    //     this.setSpeedBasedOnDestination()
+    //     return
+    //   case BehavioralState.battle:
+    //     this.setSpeed(0)
+    //     return
+    // }
   }
 
   isAlive() {

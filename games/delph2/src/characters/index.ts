@@ -1,5 +1,6 @@
 export * from './NetworkedWarriorController'
 export * from './NonPlayerCharacter'
-export * from './DeerLocomotion'
+export * from './DeerBehavior'
 export * from './PlayerController'
 export * from './ReadyPlayerMe'
+export * from "./CharacterLocomotion"
