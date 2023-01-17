@@ -95,8 +95,8 @@ export class DelphsTable extends Room<DelphsTableState> {
       random.avatar = avatar
     }
     this.game.addWarrior(random, client)
-    const dummy = generateWarrior(client.sessionId, "Dummy")
-    this.game.addWarrior(dummy)
+    // const dummy = generateWarrior(client.sessionId, "Dummy")
+    // this.game.addWarrior(dummy)
   }
 
   async onLeave(client: Client, consented: boolean) {

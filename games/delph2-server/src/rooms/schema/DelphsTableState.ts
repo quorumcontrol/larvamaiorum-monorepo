@@ -1,10 +1,25 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
+
+export enum SwingDirection {
+  none,
+  high,
+  middle,
+  low,
+}
+
+export enum BlockDirection {
+  none,
+  high,
+  middle,
+  low,
+}
+
 export enum BattlePhase {
   pending,
   strategySelect,
   battling,
-  completed
+  completed,
 }
 
 export enum RoomType {
@@ -100,17 +115,25 @@ export class Locomotion extends Schema {
   @type("number") walkSpeed: number
 }
 
+export class BattleCommands extends Schema {
+  @type("number") swingDirection: SwingDirection = SwingDirection.none
+  @type("number") blockDirection: BlockDirection = BlockDirection.none
+  @type("number") impactStrength:number = 0
+}
+
 export class Deer extends Schema {
   @type("string") id: string
   @type("number") behavioralState: BehavioralState = 0
 
   @type(Locomotion) locomotion = new Locomotion()
+  @type(BattleCommands) battleCommands = new BattleCommands
 }
 
 export class Warrior extends Schema {
   @type(Locomotion) locomotion = new Locomotion()
 
   @type("number") behavioralState: BehavioralState = 0
+  @type(BattleCommands) battleCommands = new BattleCommands
 
   @type("string") id: string
   @type("string") name: string
@@ -136,6 +159,7 @@ export class Warrior extends Schema {
 export class Battle extends Schema {
   @type("string") id: string
   @type("number") phase: BattlePhase
+  @type(Vec2) center = new Vec2()
   @type({ array: "string" }) warriorIds = new ArraySchema<string>();
   @type({ map: Item}) strategies = new MapSchema<Item>({});
   @type("number") round:number

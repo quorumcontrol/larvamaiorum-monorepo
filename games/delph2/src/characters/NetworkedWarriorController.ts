@@ -1,4 +1,4 @@
-import { AnimComponent, Entity } from "playcanvas";
+import { AnimComponent, Entity, SoundComponent, SoundSlot } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import mustFindByName from "../utils/mustFindByName";
@@ -7,6 +7,7 @@ import mustGetScript from "../utils/mustGetScript";
 import { loadGlbContainerFromUrl } from "../utils/glbUtils";
 import { randomInt } from "../utils/randoms";
 import CharacterLocomotion from "./CharacterLocomotion";
+import BattleBehavior from "./BattleBehavior";
 
 @createScript("networkedWarriorController")
 class NetworkedWarriorController extends ScriptTypeBase {
@@ -22,6 +23,8 @@ class NetworkedWarriorController extends ScriptTypeBase {
   screen: Entity
   camera: Entity
 
+  sounds: SoundComponent
+
   private gameTime = 0
   jobs:{time:number, job:()=>any}[]
 
@@ -31,6 +34,7 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.viking = mustFindByName(this.entity, 'viking')
     this.anim = this.viking.anim!
 
+    this.sounds = mustFindByName(this.entity, "Sounds").sound!
     this.healthBar = mustFindByName(this.entity, 'HealthBar')
     this.camera = mustFindByName(this.app.root, 'Camera')
     this.screen = mustFindByName(this.entity, 'PlayerNameScreen')
@@ -54,6 +58,9 @@ class NetworkedWarriorController extends ScriptTypeBase {
     this.screen.lookAt(this.camera.getPosition())
     this.screen.rotateLocal(0, 180, 0)
     this.healthBar.element!.width = this.warrior!.currentHealth / this.warrior!.initialHealth * 150
+
+    this.handleBattleEffects()
+
     // const position = this.entity.getPosition()
     // // if (position.distance(this.serverPosition) > 1) {
     // //   this.entity.setPosition(this.serverPosition.x, 0, this.serverPosition.z)
@@ -66,6 +73,35 @@ class NetworkedWarriorController extends ScriptTypeBase {
     // //   // console.log(this.serverPosition, newPosition)
     // //   this.entity.setPosition(newPosition)
     // // }
+  }
+
+  handleBattleEffects() {
+    this.handleImpactStrength()
+    this.handleSwingDirection()   
+  }
+
+  private handleSwingDirection() {
+    const slot = this.sounds.slots["SwordAgainstSword"]
+    if (this.warrior.battleCommands.swingDirection > 0) {
+      this.playIfNotPlaying(slot)
+    } else {
+      slot.stop()
+    }
+  }
+
+  private handleImpactStrength() {
+    const slot = this.sounds.slots["InjuredGrunt"]
+    if (this.warrior.battleCommands.impactStrength > 0) {
+      this.playIfNotPlaying(slot)
+    } else {
+      slot.stop()
+    }
+  }
+
+  private playIfNotPlaying(slot:SoundSlot) {
+    if (!slot.isPlaying) {
+      slot.play()
+    }
   }
 
   playAppearEffect() {
@@ -162,6 +198,8 @@ class NetworkedWarriorController extends ScriptTypeBase {
       }
       rpm.anim.enabled = true
       mustGetScript<CharacterLocomotion>(this.entity, 'characterLocomotion').animatedEntity = rpm
+      mustGetScript<BattleBehavior>(this.entity, 'battleBehavior').setup(this.warrior.battleCommands, rpm.anim)
+
       this.anim = rpm.anim
       this.viking = rpm
 
@@ -169,35 +207,37 @@ class NetworkedWarriorController extends ScriptTypeBase {
     })
   }
 
-  setPlayer(player: Warrior) {
-    this.warrior = player
-    console.log('player set', player.toJSON())
+  setWarrior(warrior: Warrior) {
+    this.warrior = warrior
+    console.log('player set', warrior.toJSON())
 
-    mustGetScript<CharacterLocomotion>(this.entity, 'characterLocomotion').setLocomotion(player.locomotion)
+    mustGetScript<CharacterLocomotion>(this.entity, 'characterLocomotion').setLocomotion(warrior.locomotion)
 
-    if (player.avatar) {
+    if (warrior.avatar) {
       this.handleAvatar()
     } else {
-      const torso = mustFindByName(this.entity, 'Torso')
+      const torso = mustFindByName(this.entity, 'Wolf3D_Avatar')
 
       const newMaterial = torso.render!.meshInstances[0].material.clone()
-      const color = player.color.toArray()
+      const color = warrior.color.toArray()
         ; (newMaterial as any).diffuse.set(color[0], color[1], color[2])
       newMaterial.update()
       torso.render!.meshInstances[0].material = newMaterial
     }
 
-    player.onChange = (_changes) => {
+    warrior.onChange = (_changes) => {
       // console.log("changes: ", _changes)
-      this.setState(player.behavioralState)
-      if (!!player.currentItem) {
+      this.setState(warrior.behavioralState)
+      if (!!warrior.currentItem) {
         this.cardText.enabled = true
-        this.cardText.element!.text = `(${player.currentItem.name})`
+        this.cardText.element!.text = `(${warrior.currentItem.name})`
       } else {
         this.cardText.enabled = false
       }
     }
-    this.entity.fire('newWarrior', player)
+    mustGetScript<BattleBehavior>(this.entity, 'battleBehavior').setup(warrior.battleCommands, this.anim)
+
+    this.entity.fire('newWarrior', warrior)
   }
 }
 

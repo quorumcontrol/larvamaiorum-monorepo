@@ -1,11 +1,11 @@
 import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
 import { deterministicRandom, randomInt } from "./utils/randoms";
 import { Item, BehavioralState, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
-import { Vec2 } from "playcanvas";
 import { Client } from "colyseus";
 import randomColor from "./utils/randomColor";
 import randomPosition from "./utils/randomPosition";
 import LocomotionLogic from './LocomotionLogic';
+import { Battler } from './BattleLogic2';
 
 const log = console.log //debug('Warrior')
 
@@ -40,7 +40,7 @@ export function generateWarrior(seed: string, name?: string): WarriorStats {
   }
 }
 
-class Warrior {
+class Warrior implements Battler {
   id: string;
 
   state: WarriorState
@@ -84,7 +84,12 @@ class Warrior {
     }
   }
 
+  battleCommands() {
+    return this.state.battleCommands
+  }
+
   recoverFromDeath() {
+    console.log(this.id, "recover form death")
     this.timeSinceDeath = 0
     this.deathSentenceTime = 0
     this.recover(1.00)
@@ -115,6 +120,10 @@ class Warrior {
     this.client?.send('mainHUDMessage', message)
   }
 
+  getGumpBalance() {
+    return this.state.wootgumpBalance
+  }
+
   incGumpBalance(amount: number) {
     if (amount !== 0) {
       this.client?.send('gumpDiff', amount)
@@ -136,20 +145,35 @@ class Warrior {
     this.locomotion.setAdditionalSpeed(additionalSpeed)
   }
 
+  getState():BehavioralState {
+    return this.state.behavioralState
+  }
+
   setState(state: BehavioralState) {
-    this.state.behavioralState = state // state state state statey state
-    // switch (state) {
-    //   case BehavioralState.move:
-    //     this.setSpeedBasedOnDestination()
-    //     return
-    //   case BehavioralState.battle:
-    //     this.setSpeed(0)
-    //     return
-    // }
+    console.log(this.id, "set state: ", state)
+    this.state.behavioralState = state
+    switch (state) {
+      // case BehavioralState.move:
+      //   this.setSpeedBasedOnDestination()
+      //   return
+      case BehavioralState.battle:
+        this.sendMessage('Battle!')
+        return
+    }
   }
 
   isAlive() {
     return this.state.currentHealth > 0;
+  }
+
+  getHealth() {
+    return this.state.currentHealth
+  }
+
+  setHealth(health:number) {
+    return this.state.assign({
+      currentHealth: health,
+    })
   }
 
   currentAttack() {

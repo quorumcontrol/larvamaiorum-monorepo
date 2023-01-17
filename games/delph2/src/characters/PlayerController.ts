@@ -3,13 +3,15 @@ import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import mustFindByName from "../utils/mustFindByName";
 import QuestLogic from "../game/QuestLogic";
-import { QuestType } from "../syncing/schema/DelphsTableState";
+import { BehavioralState, QuestType, Warrior } from "../syncing/schema/DelphsTableState";
 import mustGetScript from "../utils/mustGetScript";
 
 @createScript("playerController")
 class PlayerController extends ScriptTypeBase {
   camera: Entity
   screen: Entity
+
+  warrior?: Warrior
 
   // footStepEntity:Entity
   // footStepEffect:any
@@ -25,6 +27,10 @@ class PlayerController extends ScriptTypeBase {
     this.questArrow.enabled = true
     this.app.on('questOver', this.handleQuestOver, this)
     this.app.on('quest', this.handleQuest, this)
+
+    mustGetScript<any>(this.camera, 'orbitCamera2').focus(this.entity)
+
+
     // this.footStepEntity = mustFindByName(this.entity, "FootImpact")
     // this.footStepEffect = mustGetScript(this.footStepEntity, "effekseerEmitter")
     // mustFindByName(this.entity, "viking").anim?.on("foot_step", (_evt) => {
@@ -52,9 +58,13 @@ class PlayerController extends ScriptTypeBase {
 
     const position = chasing.getPosition()
 
-    this.questArrow.enabled = true
+    this.questArrow.enabled = (this.warrior?.behavioralState === BehavioralState.move)
     this.questArrow.lookAt(position.x, 0, position.z)
     this.questArrow.rotateLocal(0, 90, 0)
+  }
+
+  setWarrior(warrior:Warrior) {
+    this.warrior = warrior
   }
 
   private currentlyChasing() {

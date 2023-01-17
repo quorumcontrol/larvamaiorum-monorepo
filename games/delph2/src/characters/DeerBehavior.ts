@@ -1,4 +1,4 @@
-import { Entity, Vec3, SoundComponent } from "playcanvas";
+import { Entity, Vec3, SoundComponent, AnimComponent } from "playcanvas";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
@@ -6,26 +6,35 @@ import { Deer, BehavioralState } from "../syncing/schema/DelphsTableState";
 import { randomInt } from "../utils/randoms";
 import mustGetScript from "../utils/mustGetScript";
 import CharacterLocomotion from "./CharacterLocomotion";
+import BattleBehavior from "./BattleBehavior";
 
 
 @createScript("deerBehavior")
 class DeerBehavior extends ScriptTypeBase {
 
-  state: BehavioralState
+  state: Deer
   sound: SoundComponent
   deer: Entity
+  anim: AnimComponent
 
   initialize() {
     this.deer = mustFindByName(this.entity, "deerModel")
-    this.state = BehavioralState.move
+    this.anim = this.deer.anim!
     this.sound = mustFindByName(this.entity, "Sound").sound!
   }
 
   setState(newState:BehavioralState) {
-    this.deer.anim!.setBoolean('deerAttack', (newState === BehavioralState.battle))
-
     if ([BehavioralState.chasing, BehavioralState.battle].includes(newState)) {
       this.sound.slots[randomInt(2).toString()].play()
+    }
+
+    switch(newState) {
+      case BehavioralState.dead:
+        this.anim.setFloat('health', 0)
+        break;
+      case BehavioralState.move:
+        this.anim.setFloat("health", 100)
+        break;
     }
   }
 
@@ -38,10 +47,12 @@ class DeerBehavior extends ScriptTypeBase {
   setDeerState(deerstate:Deer) {
     // this.deer = deerstate
     console.log('deer set', deerstate.toJSON())
-    deerstate.onChange = (_changes) => {
-      this.setState(deerstate.behavioralState)
+    this.state = deerstate
+    this.state.onChange = () => {
+      this.setState(this.state.behavioralState)
     }
     mustGetScript<CharacterLocomotion>(this.entity, 'characterLocomotion').setLocomotion(deerstate.locomotion)
+    mustGetScript<BattleBehavior>(this.entity, 'battleBehavior').setup(deerstate.battleCommands, this.anim)
 
     this.entity.fire('new Deer', deerstate)
   }

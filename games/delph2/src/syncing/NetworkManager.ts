@@ -15,6 +15,7 @@ import QuestLogic from "../game/QuestLogic";
 import { memoize } from "../utils/memoize";
 import RovingAttack from "../game/RovingAttack";
 import { BATTLE_CHANGE, WARRIOR_CHANGE } from "./changeEvents";
+import BattleVisuals from "../game/BattleVisuals";
 
 const client = memoize(() => {
   if (typeof document !== 'undefined') {
@@ -59,7 +60,7 @@ class NetworkManager extends ScriptTypeBase {
   deerTemplate: Entity
   trapTemplate: Entity
 
-  battleEffect: Entity
+  battleVisual: Entity
 
   player?: Entity
   playerSessionId?: string
@@ -80,7 +81,7 @@ class NetworkManager extends ScriptTypeBase {
     this.trapTemplate = mustFindByName(this.app.root, "Trap")
     this.hudScript = mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud')
     this.gumpSounds = mustFindByName(this.app.root, "GumpSounds").sound!
-    this.battleEffect = mustFindByName(this.app.root, 'BattleEffects')
+    this.battleVisual = mustFindByName(this.app.root, 'Battle')
     this.client = client()
 
     this.gumpTemplate = mustFindByName(this.app.root, 'wootgump')
@@ -131,23 +132,14 @@ class NetworkManager extends ScriptTypeBase {
     this.room.state.wootgump.onRemove = (_loc, key) => {
       this.handleGumpRemove(key)
     }
-    this.room.state.battles.onRemove = (_loc, key) => {
-      this.app.fire(BATTLE_CHANGE)
-      this.handleBattleRemove(key)
-    }
-    this.room.state.battles.onAdd = (battle, key) => {
-      console.log('firing battle change')
-      this.app.fire(BATTLE_CHANGE)
-      this.handleBattleAdd(battle, key)
-    }
 
-    this.room.state.deerAttacks.onAdd = (attack, key) => {
-      this.handleDeerAttackAdd(attack, key)
-    }
+    // this.room.state.deerAttacks.onAdd = (attack, key) => {
+    //   this.handleDeerAttackAdd(attack, key)
+    // }
 
-    this.room.state.deerAttacks.onRemove = (_attack, key) => {
-      this.handleDeerAttackRemove(key)
-    }
+    // this.room.state.deerAttacks.onRemove = (_attack, key) => {
+    //   this.handleDeerAttackRemove(key)
+    // }
 
     this.room.state.deer.onAdd = (deer, key) => {
       this.handleDeerAdd(deer, key)
@@ -161,6 +153,16 @@ class NetworkManager extends ScriptTypeBase {
     }
     this.room.state.traps.onRemove = (_trap, key) => {
       this.handleTrapRemove(key)
+    }
+
+    this.room.state.battles.onRemove = (_loc, key) => {
+      this.app.fire(BATTLE_CHANGE)
+      this.handleBattleRemove(key)
+    }
+    this.room.state.battles.onAdd = (battle, key) => {
+      console.log('firing battle change')
+      this.app.fire(BATTLE_CHANGE)
+      this.handleBattleAdd(battle, key)
     }
 
     this.room.state.onChange = (changes) => {
@@ -255,62 +257,37 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   handleDeerAttackAdd(attack: DeerAttack, key: string) {
-    const effect = this.battleEffect.clone()
-    effect.name = `deer-attack-effect-${key}`
-    this.app.root.addChild(effect)
-    effect.enabled = true
-    this.playEffects(effect)
+    // const effect = this.battleEffect.clone()
+    // effect.name = `deer-attack-effect-${key}`
+    // this.app.root.addChild(effect)
+    // effect.enabled = true
+    // this.playEffects(effect)
 
-    const position = this.warriors[attack.warriorId].getPosition().add(this.deer[attack.deerId].getPosition()).divScalar(2)
-    effect.setPosition(position)
+    // const position = this.warriors[attack.warriorId].getPosition().add(this.deer[attack.deerId].getPosition()).divScalar(2)
+    // effect.setPosition(position)
   }
 
   handleDeerAttackRemove(key: string) {
-    const effects = mustFindByName(this.app.root, `deer-attack-effect-${key}`)
-    console.log('deer attack over', key)
-    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
-    Object.values(battleSound.slots).forEach((slot) => {
-      slot.stop()
-    })
-    effects.destroy()
+    // const effects = mustFindByName(this.app.root, `deer-attack-effect-${key}`)
+    // console.log('deer attack over', key)
+    // const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
+    // Object.values(battleSound.slots).forEach((slot) => {
+    //   slot.stop()
+    // })
+    // effects.destroy()
   }
 
   handleBattleAdd(battle: Battle, key: string) {
     console.log('new battle: ', battle.toJSON())
-    const effect = this.battleEffect.clone()
-    effect.name = `battle-effect-${key}`
+    const effect = this.battleVisual.clone()
+    effect.name = `battle-visuals-${key}`
     this.app.root.addChild(effect)
     effect.enabled = true
-    this.playEffects(effect)
-
-    const warriors = battle.warriorIds.map((id) => {
-      return this.warriors[id]
-    })
-    const position = warriors[0].getPosition().add(warriors[1].getPosition()).divScalar(2)
-    effect.setPosition(position)
-    warriors.forEach((warrior, i) => {
-      warrior.lookAt(warriors[(i + 1) % warriors.length].getPosition())
-    })
-  }
-
-  private playEffects(effects: Entity) {
-    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
-    Object.values(battleSound.slots).forEach((slot) => {
-      slot.play()
-    })
-
-    const emitter = mustFindByName(effects, 'BattleEffect')
-    mustGetScript<any>(emitter, 'effekseerEmitter').play()
+    mustGetScript<BattleVisuals>(effect, 'battleVisuals').setState(battle, this.warriors, this.deer)
   }
 
   handleBattleRemove(key: string) {
-    const effects = mustFindByName(this.app.root, `battle-effect-${key}`)
-    console.log('battle over', key)
-    const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
-    Object.values(battleSound.slots).forEach((slot) => {
-      slot.stop()
-    })
-    effects.destroy()
+    mustFindByName(this.app.root, `battle-visuals-${key}`).destroy()
   }
 
   handleRovingAreaAttack(attack: RovingAreaAttack, key: string) {
@@ -369,7 +346,7 @@ class NetworkManager extends ScriptTypeBase {
       this.playerSessionId = key
 
       const script = mustGetScript<NetworkedWarriorController>(playerEntity, 'networkedWarriorController')
-      script.setPlayer(warrior)
+      script.setWarrior(warrior)
       mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud').setWarrior(warrior, this.room!.state)
 
       return
@@ -381,7 +358,7 @@ class NetworkManager extends ScriptTypeBase {
     warriorEntity.enabled = true
     this.app.root.addChild(warriorEntity)
     const script = mustGetScript<NetworkedWarriorController>(warriorEntity, 'networkedWarriorController')
-    script.setPlayer(warrior)
+    script.setWarrior(warrior)
 
     if (this.player) {
       mustGetScript<NonPlayerCharacter>(warriorEntity, 'nonPlayerCharacter').setPlayerEntity(this.player)

@@ -4,14 +4,24 @@ import { Vec2 } from "playcanvas";
 import Warrior from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
 import LocomotionLogic from "./LocomotionLogic";
+import { Battler } from "./BattleLogic2";
+import randomPosition from "./utils/randomPosition";
 
 type TrapHolder = DelphsTableState['traps']
 
-class Deer {
+class Deer implements Battler {
   id: string;
   state: DeerState
 
-  gumps: Record<string,Vec2>
+  health = 1000
+  attack = 700
+  defense = 700
+
+  currentHealth = 1000
+
+  gumpBalance = 0
+
+  gumps: Record<string, Vec2>
   warriors: Record<string, Warrior>
   traps: TrapHolder
 
@@ -20,7 +30,10 @@ class Deer {
 
   locomotion: LocomotionLogic
 
-  constructor(state:DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder ) {
+  timeSinceDeath = 0
+  deathSentenceTime = 0
+
+  constructor(state: DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder) {
     this.id = state.id
     this.state = state
     this.gumps = wootgumps
@@ -30,18 +43,61 @@ class Deer {
     // const gump = Object.values(wootgumps)[randomInt(Object.values(wootgumps).length - 1)]
   }
 
-  update(dt:number) {
+  update(dt: number) {
     this.locomotion.update(dt)
-    if ([BehavioralState.move, BehavioralState.chasing].includes(this.state.behavioralState) && this.locomotion.speed() > 0) {
+    if (this.state.behavioralState === BehavioralState.dead) {
+      this.timeSinceDeath += dt
+      if (this.timeSinceDeath >= this.deathSentenceTime) {
+        this.recoverFromDeath()
+      }
+    }
+    if ([BehavioralState.move, BehavioralState.chasing].includes(this.state.behavioralState)) {
       this.updateDestination()
     }
   }
 
-  updateDestination() {
+  currentAttack() { return this.attack }
+  currentDefense() { return this.defense }
+
+  getGumpBalance() {
+    return this.gumpBalance
+  }
+
+  incGumpBalance(amt:number) {
+    this.gumpBalance += amt
+  }
+
+  sendMessage(msg:string) {
+    console.log("deer got message: ", msg)
+  }
+
+  recoverFromDeath() {
+    this.timeSinceDeath = 0
+    this.deathSentenceTime = 0
+    this.currentHealth = this.health
+    const { x, z } = randomPosition()
+    this.locomotion.setPosition(x, z)
+    this.locomotion.setDestination(x, z)
+    this.locomotion.unfreeze()
+    this.setState(BehavioralState.move)
+  }
+
+  dieForTime(seconds: number, message = "you died") {
+    this.timeSinceDeath = 0
+    this.deathSentenceTime = seconds
+    this.locomotion.freeze()
+    this.setState(BehavioralState.dead)
+    this.sendMessage(message)
+  }
+
+  private updateDestination() {
+    if (this.state.behavioralState === BehavioralState.battle) {
+      return
+    }
     // if we're chasing, get distracted by gump.
     if (this.state.behavioralState === BehavioralState.chasing) {
       const gump = this.nearbyGump() || this.randomGump()
-      
+
       // if we're not chasing or the warrior we're chasing died or started to fight, or if we're scared of a trap
       // then just go after another gump.
       if (!this.chasing || this.chasing.state.behavioralState !== BehavioralState.move || this.isNearbyTrap()) {
@@ -66,14 +122,14 @@ class Deer {
         this.setDestination(gump.x, gump.y)
         return
       }
-      
+
       // otherwise set the destination of the warrior
       if (this.chasing) {
         const position = this.chasing.locomotion.position
         this.setDestination(position.x, position.y)
         return
       }
- 
+
     }
     // if we're going after a gump, go after warriors that smell good
     const nearbyWarrior = this.nearbyLoadedUpWarrior()
@@ -97,7 +153,7 @@ class Deer {
     }
   }
 
-  chase(warrior:Warrior) {
+  chase(warrior: Warrior) {
     this.chasing = warrior
     this.setDestination(warrior.locomotion.position.x, warrior.locomotion.position.y)
     this.setState(BehavioralState.chasing)
@@ -109,33 +165,46 @@ class Deer {
     this.chasing = undefined
   }
 
-  private randomGump():Vec2|undefined {
+  private randomGump(): Vec2 | undefined {
     return Object.values(this.gumps)[randomInt(Object.values(this.gumps).length)]
   }
 
-  private isNearbyTrap():boolean {
+  private isNearbyTrap(): boolean {
     for (const [_id, trap] of this.traps.entries()) {
       if (vec2ToVec2(trap.position).distance(this.locomotion.position) < 2) {
-       return true
+        return true
       }
     }
 
     return false
   }
 
-  private nearbyGump():Vec2|undefined {
+  getHealth() {
+    return this.health
+  }
+
+  setHealth(health: number) {
+    this.health = health
+  }
+
+  private nearbyGump(): Vec2 | undefined {
     const eligible = Object.values(this.gumps).filter((gump) => {
       return this.locomotion.position.distance(gump) < 5
     })
     return eligible[randomInt(eligible.length)]
   }
 
-  private nearbyLoadedUpWarrior():Warrior|undefined {
+  private nearbyLoadedUpWarrior(): Warrior | undefined {
     return Object.values(this.warriors).find((warrior) => {
       return warrior.state.wootgumpBalance > 10 &&
         this.locomotion.position.distance(warrior.locomotion.position) < 6 &&
-          !warrior.state.currentItem
+        !warrior.state.currentItem
     })
+  }
+
+
+  getState() {
+    return this.state.behavioralState
   }
 
   setState(state: BehavioralState) {
@@ -152,8 +221,12 @@ class Deer {
     }
   }
 
-  setDestination(x: number, z:number) {
-    this.locomotion.setDestination(x,z)
+  battleCommands() {
+    return this.state.battleCommands
+  }
+
+  setDestination(x: number, z: number) {
+    this.locomotion.setDestinationAndFocus(x, z)
   }
 
 }
