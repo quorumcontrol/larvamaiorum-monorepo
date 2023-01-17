@@ -165,12 +165,6 @@ export class Battle extends Schema {
   @type("number") round:number
 }
 
-export class DeerAttack extends Schema {
-  @type("string") id: string
-  @type("string") warriorId: string
-  @type("string") deerId: string
-}
-
 export class QuestObject extends Schema {
   @type("string") id: string
   @type("number") kind: QuestObjectKind
@@ -217,7 +211,6 @@ export class DelphsTableState extends Schema {
   @type({ map: Warrior }) warriors = new MapSchema<Warrior>({})
   @type({ map: Battle }) battles = new MapSchema<Battle>({})
   @type({ map: RovingAreaAttack }) rovingAreaAttacks = new MapSchema<RovingAreaAttack>({})
-  @type({ map: DeerAttack }) deerAttacks = new MapSchema<DeerAttack>({})
   @type({ map: Vec2 }) wootgump = new MapSchema<Vec2>({})
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({})
   @type({ map: Deer }) deer = new MapSchema<Deer>({})

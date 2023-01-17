@@ -16,8 +16,6 @@ class CharacterLocomotion extends ScriptTypeBase {
   serverPosition?: Vec3
   state?: Locomotion
 
-  logOnce = false
-
   initialize() {
     this.focus = new Vec3()
     // this.state = LocomotionState.frozen
@@ -26,7 +24,6 @@ class CharacterLocomotion extends ScriptTypeBase {
   setSpeed(speed: number) {
     this.speed = speed
     if (this.animatedEntity) {
-      console.log(this.entity.name, "speed", speed)
       this.animatedEntity.anim!.setFloat('speed', speed)
     }
   }
@@ -41,15 +38,10 @@ class CharacterLocomotion extends ScriptTypeBase {
 
   setFocus(focus: Vec3) {
     this.focus.copy(focus)
-    this.logOnce = true
-    // if (this.entity.getPosition().distance(focus) > 0.1) {
-    //   this.entity.lookAt(focus.x, 0, focus.z)
-    // }
   }
 
   update(dt: number) {
     if (!this.state) {
-      console.log(this.entity.name, "not updating")
       return
     }
     if (this.entity.getPosition().distance(this.serverPosition!) > 1) {
@@ -65,13 +57,7 @@ class CharacterLocomotion extends ScriptTypeBase {
       this.entity.setPosition(newPosition)
     }
     if (this.entity.getPosition().distance(this.focus) > 0.05) {
-      if (this.logOnce) {
-        console.log(this.entity.name, "looking at ", this.focus)
-        this.logOnce = false
-      }
       this.entity.lookAt(this.focus.x, 0, this.focus.z)
-    } else {
-      console.log(this.entity.name, "not looking: ", this.entity.getPosition().distance(this.focus))
     }
   }
 
@@ -87,14 +73,13 @@ class CharacterLocomotion extends ScriptTypeBase {
     locomotionState.destination.onChange = () => {
       // console.log("new destination: ", player.destination.toJSON())
       this.setDestination(new Vec3(locomotionState.destination.x, 0, locomotionState.destination.z))
-      // this.locomotion.setDestination(player.destination.x, player.destination.z)
     }
     locomotionState.position.onChange = () => {
       // console.log(' new position: ', locomotionState.position.toJSON())
       this.setServerPosition(new Vec3(locomotionState.position.x, 0, locomotionState.position.z))
     }
     locomotionState.focus.onChange = () => {
-      console.log(this.entity.name, ' new focus: ', locomotionState.focus.x, 0, locomotionState.focus.z)
+      // console.log(this.entity.name, ' new focus: ', locomotionState.focus.x, 0, locomotionState.focus.z)
       this.setFocus(new Vec3(locomotionState.focus.x, 0, locomotionState.focus.z))
     }
     this.entity.fire('new locomotion', locomotionState)

@@ -1,7 +1,7 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, Deer, DeerAttack, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, Deer, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud, { CHOOSE_STRATEGY_EVT, PLAY_CARD_EVT } from '../game/Hud'
 import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
@@ -133,14 +133,6 @@ class NetworkManager extends ScriptTypeBase {
       this.handleGumpRemove(key)
     }
 
-    // this.room.state.deerAttacks.onAdd = (attack, key) => {
-    //   this.handleDeerAttackAdd(attack, key)
-    // }
-
-    // this.room.state.deerAttacks.onRemove = (_attack, key) => {
-    //   this.handleDeerAttackRemove(key)
-    // }
-
     this.room.state.deer.onAdd = (deer, key) => {
       this.handleDeerAdd(deer, key)
     }
@@ -254,27 +246,6 @@ class NetworkManager extends ScriptTypeBase {
   handleTrapRemove(key: string) {
     mustGetScript<TrapScript>(this.traps[key], "trap").trigger()
     delete this.traps[key]
-  }
-
-  handleDeerAttackAdd(attack: DeerAttack, key: string) {
-    // const effect = this.battleEffect.clone()
-    // effect.name = `deer-attack-effect-${key}`
-    // this.app.root.addChild(effect)
-    // effect.enabled = true
-    // this.playEffects(effect)
-
-    // const position = this.warriors[attack.warriorId].getPosition().add(this.deer[attack.deerId].getPosition()).divScalar(2)
-    // effect.setPosition(position)
-  }
-
-  handleDeerAttackRemove(key: string) {
-    // const effects = mustFindByName(this.app.root, `deer-attack-effect-${key}`)
-    // console.log('deer attack over', key)
-    // const battleSound = mustFindByName(effects, "BattleSound").findComponent('sound') as SoundComponent
-    // Object.values(battleSound.slots).forEach((slot) => {
-    //   slot.stop()
-    // })
-    // effects.destroy()
   }
 
   handleBattleAdd(battle: Battle, key: string) {

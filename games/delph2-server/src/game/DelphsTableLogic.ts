@@ -2,11 +2,9 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, DeerAttack, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase } from "../rooms/schema/DelphsTableState";
-// import BattleLogic from './BattleLogic';
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase } from "../rooms/schema/DelphsTableState";
 import BattleLogic2, { Battler } from './BattleLogic2';
 import Deer from './Deer';
-import DeerAttackLogic from './DeerAttackLogic';
 import { InventoryItem, itemFromInventoryItem } from './items';
 import { getRandomTrack } from './music';
 import QuestLogic from './QuestLogic';
@@ -29,7 +27,6 @@ class DelphsTableLogic {
   trees: Record<string, Vec2>
   deer: Record<string, Deer>
   battles: BattleList
-  // deerAttacks: Record<string, DeerAttackLogic>
   rovingAttacks: Record<string,RovingAreaAttackLogic>
 
   currentQuest?: QuestLogic
@@ -51,7 +48,6 @@ class DelphsTableLogic {
     this.trees = {}
     this.battles = {}
     this.deer = {}
-    // this.deerAttacks = {}
     this.rovingAttacks = {}
   }
 
@@ -64,13 +60,13 @@ class DelphsTableLogic {
       const position = this.randomPosition()
       this.spawnTree(new Vec2(position.x, position.z))
     }
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 5; i++) {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
     }
-    // for (let i = 0; i < 2; i++) {
-    //   this.spawnRovingAttack()
-    // }
+    for (let i = 0; i < 2; i++) {
+      this.spawnRovingAttack()
+    }
     if (this.state.roomType === RoomType.continuous) {
       console.log("accepting input because continuous room")
       this.state.assign({
@@ -112,7 +108,6 @@ class DelphsTableLogic {
     this.spawnGump()
     this.checkForHarvest()
     this.handleBattles(dt)
-    // this.handleDeerAttacks(dt)
     this.handleRecovers(dt)
     Object.values(this.rovingAttacks).forEach((attack) => {
       attack.update(dt)
@@ -338,11 +333,9 @@ class DelphsTableLogic {
           return
         }
         const distance = w.locomotion.position.distance(new Vec2(trap.position.x, trap.position.z))
-        if (distance < 3) {
+        if (distance < 2) {
           console.log(w.state.name, 'trapped')
-          w.state.assign({
-            currentHealth: w.state.currentHealth * 0.5
-          })
+          w.dieForTime(2, `trapped by ${this.warriors[trap.plantedBy]?.state.name || "unknown"}`)
           const gumpToLose = Math.floor(w.state.wootgumpBalance * 0.1)
           w.incGumpBalance(-1 * gumpToLose)
           if (trap.plantedBy && this.warriors[trap.plantedBy]) {
@@ -433,40 +426,6 @@ class DelphsTableLogic {
       }
     })
   }
-
-  // handleDeerAttacks(dt: number) {
-  //   const eligibleDeer = Object.values(this.deer).filter((d) => [BehavioralState.move, BehavioralState.chasing].includes(d.state.behavioralState))
-  //   const eligibleWarriors = Object.values(this.warriors).filter((w) => w.state.behavioralState === BehavioralState.move)
-  //   eligibleDeer.forEach((deer) => {
-  //     eligibleWarriors.forEach((w) => {
-  //       // skip over already assigned warriors
-  //       if (w.state.behavioralState !== BehavioralState.move) {
-  //         return
-  //       }
-  //       if (deer.locomotion.position.distance(w.locomotion.position) <= 0.6) {
-  //         console.log('deer close, setting up attack')
-  //         const id = randomUUID()
-  //         const attackState = new DeerAttack({
-  //           id,
-  //           warriorId: w.id,
-  //           deerId: deer.id
-  //         })
-  //         const attack = new DeerAttackLogic(id, deer, w)
-  //         this.deerAttacks[id] = attack
-  //         attack.go()
-  //         this.state.deerAttacks.set(id, attackState)
-  //       }
-  //     })
-  //   })
-
-  //   Object.values(this.deerAttacks).forEach((attack) => {
-  //     attack.update(dt)
-  //     if (attack.complete) {
-  //       this.state.deerAttacks.delete(attack.id)
-  //       delete this.deerAttacks[attack.id]
-  //     }
-  //   })
-  // }
 
   private updateMaxStats() {
     let maxAttack = 0
