@@ -50,6 +50,9 @@ class CharacterLocomotion extends ScriptTypeBase {
     const absSpeed = Math.abs(this.speed)
     if (absSpeed > 0 && this.serverPosition && this.entity.getPosition().distance(this.serverPosition) > 0.1) {
       const current = this.entity.getPosition()
+      // const newPosition = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(absSpeed * dt).add(current)
+      // newPosition.y = 0
+      // const newPosition = current.add(vector)
       const vector = new Vec3().sub2(this.serverPosition, current).normalize().mulScalar(absSpeed * dt)
       vector.y = 0
       const newPosition = current.add(vector)

@@ -25,15 +25,21 @@ export interface WarriorStats {
   avatar?: string;
 }
 
+export function randomBattleStats(seed:string) {
+  return {
+    attack: deterministicRandom(150, `generateFakeWarriors-${seed}-attack`, seed) + 1500,
+    defense: deterministicRandom(100, `generateFakeWarriors-${seed}-defense`, seed) + 900,
+    initialHealth: deterministicRandom(300, `generateFakeWarriors-${seed}-health`, seed) + 1000,
+  }
+}
+
 export function generateWarrior(seed: string, name?: string): WarriorStats {
   return {
     id: `warrior-${seed}`,
+    ...randomBattleStats(seed),
     name: name || `Warius${randomInt(1000)}`,
-    attack: deterministicRandom(150, `generateFakeWarriors-${seed}-attack`, seed) + 1500,
-    defense: deterministicRandom(100, `generateFakeWarriors-${seed}-defense`, seed) + 900,
     maxSpeed: 6.5,
     walkSpeed: 2,
-    initialHealth: deterministicRandom(300, `generateFakeWarriors-${seed}-health`, seed) + 1000,
     initialGump: 0,
     initialInventory: defaultInitialInventory,
     autoPlay: false,

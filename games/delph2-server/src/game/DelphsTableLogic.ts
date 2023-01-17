@@ -2,7 +2,7 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase, Arch } from "../rooms/schema/DelphsTableState";
 import BattleLogic2, { Battler } from './BattleLogic2';
 import Deer from './Deer';
 import { InventoryItem, itemFromInventoryItem } from './items';
@@ -66,6 +66,13 @@ class DelphsTableLogic {
     }
     for (let i = 0; i < 2; i++) {
       this.spawnRovingAttack()
+    }
+    for (let i = 0; i < 6; i++) {
+      const arch = new Arch({
+        rotation: randomInt(150)
+      })
+      arch.position.assign(this.randomPosition())
+      this.room.state.arches.push(arch)
     }
     if (this.state.roomType === RoomType.continuous) {
       console.log("accepting input because continuous room")
@@ -309,6 +316,7 @@ class DelphsTableLogic {
     Object.values(this.deer).forEach((deer) => {
       Object.keys(this.wootgump).forEach((gumpId) => {
         if (deer.locomotion.position.distance(this.wootgump[gumpId]) < 0.7) {
+          deer.incGumpBalance(1)
           delete this.wootgump[gumpId]
           this.state.wootgump.delete(gumpId)
         }
@@ -455,9 +463,9 @@ class DelphsTableLogic {
       if (!w) {
         return
       }
-      return QuestLogic.matchQuest(this.room, this.warriors, w)
+      return QuestLogic.matchQuest(this.room, this.warriors, this.state.arches.toArray(), w)
     }
-    return QuestLogic.randomQuest(this.room, this.warriors, QuestType.random)
+    return QuestLogic.randomQuest(this.room, this.warriors, this.state.arches.toArray(), QuestType.random)
   }
 
   private startQuest() {
@@ -551,12 +559,6 @@ class DelphsTableLogic {
     if (dimension > 27) {
       return dimension % 27
     }
-    // if (dimension < 0 && dimension < 37) {
-    //   return 36
-    // }
-    // if (dimension > 37) {
-    //   return dimension % 35
-    // }
     return dimension
   }
 

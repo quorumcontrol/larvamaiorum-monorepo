@@ -24,9 +24,9 @@ class DeerBehavior extends ScriptTypeBase {
   }
 
   setState(newState:BehavioralState) {
-    if ([BehavioralState.chasing, BehavioralState.battle].includes(newState)) {
-      this.sound.slots[randomInt(2).toString()].play()
-    }
+    // if ([BehavioralState.chasing, BehavioralState.battle].includes(newState)) {
+    //   this.sound.slots[randomInt(2).toString()].play()
+    // }
 
     switch(newState) {
       case BehavioralState.dead:

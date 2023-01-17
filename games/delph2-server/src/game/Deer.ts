@@ -1,7 +1,7 @@
 import { randomInt } from "./utils/randoms";
 import { BehavioralState, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
-import Warrior from "./Warrior";
+import Warrior, { randomBattleStats } from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
 import LocomotionLogic from "./LocomotionLogic";
 import { Battler } from "./BattleLogic2";
@@ -13,9 +13,9 @@ class Deer implements Battler {
   id: string;
   state: DeerState
 
-  health = 1000
-  attack = 700
-  defense = 700
+  health:number
+  attack:number
+  defense:number
 
   currentHealth = 1000
 
@@ -40,7 +40,11 @@ class Deer implements Battler {
     this.warriors = warriors
     this.traps = traps
     this.locomotion = new LocomotionLogic(this.state.locomotion)
-    // const gump = Object.values(wootgumps)[randomInt(Object.values(wootgumps).length - 1)]
+    
+    const {attack, initialHealth, defense } = randomBattleStats(this.id)
+    this.health = initialHealth
+    this.attack = attack
+    this.defense = defense
   }
 
   update(dt: number) {

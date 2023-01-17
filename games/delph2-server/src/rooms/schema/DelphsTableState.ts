@@ -192,6 +192,11 @@ export class Player extends Schema {
   @type("string") token: string
 }
 
+export class Arch extends Schema {
+  @type(Vec2) position = new Vec2()
+  @type("number") rotation:number
+}
+
 export class DelphsTableState extends Schema {
   @type("number") tick: number = 0;
   @type("number") roomType: RoomType = RoomType.continuous;
@@ -215,5 +220,6 @@ export class DelphsTableState extends Schema {
   @type({ map: Vec2 }) trees = new MapSchema<Vec2>({})
   @type({ map: Deer }) deer = new MapSchema<Deer>({})
   @type({ map: Trap }) traps = new MapSchema<Trap>({})
+  @type({ array: Arch }) arches = new ArraySchema<Arch>()
   @type(Music) nowPlaying = new Music({})
 }

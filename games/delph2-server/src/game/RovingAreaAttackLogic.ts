@@ -4,7 +4,7 @@ import randomPosition from "./utils/randomPosition"
 import { randomBounded } from "./utils/randoms"
 import Warrior from "./Warrior"
 
-const DEFAULT_TIME_IN_ONE_PLACE = 7
+const DEFAULT_TIME_IN_ONE_PLACE = 10
 const RADIUS = 5.8
 
 class RovingAreaAttackLogic {
@@ -16,6 +16,8 @@ class RovingAreaAttackLogic {
 
   warriors: Record<string,Warrior>
 
+  timeSinceHealthWithdrawl = 0
+
   constructor(state:RovingAreaAttack, warriors:Record<string,Warrior>) {
     this.state = state
     this.warriors = warriors
@@ -24,11 +26,15 @@ class RovingAreaAttackLogic {
 
   update(dt:number) {
     this.timeSinceMove += dt
+    this.timeSinceHealthWithdrawl += dt
     if (this.timeSinceMove >= this.timeInOnePlace) {
       this.updatePlace()
       this.timeSinceMove = 0
     }
-    this.findCloseWarriorsAndKillThem()
+    if (this.timeSinceHealthWithdrawl > 0.7) {
+      this.findCloseWarriorsAndHurtThem()
+      this.timeSinceHealthWithdrawl = 0
+    }
   }
 
   updatePlace() {
@@ -38,11 +44,13 @@ class RovingAreaAttackLogic {
     this.timeInOnePlace = DEFAULT_TIME_IN_ONE_PLACE + randomBounded(0.5)
   }
 
-  findCloseWarriorsAndKillThem() {
+  findCloseWarriorsAndHurtThem() {
     Object.values(this.warriors).forEach((w) => {
       if (w.locomotion.position.distance(this.position) <= RADIUS) {
-        if (w.state.behavioralState === BehavioralState.move) {
-          w.dieForTime(this.timeInOnePlace, "The gods do not favor you.")
+        if ([BehavioralState.move, BehavioralState.battle].includes(w.state.behavioralState)) {
+          w.sendMessage("This area is cursed.")
+          const currentHealth = w.getHealth()
+          w.setHealth(currentHealth - (currentHealth * 0.15))
         }
       }
     })

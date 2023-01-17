@@ -1,4 +1,4 @@
-import { Quest as StateQuest, QuestObject, QuestObjectKind, QuestType } from '../rooms/schema/DelphsTableState'
+import { Arch, Quest as StateQuest, QuestObject, QuestObjectKind, QuestType } from '../rooms/schema/DelphsTableState'
 import { randomUUID } from "crypto"
 import { randomInt } from './utils/randoms'
 import Warrior from './Warrior'
@@ -16,7 +16,7 @@ class QuestLogic {
 
   winner?: Warrior
 
-  static matchQuest(room: Room, warriors: Record<string, Warrior>, piggy: Warrior) {
+  static matchQuest(room: Room, warriors: Record<string, Warrior>, arches: Arch[], piggy: Warrior) {
     //TODO: actually random
     const questObj = new QuestObject({
       id: randomUUID(),
@@ -33,22 +33,21 @@ class QuestLogic {
       piggyId: piggy.id,
     })
 
-    let position = randomPosition()
-    while (piggy.locomotion.position.distance(new Vec2(position.x, position.z)) < 30) {
-      position = randomPosition()
-    }
-    questObj.position.assign(position)
+    const position = arches[randomInt(arches.length)].position
+    questObj.position.assign(position.toJSON())
 
     return new QuestLogic(room, state, warriors)
   }
 
-  static randomQuest(room: Room, warriors: Record<string, Warrior>, type: QuestType) {
+  static randomQuest(room: Room, warriors: Record<string, Warrior>, arches: Arch[], type: QuestType) {
   //TODO: actually random
   const questObj = new QuestObject({
     id: randomUUID(),
     kind: QuestObjectKind.chest,
   })
-  questObj.position.assign(randomPosition())
+  const position = arches[randomInt(arches.length)].position
+
+  questObj.position.assign(position.toJSON())
 
   const state = new StateQuest({
     object: questObj,

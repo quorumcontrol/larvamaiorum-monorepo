@@ -123,10 +123,14 @@ class BattleLogic2 {
 
   private handleRoundResults() {
     if (this.roundIntensity > 0) {
+      this.roundLoser.sendMessage(`lost ${this.roundIntensity} health.`)
       this.roundLoser.setHealth(this.roundLoser.getHealth() - this.roundIntensity)
+      this.roundWinner.sendMessage(`landed a hit for ${this.roundIntensity} health`)
+      // if no one won yet, keep going
       if (this.roundLoser.getHealth() > 0) {
         return
       }
+
       this.battlers.forEach((warrior, i) => {
         warrior.locomotion.clearLimiter()
         if (warrior === this.roundWinner) {
@@ -141,7 +145,7 @@ class BattleLogic2 {
           warrior.incGumpBalance(gumpTaken * -1)
           this.battlers[(i + 1) % this.battlers.length].incGumpBalance(gumpTaken)
           console.log("warrior dead from battle")
-          warrior.dieForTime(6, "You lose.")
+          warrior.dieForTime(6.5, "You lose.")
           return
         }
         throw new Error("unknown state where round winner/loser as undetermined")
@@ -207,78 +211,7 @@ class BattleLogic2 {
   isPhase(phase: BattlePhase) {
     return this.state.phase === phase
   }
-
-  // getCardWinner() {
-  //   const warriorOne = this.warriors[0]
-  //   const warriorTwo = this.warriors[1]
-  //   const cardOne = this.cardPicks[warriorOne.id]
-  //   const cardTwo = this.cardPicks[warriorTwo.id]
-  //   if (!cardOne && !cardTwo) {
-  //     return [undefined, 'nothing', 'nothing']
-  //   }
-  //   if (cardOne && !cardTwo) {
-  //     return [warriorOne, cardOne.name, 'nothing']
-  //   }
-  //   if (cardTwo && !cardOne) {
-  //     return [warriorTwo, cardTwo.name, 'nothing']
-  //   }
-  //   if (cardOne.identifier === cardTwo.identifier) {
-  //     return [undefined, cardOne, cardTwo]
-  //   }
-  //   if (cardOne.beats!.includes(cardTwo.name.toLowerCase())) {
-  //     return [warriorOne, cardOne.name, cardTwo.name]
-  //   }
-  //   return [warriorTwo, cardTwo.name, cardOne.name]
-  // }
-
-  // endIt() {
-    // const warriors = this.warriors
-
-    // const [cardWinner, winningCard, losingCard] = this.getCardWinner()
-    // if (cardWinner) {
-    //   warriors.forEach((w) => {
-    //     w.sendMessage(`${winningCard} beats ${losingCard}`)
-    //     if (w === cardWinner) {
-    //       w.sendMessage(`You won the strategy round.`)
-    //       return
-    //     }
-    //     w.sendMessage("You lost the strategy round.")
-    //   })
-    // } else {
-    //   warriors.forEach((w) => {
-    //     w.sendMessage("No winning strategy played.")
-    //   })
-    // }
-
-    // while (!warriors.some((w) => !w.isAlive())) {
-    //   const attackerIdx = randomFloat() >= 0.5 ? 0 : 1
-    //   const attacker = warriors[attackerIdx]
-    //   const defender = warriors[(attackerIdx + 1) % this.warriors.length]
-    //   const attackRoll = Math.floor(randomInt(attacker.currentAttack()) * (attacker === cardWinner ? 1 : 0.75))
-    //   const defenseRoll = Math.floor(randomInt(defender.currentDefense()) * (defender === cardWinner ? 1 : 0.75))
-    //   if (attackRoll > defenseRoll) {
-    //     defender.state.currentHealth -= (attackRoll - defenseRoll)
-    //   }
-    // }
-
-    // warriors.forEach((warrior, i) => {
-    //   warrior.clearItem()
-    //   if (warrior.isAlive()) {
-    //     warrior.sendMessage("Winner!")
-    //     warrior.setState(State.move)
-    //     this.winner = warrior
-    //   } else {
-    //     this.losers.push(warrior)
-    //     const gumpTaken = Math.floor(warrior.state.wootgumpBalance * 0.5)
-    //     warrior.incGumpBalance(gumpTaken * -1)
-    //     warriors[(i+1) % warriors.length].incGumpBalance(gumpTaken)
-    //     console.log("warrior dead from battle")
-    //     warrior.dieForTime(6, "You lose.")
-    //   }
-    // })
-    // this.setPhase(BattlePhase.completed)
-  // }
-
+  
   // give a random point that is far enough away from another point
   // often we will give the opponents keeping distance so that the players do not overlaps
   private randomBattlePosition(keepingDistanceFrom?: Vec2) {

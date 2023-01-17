@@ -157,6 +157,17 @@ class NetworkManager extends ScriptTypeBase {
       this.handleBattleAdd(battle, key)
     }
 
+    const archTemplate = mustFindByName(this.app.root, "Arch")
+    this.room.state.arches.onAdd = (archData, key) => {
+      const arch = archTemplate.clone()
+      console.log("adding arch: ", archData.toJSON())
+      this.app.root.addChild(arch)
+      arch.name = `arch-${key}`
+      arch.enabled = true
+      arch.setPosition(archData.position.x, 0, archData.position.z)
+      arch.setEulerAngles(0, archData.rotation, 0)
+    }
+
     this.room.state.onChange = (changes) => {
       changes.forEach((change) => {
         if (change.field === 'questActive') {
