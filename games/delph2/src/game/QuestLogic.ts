@@ -9,14 +9,14 @@ const QUEST_OVER_EVT = "questOver"
 class QuestLogic {
   app: pc.Application
   state: DelphsTableState
-  warriors: Record<string,Entity>
+  battlers: Record<string,Entity>
   treasure?: Entity
   clock = 0
 
-  constructor(app:pc.Application, state:DelphsTableState, warriors: Record<string,Entity>) {
+  constructor(app:pc.Application, state:DelphsTableState, battlers: Record<string,Entity>) {
     this.app = app
     this.state = state
-    this.warriors = warriors
+    this.battlers = battlers
   }
 
   update(dt:number) {
@@ -28,7 +28,7 @@ class QuestLogic {
   }
 
   piggy() {
-    return this.warriors[this.state.currentQuest!.piggyId]
+    return this.battlers[this.state.currentQuest!.piggyId]
   }
 
   destroy() {

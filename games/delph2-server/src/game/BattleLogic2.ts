@@ -5,11 +5,21 @@ import LocomotionLogic from './LocomotionLogic'
 import { randomBounded, randomFloat, randomInt } from './utils/randoms'
 import Warrior from './Warrior'
 
+export enum BattlerType {
+  deer,
+  warrior,
+}
+
 export interface Battler {
   id: string
+  name: string
   locomotion: LocomotionLogic
+  battlerType: BattlerType
+
   battleCommands: () => BattleCommands
   // state: BehavioralState
+
+  setIsPiggy: (isPiggy:boolean) => any
 
   getHealth: () => number
   setHealth: (num: number) => any
@@ -47,16 +57,16 @@ class BattleLogic2 {
   dancing = true
   timeSinceSwing = 0
 
-  constructor(id: string, warriors: Battler[], state: Battle) {
+  constructor(id: string, battlers: Battler[], state: Battle) {
     this.id = id
-    this.battlers = warriors
+    this.battlers = battlers
     this.state = state
     this.losers = []
     this.cardPicks = {}
-    this.center = warriors.reduce((vec:Vec2, battler) => {
+    this.center = battlers.reduce((vec:Vec2, battler) => {
       vec.add(battler.locomotion.position)
       return vec
-    }, new Vec2()).divScalar(warriors.length)
+    }, new Vec2()).divScalar(battlers.length)
 
     this.state.center.assign({
       x: this.center.x,
@@ -102,10 +112,10 @@ class BattleLogic2 {
       }      
 
       // see if they are close enough to battle
-      const distanceToOpponent = b.locomotion.position.distance(opponent.locomotion.position)
+      const distanceToOpponent = b.locomotion.frontPoint.distance(opponent.locomotion.frontPoint)
      
       // if they are just right, then fght!
-      if (distanceToOpponent > 1 && distanceToOpponent <= 1.6) {
+      if (distanceToOpponent > 1 && distanceToOpponent <= 2) {
         // battle!
         if (this.timeSinceSwing > 1.25) {
           this.commenceHitting()

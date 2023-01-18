@@ -26,6 +26,9 @@ class DelphsTableLogic {
   wootgump: Record<string, Vec2>
   trees: Record<string, Vec2>
   deer: Record<string, Deer>
+
+  battlers: Record<string, Battler>
+
   battles: BattleList
   rovingAttacks: Record<string,RovingAreaAttackLogic>
 
@@ -42,7 +45,7 @@ class DelphsTableLogic {
   constructor(room: Room) {
     this.room = room
     this.state = room.state
-
+    this.battlers = {}
     this.warriors = {}
     this.wootgump = {}
     this.trees = {}
@@ -60,12 +63,9 @@ class DelphsTableLogic {
       const position = this.randomPosition()
       this.spawnTree(new Vec2(position.x, position.z))
     }
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const position = this.randomPosition()
       this.spawnDeer(new Vec2(position.x, position.z))
-    }
-    for (let i = 0; i < 2; i++) {
-      this.spawnRovingAttack()
     }
     for (let i = 0; i < 6; i++) {
       const arch = new Arch({
@@ -76,11 +76,19 @@ class DelphsTableLogic {
     }
     if (this.state.roomType === RoomType.continuous) {
       console.log("accepting input because continuous room")
-      this.state.assign({
-        acceptInput: true
-      })
+      this.acceptInput()
     }
     this.setupMusic()
+  }
+
+  private acceptInput() {
+    for (let i = 0; i < 2; i++) {
+      this.spawnRovingAttack()
+    }
+    this.state.assign({
+      acceptInput: true,
+      persistantMessage: "",
+    })
   }
 
   async setupMusic() {
@@ -160,7 +168,7 @@ class DelphsTableLogic {
 
   private warriorWith50() {
     return Object.values(this.warriors).find((w) => {
-      return w.state.wootgumpBalance >= 50
+      return w.state.wootgumpBalance >= 10
     })
   }
 
@@ -191,10 +199,7 @@ class DelphsTableLogic {
     console.log("accepting input because player quorum has arrived")
 
     this.playerQuorumHasArrived = true
-    this.state.assign({
-      acceptInput: true,
-      persistantMessage: "",
-    })
+    this.acceptInput()
     this.room.lock()
     this.room.broadcast('mainHUDMessage', "First to 50 gump gets the key. Go.")
   }
@@ -245,7 +250,9 @@ class DelphsTableLogic {
       state.inventory.set(key, inventoryOfItem.clone())
     })
     console.log('added warrior: ', state.name)
-    this.warriors[sessionId] = new Warrior(state, client)
+    const warrior = new Warrior(state, client)
+    this.warriors[sessionId] = warrior 
+    this.battlers[sessionId] = warrior
     this.state.warriors.set(sessionId, state)
     this.updateMaxStats()
   }
@@ -253,6 +260,7 @@ class DelphsTableLogic {
   removeWarrior(client: Client) {
     const sessionId = client.sessionId
     delete this.warriors[sessionId]
+    delete this.battlers[sessionId]
     this.state.warriors.delete(sessionId)
     if (this.currentQuest && this.currentQuest.state.piggyId === sessionId) {
       console.log('warrior leaving was the piggy')
@@ -360,6 +368,9 @@ class DelphsTableLogic {
   }
 
   handleBattles(dt: number) {
+    if (!this.state.acceptInput) {
+      return
+    }
     const pairs: [Battler, Battler][] = []
 
     const battlers:Battler[] = (Object.values(this.warriors) as Battler[]).concat(Object.values(this.deer))
@@ -463,9 +474,9 @@ class DelphsTableLogic {
       if (!w) {
         return
       }
-      return QuestLogic.matchQuest(this.room, this.warriors, this.state.arches.toArray(), w)
+      return QuestLogic.matchQuest(this.room, this.battlers, this.state.arches.toArray(), w)
     }
-    return QuestLogic.randomQuest(this.room, this.warriors, this.state.arches.toArray(), QuestType.random)
+    return QuestLogic.randomQuest(this.room, this.battlers, this.state.arches.toArray(), QuestType.random)
   }
 
   private startQuest() {
@@ -508,7 +519,7 @@ class DelphsTableLogic {
     if (this.isMatchRoom()) {
       this.state.assign({
         acceptInput: false,
-        persistantMessage: `${winner.state.name} wins!`
+        persistantMessage: `${winner.name} wins!`
       })
       console.log(this.state.matchId, "game over, writing winner")
       this.writeWinner(winner.id).catch((err) => {
@@ -522,7 +533,7 @@ class DelphsTableLogic {
     this.room.broadcast('mainHUDMessage', 'Quest Over')
 
     if (winner) {
-      winner.client.send('mainHUDMessage', "You win!")
+      winner.sendMessage("You win!")
       Object.values(this.warriors).forEach((w) => {
         if (w === winner) {
           return
@@ -581,7 +592,7 @@ class DelphsTableLogic {
       id,
     })
     deerState.locomotion.assign({
-      maxSpeed: 6.5,
+      maxSpeed: 5,
       walkSpeed: 2,
     })
     deerState.locomotion.position.assign({
@@ -590,6 +601,7 @@ class DelphsTableLogic {
     })
     const deer = new Deer(deerState, this.wootgump, this.warriors, this.state.traps)
     this.deer[id] = deer
+    this.battlers[id] = deer
     this.state.deer.set(id, deerState)
   }
 

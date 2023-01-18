@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import useMusic from "./hooks/useMusic"
-import { AiOutlineSound } from "react-icons/ai"
+import { TbVolume } from "react-icons/tb"
 
 const NowPlaying: React.FC = () => {
   const nowPlaying = useMusic()
@@ -57,7 +57,7 @@ const NowPlaying: React.FC = () => {
           </Text>
         </HStack>
         <HStack>
-          <Icon as={AiOutlineSound} boxSize="4" />
+          <Icon as={TbVolume} boxSize="4" />
 
           <Slider
             aria-label="slider-ex-5"

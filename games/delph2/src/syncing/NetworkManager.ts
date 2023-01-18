@@ -16,6 +16,7 @@ import { memoize } from "../utils/memoize";
 import RovingAttack from "../game/RovingAttack";
 import { BATTLE_CHANGE, WARRIOR_CHANGE } from "./changeEvents";
 import BattleVisuals from "../game/BattleVisuals";
+import PlayerController from "../characters/PlayerController";
 
 const client = memoize(() => {
   if (typeof document !== 'undefined') {
@@ -65,6 +66,7 @@ class NetworkManager extends ScriptTypeBase {
   player?: Entity
   playerSessionId?: string
   warriors: Record<string, Entity>
+  battlers: Record<string, Entity>
   deer: Record<string, Entity>
   traps: Record<string, Entity>
   client: Client
@@ -74,6 +76,7 @@ class NetworkManager extends ScriptTypeBase {
 
   async initialize() {
     this.warriors = {}
+    this.battlers = {}
     this.deer = {}
     this.traps = {}
 
@@ -199,6 +202,12 @@ class NetworkManager extends ScriptTypeBase {
       }
     })
 
+    this.room.onMessage("debug", ({x,y}:{x:number, y:number}) => {
+      const debug = mustFindByName(this.app.root, "Debug")
+      debug.enabled = true
+      debug.setPosition(x, 0, y)
+    })
+
     this.app.on(SELECT_EVT, (result: RaycastResult) => {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
@@ -211,7 +220,6 @@ class NetworkManager extends ScriptTypeBase {
     this.app.on(CHOOSE_STRATEGY_EVT, (item: Item) => {
       this.room?.send(CHOOSE_STRATEGY_EVT, item.toJSON())
     })
-
   }
 
   handleQuestActiveChange() {
@@ -231,7 +239,7 @@ class NetworkManager extends ScriptTypeBase {
       }
       return
     }
-    const quest = new QuestLogic(this.app, this.room.state, this.warriors)
+    const quest = new QuestLogic(this.app, this.room.state, this.battlers)
     this.currentQuest = quest
     quest.go()
   }
@@ -243,6 +251,7 @@ class NetworkManager extends ScriptTypeBase {
     this.app.root.addChild(deerEntity)
     mustGetScript<DeerBehavior>(deerEntity, 'deerBehavior').setDeerState(deer)
     this.deer[deer.id] = deerEntity
+    this.battlers[deer.id] = deerEntity
   }
 
   handleTrapAdd(trap: Trap, key: string) {
@@ -309,6 +318,7 @@ class NetworkManager extends ScriptTypeBase {
   handlePlayerRemoved(key: string) {
     this.warriors[key].destroy()
     delete this.warriors[key]
+    delete this.battlers[key]
   }
 
   handlePlayerAdd(warrior: Warrior, key: string) {
@@ -327,8 +337,8 @@ class NetworkManager extends ScriptTypeBase {
 
       this.playerSessionId = key
 
-      const script = mustGetScript<NetworkedWarriorController>(playerEntity, 'networkedWarriorController')
-      script.setWarrior(warrior)
+      mustGetScript<NetworkedWarriorController>(playerEntity, 'networkedWarriorController').setWarrior(warrior)
+      mustGetScript<PlayerController>(playerEntity, 'playerController').setWarrior(warrior)
       mustGetScript<Hud>(mustFindByName(this.app.root, 'HUD'), 'hud').setWarrior(warrior, this.room!.state)
 
       return
@@ -346,6 +356,7 @@ class NetworkManager extends ScriptTypeBase {
       mustGetScript<NonPlayerCharacter>(warriorEntity, 'nonPlayerCharacter').setPlayerEntity(this.player)
     }
     this.warriors[key] = warriorEntity
+    this.battlers[key] = warriorEntity
   }
 }
 

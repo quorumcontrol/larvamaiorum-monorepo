@@ -8,7 +8,7 @@ import {
   TagLeftIcon,
   TagLabel,
 } from "@chakra-ui/react"
-import { AiOutlineThunderbolt } from "react-icons/ai"
+import { TbWallet } from "react-icons/tb"
 
 export interface CardProps {
   name: string
@@ -56,7 +56,7 @@ export const Card: React.FC<
           top="-10px"
           right="-10px"
         >
-          <TagLeftIcon boxSize="12px" as={AiOutlineThunderbolt} />
+          <TagLeftIcon boxSize="12px" as={TbWallet} />
           <TagLabel> {card.costToPlay}</TagLabel>
         </Tag>
       )}

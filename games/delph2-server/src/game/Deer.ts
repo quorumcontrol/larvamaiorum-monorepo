@@ -4,14 +4,19 @@ import { Vec2 } from "playcanvas";
 import Warrior, { randomBattleStats } from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
 import LocomotionLogic from "./LocomotionLogic";
-import { Battler } from "./BattleLogic2";
+import { Battler, BattlerType } from "./BattleLogic2";
 import randomPosition from "./utils/randomPosition";
+import { Room } from "colyseus";
 
 type TrapHolder = DelphsTableState['traps']
 
 class Deer implements Battler {
   id: string;
+  battlerType: BattlerType.deer
+  name = "A Deer"
+
   state: DeerState
+  
 
   health:number
   attack:number
@@ -33,18 +38,19 @@ class Deer implements Battler {
   timeSinceDeath = 0
   deathSentenceTime = 0
 
-  constructor(state: DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder) {
+  constructor(state: DeerState, wootgumps: Record<string, Vec2>, warriors: Record<string, Warrior>, traps: TrapHolder, debugRoom?:Room) {
     this.id = state.id
     this.state = state
     this.gumps = wootgumps
     this.warriors = warriors
     this.traps = traps
-    this.locomotion = new LocomotionLogic(this.state.locomotion)
+    console.log("deer has debug room:", !!debugRoom)
+    this.locomotion = new LocomotionLogic(this.state.locomotion, 1, debugRoom)
     
     const {attack, initialHealth, defense } = randomBattleStats(this.id)
-    this.health = initialHealth
-    this.attack = attack
-    this.defense = defense
+    this.health = initialHealth + randomInt(100)
+    this.attack = attack + randomInt(100)
+    this.defense = defense + randomInt(100)
   }
 
   update(dt: number) {
@@ -62,6 +68,10 @@ class Deer implements Battler {
 
   currentAttack() { return this.attack }
   currentDefense() { return this.defense }
+
+  setIsPiggy(isPiggy: boolean) {
+    return true
+  }
 
   getGumpBalance() {
     return this.gumpBalance
@@ -200,6 +210,9 @@ class Deer implements Battler {
 
   private nearbyLoadedUpWarrior(): Warrior | undefined {
     return Object.values(this.warriors).find((warrior) => {
+      if (warrior.getState() !== BehavioralState.move) {
+        return false
+      }
       return warrior.state.wootgumpBalance > 10 &&
         this.locomotion.position.distance(warrior.locomotion.position) < 6 &&
         !warrior.state.currentItem

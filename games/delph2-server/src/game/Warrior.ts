@@ -1,11 +1,11 @@
 import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
 import { deterministicRandom, randomInt } from "./utils/randoms";
 import { Item, BehavioralState, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
-import { Client } from "colyseus";
+import { Client, Room } from "colyseus";
 import randomColor from "./utils/randomColor";
 import randomPosition from "./utils/randomPosition";
 import LocomotionLogic from './LocomotionLogic';
-import { Battler } from './BattleLogic2';
+import { Battler, BattlerType } from './BattleLogic2';
 
 const log = console.log //debug('Warrior')
 
@@ -64,14 +64,20 @@ class Warrior implements Battler {
 
   isPiggy = false
 
-  constructor(state: WarriorState, client?: Client) {
+  battlerType = BattlerType.warrior
+
+  constructor(state: WarriorState, client?: Client, debugRoom?:Room) {
     this.client = client
     this.id = state.id
     this.state = state
-    this.locomotion = new LocomotionLogic(state.locomotion)
+    this.locomotion = new LocomotionLogic(state.locomotion, 0.75, debugRoom)
     const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `playerColor-${this.id}`, luminosity: 'light' }).map((c: number) => c / 255);
     state.color.clear()
     state.color.push(...color)
+  }
+
+  get name() {
+    return this.state.name
   }
 
   update(dt: number) {

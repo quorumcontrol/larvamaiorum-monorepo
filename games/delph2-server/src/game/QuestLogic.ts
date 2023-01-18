@@ -1,22 +1,27 @@
 import { Arch, Quest as StateQuest, QuestObject, QuestObjectKind, QuestType } from '../rooms/schema/DelphsTableState'
 import { randomUUID } from "crypto"
 import { randomInt } from './utils/randoms'
-import Warrior from './Warrior'
 import vec2ToVec2 from './utils/vec2ToVec2'
 import { Room } from 'colyseus'
+import { Battler, BattlerType } from './BattleLogic2'
 import { Vec2 } from 'playcanvas'
-import randomPosition from './utils/randomPosition'
 
 class QuestLogic {
   room: Room
   state: StateQuest
-  warriors: Record<string, Warrior>
+  battlers: Record<string, Battler>
+
+  questObjectPosition?: Vec2
+
+  static warriorIds(battlers:Record<string, Battler>) {
+    return Object.keys(battlers).filter((id) => battlers[id].battlerType === BattlerType.warrior)
+  }
 
   private _over = false
 
-  winner?: Warrior
+  winner?: Battler
 
-  static matchQuest(room: Room, warriors: Record<string, Warrior>, arches: Arch[], piggy: Warrior) {
+  static matchQuest(room: Room, battlers: Record<string, Battler>, arches: Arch[], piggy: Battler) {
     //TODO: actually random
     const questObj = new QuestObject({
       id: randomUUID(),
@@ -36,10 +41,10 @@ class QuestLogic {
     const position = arches[randomInt(arches.length)].position
     questObj.position.assign(position.toJSON())
 
-    return new QuestLogic(room, state, warriors)
+    return new QuestLogic(room, state, battlers)
   }
 
-  static randomQuest(room: Room, warriors: Record<string, Warrior>, arches: Arch[], type: QuestType) {
+  static randomQuest(room: Room, battlers: Record<string, Battler>, arches: Arch[], type: QuestType) {
   //TODO: actually random
   const questObj = new QuestObject({
     id: randomUUID(),
@@ -54,7 +59,7 @@ class QuestLogic {
     startedAt: new Date().getTime(),
   })
 
-  const warriorIds = Object.keys(warriors)
+  const warriorIds = QuestLogic.warriorIds(battlers)
   if (warriorIds.length > 1 && (type === QuestType.keyCarrier || (type === QuestType.random && randomInt(2) === 1))) {
     state.assign({
       kind: QuestType.keyCarrier,
@@ -63,68 +68,77 @@ class QuestLogic {
     //TODO: make sure the goal isn't so close to the piggy
   }
 
-  return new QuestLogic(room, state, warriors)
+  return new QuestLogic(room, state, battlers)
 }
 
-constructor(room: Room, state: StateQuest, warriors: Record<string, Warrior>) {
+constructor(room: Room, state: StateQuest, battlers: Record<string, Battler>) {
   this.state = state
-  this.warriors = warriors
+  this.battlers = battlers
   this.room = room
 }
 
 start() {
+  this.questObjectPosition = vec2ToVec2(this.state.object.position)
   switch (this.state.kind) {
     case QuestType.first:
       this.room.broadcast("mainHUDMessage", "First to find the prize wins!")
       return
     case QuestType.keyCarrier:
-      const piggy = this.warriors[this.state.piggyId]
-      Object.values(this.warriors).forEach((w) => {
+      const piggy = this.battlers[this.state.piggyId]
+      Object.values(this.battlers).forEach((w) => {
         if (w === piggy) {
           return w.sendMessage("First to the prize wins. You have the key. Run!")
         }
-        w.sendMessage(`${piggy.state.name} has the key. Get them.`)
+        w.sendMessage(`${piggy.name} has the key. Get them.`)
       })
       return
   }
 }
 
 update(_dt: number) {
-  Object.values(this.warriors).forEach((w) => {
-    if (this.state.piggyId && w.id !== this.state.piggyId) {
+  Object.values(this.battlers).forEach((battler) => {
+    if (battler.battlerType !== BattlerType.warrior) {
       return
     }
-    if (w.locomotion.position.distance(vec2ToVec2(this.state.object.position)) <= 2) {
-      this.winner = w
+
+    if (this.state.piggyId && battler.id !== this.state.piggyId) {
+      return
+    }
+    if (battler.locomotion.position.distance(this.questObjectPosition) <= 2) {
+      this.winner = battler
       this._over = true
     }
   })
 }
 
+private warriorIds() {
+  return Object.keys(this.battlers).filter((id) => this.battlers[id].battlerType === BattlerType.warrior)
+}
+
 updatePiggy(id: string) {
   const current = this.state.piggyId
   if (current) {
-    this.warriors[current]?.sendMessage("You lost the key!")
-    this.warriors[current]?.setIsPiggy(false)
+    this.battlers[current]?.sendMessage("You lost the key!")
+    this.battlers[current]?.setIsPiggy(false)
   }
   this.state.assign({
     piggyId: id,
   })
-  const newWarrior = this.warriors[id]
+  const newWarrior = this.battlers[id]
   newWarrior.setIsPiggy(true)
 
   newWarrior?.sendMessage("You have the key. Get to the prize.")
-  Object.values(this.warriors).forEach((w) => {
+  Object.values(this.battlers).forEach((w) => {
     if ([newWarrior.id, current].includes(w.id)) {
       return
     }
-    w.sendMessage(`${newWarrior.state.name} has the key. Get them.`)
+    w.sendMessage(`${newWarrior.name} has the key. Get them.`)
   })
 }
 
 setNewRandomPiggy() {
   console.log("new random piggy")
-  const ids = Object.keys(this.warriors)
+  const ids = this.warriorIds()
   this.updatePiggy(ids[randomInt(ids.length)])
 }
 

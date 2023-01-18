@@ -4,8 +4,8 @@ import randomPosition from "./utils/randomPosition"
 import { randomBounded } from "./utils/randoms"
 import Warrior from "./Warrior"
 
-const DEFAULT_TIME_IN_ONE_PLACE = 10
-const RADIUS = 5.8
+const DEFAULT_TIME_IN_ONE_PLACE = 7
+const RADIUS = 5.5
 
 class RovingAreaAttackLogic {
   timeSinceMove = 0
@@ -26,11 +26,11 @@ class RovingAreaAttackLogic {
 
   update(dt:number) {
     this.timeSinceMove += dt
-    this.timeSinceHealthWithdrawl += dt
     if (this.timeSinceMove >= this.timeInOnePlace) {
       this.updatePlace()
       this.timeSinceMove = 0
     }
+    this.timeSinceHealthWithdrawl += dt
     if (this.timeSinceHealthWithdrawl > 0.7) {
       this.findCloseWarriorsAndHurtThem()
       this.timeSinceHealthWithdrawl = 0
@@ -48,7 +48,7 @@ class RovingAreaAttackLogic {
     Object.values(this.warriors).forEach((w) => {
       if (w.locomotion.position.distance(this.position) <= RADIUS) {
         if ([BehavioralState.move, BehavioralState.battle].includes(w.state.behavioralState)) {
-          w.sendMessage("This area is cursed.")
+          w.sendMessage("This area is cursed. -15% health.")
           const currentHealth = w.getHealth()
           w.setHealth(currentHealth - (currentHealth * 0.15))
         }
