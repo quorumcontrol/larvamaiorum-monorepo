@@ -9,7 +9,7 @@ const useInventory = (w?:Warrior, kind="field"):Item[] => {
       return []
     }
     const inv:Item[] = []
-    w.inventory.forEach((i) => {
+    Object.values(w.inventory).forEach((i) => {
       if ((i.item as any)[kind]) {
         inv.push(i.item)
       }

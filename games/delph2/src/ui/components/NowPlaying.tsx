@@ -20,17 +20,26 @@ const NowPlaying: React.FC = () => {
   const [audio, setAudio] = useState<HTMLAudioElement>()
   const [sliderValue, setSliderValue] = useState(50)
 
+  const url = nowPlaying.url
+
   useEffect(() => {
+    if (!url) {
+      return
+    }
+    if (audio && audio.currentSrc.toLowerCase() == url?.toLowerCase()) {
+      return
+    }
     if (audio) {
       audio.pause()
       audio.remove()
     }
-    const nextAudio = new Audio(nowPlaying.url)
+
+    const nextAudio = new Audio(url)
     nextAudio.volume = 0.05 * (sliderValue / 50)
 
     nextAudio.play()
     setAudio(nextAudio)
-  }, [nowPlaying])
+  }, [url])
 
   useEffect(() => {
     if (!audio) {

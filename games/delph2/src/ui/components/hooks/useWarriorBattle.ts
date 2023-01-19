@@ -4,7 +4,7 @@ import useBattles from "./useBattles";
 
 const useWarriorBattle = (w?:Warrior):Battle|undefined => {
   const battles = useBattles()
-  if (!w) {
+  if (!w || !battles) {
     return undefined
   }
 

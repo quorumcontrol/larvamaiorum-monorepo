@@ -23,18 +23,14 @@ const BattleStrategyPicker: React.FC = () => {
   const player = useCurrentPlayer()
   const inventory = useInventory(player, "battle")
   const playerBattle = useWarriorBattle(player)
-  if (playerBattle) {
-    console.log(
-      "---------------> player battle detected, ",
-      playerBattle.toJSON(),
-      playerBattle.phase === BattlePhase.strategySelect
-    )
-  }
+
   const [isChosen, setIsChosen] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
+  const phase = playerBattle?.phase
+
   useEffect(() => {
-    if (!playerBattle) {
+    if (!phase) {
       setIsChosen(false)
       setIsOpen(false)
       return
@@ -43,8 +39,8 @@ const BattleStrategyPicker: React.FC = () => {
       setIsOpen(false)
       return
     }
-    setIsOpen(playerBattle.phase === BattlePhase.strategySelect)
-  }, [playerBattle, isChosen])
+    setIsOpen(phase === BattlePhase.strategySelect)
+  }, [phase, isChosen])
 
   const onCardClick = useCallback(
     (evt: React.MouseEvent<HTMLDivElement, MouseEvent>, item: Item) => {

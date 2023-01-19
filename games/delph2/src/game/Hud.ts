@@ -77,14 +77,14 @@ class Hud extends ScriptTypeBase {
       this.persistantMessage.enabled = false
     }
 
-    this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
-    this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
-    this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
-    this.statElements.AttackStat.element!.text = this.warrior.currentAttack.toString()
-    this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
-    this.statElements.HealthStat.element!.text = `${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}`
+    // this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
+    // this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
+    // this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
+    // this.statElements.AttackStat.element!.text = this.warrior.currentAttack.toString()
+    // this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
+    // this.statElements.HealthStat.element!.text = `${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}`
 
-    this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
+    // this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
   }
 
   queueMessage(message: string) {

@@ -7,6 +7,7 @@ import { DelphsTableState } from "../syncing/schema/DelphsTableState"
 import theme from "../main-site-components/theme"
 import RightSideUI from "./components/RightSideUI"
 import BattleStrategyPicker from "./components/BattleStrategyPicker"
+import TopLeftUI from "./components/TopLeftUI"
 
 const Fonts = () => (
   <Global
@@ -39,7 +40,8 @@ const App: React.FC<{ app: pc.Application; room: Room<DelphsTableState> }> = ({
     <ChakraProvider theme={theme}>
       <Fonts />
       <AppProvider app={app} room={room}>
-        <BattleStrategyPicker />
+        <TopLeftUI />
+        {/* <BattleStrategyPicker /> */}
         <RightSideUI />
       </AppProvider>
     </ChakraProvider>
