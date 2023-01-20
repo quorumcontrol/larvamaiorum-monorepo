@@ -5,8 +5,7 @@ import { Global } from "@emotion/react"
 import { Room } from "colyseus.js"
 import { DelphsTableState } from "../syncing/schema/DelphsTableState"
 import theme from "../main-site-components/theme"
-import RightSideUI from "./components/RightSideUI"
-import TopLeftUI from "./components/TopLeftUI"
+import UIDecider from "./components/UIDecider"
 
 const Fonts = () => (
   <Global
@@ -39,8 +38,7 @@ const App: React.FC<{ app: pc.Application; room: Room<DelphsTableState> }> = ({
     <ChakraProvider theme={theme}>
       <Fonts />
       <AppProvider app={app} room={room}>
-        <TopLeftUI />
-        <RightSideUI />
+        <UIDecider />
       </AppProvider>
     </ChakraProvider>
   )

@@ -27,7 +27,7 @@ const BattleSlider: React.FC<SliderProps> = (userProps) => {
     <VStack>
       <Heading>Battle Strategy</Heading>
       <Slider
-        colorScheme="brand.orange"
+        colorScheme="red"
         aria-label="slider-battle-strategy"
         value={sliderValue}
         focusThumbOnChange={false}
