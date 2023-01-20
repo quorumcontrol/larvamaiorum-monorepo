@@ -69,7 +69,7 @@ const NowPlaying: React.FC = () => {
           <Icon as={TbVolume} boxSize="4" />
 
           <Slider
-            aria-label="slider-ex-5"
+            aria-label="slider-volume"
             value={sliderValue}
             focusThumbOnChange={false}
             defaultValue={50}
