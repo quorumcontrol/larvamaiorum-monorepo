@@ -10,20 +10,31 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react"
+import { useState } from "react"
 
-const BattleSlider: React.FC<SliderProps> = (props) => {
+const BattleSlider: React.FC<SliderProps> = (userProps) => {
+  const {onChange:userOnChange, ...props} = userProps
+  const [sliderValue, setSliderValue] = useState(props.defaultValue)
+
+  const onChange = (val:number) => {
+    setSliderValue(val)
+    if (userOnChange) {
+      userOnChange(val)
+    }
+  }
+
   return (
     <VStack>
       <Heading>Battle Strategy</Heading>
       <Slider
-        colorScheme="pink"
-        aria-label="slider-ex-5"
-        value={50}
+        colorScheme="brand.orange"
+        aria-label="slider-battle-strategy"
+        value={sliderValue}
         focusThumbOnChange={false}
-        defaultValue={50}
-        min={0}
+        defaultValue={props.defaultValue || 0}
+        min={-100}
         max={100}
-        onChange={(v) => console.log("change")}
+        onChange={onChange}
         {...props}
       >
         <SliderTrack h="20px" borderRadius="lg">
