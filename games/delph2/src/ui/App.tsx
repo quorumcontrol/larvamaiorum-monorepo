@@ -6,7 +6,6 @@ import { Room } from "colyseus.js"
 import { DelphsTableState } from "../syncing/schema/DelphsTableState"
 import theme from "../main-site-components/theme"
 import RightSideUI from "./components/RightSideUI"
-import BattleStrategyPicker from "./components/BattleStrategyPicker"
 import TopLeftUI from "./components/TopLeftUI"
 
 const Fonts = () => (
@@ -41,7 +40,6 @@ const App: React.FC<{ app: pc.Application; room: Room<DelphsTableState> }> = ({
       <Fonts />
       <AppProvider app={app} room={room}>
         <TopLeftUI />
-        {/* <BattleStrategyPicker /> */}
         <RightSideUI />
       </AppProvider>
     </ChakraProvider>

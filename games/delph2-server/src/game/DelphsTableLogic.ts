@@ -259,8 +259,16 @@ class DelphsTableLogic {
 
   removeWarrior(client: Client) {
     const sessionId = client.sessionId
+
+    const warrior = this.warriors[sessionId]
+    const battle = this.battles[warrior.id]
+    if (battle) {
+      battle.interruptAndTerminate()
+    }
+
     delete this.warriors[sessionId]
     delete this.battlers[sessionId]
+    
     this.state.warriors.delete(sessionId)
     if (this.currentQuest && this.currentQuest.state.piggyId === sessionId) {
       console.log('warrior leaving was the piggy')

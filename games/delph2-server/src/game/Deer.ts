@@ -35,6 +35,8 @@ class Deer implements Battler {
 
   locomotion: LocomotionLogic
 
+  timeSinceDigestion = 0
+
   timeSinceDeath = 0
   deathSentenceTime = 0
 
@@ -64,12 +66,17 @@ class Deer implements Battler {
     if ([BehavioralState.move, BehavioralState.chasing].includes(this.state.behavioralState)) {
       this.updateDestination()
     }
+    this.timeSinceDigestion += dt
+    if (dt > 5) {
+      this.digestWootgump()
+      this.timeSinceDigestion = 0
+    }
   }
 
   currentAttack() { return this.attack }
   currentDefense() { return this.defense }
 
-  setIsPiggy(isPiggy: boolean) {
+  setIsPiggy(_isPiggy: boolean) {
     return true
   }
 
@@ -102,6 +109,11 @@ class Deer implements Battler {
     this.locomotion.freeze()
     this.setState(BehavioralState.dead)
     this.sendMessage(message)
+  }
+
+  private digestWootgump() {
+    const amountToDigest = Math.floor(this.gumpBalance * 0.1)
+    this.incGumpBalance(-1 * amountToDigest)
   }
 
   private updateDestination() {

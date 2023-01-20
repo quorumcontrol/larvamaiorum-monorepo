@@ -19,15 +19,6 @@ class Hud extends ScriptTypeBase {
   persistantMessage: Entity
   // questIndicator: Entity
 
-  statElements: {
-    Attack: Entity
-    Defense: Entity
-    Health: Entity
-    AttackStat: Entity
-    DefenseStat: Entity
-    HealthStat: Entity
-  }
-
   previousArtwork?: Asset
 
   mainMessage: Entity
@@ -40,21 +31,11 @@ class Hud extends ScriptTypeBase {
     this.messages = []
 
     this.name = mustFindByName(this.entity, 'Name')
-    this.gumpStats = mustFindByName(this.entity, 'Gump')
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
     // this.questIndicator = mustFindByName(this.entity, 'QuestIndicator')
 
     this.app.on('mainHUDMessage', this.queueMessage, this)
-
-    this.statElements = {
-      Attack: mustFindByName(this.entity, "Attack"),
-      Defense: mustFindByName(this.entity, "Defense"),
-      Health: mustFindByName(this.entity, "Health"),
-      AttackStat: mustFindByName(this.entity, "AttackStat"),
-      DefenseStat: mustFindByName(this.entity, "DefenseStat"),
-      HealthStat: mustFindByName(this.entity, "HealthStat")
-    }
   }
 
   update(dt: number) {
@@ -68,23 +49,12 @@ class Hud extends ScriptTypeBase {
       return
     }
 
-    // this.questIndicator.enabled = !!this.state?.currentQuest
-
     if (this.state?.persistantMessage) {
       this.persistantMessage.enabled = true
       this.persistantMessage.element!.text = this.state.persistantMessage
     } else {
       this.persistantMessage.enabled = false
     }
-
-    // this.statElements.Attack.element!.width = 200 * (this.warrior.currentAttack / this.maxStats?.maxAttack)
-    // this.statElements.Defense.element!.width = 200 * (this.warrior.currentDefense / this.maxStats?.maxDefense)
-    // this.statElements.Health.element!.width = 200 * (this.warrior.currentHealth / this.warrior.initialHealth)
-    // this.statElements.AttackStat.element!.text = this.warrior.currentAttack.toString()
-    // this.statElements.DefenseStat.element!.text = this.warrior.currentDefense.toString()
-    // this.statElements.HealthStat.element!.text = `${Math.floor(this.warrior.currentHealth)} / ${this.warrior.initialHealth}`
-
-    // this.gumpStats.element!.text = `gump: ${this.warrior.wootgumpBalance}`
   }
 
   queueMessage(message: string) {

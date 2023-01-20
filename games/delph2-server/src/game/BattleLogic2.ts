@@ -77,6 +77,14 @@ class BattleLogic2 {
     })
   }
 
+  interruptAndTerminate() {
+    this.setPhase(BattlePhase.completed)
+
+    this.battlers.forEach((b) => {
+      b.setState(BehavioralState.move)
+    })
+  }
+
   update(dt: number) {
     if (!this.started || this.state.phase == BattlePhase.completed) {
       return

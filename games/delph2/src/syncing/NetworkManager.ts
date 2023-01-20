@@ -122,9 +122,9 @@ class NetworkManager extends ScriptTypeBase {
       this.handlePlayerAdd(player, key)
     }
 
-    this.room.state.warriors.onRemove = (player, key) => {
+    this.room.state.warriors.onRemove = (warrior, key) => {
       this.app.fire(WARRIOR_CHANGE)
-      this.handlePlayerRemoved(key)
+      this.handleWarriorRemoved(warrior, key)
     }
     this.room.state.wootgump.onAdd = (location, key) => {
       this.handleGumpAdd(location, key)
@@ -198,7 +198,6 @@ class NetworkManager extends ScriptTypeBase {
             this.gumpSounds.slots['Increase'].play()
           }, i * 100)
         }
-
       }
     })
 
@@ -212,9 +211,10 @@ class NetworkManager extends ScriptTypeBase {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
 
-    this.app.on(PLAY_CARD_EVT, (item: Item) => {
-      console.log("playing card: ", item.toJSON())
-      this.room?.send('playCard', item.toJSON())
+    this.app.on(PLAY_CARD_EVT, (evtItem: Item) => {
+      const item = evtItem.toJSON ? evtItem.toJSON() : evtItem
+      console.log("playing card: ", item)
+      this.room?.send('playCard', item)
     })
 
     this.app.on(CHOOSE_STRATEGY_EVT, (item: Item) => {
@@ -274,7 +274,7 @@ class NetworkManager extends ScriptTypeBase {
     effect.name = `battle-visuals-${key}`
     this.app.root.addChild(effect)
     effect.enabled = true
-    mustGetScript<BattleVisuals>(effect, 'battleVisuals').setState(battle, this.warriors, this.deer)
+    mustGetScript<BattleVisuals>(effect, 'battleVisuals').setState(battle, this.battlers)
   }
 
   handleBattleRemove(key: string) {
@@ -315,10 +315,10 @@ class NetworkManager extends ScriptTypeBase {
     }).start()
   }
 
-  handlePlayerRemoved(key: string) {
+  handleWarriorRemoved(warrior:Warrior, key: string) {
     this.warriors[key].destroy()
     delete this.warriors[key]
-    delete this.battlers[key]
+    delete this.battlers[warrior.id]
   }
 
   handlePlayerAdd(warrior: Warrior, key: string) {
@@ -334,6 +334,7 @@ class NetworkManager extends ScriptTypeBase {
         mustGetScript<NonPlayerCharacter>(w, 'nonPlayerCharacter').setPlayerEntity(playerEntity)
       })
       this.warriors[key] = playerEntity
+      this.battlers[warrior.id] = playerEntity
 
       this.playerSessionId = key
 
@@ -356,7 +357,7 @@ class NetworkManager extends ScriptTypeBase {
       mustGetScript<NonPlayerCharacter>(warriorEntity, 'nonPlayerCharacter').setPlayerEntity(this.player)
     }
     this.warriors[key] = warriorEntity
-    this.battlers[key] = warriorEntity
+    this.battlers[warrior.id] = warriorEntity
   }
 }
 

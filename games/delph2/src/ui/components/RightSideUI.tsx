@@ -1,7 +1,7 @@
 import React from "react"
 import { VStack } from "@chakra-ui/react"
 import NowPlaying from "./NowPlaying"
-import FieldCardPicker from "./FieldCardPicker"
+import PlayCard from "./PlayCard"
 
 const RightSideUI: React.FC = () => {
   return (
@@ -14,7 +14,7 @@ const RightSideUI: React.FC = () => {
       maxWidth="20vw"
       minWidth="300px"
     >
-      <FieldCardPicker />
+      <PlayCard />
       <NowPlaying />
     </VStack>
   )

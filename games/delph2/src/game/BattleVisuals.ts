@@ -31,26 +31,17 @@ class BattleVisuals extends ScriptTypeBase {
     this._destroys.push(func)
   }
 
-  private stop() {
-    // Object.values(this.sound.slots).forEach((slot) => {
-    //   slot.stop()
-    // })
-  }
-
-  private playEffects() {
-    // Object.values(this.sound.slots).forEach((slot) => {
-    //   slot.play()
-    // })
-
-    // const emitter = mustFindByName(effects, 'BattleEffect')
-    // mustGetScript<any>(emitter, 'effekseerEmitter').play()
-  }
-
-  setState(battle:Battle, warriors:Record<string, Entity>, deer:Record<string, Entity>) {
+  setState(battle:Battle, allBattlers: Record<string, Entity>) {
     this.entity.setPosition(battle.center.x, 0, battle.center.z)
     this.battlers = battle.warriorIds.map((id) => {
-      return warriors[id] || deer[id]
-    })
+      return allBattlers[id]
+    }).filter((b) => !!b)
+
+    if (this.battlers.length < battle.warriorIds.length) {
+      console.error("could not find all battlers in: ", battle.toJSON())
+      // this.entity.destroy()
+      return
+    }
 
     this.battlers.forEach((battler, i) => {
       const opponent = this.battlers[(i+1) % this.battlers.length]

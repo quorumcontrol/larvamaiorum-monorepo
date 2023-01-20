@@ -7,20 +7,23 @@ import {
   Tag,
   TagLeftIcon,
   TagLabel,
+  Text,
 } from "@chakra-ui/react"
 import { TbWallet } from "react-icons/tb"
 
 export interface CardProps {
+  identifier: string
   name: string
+  description: string
   art: string
   frameColor: string
   costToPlay?: number
 }
 
 export const Card: React.FC<
-  BoxProps & { card: CardProps; showCost?: boolean }
+  BoxProps & { card: CardProps; showCost?: boolean; showDescription?: boolean }
 > = (props) => {
-  const { card, showCost, ...boxProps } = props
+  const { card, showCost, showDescription, ...boxProps } = props
   const frameColor = card.frameColor
 
   return (
@@ -42,15 +45,41 @@ export const Card: React.FC<
         />
       </AspectRatio>
 
-      <Box position="absolute" bottom={["0px", "0px", "0px", "20px"]} left="0" width="100%" px={[0,0,0,4]}>
+      {showDescription && (
+        <Box
+          position="absolute"
+          top={["0px", "0px", "0px", "20px"]}
+          left="0"
+          width="100%"
+          px={[0, 0, 0, 4]}
+        >
+          <Box
+            bgColor={frameColor}
+            borderRadius="10px"
+            textAlign="center"
+            p="4"
+          >
+            <Text fontSize="sm">{card.description}</Text>
+          </Box>
+        </Box>
+      )}
+
+      <Box
+        position="absolute"
+        bottom={["0px", "0px", "0px", "20px"]}
+        left="0"
+        width="100%"
+        px={[0, 0, 0, 4]}
+      >
         <Box bgColor={frameColor} borderRadius="10px" textAlign="center" py="3">
           <Heading size="md">{card.name}</Heading>
         </Box>
       </Box>
+      
       {showCost && (
         <Tag
           variant={"solid"}
-          bgColor={"brand.orange"}
+          bgColor={"gray.900"}
           size="lg"
           position="absolute"
           top="-10px"
