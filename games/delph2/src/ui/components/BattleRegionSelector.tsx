@@ -16,21 +16,27 @@ const BattleRegionSelector: React.FC<
   const placementIcon = useRef<HTMLDivElement>(null)
   const { onRegionSelect, opponentPositon, ...props } = userProps
 
-  const topLeft = () => {
+  const boundingRect = () => {
     if (!clickBox.current) {
       return undefined
     }
-    return new Vec2(clickBox.current.offsetLeft, clickBox.current.offsetTop)
+    return clickBox.current.getBoundingClientRect()
+  }
+
+  const topLeft = () => {
+    const rect = boundingRect()
+    if (!rect) {
+      return undefined
+    }
+    return new Vec2(rect.left, rect.top)
   }
 
   const widthAndHeight = () => {
-    if (!clickBox.current) {
+    const rect = boundingRect()
+    if (!rect) {
       return undefined
     }
-    return new Vec2(
-      clickBox.current.offsetWidth,
-      clickBox.current.offsetHeight
-    ).divScalar(2)
+    return new Vec2(rect.width, rect.height).divScalar(2)
   }
 
   const centerPoint = () => {
@@ -65,20 +71,18 @@ const BattleRegionSelector: React.FC<
       )
       throw new Error("no div")
     }
-    // console.log(evt)
-    // console.log(
-    //   "left/top: ",
-    //   clickBox.current?.offsetLeft,
-    //   clickBox.current?.offsetTop,
-    //   "pageX, pageY",
-    //   evt.pageX,
-    //   evt.pageY,
-    //   "width/height",
-    //   clickBox.current.offsetWidth,
-    //   clickBox.current.offsetHeight
-    // )
+    console.log(evt)
+    console.log(
+      "box",
+      boundingRect(),
+      "screex, screeny",
+      evt.clientX,
+      evt.clientY,
+      "center",
+      centerPoint(),
+    )
 
-    const click = new Vec2(evt.pageX, evt.pageY)
+    const click = new Vec2(evt.clientX, evt.clientY)
 
     setClickedOnce(true)
     setLastClick(

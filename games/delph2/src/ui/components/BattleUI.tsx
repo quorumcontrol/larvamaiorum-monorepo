@@ -12,7 +12,7 @@ const BattleUI: React.FC<BattleUIProps> = ({}) => {
   return (
     <>
       <VStack w="100%" position="fixed" bottom="20px" left="0">
-        <HStack p={4} spacing="8">
+        <HStack p={4} spacing="12">
           <BattleRegionSelector />
           <Spacer />
           <PlayCard />
