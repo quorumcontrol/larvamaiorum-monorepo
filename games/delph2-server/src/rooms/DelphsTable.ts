@@ -1,5 +1,5 @@
 import { Room, Client } from "colyseus";
-import { DelphsTableState, Player, RoomType } from "./schema/DelphsTableState";
+import { BattleControlMessage, BATTLE_CONTROL_MESSAGE, DelphsTableState, Player, RoomType } from "./schema/DelphsTableState";
 import DelphsTableLogic from "../game/DelphsTableLogic";
 import { generateWarrior } from "../game/Warrior";
 import { InventoryItem } from "../game/items";
@@ -57,11 +57,13 @@ export class DelphsTable extends Room<DelphsTableState> {
     this.onMessage("playCard", (client, card: InventoryItem) => {
       this.game.playCard(client.sessionId, card)
     })
-    this.onMessage("chooseStrategy", (client, card:InventoryItem) => {
-      this.game.chooseStrategy(client, card)
-    })
+
     this.onMessage("getLatency", (client) => {
       client.send(new Date().getTime())
+    })
+
+    this.onMessage(BATTLE_CONTROL_MESSAGE, (client, msg:BattleControlMessage) => {
+      this.game.updateBattleControl(client, msg)
     })
   }
 

@@ -52,7 +52,8 @@ const PlayCard: React.FC = () => {
     app.fire(PLAY_CARD_EVT, cards[identifiers[0]])
   }
 
-  const onButtonClick = () => {
+  const onButtonClick = (evt:React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    evt.stopPropagation()
     setShowModal(true)
   }
 
@@ -79,7 +80,7 @@ const PlayCard: React.FC = () => {
         </ModalContent>
       </Modal>
       <VStack
-        onClick={onButtonClick}
+        onMouseDown={onButtonClick}
         animation={`${pulse} infinite 3s linear`}
         cursor="pointer"
         p={0}
@@ -92,9 +93,9 @@ const PlayCard: React.FC = () => {
           borderRadius="120px"
           bgColor="brand.orange"
         >
-          <Icon as={TbShieldCheckered} h="64px" w="64px" />
+          <Icon as={TbShieldCheckered} h={["32px", "32px", "32px", "64px"]} w={["32px", "32px", "32px", "64px"]} />
         </Flex>
-        <Heading>Play Card</Heading>
+        <Heading size={["lg", "lg", "lg", "2xl"]}>Play Card</Heading>
       </VStack>
     </>
   )

@@ -13,29 +13,16 @@ import {
 import { useState } from "react"
 
 const BattleSlider: React.FC<SliderProps> = (userProps) => {
-  const {onChange:userOnChange, ...props} = userProps
-  const [sliderValue, setSliderValue] = useState(props.defaultValue)
-
-  const onChange = (val:number) => {
-    setSliderValue(val)
-    if (userOnChange) {
-      userOnChange(val)
-    }
-  }
-
   return (
     <VStack>
       <Heading>Battle Strategy</Heading>
       <Slider
         colorScheme="red"
         aria-label="slider-battle-strategy"
-        value={sliderValue}
         focusThumbOnChange={false}
-        defaultValue={props.defaultValue || 0}
         min={-100}
         max={100}
-        onChange={onChange}
-        {...props}
+        {...userProps}
       >
         <SliderTrack h="20px" borderRadius="lg">
           <SliderFilledTrack />

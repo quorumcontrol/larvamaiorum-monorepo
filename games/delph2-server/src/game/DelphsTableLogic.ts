@@ -2,14 +2,13 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase, Arch } from "../rooms/schema/DelphsTableState";
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase, Arch, BattleControlMessage } from "../rooms/schema/DelphsTableState";
 import BattleLogic2, { Battler } from './BattleLogic2';
 import Deer from './Deer';
 import { InventoryItem, itemFromInventoryItem } from './items';
 import { getRandomTrack } from './music';
 import QuestLogic from './QuestLogic';
 import RovingAreaAttackLogic from './RovingAreaAttackLogic';
-import iterableToArray from './utils/iterableToArray';
 import randomPosition from './utils/randomPosition';
 import { randomBounded, randomInt } from "./utils/randoms";
 import Warrior, { WarriorStats } from "./Warrior";
@@ -160,16 +159,10 @@ class DelphsTableLogic {
     }
 
     if (this.isMatchRoom()) {
-      return !!this.warriorWith50()
+      return true
     }
 
     return this.timeSinceLastQuest > 60 && (Math.floor(this.timeSinceLastQuest) % 10 === 0 && randomInt(10) === 1)
-  }
-
-  private warriorWith50() {
-    return Object.values(this.warriors).find((w) => {
-      return w.state.wootgumpBalance >= 10
-    })
   }
 
   private isMatchRoom() {
@@ -181,7 +174,7 @@ class DelphsTableLogic {
     if (this.state.playerCount) {
       return (warriorLength >= this.state.playerCount)
     }
-    const expectedPlayers = iterableToArray(this.state.expectedPlayers.values())
+    const expectedPlayers = Array.from(this.state.expectedPlayers.values())
     return warriorLength >= expectedPlayers.length
   }
 
@@ -202,20 +195,6 @@ class DelphsTableLogic {
     this.acceptInput()
     this.room.lock()
     this.room.broadcast('mainHUDMessage', "First to 50 gump gets the key. Go.")
-  }
-
-  chooseStrategy(client:Client, strategyCard:InventoryItem) {
-    const warrior = this.warriors[client.sessionId]
-    if (!warrior) {
-      console.error("no warrior for client")
-      return
-    }
-    const battle = this.battles[warrior.id]
-    if (!battle) {
-      console.error('no battle for warrior: ', warrior.state.name)
-      return
-    }
-    battle.setCardPick(warrior, itemFromInventoryItem(strategyCard))
   }
 
   addWarrior(stats: WarriorStats, client?: Client) {
@@ -308,7 +287,7 @@ class DelphsTableLogic {
     if (!warrior) {
       return
     }
-    if (iterableToArray(this.state.traps.values()).length > 50) {
+    if (Array.from(this.state.traps.values()).length > 50) {
       warrior.sendMessage("No more traps allowed")
       return
     }
@@ -395,6 +374,13 @@ class DelphsTableLogic {
         if (battler.id.startsWith('deer') && potentialOpponent.id.startsWith('deer')) {
           return // don't let two deer fight each other
         }
+
+        // if we're in a quest situation, the deer should only attack the key holder
+        if (battler.ignoreNonKeyHolder || potentialOpponent.ignoreNonKeyHolder && this.currentQuest?.state.piggyId) {
+          if (![battler.id, potentialOpponent.id].includes(this.currentQuest?.state.piggyId)) {
+            return
+          }
+        }
         if (battler.locomotion.position.distance(potentialOpponent.locomotion.position) < 2) {
           pairs.push([battler, potentialOpponent])
         }
@@ -430,27 +416,38 @@ class DelphsTableLogic {
           delete this.battles[w.id]
         })
         this.state.battles.delete(battle.id)
-        if (this.currentQuest && this.currentQuest.state.piggyId) {
-          const piggyId = this.currentQuest.state.piggyId
-          const winner = battle.winner!
-          if (winner.id === piggyId) {
-            return // do nothing because the winner stays the piggy.
-          }
-          battle.losers.forEach((w) => {
-            if (w.id === piggyId) {
-              this.currentQuest.updatePiggy(winner.id)
-            }
-          })
+        if (this.currentQuest) {
+          this.currentQuest.processBattle(battle)
         }
       }
     })
   }
 
-  handleRecovers(_dt: number) {
+  private handleRecovers(_dt: number) {
     Object.values(this.warriors).forEach((w) => {
       if (w.state.behavioralState === BehavioralState.move) {
         w.recover(0.002)
       }
+    })
+  }
+
+  updateBattleControl(client:Client, msg: BattleControlMessage) {
+    const warrior = this.warriors[client.sessionId]
+    if (!warrior) {
+      console.error("no warrior found for ", client.sessionId)
+      return
+    }
+
+    const battle = this.battles[warrior.id]
+    if (!battle) {
+      console.error('no battle for warrior: ', warrior.id, warrior.state.name)
+      return
+    }
+    console.log(client.sessionId, "update battle controls, ", msg)
+
+    battle.setControls(warrior.id, {
+      regionalPosition: new Vec2(msg.region[0], msg.region[1]),
+      attackDefenseSlider: msg.attackDefenseSlider
     })
   }
 
@@ -478,11 +475,7 @@ class DelphsTableLogic {
 
   private getQuest() {
     if (this.isMatchRoom()) {
-      const w = this.warriorWith50()
-      if (!w) {
-        return
-      }
-      return QuestLogic.matchQuest(this.room, this.battlers, this.state.arches.toArray(), w)
+      return QuestLogic.matchQuest(this.room, this.battlers, this.state.arches.toArray())
     }
     return QuestLogic.randomQuest(this.room, this.battlers, this.state.arches.toArray(), QuestType.random)
   }

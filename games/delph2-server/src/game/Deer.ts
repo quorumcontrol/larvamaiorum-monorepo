@@ -15,8 +15,10 @@ class Deer implements Battler {
   battlerType: BattlerType.deer
   name = "A Deer"
 
+  randomizeBattleRegion = true
+  ignoreNonKeyHolder = true
+
   state: DeerState
-  
 
   health:number
   attack:number
@@ -50,9 +52,9 @@ class Deer implements Battler {
     this.locomotion = new LocomotionLogic(this.state.locomotion, 1, debugRoom)
     
     const {attack, initialHealth, defense } = randomBattleStats(this.id)
-    this.health = initialHealth + randomInt(100)
-    this.attack = attack + randomInt(100)
-    this.defense = defense + randomInt(100)
+    this.health = initialHealth - randomInt(200)
+    this.attack = attack + randomInt(1200)
+    this.defense = Math.max(200, defense - randomInt(600))
   }
 
   update(dt: number) {
@@ -67,7 +69,7 @@ class Deer implements Battler {
       this.updateDestination()
     }
     this.timeSinceDigestion += dt
-    if (dt > 5) {
+    if (dt > 3) {
       this.digestWootgump()
       this.timeSinceDigestion = 0
     }
@@ -217,6 +219,9 @@ class Deer implements Battler {
     const eligible = Object.values(this.gumps).filter((gump) => {
       return this.locomotion.position.distance(gump) < 5
     })
+    if (eligible.length === 0) {
+      return undefined
+    }
     return eligible[randomInt(eligible.length)]
   }
 
@@ -230,7 +235,6 @@ class Deer implements Battler {
         !warrior.state.currentItem
     })
   }
-
 
   getState() {
     return this.state.behavioralState

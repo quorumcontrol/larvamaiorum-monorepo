@@ -15,9 +15,11 @@ import React, { useEffect, useState } from "react"
 import useMusic from "./hooks/useMusic"
 import { TbVolume } from "react-icons/tb"
 
+//singleton
+const audio = new Audio()
+
 const NowPlaying: React.FC = () => {
   const nowPlaying = useMusic()
-  const [audio, setAudio] = useState<HTMLAudioElement>()
   const [sliderValue, setSliderValue] = useState(50)
 
   const url = nowPlaying.url
@@ -26,20 +28,17 @@ const NowPlaying: React.FC = () => {
     if (!url) {
       return
     }
-    if (audio && audio.currentSrc.toLowerCase() == url?.toLowerCase()) {
+    if (audio.currentSrc.toLowerCase() === url?.toLowerCase()) {
       return
     }
-    if (audio) {
-      audio.pause()
-      audio.remove()
-    }
+    
+    audio.pause()
+    
+    audio.volume = 0.05 * (sliderValue / 50)
 
-    const nextAudio = new Audio(url)
-    nextAudio.volume = 0.05 * (sliderValue / 50)
-
-    nextAudio.play()
-    setAudio(nextAudio)
-  }, [url])
+    audio.src = url
+    audio.play()
+  }, [url, audio])
 
   useEffect(() => {
     if (!audio) {

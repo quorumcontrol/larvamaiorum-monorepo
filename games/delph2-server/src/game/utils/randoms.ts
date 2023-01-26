@@ -1,8 +1,10 @@
-import { createHash } from 'crypto'
+import { createHash, randomInt as cryptoRandomInt } from 'crypto'
 import BN from "bn.js";
 
+const LARGE_NUMBER = 1_000_000_000_000
+
 export function randomFloat() {
-  return Math.random();
+  return cryptoRandomInt(LARGE_NUMBER) / LARGE_NUMBER
 }
 
 function deterministicNumber(id:string, seed:string) {
@@ -17,7 +19,7 @@ export function randomBounded(size: number) {
 }
 
 export function randomInt(max:number) {
-  return Math.floor(randomFloat() * max)
+  return cryptoRandomInt(Math.floor(max))
 }
 
 export function deterministicBounded(size: number, id:string, seed:string) {

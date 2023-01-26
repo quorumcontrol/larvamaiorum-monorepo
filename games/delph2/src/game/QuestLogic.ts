@@ -33,18 +33,38 @@ class QuestLogic {
 
   destroy() {
     console.log("destroying quest", this.treasure)
-    const start = this.treasure!.getLocalPosition()
-    this.treasure!.tween(start).to({x: start.x, y: -20, z: start.z}, 0.2).start().on('complete', () => {
-      this.treasure?.destroy()
-    })
+    this.treasure?.destroy()
     this.app.fire(QUEST_OVER_EVT)
     return
   }
 
   go() {
     if (!this.state.currentQuest) {
-      throw new Error('should never happen, the quest is active, but there is no current quest')
+      throw new Error('go: should never happen, the quest is active, but there is no current quest')
     }
+    const stopListening = this.state.currentQuest.listen("object", (object) => {
+      if (this.treasure) {
+        this.treasure.destroy()
+      }
+      console.log("quest object change: ", object)
+      this.possiblySetupChest()
+    })
+    this.app.once(QUEST_OVER_EVT, stopListening)
+    
+    this.possiblySetupChest()
+
+    this.app.fire("quest", this)
+  }
+
+  private possiblySetupChest() {
+    if (!this.state.currentQuest) {
+      throw new Error('setupCHest: should never happen, the quest is active, but there is no current quest')
+    }
+
+    if (!this.state.currentQuest.object) {
+      return
+    }
+
     mustFindByName(this.app.root, 'QuestSounds').sound!.slots['QuestStart'].play()
     const chest = mustFindByName(this.app.root, 'Chest').clone()
     chest.name = QUEST_OBJECT_NAME
@@ -53,8 +73,6 @@ class QuestLogic {
     this.app.root.addChild(chest)
     chest.enabled = true
     this.treasure = chest
-
-    this.app.fire("quest", this)
   }
 
 }

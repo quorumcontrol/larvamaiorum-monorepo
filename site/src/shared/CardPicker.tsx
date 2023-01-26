@@ -23,7 +23,8 @@ const CardPicker: React.FC<CardPickerProps> = ({ maxSelected = 4, onSelected, ca
   const isHighlighted = (identifier:string) => highlighted.includes(identifier)
   const isSelected = (identifier:string) => selected.includes(identifier)
 
-  const onContinue = () => {
+  const onContinue = (evt?:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    evt?.stopPropagation()
     console.log('cards picked: ', selected)
     if (onSelected) {
       onSelected(selected)
@@ -73,7 +74,7 @@ const CardPicker: React.FC<CardPickerProps> = ({ maxSelected = 4, onSelected, ca
             return (
               <WrapItem key={`cardPicker-${item.identifier}`}>
                 <VStack
-                  onClick={(evt) => onCardAreaClick(evt, item.identifier)}
+                  onMouseDown={(evt) => onCardAreaClick(evt, item.identifier)}
                   spacing={2}
                   p="4"
                   pb={padding}
@@ -104,7 +105,7 @@ const CardPicker: React.FC<CardPickerProps> = ({ maxSelected = 4, onSelected, ca
           <Button
             variant="primary"
             disabled={!(selected.length === maxSelected)}
-            onClick={onContinue}
+            onMouseDown={onContinue}
           >
             Choose these {maxSelected} cards
           </Button>

@@ -1,5 +1,11 @@
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 
+export const BATTLE_CONTROL_MESSAGE = "battleControlChange"
+
+export interface BattleControlMessage {
+  region: [number, number] // between -1 and 1 with 0,0 as the centerpoint
+  attackDefenseSlider: number // between -100 and 100
+}
 
 export enum SwingDirection {
   none,
@@ -163,6 +169,8 @@ export class Battle extends Schema {
   @type({ array: "string" }) warriorIds = new ArraySchema<string>();
   @type({ map: Item}) strategies = new MapSchema<Item>({});
   @type("number") round:number
+
+  @type({ map: Vec2 }) approximateRegionControls = new MapSchema<Vec2>({})
 }
 
 export class QuestObject extends Schema {
@@ -175,7 +183,7 @@ export class Quest extends Schema {
   @type("number") startedAt: number
 
   @type("number") kind: QuestType = 0
-  @type(QuestObject) object: QuestObject
+  @type(QuestObject) object?: QuestObject
   // the player everyone is trying to get
   @type("string") piggyId: string
 }

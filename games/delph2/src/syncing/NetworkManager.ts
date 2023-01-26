@@ -1,7 +1,7 @@
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Client, Room } from 'colyseus.js'
-import { Battle, Deer, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
+import { Battle, BattleControlMessage, BATTLE_CONTROL_MESSAGE, Deer, DelphsTableState, Item, RovingAreaAttack, Trap, Vec2, Warrior } from "./schema/DelphsTableState";
 import { SELECT_EVT } from "../controls";
 import Hud, { CHOOSE_STRATEGY_EVT, PLAY_CARD_EVT } from '../game/Hud'
 import { Entity, RaycastResult, SoundComponent, Vec3 } from "playcanvas";
@@ -219,6 +219,10 @@ class NetworkManager extends ScriptTypeBase {
 
     this.app.on(CHOOSE_STRATEGY_EVT, (item: Item) => {
       this.room?.send(CHOOSE_STRATEGY_EVT, item.toJSON())
+    })
+
+    this.app.on(BATTLE_CONTROL_MESSAGE, (msg:BattleControlMessage) => {
+      this.room?.send(BATTLE_CONTROL_MESSAGE, msg)
     })
   }
 

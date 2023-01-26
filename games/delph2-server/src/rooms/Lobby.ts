@@ -1,6 +1,5 @@
 import { Room, Client } from "colyseus";
 import { LobbyState, Player, ReservationRequest } from "./schema/LobbyState";
-import iterableToArray from '../game/utils/iterableToArray'
 import { SimpleSyncher } from '../game/utils/singletonQueue'
 import { randomUUID } from 'crypto'
 
@@ -33,7 +32,7 @@ export class LobbyRoom extends Room<LobbyState> {
       try {
         if (this.state.twoPersonWaiting.size > 1) {
           console.log("looking for waiting players")
-          const waiting = iterableToArray(this.state.twoPersonWaiting.values())
+          const waiting = Array.from(this.state.twoPersonWaiting.values())
           const rooms = waiting.map((player, i, arry) => {
             // only do every other player but allow the 0 index to get the next one
             if ((i+1) % 2 == 0) {

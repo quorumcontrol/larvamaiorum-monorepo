@@ -1,9 +1,14 @@
-import { Vec2, Vec3 } from 'playcanvas'
-import { Battle, BattlePhase, Item, BehavioralState, LocomotionState, BattleCommands, SwingDirection, BlockDirection } from '../rooms/schema/DelphsTableState'
+import { Vec2 } from 'playcanvas'
+import { Battle, BattlePhase, BehavioralState, LocomotionState, BattleCommands, SwingDirection, BlockDirection, Vec2 as StateVec2 } from '../rooms/schema/DelphsTableState'
 import { ItemDescription } from './items'
 import LocomotionLogic from './LocomotionLogic'
 import { randomBounded, randomFloat, randomInt } from './utils/randoms'
-import Warrior from './Warrior'
+
+const SLIDER_BONUS = 0.20 // 20% can be determined by your slider
+const REGIONAL_BONUS_PERCENTAGE = 20
+
+// this is the maximum normalized distance. in code: new pc.Vec2(-1,-1).distance(new pc.Vec2(1,1))
+const MAX_REGIONAL_DIFFERENCE = 2.8284271247461903
 
 export enum BattlerType {
   deer,
@@ -15,6 +20,9 @@ export interface Battler {
   name: string
   locomotion: LocomotionLogic
   battlerType: BattlerType
+
+  randomizeBattleRegion?: boolean
+  ignoreNonKeyHolder?: boolean
 
   battleCommands: () => BattleCommands
   // state: BehavioralState
@@ -36,6 +44,11 @@ export interface Battler {
   dieForTime: (seconds:number, msg?:string)=>any
 }
 
+interface ControlState {
+  attackDefenseSlider: number // between -100 and 100
+  regionalPosition: Vec2 // normalized region, the distance between the two points adjusts the battle
+}
+
 class BattleLogic2 {
   id: string
   state: Battle
@@ -51,11 +64,17 @@ class BattleLogic2 {
   cardPicks: Record<string, ItemDescription>
 
   private roundIntensity = 0
-  private roundWinner: Battler
-  private roundLoser: Battler
+  private roundWinner?: Battler
+  private roundLoser?: Battler
+
+  private controls: Record<string, ControlState>
+
+  private sampledControls: Record<string, ControlState>
 
   dancing = true
   timeSinceSwing = 0
+
+  private timeSinceShownControls = 0
 
   constructor(id: string, battlers: Battler[], state: Battle) {
     this.id = id
@@ -63,6 +82,18 @@ class BattleLogic2 {
     this.state = state
     this.losers = []
     this.cardPicks = {}
+    this.controls = battlers.reduce((memo, b) => {
+      return {
+        ...memo,
+        [b.id]: {
+          attackDefenseSlider: 0,
+          regionalPosition: new Vec2(0,0),
+        }
+      }
+    }, {} as Record<string, ControlState>)
+    this.sampledControls = this.sampleControls()
+    this.updateStateForSampledControls()
+
     this.center = battlers.reduce((vec:Vec2, battler) => {
       vec.add(battler.locomotion.position)
       return vec
@@ -85,11 +116,66 @@ class BattleLogic2 {
     })
   }
 
+  setControls(battlerId: string, controls:ControlState) {
+    if (!this.battlers.find((b) => b.id === battlerId)) {
+      throw new Error("battle received a control message when there was no battler")
+    }
+    this.controls[battlerId] = controls
+  }
+
   update(dt: number) {
     if (!this.started || this.state.phase == BattlePhase.completed) {
       return
     }
     this.handleSwingOrHit(dt)
+    this.possiblyUpdateControls(dt)
+  }
+
+  private updateStateForSampledControls() {
+    Object.keys(this.sampledControls).forEach((battlerId) => {
+      const sampledPosition = this.sampledControls[battlerId].regionalPosition
+      const regionalPosition = new StateVec2()
+      regionalPosition.assign({
+        x: sampledPosition.x,
+        z: sampledPosition.y,
+      })
+      this.state.approximateRegionControls.set(battlerId, regionalPosition)
+    })
+  }
+
+  // every 2 seconds, show the players what the positions were (2 seconds *ago*)
+  private possiblyUpdateControls(dt:number) {
+    this.timeSinceShownControls += dt
+    if (this.timeSinceShownControls >= 1) {
+      console.log(this.id, "updating sampled controls")
+      this.updateStateForSampledControls()
+      this.sampledControls = this.sampleControls()
+      this.battlers.forEach((b) => {
+        console.log(this.id, b.id, "randomizedBattleRegion?", b.randomizeBattleRegion)
+        if (b.randomizeBattleRegion) {
+          const region = this.randomRegion()
+          console.log("updating region for", b.id, region)
+          this.controls[b.id].regionalPosition = region
+        }
+      })
+      this.timeSinceShownControls = 0
+    }
+  }
+
+  private sampleControls() {
+    return Object.keys(this.controls).reduce((memo, battlerId) => {
+      return {
+        ...memo,
+        [battlerId]: {
+          attackDefenseSlider: this.controls[battlerId].attackDefenseSlider,
+          regionalPosition: this.controls[battlerId].regionalPosition.clone(),
+        }
+      }
+    }, {} as Record<string, ControlState>)
+  }
+
+  private randomRegion() {
+    return new Vec2(randomBounded(1), randomBounded(1))
   }
 
   private handleSwingOrHit(dt: number) {
@@ -171,7 +257,60 @@ class BattleLogic2 {
       this.setPhase(BattlePhase.completed)
       this.clearBattleCommands()
     }
+  }
 
+  private randomAttackerAndDefender() {
+    const attackerIdx = randomFloat() >= 0.5 ? 0 : 1
+    const attacker = this.battlers[attackerIdx]
+    const defender = this.battlers[(attackerIdx + 1) % this.battlers.length]
+    return { attacker, defender }
+  }
+
+  private getAttackerAndDefender() {
+    if (!this.roundWinner) {
+      return this.randomAttackerAndDefender()
+    }
+
+    // 2/3 chance we keep the same attacker so they can go on a streak
+    if (randomInt(3) > 0) {
+      return { attacker: this.roundWinner, defender: this.roundLoser }
+    }
+
+    // but if not, do the random one again
+    return this.randomAttackerAndDefender()
+  }
+
+  private getAttackRoll(attacker: Battler) {
+    const controls = this.controls[attacker.id]
+    const rawRoll = randomInt(Math.floor(attacker.currentAttack()))
+
+    console.log("attack multiplier: ",  1+(SLIDER_BONUS * controls.attackDefenseSlider / 100))
+    // a full slider to attack gives you +20% but a full to defense gives you -20%
+    const multiplier = 1 + (SLIDER_BONUS * controls.attackDefenseSlider / 100)
+    return rawRoll * multiplier
+  }
+
+  private getDefenseRoll(defender: Battler) {
+    const controls = this.controls[defender.id]
+    const rawRoll = randomInt(Math.floor(defender.currentDefense()))
+
+    console.log("defense multiplier: ", 1-(SLIDER_BONUS * controls.attackDefenseSlider / 100))
+    // a full slider to defense gives you +20% but a full to attack gives you -20%
+    const multiplier = 1 - (SLIDER_BONUS * controls.attackDefenseSlider / 100)
+    return rawRoll * multiplier
+  }
+
+  private controlBonus(attacker: Battler, defender: Battler) {
+    const defenseControls = this.controls[defender.id]
+    const attackControls = this.controls[attacker.id]
+
+    const distance = attackControls.regionalPosition.distance(defenseControls.regionalPosition)
+
+    // take the distance and we scale that to a zero to the double the max regional difference then later
+    // we are going to subtract the number so that a zero distance becomes a negative bonus and a larger distance becomes a positive bonus
+    const scaleTo0toDoubleBonusPercentage = (distance * (REGIONAL_BONUS_PERCENTAGE * 2)) / MAX_REGIONAL_DIFFERENCE
+
+    return (scaleTo0toDoubleBonusPercentage - REGIONAL_BONUS_PERCENTAGE) / 100
   }
 
   private commenceHitting() {
@@ -179,11 +318,12 @@ class BattleLogic2 {
     this.dancing = false
     this.timeSinceSwing = 0
 
-    const attackerIdx = randomFloat() >= 0.5 ? 0 : 1
-    const attacker = this.battlers[attackerIdx]
-    const defender = this.battlers[(attackerIdx + 1) % this.battlers.length]
-    const attackRoll = randomInt(attacker.currentAttack())
-    const defenseRoll = randomInt(defender.currentDefense())
+    const { attacker, defender } = this.getAttackerAndDefender()
+    
+    console.log("control bonus: ", this.controlBonus(attacker, defender))
+
+    const attackRoll = Math.floor(this.getAttackRoll(attacker) * (1 + this.controlBonus(attacker, defender)))
+    const defenseRoll = Math.floor(this.getDefenseRoll(defender))
 
     const intensity = (attackRoll - defenseRoll)
 
@@ -215,10 +355,6 @@ class BattleLogic2 {
         blockDirection: BlockDirection.none,
       })
     })
-  }
-
-  setCardPick(warrior: Warrior, card: ItemDescription) {
-    //nothing
   }
 
   setPhase(phase: BattlePhase) {
