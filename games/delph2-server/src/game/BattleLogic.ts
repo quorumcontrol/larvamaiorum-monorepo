@@ -94,7 +94,7 @@ class BattleLogic {
     if (cardOne.identifier === cardTwo.identifier) {
       return [undefined, cardOne, cardTwo]
     }
-    if (cardOne.beats!.includes(cardTwo.name.toLowerCase())) {
+    if (cardOne.cancels!.includes(cardTwo.name.toLowerCase())) {
       return [warriorOne, cardOne.name, cardTwo.name]
     }
     return [warriorTwo, cardTwo.name, cardOne.name]

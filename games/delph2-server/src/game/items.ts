@@ -37,8 +37,7 @@ export interface ItemDescription {
   appliesToWorld?:boolean
   repels?: GameNags[],
   affectsAllPlayers?: boolean,
-  beats?: string[],
-  flipsAgainst?: string[],
+  cancels?: string[],
 }
 
 const items:ItemDescription[] = [
@@ -72,7 +71,7 @@ const items:ItemDescription[] = [
     address: zeroAddr,
     id: 3,
     name: "Speed",
-    description: "Increase the speed of your player for 15s.",
+    description: "Increase the speed of your player by 3 for 15s.",
     costToPlay: 10,
     speed: 3,
     timeLimit: 15,
@@ -86,25 +85,24 @@ const items:ItemDescription[] = [
     name: "Kindness",
     description: "Protects the entire board from the gods.",
     costToPlay: 10,
-    speed: 0,
     timeLimit: 60,
     field: true,
     art: "https://delphsart.s3.fr-par.scw.cloud/gift.png",
     frameColor: "#37363B",
     repels: [GameNags.roving],
   },
-
-
   {
     address: zeroAddr,
     id: 5,
     name: "Aggressive",
     description: "Focus on attack over defense at all costs.",
     battle: true,
-    costToPlay:0,
+    attack: 150,
+    defense: -200,
+    costToPlay: 5,
     art: "https://delphsart.s3.fr-par.scw.cloud/aggressive.png",
     frameColor: "#37363B",
-    beats: ["balanced", "snake fu"]
+    cancels: ["balanced", "snake fu"]
   },
   {
     address: zeroAddr,
@@ -112,10 +110,12 @@ const items:ItemDescription[] = [
     name: "Defensive",
     description: "Focus on defense over attack at all costs.",
     battle: true,
-    costToPlay:0,
+    attack: -200,
+    defense: 150,
+    costToPlay:5,
     art: "https://delphsart.s3.fr-par.scw.cloud/defensive.png",
     frameColor: "#37363B",
-    beats: ["aggressive", "evasive"]
+    cancels: ["aggressive", "evasive"]
   },
   {
     address: zeroAddr,
@@ -123,10 +123,12 @@ const items:ItemDescription[] = [
     name: "Snake Fu",
     description: "An ancient style of combat based on the movement of snakes.",
     battle: true,
-    costToPlay:0,
+    costToPlay:10,
+    attack: 200,
+    defense: 200,
     art: "https://delphsart.s3.fr-par.scw.cloud/snake.png",
     frameColor: "#37363B",
-    beats: ["defensive", "evasive"]
+    cancels: ["defensive", "evasive"]
   },
   {
     address: zeroAddr,
@@ -134,10 +136,13 @@ const items:ItemDescription[] = [
     name: "Evasive",
     description: "Attempt to dodge your opponent whenever possible.",
     battle: true,
-    costToPlay:0,
+    costToPlay:7,
+    attack: -150,
+    defense: 200,
+    health: 200,
     art: "https://delphsart.s3.fr-par.scw.cloud/evasive.png",
     frameColor: "#37363B",
-    beats: ["aggressive"],
+    cancels: ["aggressive"],
     flipsAgainst: ["balanced"]
   },
   {
@@ -146,10 +151,12 @@ const items:ItemDescription[] = [
     name: "Balanced",
     description: "A balanced strategy of attack and defense.",
     battle: true,
-    costToPlay:0,
+    costToPlay:7,
+    attack: 150,
+    defense: 150,
     art: "https://delphsart.s3.fr-par.scw.cloud/balanced.png",
     frameColor: "#37363B",
-    beats: ["defensive", "snake fu"],
+    cancels: ["defensive", "snake fu"],
     flipsAgainst: ["evasive"]
   },
 ].map((i) => {
