@@ -54,7 +54,7 @@ export class DelphsTable extends Room<DelphsTableState> {
       console.log(client.sessionId, 'updateDestination', destination)
       this.game.updateDestination(client.sessionId, destination)
     });
-    this.onMessage("playCard", (client, card: InventoryItem) => {
+    this.onMessage("playCard", (client, card: string) => {
       this.game.playCard(client.sessionId, card)
     })
 

@@ -3,6 +3,7 @@ import {
   Button,
   Flex,
   Heading,
+  HStack,
   Icon,
   keyframes,
   Modal,
@@ -18,8 +19,9 @@ import {
 import { useState } from "react"
 import { TbShieldCheckered } from "react-icons/tb"
 import { PLAY_CARD_EVT } from "../../game"
-import { CardProps } from "../../main-site-components/Card"
+import { Card, CardProps } from "../../main-site-components/Card"
 import CardPicker from "../../main-site-components/CardPicker"
+import { Item } from "../../syncing/schema/DelphsTableState"
 import { usePlayCanvasContext } from "./appProvider"
 import useCurrentPlayer from "./hooks/useCurrentPlayer"
 import useInventory from "./hooks/useInventory"
@@ -31,39 +33,44 @@ const pulse = keyframes`
 `
 
 const PlayCard: React.FC = () => {
-  const [showModal, setShowModal] = useState(false)
+  // const [showModal, setShowModal] = useState(false)
   const { app } = usePlayCanvasContext()
   const player = useCurrentPlayer()
   const inventory = useInventory(player)
+  console.log("inv: ", inventory)
 
-  const cards = inventory.reduce((memo, i) => {
-    return {
-      ...memo,
-      [i.id]: {
-        ...i,
-        identifier: i.id,
-      },
-    }
-  }, {} as Record<string, CardProps>)
+  // const onSelected = (identifiers: string[]) => {
+  //   console.log("selected: ", identifiers, cards)
+  //   onModalClose()
+  //   app.fire(PLAY_CARD_EVT, cards[identifiers[0]])
+  // }
 
-  const onSelected = (identifiers: string[]) => {
-    console.log("selected: ", identifiers, cards)
-    onModalClose()
-    app.fire(PLAY_CARD_EVT, cards[identifiers[0]])
-  }
-
-  const onButtonClick = (evt:React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  // const onButtonClick = (evt:React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  //   evt.stopPropagation()
+  //   setShowModal(true)
+  // }
+  const onButtonClick = (evt:React.MouseEvent<HTMLDivElement, MouseEvent>, card:Item) => {
     evt.stopPropagation()
-    setShowModal(true)
+    app.fire(PLAY_CARD_EVT, card)
+    // setShowModal(true)
   }
 
-  const onModalClose = () => {
-    setShowModal(false)
-  }
+  // const onModalClose = () => {
+  //   setShowModal(false)
+  // }
 
   return (
     <>
-      <Modal isOpen={showModal} onClose={onModalClose}>
+      <HStack>
+        {inventory.map((item, i) => {
+          return (
+            <Box key={`card-${item.identifier}-${i}`}>
+              <Card card={item} width={["150px", "150px", "150px"]} showCost onMouseDown={(evt) => onButtonClick(evt, item)} />
+            </Box>
+          )
+        })}
+      </HStack>
+      {/* <Modal isOpen={showModal} onClose={onModalClose}>
         <ModalOverlay />
         <ModalContent minW="40vw" bgColor="rgba(0,0,0,0.6)" backdropBlur="2px">
           <ModalHeader>Pick Card</ModalHeader>
@@ -78,8 +85,8 @@ const PlayCard: React.FC = () => {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
-      <VStack
+      </Modal> */}
+      {/* <VStack
         onMouseDown={onButtonClick}
         animation={`${pulse} infinite 3s linear`}
         cursor="pointer"
@@ -96,7 +103,7 @@ const PlayCard: React.FC = () => {
           <Icon as={TbShieldCheckered} h={["32px", "32px", "32px", "64px"]} w={["32px", "32px", "32px", "64px"]} />
         </Flex>
         <Heading size={["lg", "lg", "lg", "2xl"]}>Play Card</Heading>
-      </VStack>
+      </VStack> */}
     </>
   )
 }

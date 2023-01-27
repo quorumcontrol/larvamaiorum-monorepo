@@ -85,8 +85,7 @@ export class RovingAreaAttack extends Schema {
 }
 
 export class Item extends Schema {
-  @type("string") address: string
-  @type("number") id: number
+  @type("string") identifier:string
 
   @type("string") name: string
   @type("string") description: string
@@ -99,10 +98,10 @@ export class Item extends Schema {
   @type("boolean") affectsAllPlayers?: boolean
 }
 
-export class InventoryOfItem extends Schema {
-  @type(Item) item: Item
-  @type("number") quantity: number
-}
+// export class InventoryOfItem extends Schema {
+//   @type(Item) item: Item
+//   @type("number") quantity: number
+// }
 
 export class Trap extends Schema {
   @type("string") id: string
@@ -151,8 +150,9 @@ export class Warrior extends Schema {
   @type("number") currentHealth: number
   @type("number") initialGump: number
   @type("number") wootgumpBalance: number
-  @type({ map: InventoryOfItem }) initialInventory = new MapSchema<InventoryOfItem>({})
-  @type({ map: InventoryOfItem }) inventory = new MapSchema<InventoryOfItem>({})
+  // @type({ map: InventoryOfItem }) initialInventory = new MapSchema<InventoryOfItem>({})
+  // @type({ map: InventoryOfItem }) inventory = new MapSchema<InventoryOfItem>({})
+  @type({ array: Item }) inventory = new ArraySchema<Item>()
   @type(Item) currentItem: Item
 
   @type("boolean") autoPlay = false

@@ -1,4 +1,5 @@
 import { GameNags } from "../rooms/schema/DelphsTableState"
+import { randomInt } from "./utils/randoms"
 
 export interface InventoryItem {
   address: string
@@ -12,7 +13,8 @@ export function getIdentifier(item: InventoryItem) {
 // expected to be ${address}-${id}
 type InventoryIdentifier = string
 
-export type Inventory = Record<InventoryIdentifier, {quantity: number, item: InventoryItem}>
+// export type Inventory = Record<InventoryIdentifier, {quantity: number, item: InventoryItem}>
+export type Inventory = ItemDescription[]
 
 const zeroAddr = '0x0000000000000000000000000000000000000000'
 
@@ -143,7 +145,7 @@ const items:ItemDescription[] = [
     art: "https://delphsart.s3.fr-par.scw.cloud/evasive.png",
     frameColor: "#37363B",
     cancels: ["aggressive"],
-    flipsAgainst: ["balanced"]
+    // flipsAgainst: ["balanced"]
   },
   {
     address: zeroAddr,
@@ -157,7 +159,7 @@ const items:ItemDescription[] = [
     art: "https://delphsart.s3.fr-par.scw.cloud/balanced.png",
     frameColor: "#37363B",
     cancels: ["defensive", "snake fu"],
-    flipsAgainst: ["evasive"]
+    // flipsAgainst: ["evasive"]
   },
 ].map((i) => {
   return {
@@ -173,14 +175,25 @@ export const itemsByIdentifier = items.reduce((memo, item) => {
   }
 }, {} as Record<string,ItemDescription>)
 
-export const defaultInitialInventory:Inventory = [0,1,2,4,5,8].reduce((inventory, itemsId) => {
-  inventory[items[itemsId].identifier] = {quantity: -1, item: { address: items[itemsId].address, id: items[itemsId].id }}
-  return inventory
-}, {} as Inventory) 
+// export const defaultInitialInventory:Inventory = [0,1,2,4,5,8].reduce((inventory, itemsId) => {
+//   inventory[items[itemsId].identifier] = {quantity: -1, item: { address: items[itemsId].address, id: items[itemsId].id }}
+//   return inventory
+// }, {} as Inventory) 
 
-export function itemFromInventoryItem(inventoryItem:InventoryItem) {
-  const identifier = getIdentifier(inventoryItem)
-  return itemsByIdentifier[identifier]
+export const randomInventory = (numberOfcards:number):Inventory => {
+  return Array(numberOfcards).fill(true).map((_, i) => {
+    return randomItem()
+  })
 }
+
+export const randomItem = () => {
+  const itemArray = Object.values(items)
+  return itemArray[randomInt(itemArray.length)]
+}
+
+// export function itemFromInventoryItem(inventoryItem:InventoryItem) {
+//   const identifier = getIdentifier(inventoryItem)
+//   return itemsByIdentifier[identifier]
+// }
 
 export default items

@@ -1,4 +1,4 @@
-import { defaultInitialInventory, getIdentifier, Inventory, InventoryItem, ItemDescription, itemFromInventoryItem } from './items'
+import { Inventory, ItemDescription, itemsByIdentifier, randomInventory, randomItem } from './items'
 import { deterministicRandom, randomInt } from "./utils/randoms";
 import { Item, BehavioralState, Warrior as WarriorState } from '../rooms/schema/DelphsTableState'
 import { Client, Room } from "colyseus";
@@ -20,7 +20,7 @@ export interface WarriorStats {
   walkSpeed: number;
   initialHealth: number;
   initialGump: number;
-  initialInventory: Inventory;
+  inventory: Inventory;
   autoPlay: boolean;
   avatar?: string;
 }
@@ -41,7 +41,7 @@ export function generateWarrior(seed: string, name?: string): WarriorStats {
     maxSpeed: 6.5,
     walkSpeed: 2,
     initialGump: 0,
-    initialInventory: defaultInitialInventory,
+    inventory: randomInventory(3),
     autoPlay: false,
   }
 }
@@ -74,6 +74,10 @@ class Warrior implements Battler {
     const color: [number, number, number] = randomColor({ format: 'rgbArray', seed: `playerColor-${this.id}`, luminosity: 'light' }).map((c: number) => c / 255);
     state.color.clear()
     state.color.push(...color)
+  }
+
+  currentItem() {
+    return this.state.currentItem
   }
 
   get name() {
@@ -228,10 +232,26 @@ class Warrior implements Battler {
     return amountToUp;
   }
 
-  playItem(inventoryItem: InventoryItem): ItemDescription | null {
-    const item = itemFromInventoryItem(inventoryItem)
+  handleOtherWarriorCardPlay(warrior:Warrior, item:ItemDescription) {
+    if (warrior === this) {
+      return
+    }
+    //TODO: pop open a toast about the person playing a card
+    this.sendMessage(`${warrior.name} played ${item.name}`)
+    
+    // see if that card cancels
+    if (!this.state.currentItem) {
+      return
+    }
+    if (item.cancels?.includes(this.state.currentItem.name.toLowerCase())) {
+      this.sendMessage("Your card was canceled")
+      this.clearItem()
+    }
+  }
 
-    const identifier = getIdentifier(item)
+  playItem(identifier:string): ItemDescription | null {
+    const item = itemsByIdentifier[identifier]
+
     log('play item identifier: ', identifier)
     // looking for zero equality means that we allow -1 to mean "unlimited items"
     if (!this.hasCard(item)) {
@@ -246,35 +266,35 @@ class Warrior implements Battler {
       this.incGumpBalance(-1 * item.costToPlay)
     }
 
-    const inventoryRecord = this.state.inventory.get(identifier)
+    // remove the card from their inventory
+    const idx = this.state.inventory.findIndex((i) => i.identifier === identifier)
+    this.state.inventory.splice(idx, 1)
 
-    inventoryRecord.quantity -= 1
+    // now add a new random one
+    this.state.inventory.push(new Item(randomItem()))
+
     // if the item is a trap or equivalent (appliesToWorld), don't actually set it on the player
     if (item.appliesToWorld) {
       return item
     }
-    this.setItemInState(inventoryItem)
+    this.setCurrentItem(identifier)
     return item
   }
 
   hasCard(item: ItemDescription) {
-    const inventoryRecord = this.state.inventory.get(item.identifier)
-    if (!inventoryRecord || inventoryRecord.quantity === 0) {
+    const inventoryRecord = this.state.inventory.find((i) => i.identifier === item.identifier)
+    if (!inventoryRecord) {
       return false
     }
-    // anything less than zero means "unlimited" and anything above zero means they have one
+
     return true
   }
 
-  private setItemInState(item: InventoryItem) {
-    log('setting item: ', item, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
+  private setCurrentItem(identifier:string) {
+    log('setting item: ', identifier, ' existing: ', this.state.currentItem?.toJSON(), 'inventory', this.state.inventory.toJSON())
     // find it in the inventory
-    const description = itemFromInventoryItem(item)
-    this.state.currentItem = new Item({
-      ...item,
-      name: description.name,
-      description: description.description,
-    })
+    const description = itemsByIdentifier[identifier]
+    this.state.currentItem = new Item(description)
     this.updateAttackAndDefenseState()
   }
 
@@ -294,7 +314,7 @@ class Warrior implements Battler {
     if (!this.state.currentItem) {
       return null
     }
-    return itemFromInventoryItem(this.state.currentItem)
+    return itemsByIdentifier[this.state.currentItem.identifier]
   }
 
   clearItem() {

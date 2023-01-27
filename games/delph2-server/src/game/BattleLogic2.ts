@@ -1,5 +1,5 @@
 import { Vec2 } from 'playcanvas'
-import { Battle, BattlePhase, BehavioralState, LocomotionState, BattleCommands, SwingDirection, BlockDirection, Vec2 as StateVec2 } from '../rooms/schema/DelphsTableState'
+import { Battle, BattlePhase, BehavioralState, LocomotionState, BattleCommands, SwingDirection, BlockDirection, Vec2 as StateVec2, Item } from '../rooms/schema/DelphsTableState'
 import { ItemDescription } from './items'
 import LocomotionLogic from './LocomotionLogic'
 import { randomBounded, randomFloat, randomInt } from './utils/randoms'
@@ -23,6 +23,8 @@ export interface Battler {
 
   randomizeBattleRegion?: boolean
   ignoreNonKeyHolder?: boolean
+
+  currentItem: () => Item|undefined
 
   battleCommands: () => BattleCommands
   // state: BehavioralState

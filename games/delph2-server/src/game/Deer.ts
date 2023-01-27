@@ -1,5 +1,5 @@
 import { randomInt } from "./utils/randoms";
-import { BehavioralState, Deer as DeerState, DelphsTableState, GameNags } from '../rooms/schema/DelphsTableState'
+import { BehavioralState, Deer as DeerState, DelphsTableState, GameNags, Item } from '../rooms/schema/DelphsTableState'
 import { Vec2 } from "playcanvas";
 import Warrior, { randomBattleStats } from "./Warrior";
 import vec2ToVec2 from "./utils/vec2ToVec2";
@@ -55,6 +55,10 @@ class Deer implements Battler {
     this.health = initialHealth - randomInt(200)
     this.attack = attack + randomInt(1200)
     this.defense = Math.max(200, defense - randomInt(600))
+  }
+
+  currentItem():Item|undefined {
+    return undefined
   }
 
   update(dt: number) {
@@ -137,7 +141,7 @@ class Deer implements Battler {
       }
 
       // if the player has played a card while chasing, then start ignoring them.
-      if (this.chasing!.state.currentItem?.repels.includes(GameNags.deer)) {
+      if (this.chasing!.state.currentItem?.repels?.includes(GameNags.deer)) {
         this.stopChasing()
         if (gump) {
           this.setDestination(gump.x, gump.y)
@@ -232,7 +236,7 @@ class Deer implements Battler {
       }
       return warrior.state.wootgumpBalance > 10 &&
         this.locomotion.position.distance(warrior.locomotion.position) < 6 &&
-        !warrior.state.currentItem
+        !warrior.currentItem()?.repels?.includes(GameNags.deer)
     })
   }
 

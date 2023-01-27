@@ -211,10 +211,9 @@ class NetworkManager extends ScriptTypeBase {
       this.room?.send('updateDestination', { x: result.point.x, z: result.point.z })
     })
 
-    this.app.on(PLAY_CARD_EVT, (evtItem: Item) => {
-      const item = evtItem.toJSON ? evtItem.toJSON() : evtItem
+    this.app.on(PLAY_CARD_EVT, (item: Item) => {
       console.log("playing card: ", item)
-      this.room?.send('playCard', item)
+      this.room?.send('playCard', item.identifier)
     })
 
     this.app.on(CHOOSE_STRATEGY_EVT, (item: Item) => {

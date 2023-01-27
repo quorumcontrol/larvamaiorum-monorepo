@@ -1,5 +1,5 @@
 import { Vec2 } from "playcanvas"
-import { RovingAreaAttack, BehavioralState } from "../rooms/schema/DelphsTableState"
+import { RovingAreaAttack, BehavioralState, GameNags } from "../rooms/schema/DelphsTableState"
 import randomPosition from "./utils/randomPosition"
 import { randomBounded } from "./utils/randoms"
 import Warrior from "./Warrior"
@@ -45,7 +45,18 @@ class RovingAreaAttackLogic {
   }
 
   findCloseWarriorsAndHurtThem() {
+    if (Object.values(this.warriors).some((w) => {
+      const item = w.currentItem()
+      return item && item.affectsAllPlayers && item.repels.includes(GameNags.roving)
+    })) {
+      // the table is protected
+      return
+    }
     Object.values(this.warriors).forEach((w) => {
+      if (w.currentItem()?.repels?.includes(GameNags.roving)) {
+        // this player is protected
+        return
+      }
       if (w.locomotion.position.distance(this.position) <= RADIUS) {
         if ([BehavioralState.move, BehavioralState.battle].includes(w.state.behavioralState)) {
           w.sendMessage("This area is cursed. -15% health.")

@@ -2,10 +2,10 @@ import { Client, Room } from 'colyseus';
 import { randomUUID } from 'crypto'
 import { backOff } from 'exponential-backoff';
 import { Vec2 } from "playcanvas";
-import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, InventoryOfItem, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase, Arch, BattleControlMessage } from "../rooms/schema/DelphsTableState";
-import BattleLogic2, { Battler } from './BattleLogic2';
+import { DelphsTableState, Deer as DeerState, Warrior as WarriorState, Vec2 as StateVec2, Battle, BehavioralState, Item, Trap, RoomType, QuestType, RovingAreaAttack, BattlePhase, Arch, BattleControlMessage, GameNags } from "../rooms/schema/DelphsTableState";
+import BattleLogic2, { Battler, BattlerType } from './BattleLogic2';
 import Deer from './Deer';
-import { InventoryItem, itemFromInventoryItem } from './items';
+import { InventoryItem, itemsByIdentifier } from './items';
 import { getRandomTrack } from './music';
 import QuestLogic from './QuestLogic';
 import RovingAreaAttackLogic from './RovingAreaAttackLogic';
@@ -217,16 +217,9 @@ class DelphsTableLogic {
     state.locomotion.position.assign(position)
     state.locomotion.destination.assign(position)
     state.locomotion.focus.assign(position)
-    Object.keys(stats.initialInventory).forEach((key) => {
-      const initialInventory = stats.initialInventory[key]
-      const itemDescription = itemFromInventoryItem(initialInventory.item)
-      const item = new Item({
-        ...initialInventory.item,
-        ...itemDescription,
-      })
-      const inventoryOfItem = new InventoryOfItem({ quantity: initialInventory.quantity, item: item })
-      state.initialInventory.set(key, inventoryOfItem)
-      state.inventory.set(key, inventoryOfItem.clone())
+    stats.inventory.forEach((itemDescription) => {
+      const item = new Item(itemDescription)
+      state.inventory.push(item)
     })
     console.log('added warrior: ', state.name)
     const warrior = new Warrior(state, client)
@@ -265,7 +258,7 @@ class DelphsTableLogic {
     }
   }
 
-  playCard(sessionId: string, item: InventoryItem) {
+  playCard(sessionId: string, identifier: string) {
     if (!this.state.acceptInput) {
       return
     }
@@ -273,10 +266,25 @@ class DelphsTableLogic {
       this.warriors[sessionId].sendMessage("You have the key. No cards allowed.")
       return  
     }
-    const result = this.warriors[sessionId]?.playItem(item)
-    if (result?.name === "Trap") {
+    const warrior = this.warriors[sessionId]
+    if (!warrior) {
+      console.error('no warrior for ', sessionId)
+      return
+    }
+    const result = warrior.playItem(identifier)
+
+    if (!result) {
+      return
+    }
+
+    if (result.name === "Trap") {
       this.setTrap(sessionId)
     }
+
+    Object.values(this.warriors).forEach((w) => {
+      w.handleOtherWarriorCardPlay(warrior, itemsByIdentifier[identifier])
+    })
+
   }
 
   private setTrap(sessionId: string) {
@@ -371,8 +379,16 @@ class DelphsTableLogic {
         if (potentialOpponent.id === battler.id || ![BehavioralState.move, BehavioralState.chasing].includes(potentialOpponent.getState())) {
           return
         }
-        if (battler.id.startsWith('deer') && potentialOpponent.id.startsWith('deer')) {
+        if (battler.battlerType == BattlerType.deer && potentialOpponent.battlerType == BattlerType.deer) {
           return // don't let two deer fight each other
+        }
+
+        if (battler.currentItem()?.repels.includes(GameNags.deer) && potentialOpponent.battlerType === BattlerType.deer) {
+          return // don't let a deer fight someone with a repel card
+        }
+
+        if (battler.battlerType === BattlerType.deer && potentialOpponent.currentItem()?.repels.includes(GameNags.deer)) {
+          return // same as above, don't allow a deer to fight someone with a repel card.
         }
 
         // if we're in a quest situation, the deer should only attack the key holder

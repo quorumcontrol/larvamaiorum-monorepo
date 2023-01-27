@@ -102,7 +102,7 @@ class QuestLogic {
   }
 
   update(_dt: number) {
-    if (this.state.piggyId) {
+    if (QuestType.first || this.state.piggyId) {
       Object.values(this.battlers).forEach((battler) => {
         if (battler.battlerType !== BattlerType.warrior) {
           return
@@ -149,7 +149,7 @@ class QuestLogic {
 
   processBattle(battle: BattleLogic2) {
     // keep track of consecutive battles for human warriors (not the deer)
-    if (battle.losers.concat([battle.winner!]).every((b) => b.battlerType == BattlerType.warrior)) {
+    if (battle.losers.concat([battle.winner!]).every((b) => b && b.battlerType == BattlerType.warrior)) {
       this.consecutiveBattles[battle.winner.id] ||= 0
       this.consecutiveBattles[battle.winner.id]++
       battle.losers.forEach((l) => {

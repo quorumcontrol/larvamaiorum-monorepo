@@ -29,10 +29,10 @@ const BattleUI: React.FC<BattleUIProps> = ({ battle }) => {
     } as BattleControlMessage)
   }, [sliderValue, regionSelect])
 
-  const onSliderChange = (val:number) => {
-    console.log("slider value change", val)
-    setSliderValue(val)
-  }
+  // const onSliderChange = (val:number) => {
+  //   console.log("slider value change", val)
+  //   setSliderValue(val)
+  // }
 
   const onRegionSelect = (normalizedClick: Vec2) => {
     console.log('new regional select', normalizedClick)
@@ -46,8 +46,8 @@ const BattleUI: React.FC<BattleUIProps> = ({ battle }) => {
           <BattleRegionSelector opponentPositon={opponentsControls ? [opponentsControls.x, opponentsControls.z] : undefined} onRegionSelect={onRegionSelect} />
           <Spacer />
           <PlayCard />
-          <Spacer />
-          <BattleSlider value={sliderValue} onChange={onSliderChange}  />
+          {/* <Spacer />
+          <BattleSlider value={sliderValue} onChange={onSliderChange}  /> */}
         </HStack>
       </VStack>
     </>
