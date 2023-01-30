@@ -379,15 +379,21 @@ class DelphsTableLogic {
         if (potentialOpponent.id === battler.id || ![BehavioralState.move, BehavioralState.chasing].includes(potentialOpponent.getState())) {
           return
         }
-        if (battler.battlerType == BattlerType.deer && potentialOpponent.battlerType == BattlerType.deer) {
+        if (battler.battlerType === BattlerType.deer && potentialOpponent.battlerType == BattlerType.deer) {
           return // don't let two deer fight each other
         }
 
-        if (battler.currentItem()?.repels.includes(GameNags.deer) && potentialOpponent.battlerType === BattlerType.deer) {
+        if (battler.locomotion.position.distance(potentialOpponent.locomotion.position) >= 2) {
+          return
+        }
+
+        // console.log("deer is: ", BattlerType.deer, "battler: ", battler.battlerType, "repels: ", battler.currentItem()?.repels, potentialOpponent.id)
+
+        if (battler.currentItem()?.repels?.includes(GameNags.deer) && potentialOpponent.battlerType === BattlerType.deer) {
           return // don't let a deer fight someone with a repel card
         }
 
-        if (battler.battlerType === BattlerType.deer && potentialOpponent.currentItem()?.repels.includes(GameNags.deer)) {
+        if (battler.battlerType === BattlerType.deer && potentialOpponent.currentItem()?.repels?.includes(GameNags.deer)) {
           return // same as above, don't allow a deer to fight someone with a repel card.
         }
 
@@ -397,9 +403,8 @@ class DelphsTableLogic {
             return
           }
         }
-        if (battler.locomotion.position.distance(potentialOpponent.locomotion.position) < 2) {
-          pairs.push([battler, potentialOpponent])
-        }
+        
+        pairs.push([battler, potentialOpponent])
       })
     })
 
@@ -493,7 +498,7 @@ class DelphsTableLogic {
     if (this.isMatchRoom()) {
       return QuestLogic.matchQuest(this.room, this.battlers, this.state.arches.toArray())
     }
-    return QuestLogic.randomQuest(this.room, this.battlers, this.state.arches.toArray(), QuestType.random)
+    return QuestLogic.randomQuest(this.room, this.battlers, this.state.arches.toArray())
   }
 
   private startQuest() {

@@ -92,6 +92,7 @@ const items:ItemDescription[] = [
     art: "https://delphsart.s3.fr-par.scw.cloud/gift.png",
     frameColor: "#37363B",
     repels: [GameNags.roving],
+    affectsAllPlayers: true,
   },
   {
     address: zeroAddr,
@@ -189,6 +190,7 @@ export const randomInventory = (numberOfcards:number):Inventory => {
 export const randomItem = () => {
   const itemArray = Object.values(items)
   return itemArray[randomInt(itemArray.length)]
+  // return itemArray[3]
 }
 
 // export function itemFromInventoryItem(inventoryItem:InventoryItem) {

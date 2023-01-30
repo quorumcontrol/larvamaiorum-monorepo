@@ -7,12 +7,13 @@ import LocomotionLogic from "./LocomotionLogic";
 import { Battler, BattlerType } from "./BattleLogic2";
 import randomPosition from "./utils/randomPosition";
 import { Room } from "colyseus";
+import { ItemDescription } from "./items";
 
 type TrapHolder = DelphsTableState['traps']
 
 class Deer implements Battler {
   id: string;
-  battlerType: BattlerType.deer
+  battlerType = BattlerType.deer
   name = "A Deer"
 
   randomizeBattleRegion = true
@@ -57,7 +58,7 @@ class Deer implements Battler {
     this.defense = Math.max(200, defense - randomInt(600))
   }
 
-  currentItem():Item|undefined {
+  currentItem():ItemDescription|undefined {
     return undefined
   }
 

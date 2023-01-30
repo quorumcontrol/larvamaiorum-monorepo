@@ -76,10 +76,6 @@ class Warrior implements Battler {
     state.color.push(...color)
   }
 
-  currentItem() {
-    return this.state.currentItem
-  }
-
   get name() {
     return this.state.name
   }
@@ -149,7 +145,7 @@ class Warrior implements Battler {
   }
 
   setAdditionalSpeed() {
-    const currentItem = this.currentItemDetails()
+    const currentItem = this.currentItem()
 
     let additionalSpeed = 0
     if (currentItem?.speed) {
@@ -193,7 +189,7 @@ class Warrior implements Battler {
   }
 
   currentAttack() {
-    const item = this.currentItemDetails()
+    const item = this.currentItem()
     let additionalAttack = 0
     if (item?.attack) {
       additionalAttack += item.attack
@@ -205,7 +201,7 @@ class Warrior implements Battler {
   }
 
   currentDefense() {
-    const item = this.currentItemDetails()
+    const item = this.currentItem()
     let additionalDefense = 0
     if (item?.defense) {
       additionalDefense += item.defense
@@ -299,7 +295,7 @@ class Warrior implements Battler {
   }
 
   private checkForCardTimeout() {
-    const details = this.currentItemDetails()
+    const details = this.currentItem()
     if (details?.timeLimit && this.timeWithCard > details.timeLimit) {
       this.clearItem()
     }
@@ -310,7 +306,7 @@ class Warrior implements Battler {
     this.state.currentDefense = this.currentDefense()
   }
 
-  currentItemDetails() {
+  currentItem() {
     if (!this.state.currentItem) {
       return null
     }

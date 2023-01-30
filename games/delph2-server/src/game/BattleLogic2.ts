@@ -24,7 +24,7 @@ export interface Battler {
   randomizeBattleRegion?: boolean
   ignoreNonKeyHolder?: boolean
 
-  currentItem: () => Item|undefined
+  currentItem: () => ItemDescription|undefined
 
   battleCommands: () => BattleCommands
   // state: BehavioralState

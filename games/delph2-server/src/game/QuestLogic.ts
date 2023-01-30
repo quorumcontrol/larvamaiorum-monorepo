@@ -46,7 +46,7 @@ class QuestLogic {
     return new QuestLogic(room, state, battlers, arches)
   }
 
-  static randomQuest(room: Room, battlers: Record<string, Battler>, arches: Arch[], type: QuestType) {
+  static randomQuest(room: Room, battlers: Record<string, Battler>, arches: Arch[]) {
     //TODO: actually random
     const questObj = new QuestObject({
       id: randomUUID(),
@@ -59,16 +59,8 @@ class QuestLogic {
     const state = new StateQuest({
       object: questObj,
       startedAt: new Date().getTime(),
+      type: QuestType.first,
     })
-
-    const warriorIds = QuestLogic.warriorIds(battlers)
-    if (warriorIds.length > 1 && (type === QuestType.keyCarrier || (type === QuestType.random && randomInt(2) === 1))) {
-      state.assign({
-        kind: QuestType.keyCarrier,
-        piggyId: warriorIds[randomInt(warriorIds.length)],
-      })
-      //TODO: make sure the goal isn't so close to the piggy
-    }
 
     return new QuestLogic(room, state, battlers, arches)
   }
@@ -90,19 +82,13 @@ class QuestLogic {
         this.room.broadcast("mainHUDMessage", "First to find the prize wins!")
         return
       case QuestType.keyCarrier:
-      // const piggy = this.battlers[this.state.piggyId]
-      // Object.values(this.battlers).forEach((w) => {
-      //   if (w === piggy) {
-      //     return w.sendMessage("First to the prize wins. You have the key. Run!")
-      //   }
-      //   w.sendMessage(`${piggy.name} has the key. Get them.`)
-      // })
-      // return
+        // for now do nothing
+        return
     }
   }
 
   update(_dt: number) {
-    if (QuestType.first || this.state.piggyId) {
+    if (this.state.kind === QuestType.first || this.state.piggyId) {
       Object.values(this.battlers).forEach((battler) => {
         if (battler.battlerType !== BattlerType.warrior) {
           return
@@ -116,6 +102,7 @@ class QuestLogic {
           return
         }
         if (battler.locomotion.position.distance(this.questObjectPosition) <= 2) {
+          console.log("quest complete: ", battler.name, "wins")
           this.winner = battler
           this._over = true
         }
