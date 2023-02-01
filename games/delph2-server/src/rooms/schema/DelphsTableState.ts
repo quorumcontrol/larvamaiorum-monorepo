@@ -181,6 +181,7 @@ export class QuestObject extends Schema {
 
 export class Quest extends Schema {
   @type("number") startedAt: number
+  @type("string") description:string
 
   @type("number") kind: QuestType = 0
   @type(QuestObject) object?: QuestObject

@@ -126,7 +126,7 @@ class BattleLogic2 {
   }
 
   update(dt: number) {
-    if (!this.started || this.state.phase == BattlePhase.completed) {
+    if (!this.started || this.isPhase(BattlePhase.completed)) {
       return
     }
     this.handleSwingOrHit(dt)
@@ -194,6 +194,10 @@ class BattleLogic2 {
       this.timeSinceSwing = 0
       this.clearBattleCommands()
       this.handleRoundResults()
+    }
+
+    if (this.isPhase(BattlePhase.completed)) {
+      return
     }
 
     const warriorLength = this.battlers.length

@@ -37,7 +37,7 @@ const PlayCard: React.FC = () => {
   const { app } = usePlayCanvasContext()
   const player = useCurrentPlayer()
   const inventory = useInventory(player)
-  console.log("inv: ", inventory)
+  // console.log("inv: ", inventory)
 
   // const onSelected = (identifiers: string[]) => {
   //   console.log("selected: ", identifiers, cards)
@@ -65,7 +65,7 @@ const PlayCard: React.FC = () => {
         {inventory.map((item, i) => {
           return (
             <Box key={`card-${item.identifier}-${i}`}>
-              <Card card={item} width={["150px", "150px", "150px"]} showCost onMouseDown={(evt) => onButtonClick(evt, item)} />
+              <Card card={item} width={["90px", "90px", "100px", "150px"]} showCost onMouseDown={(evt) => onButtonClick(evt, item)} />
             </Box>
           )
         })}

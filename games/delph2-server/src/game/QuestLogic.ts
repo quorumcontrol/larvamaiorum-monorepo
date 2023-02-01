@@ -33,6 +33,7 @@ class QuestLogic {
 
     const state = new StateQuest({
       // object: questObj,
+      description: "First warrior to get 50 gump and win 2 consecutive battles against another player gets they key. First one to exit with the key wins.",
       startedAt: new Date().getTime(),
     })
 
@@ -60,6 +61,7 @@ class QuestLogic {
       object: questObj,
       startedAt: new Date().getTime(),
       type: QuestType.first,
+      description: "First to the exit wins."
     })
 
     return new QuestLogic(room, state, battlers, arches)

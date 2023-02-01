@@ -125,6 +125,7 @@ class Warrior implements Battler {
   setIsPiggy(isPiggy: boolean) {
     this.isPiggy = isPiggy
     this.updateAttackAndDefenseState()
+    this.clearItem()
   }
 
   sendMessage(message: string) {
