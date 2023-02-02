@@ -1,8 +1,6 @@
 import axios, { AxiosPromise } from "axios";
 // import ThenArg from "./ThenArg";
 
-const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-
 interface CompletionParameters {
   apiKey: string;
   engine: string;
