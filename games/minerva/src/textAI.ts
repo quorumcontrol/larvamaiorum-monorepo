@@ -47,4 +47,6 @@ export function generateCompletions(
       frequency_penalty: completionParams.frequencyPenalty,
     },
   });
+
+
 }

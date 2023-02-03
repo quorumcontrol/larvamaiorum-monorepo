@@ -1,5 +1,5 @@
 {
-  "name": "playcanvas-typescript-example",
+  "name": "pickle-chess",
   "version": "1.0.0",
   "description": "",
   "private": true,
@@ -50,7 +50,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.1",
-    "playcanvas": "^1.60.0",
+    "playcanvas": "^1.57.1",
     "playcanvas-sync": "github:playcanvas/playcanvas-sync",
     "prettier": "^2.5.1",
     "prop-types": "^15.8.1",
