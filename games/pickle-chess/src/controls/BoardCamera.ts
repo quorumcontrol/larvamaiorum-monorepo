@@ -1,3 +1,6 @@
+import { Room } from "colyseus.js";
+import { Vec3 } from "playcanvas";
+import { PickleChessState } from "../syncing/schema/PickleChessState";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
@@ -10,9 +13,10 @@ class BoardCamera extends ScriptTypeBase {
   initialize() {
     this.orbitCamera = mustGetScript(this.entity, "orbitCamera2")
     const board = mustFindByName(this.app.root, "Board")
-    this.app.on("newRoom", () => {
+    this.app.on("newRoom", (_room:Room<PickleChessState>) => {
+      // TODO: use the actual board size, but right now it's not yet synced
       console.log('focusing camera on the board')
-      this.orbitCamera.focus(board)
+      this.orbitCamera.pivotPoint = new Vec3(5,0,5)
     })
   }
 }

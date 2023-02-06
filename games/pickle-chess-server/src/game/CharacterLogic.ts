@@ -23,7 +23,6 @@ class CharacterLogic {
   setDestination(tile: Tile) {
     this.userSetDestination = tile
     console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
-
   }
 
   update(dt: number) {
@@ -46,6 +45,7 @@ class CharacterLogic {
 
     if (this.userSetDestination.id === tile.id) {
       this.userSetDestination = undefined
+      return
     }
 
     if (this.locomotion.getState() === LocomotionState.arrived) {

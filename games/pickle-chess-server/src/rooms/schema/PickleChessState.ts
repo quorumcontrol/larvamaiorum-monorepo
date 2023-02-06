@@ -117,6 +117,7 @@ export class Tile extends Schema {
 export class PickleChessState extends Schema {
   @type("string") id: string
   @type("number") roomState: RoomState = RoomState.waitingForPlayers
+  @type("string") winner?:string
   @type({ map: Tile }) board = new MapSchema<Tile>();
   @type({ map: Character }) characters = new MapSchema<Character>();
   @type({ map: Player }) players = new MapSchema<Player>();

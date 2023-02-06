@@ -1,19 +1,22 @@
-import { Client } from "colyseus";
-import { PickleChessRoom } from "../rooms/PickleChessRoom";
-import { Character, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, Tile, TileClickmessage, TileType } from "../rooms/schema/PickleChessState";
-import { getAiBoard } from "./boardFetching";
-import BoardLogic from "./BoardLogic";
-import CharacterLogic from "./CharacterLogic";
+import { Client } from "colyseus"
+import { PickleChessRoom } from "../rooms/PickleChessRoom"
+import { Character, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, Tile, TileClickmessage, TileType } from "../rooms/schema/PickleChessState"
+import { getAiBoard } from "./boardFetching"
+import BoardLogic from "./BoardLogic"
+import CharacterLogic from "./CharacterLogic"
+import EventEmitter from "events"
 
 const CHARACTERS_PER_PLAYER = 8
 const NUMBER_OF_PLAYERS = 2
+
+const BOARD_LOAD_EVENT = "boardLoaded"
 
 export interface RoomJoinOptions {
   name: string
   avatar?: string
 }
 
-class RoomHandler {
+class RoomHandler extends EventEmitter {
   private room: PickleChessRoom
   private state: PickleChessState
 
@@ -21,8 +24,10 @@ class RoomHandler {
 
   board: BoardLogic
 
+  private boardLoaded = false
 
   constructor(room: PickleChessRoom) {
+    super()
     this.room = room
     this.state = room.state
     this.board = new BoardLogic(this.state)
@@ -33,7 +38,11 @@ class RoomHandler {
     this.characters.forEach((character) => {
       character.update(dt)
     })
+    if (this.state.roomState !== RoomState.playing) {
+      return
+    }
     this.handleCharacterRemovals()
+    this.checkForOver()
   }
 
   async setup() {
@@ -41,6 +50,30 @@ class RoomHandler {
     this.board.populateTileMap(rawBoard)
     this.room.onMessage(Messages.setDestination, this.handleSetDestination.bind(this))
     this.room.onMessage(Messages.tileClick, this.handleTileClick.bind(this))
+    this.boardLoaded = true
+    this.emit(BOARD_LOAD_EVENT)
+  }
+
+  private isPlaying() {
+    return this.state.roomState === RoomState.playing
+  }
+
+  checkForOver() {
+    if (!this.boardLoaded) {
+      return
+    }
+    // see if one player only has a single character left
+    const players = this.state.players
+    const playerIds = Array.from(players.keys())
+    const playerCharacters = playerIds.map((playerId) => {
+      return this.characters.filter((character) => character.state.playerId === playerId)
+    })
+    const playerWithOneCharacter = playerCharacters.find((characters) => characters.length <= 1)
+    if (playerWithOneCharacter) {
+      console.log("------------------ game over!")
+      this.state.winner = playerWithOneCharacter[0].state.playerId
+      this.state.roomState = RoomState.gameOver
+    }
   }
 
   handleCharacterRemovals() {
@@ -98,16 +131,16 @@ class RoomHandler {
     })
   }
 
-  private removeCharacter(character: CharacterLogic) {
-    this.state.characters.delete(character.state.id)
-  }
-
   private handleSetDestination(client: Client, message: SetDestinationMessage) {
     console.log(client.sessionId, "set destination", message);
   }
 
   private handleTileClick(client: Client, {x,y}: TileClickmessage) {
     console.log(client.sessionId, "clicked tile", x,y);
+    if (!this.isPlaying()) {
+      console.log("not handling tile click")
+      return
+    }
     const tile = this.board.getTile(x,y)
     if (!tile) {
       console.error("Tile not found", x,y)
@@ -140,38 +173,47 @@ class RoomHandler {
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
-    console.log(client.sessionId, "joined!", options);
-    this.state.players.set(client.sessionId, new Player({
-      id: client.sessionId,
-      name: options.name,
-      avatar: options.avatar,
-    }))
-    for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
-      const tile = this.board.randomAvailableInitialLocation()
-      const character = new Character({
-        id: `${client.sessionId}-${i}`,
-        playerId: client.sessionId,
-        tileId: tile.id,
+    const handleJoin = () => {
+      console.log(client.sessionId, "joined!", options);
+      this.state.players.set(client.sessionId, new Player({
+        id: client.sessionId,
+        name: options.name,
         avatar: options.avatar,
-      })
-      character.locomotion.assign({
-        walkSpeed: 2.0,
-      })
-      character.locomotion.position.assign({
-        x: tile.x,
-        z: tile.y,
-      })
-      character.locomotion.destination.assign({
-        x: tile.x,
-        z: tile.y,
-      })
-      this.state.characters.set(character.id, character)
-      this.characters.push(new CharacterLogic(character, this.board))
+      }))
+      for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
+        const tile = this.board.randomAvailableInitialLocation()
+        const character = new Character({
+          id: `${client.sessionId}-${i}`,
+          playerId: client.sessionId,
+          tileId: tile.id,
+          avatar: options.avatar,
+        })
+        character.locomotion.assign({
+          walkSpeed: 2.0,
+        })
+        character.locomotion.position.assign({
+          x: tile.x,
+          z: tile.y,
+        })
+        character.locomotion.destination.assign({
+          x: tile.x,
+          z: tile.y,
+        })
+        this.state.characters.set(character.id, character)
+        this.characters.push(new CharacterLogic(character, this.board))
+      }
+      if (this.playerCount() >= NUMBER_OF_PLAYERS) {
+        this.room.lock()
+        this.state.assign({
+          roomState: RoomState.playing
+        })
+      }
     }
-    if (this.playerCount() >= NUMBER_OF_PLAYERS) {
-      this.room.lock()
-      this.state.roomState = RoomState.playing
+    if (this.boardLoaded) {
+      return handleJoin()
     }
+    this.once(BOARD_LOAD_EVENT, handleJoin)
+    
   }
 }
 

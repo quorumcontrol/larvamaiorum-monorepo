@@ -28,7 +28,7 @@ export function generateCompletions(
   prompt: string | Array<string>,
   completionParams: CompletionParameters,
   n: number = 1
-): AxiosPromise {
+): AxiosPromise<{ choices: Array<{ text: string }> }> {
   return axios({
     method: "POST",
     url: `https://api.openai.com/v1/engines/${completionParams.engine}/completions`,

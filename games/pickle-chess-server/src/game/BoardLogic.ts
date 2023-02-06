@@ -39,6 +39,7 @@ class BoardLogic {
     if (character && character.playerId === playerId) {
       return false
     }
+    return true
   }
 
   isOccupiedByOpposingPlayer(playerId:string, tile?:Tile) {
@@ -72,7 +73,7 @@ class BoardLogic {
           return 0
         })) 
       },
-      diagonalAllowed: false,
+      diagonalAllowed: true,
       includeEndNode: true,
       includeStartNode: false,
     });
