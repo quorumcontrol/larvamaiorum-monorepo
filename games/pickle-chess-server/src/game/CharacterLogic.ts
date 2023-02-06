@@ -49,12 +49,20 @@ class CharacterLogic {
     }
 
     if (this.locomotion.getState() === LocomotionState.arrived) {
-      const path = this.board.findPath(tile, this.userSetDestination)
+      const path = this.board.findPath(tile, this.userSetDestination, this)
       if (path.length === 0) {
+        console.log("no path")
         this.userSetDestination = undefined
         return
       }
       const nextTile = this.board.getTile(path[0][0], path[0][1])
+
+      if (this.board.getOccupent(nextTile.x, nextTile.y)) {
+        // if someone is already on this tile, just stop
+        this.userSetDestination = undefined
+        return
+      }
+
       this.locomotion.setDestinationAndFocus(nextTile.x, nextTile.y)
       this.locomotion.setState(LocomotionState.move)
     }

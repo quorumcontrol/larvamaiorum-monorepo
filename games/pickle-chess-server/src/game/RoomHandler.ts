@@ -19,7 +19,7 @@ class RoomHandler {
 
   private characters: CharacterLogic[]
 
-  private board: BoardLogic
+  board: BoardLogic
 
 
   constructor(room: PickleChessRoom) {
@@ -33,6 +33,7 @@ class RoomHandler {
     this.characters.forEach((character) => {
       character.update(dt)
     })
+    this.handleCharacterRemovals()
   }
 
   async setup() {
@@ -40,6 +41,65 @@ class RoomHandler {
     this.board.populateTileMap(rawBoard)
     this.room.onMessage(Messages.setDestination, this.handleSetDestination.bind(this))
     this.room.onMessage(Messages.tileClick, this.handleTileClick.bind(this))
+  }
+
+  handleCharacterRemovals() {
+    // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
+    this.characters.forEach((character, i, characters) => {
+      const playerId = character.state.playerId
+      const {x,z} = character.position()
+      const playerTile = this.board.getTile(x,z)
+      if (!playerTile) {
+        console.error("tile not found", x,z)
+        return
+      }
+      // first find if the tile above and below is occupied by an opponent
+      const tileAbove = this.board.getTile(x, z+1)
+      const tileBelow = this.board.getTile(x, z-1)
+      const tileLeft = this.board.getTile(x-1, z)
+      const tileRight = this.board.getTile(x+1, z)
+
+      if (tileAbove && tileBelow && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+
+      if (tileLeft && tileRight && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+
+      // check for the corners of the board which would allow a top,left or a top, right, etc to remove a character.
+      if (!this.board.isPassable(playerId, tileAbove) && !this.board.isPassable(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+
+      if (!this.board.isPassable(playerId, tileAbove) && !this.board.isPassable(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+
+      if (!this.board.isPassable(playerId, tileBelow) && !this.board.isPassable(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+
+      if (!this.board.isPassable(playerId, tileBelow) && !this.board.isPassable(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
+        this.state.characters.delete(character.state.id)
+        characters.splice(i, 1)
+        return
+      }
+    })
+  }
+
+  private removeCharacter(character: CharacterLogic) {
+    this.state.characters.delete(character.state.id)
   }
 
   private handleSetDestination(client: Client, message: SetDestinationMessage) {
@@ -87,7 +147,7 @@ class RoomHandler {
       avatar: options.avatar,
     }))
     for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
-      const tile = this.board.randomReachableBoardLocation()
+      const tile = this.board.randomAvailableInitialLocation()
       const character = new Character({
         id: `${client.sessionId}-${i}`,
         playerId: client.sessionId,

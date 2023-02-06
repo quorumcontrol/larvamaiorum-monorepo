@@ -2,6 +2,7 @@ import { AStarFinder } from "astar-typescript"
 import { IPoint } from "astar-typescript/dist/interfaces/astar.interfaces"
 import { PickleChessState, Tile, TileType } from "../rooms/schema/PickleChessState"
 import { RawBoard } from "./boardFetching"
+import CharacterLogic from "./CharacterLogic"
 import { randomInt } from "./utils/randoms"
 
 const tileFloor = (num:number) => {
@@ -13,22 +14,69 @@ class BoardLogic {
 
   private tiles: Tile[][]
 
-  private aStar?: AStarFinder
-
   constructor(state: PickleChessState) {
     this.tiles = []
     this.state = state
   }
 
-  getTile(x: number, y: number) {
-    return this.tiles[tileFloor(y)][tileFloor(x)]
+  getOccupent(x: number, y: number) {
+    const tile = this.getTile(x, y)
+    return this.characterAt(tile)
   }
 
-  findPath(from:IPoint, to:IPoint) {
-    if (!this.aStar) {
-      throw new Error("no aStar, but finding path")
+  characterAt(tile: Tile) {
+    return Array.from(this.state.characters.values()).find((character) => character.tileId === tile.id)
+  }
+
+  isPassable(playerId: string, tile?: Tile) {
+    if (!tile) {
+      return false
     }
-    return this.aStar.findPath(from, to)
+    if ([TileType.water, TileType.stone].includes(tile.type)) {
+      return false
+    }
+    const character = this.characterAt(tile)
+    if (character && character.playerId === playerId) {
+      return false
+    }
+  }
+
+  isOccupiedByOpposingPlayer(playerId:string, tile?:Tile) {
+    if (!tile) {
+      return false
+    }
+    const character = this.characterAt(tile)
+    if (!character) {
+      return false
+    }
+
+    return character.playerId !== playerId
+  }
+  
+  getTile(x: number, y: number) {
+    const column = this.tiles[tileFloor(y)] || []
+    return column[tileFloor(x)]
+  }
+
+  findPath(from:IPoint, to:IPoint, movingCharacter:CharacterLogic) {
+    const aStar = new AStarFinder({
+      grid: {
+        matrix: this.tiles.map((column) => column.map((tile) => {
+          if ([TileType.water, TileType.stone].includes(tile.type)) {
+            return 1
+          }
+          const character = this.characterAt(tile)
+          if (character && character.id !== movingCharacter.state.id) {
+            return 1
+          }
+          return 0
+        })) 
+      },
+      diagonalAllowed: false,
+      includeEndNode: true,
+      includeStartNode: false,
+    });
+    return aStar.findPath(from, to)
   }
 
   populateTileMap(board: RawBoard) {
@@ -47,19 +95,6 @@ class BoardLogic {
         this.tiles[y][x] = tile
       }
     }
-    this.aStar = new AStarFinder({
-      grid: {
-        matrix: this.tiles.map((row) => row.map((tile) => {
-          if ([TileType.water, TileType.stone].includes(tile.type)) {
-            return 1
-          }
-          return 0
-        })) 
-      },
-      diagonalAllowed: false,
-      includeEndNode: true,
-      includeStartNode: false,
-    });
   }
 
   randomBoardLocation() {
@@ -68,11 +103,11 @@ class BoardLogic {
     return { x, y }
   }
 
-  randomReachableBoardLocation():Tile {
+  randomAvailableInitialLocation():Tile {
     const location = this.randomBoardLocation()
     const tile = this.getTile(location.x, location.y)
-    if ([TileType.stone, TileType.water].includes(tile.type)) {
-      return this.randomReachableBoardLocation()
+    if ([TileType.stone, TileType.water].includes(tile.type) || this.getOccupent(tile.x, tile.y)) {
+      return this.randomAvailableInitialLocation()
     }
     return tile
   }

@@ -4,7 +4,6 @@ import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { Entity, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import { Character } from "../syncing/schema/PickleChessState";
-import { randomInt } from "crypto";
 import { loadGlbContainerFromUrl } from "../utils/glbUtils";
 
 @createScript("character")
@@ -35,9 +34,6 @@ class CharacterVisual extends ScriptTypeBase {
     if (position.distance(this.focus) > 0.05) {
       this.entity.lookAt(this.focus.x, this.focus.y, this.focus.z)
       this.entity.rotateLocal(0,180,0)
-    }
-    if (this.characterState.locomotion.speed > 0) {
-      console.log("speed: ", this.characterState.locomotion.speed)
     }
     this.entity.anim!.setFloat("speed", this.characterState.locomotion.speed)
   }
