@@ -1,4 +1,5 @@
-export * from "./Board"
+export * from "./Tile"
 export * from "./TreeTile"
 export * from "./StoneTile"
 export * from "./GrassTile"
+export * from "./CharacterVisual"

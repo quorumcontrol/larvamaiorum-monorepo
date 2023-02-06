@@ -1,6 +1,7 @@
 
 import './controls'
 import './game'
+import './syncing'
 
 console.log(`
 --------------------------------------------------------------------------------
