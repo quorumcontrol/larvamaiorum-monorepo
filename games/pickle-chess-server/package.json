@@ -33,6 +33,7 @@
   "dependencies": {
     "@colyseus/arena": "^0.14.22",
     "@colyseus/monitor": "^0.14.20",
+    "astar-typescript": "^1.2.6",
     "bn.js": "^5.2.1",
     "colyseus": "^0.14.20",
     "cors": "^2.8.5",

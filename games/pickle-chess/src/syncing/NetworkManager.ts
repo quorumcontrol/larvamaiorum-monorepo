@@ -14,14 +14,26 @@ import { Character, Messages, PickleChessState, Tile, tileTypeToEnglish } from "
 const ROOM_TYPE = "PickleChessRoom"
 
 const client = memoize(() => {
-  // if (typeof document !== 'undefined') {
-  //   const params = new URLSearchParams(document.location.search);
-  //   if (params.get('arena')) {
-  //     return new Client("wss://zh8smr.colyseus.de")
-  //   }
-  // }
+  if (typeof document !== 'undefined') {
+    const params = new URLSearchParams(document.location.search);
+    if (params.get('arena')) {
+      return new Client("wss://zh8smr.colyseus.de")
+    }
+  }
   return new Client("ws://localhost:2567")
 })
+
+const roomParams = () => {
+  if (typeof document !== 'undefined') {
+    const params = new URLSearchParams(document.location.search);
+    const encodedMatchData = params.get("m")
+    if (encodedMatchData) {
+      return [ROOM_TYPE, JSON.parse(atob(encodedMatchData))]
+    }
+    return [ROOM_TYPE, { name: params.get("name") }]
+  }
+  return [ROOM_TYPE, {}]
+}
 
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
@@ -54,9 +66,10 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   async go() {
-    this.room = await this.client.joinOrCreate<PickleChessState>(ROOM_TYPE, {
-      name: "bob"
-    });
+    const [roomType, params] = roomParams()
+    console.log("joining room: ", roomType, params)
+    this.room = await this.client.joinOrCreate<PickleChessState>(roomType, params)
+
     this.room.onError((error) => {
       console.error("room error", error)
     })
@@ -91,12 +104,12 @@ class NetworkManager extends ScriptTypeBase {
     character.enabled = true
     const {x, z} = characterState.locomotion.position
     mustGetScript<CharacterVisual>(character, "character").setCharacter(characterState, this.room.sessionId)
-    character.setLocalPosition(x, 0.1, z)
+    character.setLocalPosition(x, 0, z)
     boardElement.addChild(character)
   }
 
   private handleTileAdd(tile:Tile, id:string) {
-    console.log("tile added", tile.toJSON(), id)
+    // console.log("tile added", tile.toJSON(), id)
     const boardElement = mustFindByName(this.app.root, "Board")
     const tileHolder = mustFindByName(boardElement, "Tiles")
     const templates = mustFindByName(this.app.root, "Templates")

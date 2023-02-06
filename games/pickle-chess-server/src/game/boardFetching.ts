@@ -1,5 +1,5 @@
 
-type RawBoard = number[][]
+export type RawBoard = number[][]
 
 // TODO: fetch a new board from openAI
 export const getAiBoard = async ():Promise<RawBoard> => {
@@ -7,9 +7,9 @@ export const getAiBoard = async ():Promise<RawBoard> => {
   [3,4,4,4,4,4,4,4,3],
   [3,4,2,2,2,2,2,4,3],
   [3,4,2,1,1,1,2,4,3],
-  [3,4,2,1,1,1,2,4,3],
+  [3,2,2,1,1,1,2,4,3],
   [3,4,2,2,2,2,2,4,3],
-  [3,4,4,4,4,4,4,4,3],
+  [3,4,4,4,4,2,4,4,3],
   [3,3,3,3,3,3,3,3,3],
   [2,2,2,2,2,2,2,2,2],
   [2,1,1,4,4,4,1,1,2],
