@@ -1,24 +1,28 @@
 
 import { createScript } from "../utils/createScriptDecorator";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
-import { Entity, Vec3 } from "playcanvas";
+import { Entity, SoundComponent, Vec3 } from "playcanvas";
 import mustFindByName from "../utils/mustFindByName";
 import { Character } from "../syncing/schema/PickleChessState";
 import { loadGlbContainerFromUrl } from "../utils/glbUtils";
+import mustGetScript from "../utils/mustGetScript";
 
 @createScript("character")
 class CharacterVisual extends ScriptTypeBase {
   private highlightElement: Entity
-
   private characterState?: Character
-
   private playerId?: string
-
   private focus: Vec3
+  private deathEffect:any
+  private sound:SoundComponent
+  private dead = false
+
 
   initialize() {
     this.focus = new Vec3()
     this.highlightElement = mustFindByName(this.entity, "Highlight")
+    this.deathEffect = mustGetScript(mustFindByName(this.entity, "DeathEffect"), "effekseerEmitter")
+    this.sound = mustFindByName(this.entity, "Sound").sound!
   }
 
   update(): void {
@@ -46,6 +50,16 @@ class CharacterVisual extends ScriptTypeBase {
     }
   }
 
+  kill() {
+    this.dead = true
+    this.deathEffect.play()
+    const currentPosition = this.entity.getLocalPosition()
+    this.entity.anim!.setFloat("health", 0)
+    this.sound.slots["Death"].play()
+    this.entity.tween(currentPosition).to({y: -1}, 3, pc.SineInOut).start().on("complete", () => {
+      this.entity.destroy()
+    })
+  }
 
   private handleAvatar() {
     if (!this.characterState) {
@@ -57,9 +71,11 @@ class CharacterVisual extends ScriptTypeBase {
 
     const armature = mustFindByName(this.entity, "Armature")
 
-
     loadGlbContainerFromUrl(this.app, url, null, name, (err: any, asset: pc.Asset) => {
       console.log("avatar loaded")
+      if (this.dead) {
+        return // no need for any of this
+      }
       if (err) {
         console.error("error loading avatar: ", err)
         return //TODO: retry?

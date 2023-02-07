@@ -1,11 +1,11 @@
 import { generateCompletions } from "./textAI"
 
-const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-if (!apiKey) {
-  throw new Error("missing api key")
-}
-
 export const fetchBoard = async () => {
+  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("missing api key")
+  }
+
   const userPrompt = `
 You are designing a top-down level for a 3d game. There are 5 tile types:
 

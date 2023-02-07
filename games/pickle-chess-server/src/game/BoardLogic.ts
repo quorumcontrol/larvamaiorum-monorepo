@@ -5,7 +5,7 @@ import { RawBoard } from "./boardFetching"
 import CharacterLogic from "./CharacterLogic"
 import { randomInt } from "./utils/randoms"
 
-const tileFloor = (num:number) => {
+const tileFloor = (num: number) => {
   return Math.max(0, Math.round(num))
 }
 
@@ -42,7 +42,7 @@ class BoardLogic {
     return true
   }
 
-  isOccupiedByOpposingPlayer(playerId:string, tile?:Tile) {
+  isOccupiedByOpposingPlayer(playerId: string, tile?: Tile) {
     if (!tile) {
       return false
     }
@@ -53,13 +53,13 @@ class BoardLogic {
 
     return character.playerId !== playerId
   }
-  
+
   getTile(x: number, y: number) {
     const column = this.tiles[tileFloor(y)] || []
     return column[tileFloor(x)]
   }
 
-  findPath(from:IPoint, to:IPoint, movingCharacter:CharacterLogic) {
+  findPath(from: IPoint, to: IPoint, movingCharacter: CharacterLogic) {
     const aStar = new AStarFinder({
       grid: {
         matrix: this.tiles.map((column) => column.map((tile) => {
@@ -70,8 +70,11 @@ class BoardLogic {
           if (character && character.id !== movingCharacter.state.id) {
             return 1
           }
+          if (this.killsPlayer(tile, movingCharacter.state.playerId)) {
+            return 1
+          }
           return 0
-        })) 
+        }))
       },
       diagonalAllowed: true,
       includeEndNode: true,
@@ -98,23 +101,56 @@ class BoardLogic {
     }
   }
 
+  killsPlayer(playerTile: Tile, playerId: string) {
+    const { x, y } = playerTile
+    // first find if the tile above and below is occupied by an opponent
+    const tileAbove = this.getTile(x, y + 1)
+    const tileBelow = this.getTile(x, y - 1)
+    const tileLeft = this.getTile(x - 1, y)
+    const tileRight = this.getTile(x + 1, y)
+
+    if (tileAbove && tileBelow && this.isOccupiedByOpposingPlayer(playerId, tileAbove) && this.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+      return true
+    }
+
+    if (tileLeft && tileRight && this.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.isOccupiedByOpposingPlayer(playerId, tileRight)) {
+      return true
+    }
+
+    // check for the corners of the board which would allow a top,left or a top, right, etc to remove a character.
+    if (!this.isPassable(playerId, tileAbove) && !this.isPassable(playerId, tileLeft) && this.isOccupiedByOpposingPlayer(playerId, tileRight) && this.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+      return true
+    }
+
+    if (!this.isPassable(playerId, tileAbove) && !this.isPassable(playerId, tileRight) && this.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+      return true
+    }
+
+    if (!this.isPassable(playerId, tileBelow) && !this.isPassable(playerId, tileLeft) && this.isOccupiedByOpposingPlayer(playerId, tileRight) && this.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
+      return true
+    }
+
+    if (!this.isPassable(playerId, tileBelow) && !this.isPassable(playerId, tileRight) && this.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
+      return true
+    }
+
+    return false
+  }
+
   randomBoardLocation() {
     const y = randomInt(this.tiles.length)
     const x = randomInt(this.tiles[0].length)
     return { x, y }
   }
 
-  randomAvailableInitialLocation():Tile {
+  randomAvailableInitialLocation(playerId: string): Tile {
     const location = this.randomBoardLocation()
     const tile = this.getTile(location.x, location.y)
-    if ([TileType.stone, TileType.water].includes(tile.type) || this.getOccupent(tile.x, tile.y)) {
-      return this.randomAvailableInitialLocation()
+    if ([TileType.stone, TileType.water].includes(tile.type) || this.getOccupent(tile.x, tile.y) || this.killsPlayer(tile, playerId)) {
+      return this.randomAvailableInitialLocation(playerId)
     }
     return tile
   }
-
-
-
 }
 
 export default BoardLogic

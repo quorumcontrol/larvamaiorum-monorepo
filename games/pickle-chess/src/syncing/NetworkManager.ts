@@ -17,7 +17,7 @@ const client = memoize(() => {
   if (typeof document !== 'undefined') {
     const params = new URLSearchParams(document.location.search);
     if (params.get('arena')) {
-      return new Client("wss://zh8smr.colyseus.de")
+      return new Client("wss://uxddx0.colyseus.de")
     }
   }
   return new Client("ws://localhost:2567")
@@ -90,7 +90,7 @@ class NetworkManager extends ScriptTypeBase {
   private handleCharacterRemove(_characterState:Character, id:string) {
     //TODO: effects and stuff
     const character = mustFindByName(this.app.root, id)
-    character.destroy()
+    mustGetScript<CharacterVisual>(character, "character").kill()
   }
 
   private handleCharacterAdd(characterState:Character, id:string) {

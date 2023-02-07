@@ -86,47 +86,9 @@ class RoomHandler extends EventEmitter {
         console.error("tile not found", x,z)
         return
       }
-      // first find if the tile above and below is occupied by an opponent
-      const tileAbove = this.board.getTile(x, z+1)
-      const tileBelow = this.board.getTile(x, z-1)
-      const tileLeft = this.board.getTile(x-1, z)
-      const tileRight = this.board.getTile(x+1, z)
-
-      if (tileAbove && tileBelow && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
+      if (this.board.killsPlayer(playerTile, playerId)) {
         this.state.characters.delete(character.state.id)
         characters.splice(i, 1)
-        return
-      }
-
-      if (tileLeft && tileRight && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight)) {
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        return
-      }
-
-      // check for the corners of the board which would allow a top,left or a top, right, etc to remove a character.
-      if (!this.board.isPassable(playerId, tileAbove) && !this.board.isPassable(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        return
-      }
-
-      if (!this.board.isPassable(playerId, tileAbove) && !this.board.isPassable(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        return
-      }
-
-      if (!this.board.isPassable(playerId, tileBelow) && !this.board.isPassable(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        return
-      }
-
-      if (!this.board.isPassable(playerId, tileBelow) && !this.board.isPassable(playerId, tileRight) && this.board.isOccupiedByOpposingPlayer(playerId, tileLeft) && this.board.isOccupiedByOpposingPlayer(playerId, tileAbove)) {
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        return
       }
     })
   }
@@ -154,7 +116,11 @@ class RoomHandler extends EventEmitter {
     const highlightedCharacterId = player.highlightedCharacterId
     if (highlightedCharacterId) {
       const character = this.characters.find((character) => character.state.id === highlightedCharacterId)
-      character!.setDestination(tile)
+      if (!character) {
+        player.highlightedCharacterId = ""
+        return
+      }
+      character.setDestination(tile)
       character.state.highlightedForPlayer.set(client.sessionId, false)
       player.highlightedCharacterId = ""
       return
@@ -181,7 +147,7 @@ class RoomHandler extends EventEmitter {
         avatar: options.avatar,
       }))
       for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
-        const tile = this.board.randomAvailableInitialLocation()
+        const tile = this.board.randomAvailableInitialLocation(client.sessionId)
         const character = new Character({
           id: `${client.sessionId}-${i}`,
           playerId: client.sessionId,
