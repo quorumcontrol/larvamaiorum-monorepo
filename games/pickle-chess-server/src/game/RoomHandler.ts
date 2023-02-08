@@ -1,10 +1,11 @@
 import { Client } from "colyseus"
 import { PickleChessRoom } from "../rooms/PickleChessRoom"
-import { Character, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, Tile, TileClickmessage, TileType } from "../rooms/schema/PickleChessState"
+import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, Tile, TileClickmessage, TileType } from "../rooms/schema/PickleChessState"
 import { getAiBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
+import { getRandomTrack } from "./music"
 
 const CHARACTERS_PER_PLAYER = 8
 const NUMBER_OF_PLAYERS = 2
@@ -25,6 +26,7 @@ class RoomHandler extends EventEmitter {
   board: BoardLogic
 
   private boardLoaded = false
+  private timeSinceMusic = 0
 
   constructor(room: PickleChessRoom) {
     super()
@@ -43,13 +45,25 @@ class RoomHandler extends EventEmitter {
     }
     this.handleCharacterRemovals()
     this.checkForOver()
+    this.timeSinceMusic += dt
+    // try every 20s incase music is failing
+    if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20_000) {
+      this.timeSinceMusic = 0
+      this.setupMusic()
+    }
+    if (this.state.nowPlaying.duration > 0 && this.timeSinceMusic > this.state.nowPlaying.duration) {
+      this.timeSinceMusic = 0
+      this.setupMusic()
+    }
   }
 
   async setup() {
+    this.setupMusic()
     const rawBoard = await getAiBoard()
     this.board.populateTileMap(rawBoard)
     this.room.onMessage(Messages.setDestination, this.handleSetDestination.bind(this))
     this.room.onMessage(Messages.tileClick, this.handleTileClick.bind(this))
+    this.room.onMessage(Messages.characterClick, this.handleCharacterClick.bind(this))
     this.boardLoaded = true
     this.emit(BOARD_LOAD_EVENT)
   }
@@ -94,8 +108,48 @@ class RoomHandler extends EventEmitter {
     })
   }
 
+  private async setupMusic() {
+    const track = await getRandomTrack()
+    if (track) {
+      console.log('updating track to: ', track.title)
+      this.state.nowPlaying.assign({
+        name: track.title,
+        duration: track.duration,
+        artwork: track.artwork,
+        artist: track.artist,
+        url: track.streaming,
+        startedAt: new Date().getTime(),
+      })
+    }
+    this.timeSinceMusic = 0
+  }
+
   private handleSetDestination(client: Client, message: SetDestinationMessage) {
     console.log(client.sessionId, "set destination", message);
+  }
+
+  private handleCharacterClick(client: Client, { id }: CharacterClickMessage) {
+    console.log(client.sessionId, "clicked character", id);
+    if (!this.isPlaying()) {
+      console.log("not handling character click")
+      return
+    }
+    const character = this.characters.find((character) => character.state.id === id)
+    if (!character) {
+      console.error("Character not found", id)
+      return
+    }
+    const player = this.state.players.get(client.sessionId)
+    if (!player) {
+      console.error("Player not found", client.sessionId)
+      return
+    }
+    
+    if (character.state.playerId === player.id) {
+      player.highlightedCharacterId = id
+      character.state.highlightedForPlayer.set(client.sessionId, true)
+      return
+    }
   }
 
   private handleTileClick(client: Client, {x,y}: TileClickmessage) {

@@ -9,12 +9,17 @@ export enum RoomState {
 export enum Messages {
   setDestination = "setDest",
   tileClick = "tileClick",
+  characterClick = "characterClick",
 }
 
 export interface SetDestinationMessage {
   x: number
   y: number
   characterId: string
+}
+
+export interface CharacterClickMessage {
+  id: string
 }
 
 export interface TileClickmessage {
@@ -121,4 +126,5 @@ export class PickleChessState extends Schema {
   @type({ map: Tile }) board = new MapSchema<Tile>();
   @type({ map: Character }) characters = new MapSchema<Character>();
   @type({ map: Player }) players = new MapSchema<Player>();
+  @type(Music) nowPlaying = new Music({})
 }

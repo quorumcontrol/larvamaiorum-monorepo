@@ -14,8 +14,8 @@ class BoardCamera extends ScriptTypeBase {
     this.orbitCamera = mustGetScript(this.entity, "orbitCamera2")
     const board = mustFindByName(this.app.root, "Board")
     this.app.on("newRoom", (_room:Room<PickleChessState>) => {
-      // TODO: use the actual board size, but right now it's not yet synced
       console.log('focusing camera on the board')
+      this.orbitCamera.focus(board)
       this.orbitCamera.pivotPoint = new Vec3(5,0,5)
     })
   }

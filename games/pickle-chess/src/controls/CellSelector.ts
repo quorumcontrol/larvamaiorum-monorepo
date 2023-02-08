@@ -133,7 +133,8 @@ class CellSelector extends ScriptTypeBase {
     );
 
     // Raycast between the two points and return the closest hit result
-    const result = this.app.systems.rigidbody!.raycastFirst(from, to);
+    // const result = this.app.systems.rigidbody!.raycastFirst(from, to);
+    const result = this.app.systems.rigidbody!.raycastAll(from, to);
 
     // If there was a hit, emit the entity
     if (result) {

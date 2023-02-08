@@ -9,7 +9,7 @@ import { memoize } from "../utils/memoize";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import { randomBounded } from "../utils/randoms";
-import { Character, Messages, PickleChessState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
+import { Character, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
 
 const ROOM_TYPE = "PickleChessRoom"
 
@@ -38,8 +38,8 @@ const roomParams = () => {
 @createScript("networkManager")
 class NetworkManager extends ScriptTypeBase {
 
-  private client:Client
-  private room:Room<PickleChessState>
+  private client: Client
+  private room: Room<PickleChessState>
 
   initialize() {
     this.client = client()
@@ -52,17 +52,41 @@ class NetworkManager extends ScriptTypeBase {
     this.app.on(SELECT_EVT, this.handleLocalCellSelect, this)
   }
 
-  private handleLocalCellSelect(result: RaycastResult) {
-    const entity = result.entity
-    console.log("click", entity.name)
-    if (!entity.name?.startsWith("tile-")) {
-      console.log('ignoring')
+  private isCharacterSelected() {
+    const player = this.room.state.players.get(this.room.sessionId)
+    return player && !!player.highlightedCharacterId
+  }
+
+  private handleLocalCellSelect(results: RaycastResult[]) {
+    if (this.room?.state?.roomState !== RoomState.playing) {
       return
     }
-    const x = entity.name.split("-")[1]
-    const y = entity.name.split("-")[2]
-    console.log("cell select, entity", x, y, entity.name)
-    this.room.send(Messages.tileClick , {x, y})
+    // if the user has a character selected
+    const isCharacterSelected = this.isCharacterSelected()
+
+    const result = results.find((result) => {
+      const entity = result.entity
+      if (isCharacterSelected) {
+        return entity.tags.has("tile")
+      }
+      return entity.tags.has("tile") || entity.tags.has("character")
+    })
+    if (!result) {
+      return
+    }
+    const entity = result.entity
+    if (entity.tags.has("tile")) {
+      const x = entity.name.split("-")[1]
+      const y = entity.name.split("-")[2]
+      console.log("cell select, entity", x, y, entity.name)
+      this.room.send(Messages.tileClick, { x, y })
+      return
+    }
+    if (entity.tags.has("character")) {
+      console.log("character select, entity", entity.name)
+      this.room.send(Messages.characterClick, { id: entity.name })
+      return
+    }
   }
 
   async go() {
@@ -87,13 +111,13 @@ class NetworkManager extends ScriptTypeBase {
     this.app.fire("newRoom", this.room)
   }
 
-  private handleCharacterRemove(_characterState:Character, id:string) {
+  private handleCharacterRemove(_characterState: Character, id: string) {
     //TODO: effects and stuff
     const character = mustFindByName(this.app.root, id)
     mustGetScript<CharacterVisual>(character, "character").kill()
   }
 
-  private handleCharacterAdd(characterState:Character, id:string) {
+  private handleCharacterAdd(characterState: Character, id: string) {
     const templates = mustFindByName(this.app.root, "Templates")
     const characterTemplate = mustFindByName(templates, "Character") as Entity
     const boardElement = mustFindByName(this.app.root, "Board")
@@ -102,13 +126,13 @@ class NetworkManager extends ScriptTypeBase {
     const character = characterTemplate.clone()
     character.name = characterState.id
     character.enabled = true
-    const {x, z} = characterState.locomotion.position
+    const { x, z } = characterState.locomotion.position
     mustGetScript<CharacterVisual>(character, "character").setCharacter(characterState, this.room.sessionId)
     character.setLocalPosition(x, 0, z)
     boardElement.addChild(character)
   }
 
-  private handleTileAdd(tile:Tile, id:string) {
+  private handleTileAdd(tile: Tile, id: string) {
     // console.log("tile added", tile.toJSON(), id)
     const boardElement = mustFindByName(this.app.root, "Board")
     const tileHolder = mustFindByName(boardElement, "Tiles")
@@ -122,7 +146,7 @@ class NetworkManager extends ScriptTypeBase {
     mustGetScript<TileVisual>(tileEntity, "tile").setTile(tile, this.room.sessionId)
   }
 
-  private handleTileRemove(_tile:Tile, id:string) {
+  private handleTileRemove(_tile: Tile, id: string) {
     const tileEntity = mustFindByName(this.app.root, id)
     tileEntity.destroy()
   }

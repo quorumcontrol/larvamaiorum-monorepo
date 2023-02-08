@@ -47,10 +47,6 @@ const NowPlaying: React.FC = () => {
     audio.volume = 0.05 * (sliderValue / 50)
   }, [sliderValue, audio])
 
-  if (!url) {
-    return null
-  }
-
   return (
     <Box p={[2, 2, 2, 4]} m={4} borderRadius={"lg"} bgColor="rgba(0,0,0,0.6)">
       <VStack alignItems="left">
