@@ -18,10 +18,9 @@ export function loadGlbContainerFromUrl(app: pc.Application, url: string, option
     filename: filename
   };
 
-  var asset = new pc.Asset(filename, 'container', file, undefined, options);
   let finished = false
 
-  asset.once('load', (containerAsset: pc.Asset) => {
+  const onLoaded = (containerAsset: pc.Asset) => {
     console.log("asset once called")
     if (finished) {
       console.error("asset once was called multiple times, but we're ignoring it")
@@ -42,7 +41,22 @@ export function loadGlbContainerFromUrl(app: pc.Application, url: string, option
 
       callback(null, containerAsset);
     }
-  });
+  }
+
+  // see if the asset already exists and if so, just return it when ready
+  let asset = app.assets.find(filename);
+  if (asset) {
+    if (asset.resource) {
+      onLoaded(asset);
+    } else {
+      asset.once('load', onLoaded);
+    }
+    return asset;
+  }
+
+  asset = new pc.Asset(filename, 'container', file, undefined, options);
+
+  asset.once('load', onLoaded)
 
   app.assets.add(asset);
   app.assets.load(asset);
