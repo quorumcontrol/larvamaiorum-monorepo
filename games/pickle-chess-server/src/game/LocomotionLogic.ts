@@ -5,7 +5,7 @@ import { Locomotion, LocomotionState } from "../rooms/schema/PickleChessState"
 class LocomotionLogic {
   position: Vec2
   destination: Vec2
-  focus: Vec2
+  // focus: Vec2
   frontPoint: Vec2
 
   private forward:Vec2
@@ -26,14 +26,14 @@ class LocomotionLogic {
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
     this.destination = new Vec2(state.destination.x, state.destination.z)
-    this.focus = new Vec2(state.focus.x, state.focus.z)
+    // this.focus = new Vec2(state.focus.x, state.focus.z)
     this.frontOfCharacterOffset = frontOfCharacterOffset
 
-    this.forward = new Vec2()
-    this.updateForward()
+    // this.forward = new Vec2()
+    // this.updateForward()
 
     this.frontPoint = new Vec2()
-    this.updateFrontPoint()
+    // this.updateFrontPoint()
 
     this.debugRoom = room
   }
@@ -48,8 +48,8 @@ class LocomotionLogic {
         x: this.position.x,
         z: this.position.y,
       })
-      this.updateForward()
-      this.updateFrontPoint()
+      // this.updateForward()
+      // this.updateFrontPoint()
       this.setSpeedBasedOnDestination()
       // if (this.debugRoom) {
       //   this.debugRoom.broadcast("debug", {x: this.frontPoint.x, y: this.frontPoint.y})
@@ -81,22 +81,27 @@ class LocomotionLogic {
     this.position.set(x, z)
   }
 
+  stop() {
+    this.setDestination(this.position.x, this.position.y)
+    this.setSpeed(0)
+  }
+
   // setAdditionalSpeed(additionalSpeed: number) {
   //   this.addionalSpeed = additionalSpeed
   // }
 
   setDestinationAndFocus(x: number, z: number) {
-    this.setFocus(x, z)
+    // this.setFocus(x, z)
     this.setDestination(x, z)
   }
 
-  setFocus(x: number, z: number) {
-    this.state.focus.assign({
-      x,
-      z,
-    })
-    this.focus.set(x, z)
-  }
+  // setFocus(x: number, z: number) {
+  //   this.state.focus.assign({
+  //     x,
+  //     z,
+  //   })
+  //   this.focus.set(x, z)
+  // }
 
   setDestination(x: number, z: number) {
     this.state.destination.assign({
@@ -133,19 +138,19 @@ class LocomotionLogic {
     this.limiter = undefined
   }
 
-  private updateFrontPoint() {
-    this.frontPoint.add2(this.position, this.forward.mulScalar(this.frontOfCharacterOffset))
-  }
+  // private updateFrontPoint() {
+  //   this.frontPoint.add2(this.position, this.forward.mulScalar(this.frontOfCharacterOffset))
+  // }
 
-  private updateForward() {
-    return this.forward.sub2(this.focus, this.position).normalize()
-  }
+  // private updateForward() {
+  //   return this.forward.sub2(this.focus, this.position).normalize()
+  // }
 
-  private angleToDestination() {
-    const targetDir = new Vec2().sub2(this.destination, this.position).normalize();
-    const angleInRadians = Math.acos(targetDir.dot(this.forward));
-    return angleInRadians * math.RAD_TO_DEG;
-  }
+  // private angleToDestination() {
+  //   const targetDir = new Vec2().sub2(this.destination, this.position).normalize();
+  //   const angleInRadians = Math.acos(targetDir.dot(this.forward));
+  //   return angleInRadians * math.RAD_TO_DEG;
+  // }
 
   private setSpeedBasedOnDestination() {
     const dist = this.distanceToDestination()
@@ -162,19 +167,19 @@ class LocomotionLogic {
     this.state.assign({
       locomotionState: LocomotionState.arrived
     })
-    this.setSpeed(0)
+    // this.setSpeed(0)
   }
 
   private setSpeed(speed: number) {
     this.state.speed = speed
 
-    if (this.limiter && speed > this.limiter) {
-      this.state.speed = this.limiter
-    }
+    // if (this.limiter && speed > this.limiter) {
+    //   this.state.speed = this.limiter
+    // }
 
-    if (this.angleToDestination() > 100) {
-      this.state.speed *= -1
-    }
+    // if (this.angleToDestination() > 100) {
+    //   this.state.speed *= -1
+    // }
   }
 
 }

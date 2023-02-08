@@ -87,6 +87,7 @@ class RoomHandler extends EventEmitter {
         return
       }
       if (this.board.killsPlayer(playerTile, playerId)) {
+        character.stop()
         this.state.characters.delete(character.state.id)
         characters.splice(i, 1)
       }

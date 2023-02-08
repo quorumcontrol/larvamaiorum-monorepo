@@ -1,5 +1,4 @@
-import { Room } from "colyseus";
-import { Character, LocomotionState, PickleChessState, Tile } from "../rooms/schema/PickleChessState";
+import { Character, LocomotionState, Tile } from "../rooms/schema/PickleChessState";
 import BoardLogic from "./BoardLogic";
 import LocomotionLogic from "./LocomotionLogic";
 
@@ -25,6 +24,11 @@ class CharacterLogic {
     console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
   }
 
+  stop() {
+    this.locomotion.stop()
+    this.userSetDestination = undefined
+  }
+
   update(dt: number) {
     this.locomotion.update(dt)
     if (!this.userSetDestination) {
@@ -43,23 +47,23 @@ class CharacterLogic {
     }
     this.state.tileId = tile.id
 
-    if (this.userSetDestination.id === tile.id) {
-      this.userSetDestination = undefined
-      return
-    }
-
     if (this.locomotion.getState() === LocomotionState.arrived) {
+      if (this.userSetDestination.id === tile.id) {
+        this.stop()
+        return
+      }
+
       const path = this.board.findPath(tile, this.userSetDestination, this)
       if (path.length === 0) {
         console.log("no path")
-        this.userSetDestination = undefined
+        this.stop()
         return
       }
       const nextTile = this.board.getTile(path[0][0], path[0][1])
 
       if (this.board.getOccupent(nextTile.x, nextTile.y)) {
         // if someone is already on this tile, just stop
-        this.userSetDestination = undefined
+        this.stop()
         return
       }
 

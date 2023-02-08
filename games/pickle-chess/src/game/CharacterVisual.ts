@@ -17,12 +17,19 @@ class CharacterVisual extends ScriptTypeBase {
   private sound:SoundComponent
   private dead = false
 
+  private unsub?: () => void
+
 
   initialize() {
     this.focus = new Vec3()
     this.highlightElement = mustFindByName(this.entity, "Highlight")
     this.deathEffect = mustGetScript(mustFindByName(this.entity, "DeathEffect"), "effekseerEmitter")
     this.sound = mustFindByName(this.entity, "Sound").sound!
+    this.entity.on("destroy", () => {
+      if (this.unsub) {
+        this.unsub()
+      }
+    })
   }
 
   update(): void {
@@ -35,11 +42,10 @@ class CharacterVisual extends ScriptTypeBase {
     this.highlightElement.enabled = this.characterState.highlightedForPlayer.get(this.playerId) || false
     const serverPosition = this.characterState.locomotion.position
     this.entity.setPosition(serverPosition.x, 0, serverPosition.z)
-    if (position.distance(this.focus) > 0.05) {
+    if (position.distance(this.focus) > 0.06) {
       this.entity.lookAt(this.focus.x, this.focus.y, this.focus.z)
       this.entity.rotateLocal(0,180,0)
     }
-    this.entity.anim!.setFloat("speed", this.characterState.locomotion.speed)
   }
 
   setCharacter(character: Character, playerId: string) {
@@ -48,6 +54,10 @@ class CharacterVisual extends ScriptTypeBase {
     if (this.characterState.avatar) {
       this.handleAvatar()
     }
+    this.unsub = character.locomotion.listen("speed", (newSpeed) => {
+      console.log("new speed", this.characterState?.id, newSpeed)
+      this.entity.anim!.setFloat("speed", newSpeed)
+    })
   }
 
   kill() {

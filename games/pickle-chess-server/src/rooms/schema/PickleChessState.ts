@@ -73,7 +73,7 @@ export class Locomotion extends Schema {
   @type("number") locomotionState: LocomotionState = 0;
   // focus might be unused, but keeping it for consistency with existing code
   // and for the future, where a battle might happen and the focus would change.
-  @type(Vec2) focus: Vec2 = new Vec2();
+  // @type(Vec2) focus: Vec2 = new Vec2();
 
   // @type("number") maxSpeed: number
   @type("number") walkSpeed: number
