@@ -1,6 +1,6 @@
 import { Client } from "colyseus"
 import { PickleChessRoom } from "../rooms/PickleChessRoom"
-import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, Tile, TileClickmessage, TileType } from "../rooms/schema/PickleChessState"
+import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, TileClickmessage } from "../rooms/schema/PickleChessState"
 import { getAiBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
@@ -85,8 +85,11 @@ class RoomHandler extends EventEmitter {
     const playerWithOneCharacter = playerCharacters.find((characters) => characters.length <= 1)
     if (playerWithOneCharacter) {
       console.log("------------------ game over!")
-      this.state.winner = playerWithOneCharacter[0].state.playerId
-      this.state.roomState = RoomState.gameOver
+      this.state.assign({
+        winner: playerWithOneCharacter[0].state.playerId,
+        roomState: RoomState.gameOver,
+        persistantMessage: "Game Over"
+      })
     }
   }
 
@@ -193,6 +196,28 @@ class RoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
+  private startCountdown() {
+    let countdown = 15
+    this.state.assign({
+      persistantMessage: `${countdown}`,
+      roomState: RoomState.countdown
+    })
+    const interval = this.room.clock.setInterval(() => {
+      countdown--
+      this.state.assign({
+        persistantMessage: `${countdown}`,
+      })
+      if (countdown === 0) {
+        interval.clear()
+        this.state.assign({
+          persistantMessage: "",
+          roomState: RoomState.playing
+        })
+        this.room.broadcast(Messages.hudText, {text: "GO!"}, { afterNextPatch: true })
+      }
+    }, 1000)
+  }
+
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
     const handleJoin = () => {
       console.log(client.sessionId, "joined!", options);
@@ -225,9 +250,7 @@ class RoomHandler extends EventEmitter {
       }
       if (this.playerCount() >= NUMBER_OF_PLAYERS) {
         this.room.lock()
-        this.state.assign({
-          roomState: RoomState.playing
-        })
+        this.startCountdown()
       }
     }
     if (this.boardLoaded) {

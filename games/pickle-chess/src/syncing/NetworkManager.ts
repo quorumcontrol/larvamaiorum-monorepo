@@ -9,7 +9,7 @@ import { memoize } from "../utils/memoize";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
 import { randomBounded } from "../utils/randoms";
-import { Character, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
+import { Character, HudTextMessage, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
 
 const ROOM_TYPE = "PickleChessRoom"
 
@@ -105,7 +105,9 @@ class NetworkManager extends ScriptTypeBase {
 
     this.room.state.characters.onAdd = this.handleCharacterAdd.bind(this)
     this.room.state.characters.onRemove = this.handleCharacterRemove.bind(this)
-
+    this.room.onMessage(Messages.hudText, (msg:HudTextMessage) => {
+      this.app.fire(Messages.hudText, msg)
+    })
 
     console.log("new room!", this.room.state.toJSON())
     this.app.fire("newRoom", this.room)

@@ -2,6 +2,7 @@ import { Schema, MapSchema, type, filter, filterChildren } from "@colyseus/schem
 
 export enum RoomState {
   waitingForPlayers,
+  countdown,
   playing,
   gameOver,
 }
@@ -10,6 +11,11 @@ export enum Messages {
   setDestination = "setDest",
   tileClick = "tileClick",
   characterClick = "characterClick",
+  hudText = "hudText",
+}
+
+export interface HudTextMessage {
+  text: string
 }
 
 export interface SetDestinationMessage {
@@ -123,6 +129,8 @@ export class PickleChessState extends Schema {
   @type("string") id: string
   @type("number") roomState: RoomState = RoomState.waitingForPlayers
   @type("string") winner?:string
+  @type("string") persistantMessage:string = "Waiting for Players"
+
   @type({ map: Tile }) board = new MapSchema<Tile>();
   @type({ map: Character }) characters = new MapSchema<Character>();
   @type({ map: Player }) players = new MapSchema<Player>();
