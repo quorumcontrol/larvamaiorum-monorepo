@@ -8,7 +8,6 @@ export enum RoomState {
 }
 
 export enum Messages {
-  setDestination = "setDest",
   tileClick = "tileClick",
   characterClick = "characterClick",
   hudText = "hudText",

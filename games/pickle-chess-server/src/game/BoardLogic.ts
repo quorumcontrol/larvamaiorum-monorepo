@@ -10,13 +10,24 @@ const tileFloor = (num: number) => {
 }
 
 class BoardLogic {
-  private state: PickleChessState
+  // private state: PickleChessState
+  private characters: CharacterLogic[]
 
-  private tiles: Tile[][]
+  tiles: Tile[][]
 
-  constructor(state: PickleChessState) {
-    this.tiles = []
-    this.state = state
+  constructor(characters: CharacterLogic[], tiles?: Tile[]) {
+    if (tiles) {
+      this.populateInternalTiles(tiles)
+    } else {
+      this.tiles = []
+    }
+    this.characters = characters
+    // this.state = state
+  }
+
+  private populateInternalTiles(tiles:Tile[]) {
+    this.tiles = Array(tiles.length).fill([])
+    tiles.forEach((tile) => this.tiles[tile.y].push(tile))
   }
 
   getOccupent(x: number, y: number) {
@@ -25,7 +36,7 @@ class BoardLogic {
   }
 
   characterAt(tile: Tile) {
-    return Array.from(this.state.characters.values()).find((character) => character.tileId === tile.id)
+    return this.characters.find((character) => character.state.tileId === tile.id)
   }
 
   isPassable(playerId: string, tile?: Tile) {
@@ -36,7 +47,7 @@ class BoardLogic {
       return false
     }
     const character = this.characterAt(tile)
-    if (character && character.playerId === playerId) {
+    if (character && character.state.playerId === playerId) {
       return false
     }
     return true
@@ -51,7 +62,7 @@ class BoardLogic {
       return false
     }
 
-    return character.playerId !== playerId
+    return character.state.playerId !== playerId
   }
 
   getTile(x: number, y: number) {
@@ -67,7 +78,7 @@ class BoardLogic {
             return 1
           }
           const character = this.characterAt(tile)
-          if (character && character.id !== movingCharacter.state.id) {
+          if (character && character.state.id !== movingCharacter.state.id) {
             return 1
           }
           if (this.killsPlayer(tile, movingCharacter.state.playerId)) {
@@ -84,6 +95,7 @@ class BoardLogic {
   }
 
   populateTileMap(board: RawBoard) {
+    const allTiles:Tile[] = []
     for (let y = 0; y < board.length; y++) {
       this.tiles[y] = []
       for (let x = 0; x < board[y].length; x++) {
@@ -95,10 +107,11 @@ class BoardLogic {
           y,
           type: tileType,
         })
-        this.state.board.set(id, tile)
         this.tiles[y][x] = tile
+        allTiles.push(tile)
       }
     }
+    return allTiles
   }
 
   killsPlayer(playerTile: Tile, playerId: string) {

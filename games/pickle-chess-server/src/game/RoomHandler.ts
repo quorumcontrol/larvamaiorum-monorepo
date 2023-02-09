@@ -7,17 +7,23 @@ import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
 import { GameState, getTaunt } from "../ai/taunt"
+import { AIBrain } from "../ai/gamePlayer"
 
 const CHARACTERS_PER_PLAYER = 8
 const NUMBER_OF_PLAYERS = 2
 
 const BOARD_LOAD_EVENT = "boardLoaded"
 
-const TIME_BETWEEN_TAUNTS = 15_000
+const TIME_BETWEEN_TAUNTS = 15
+
+const TIME_BETWEEN_AI_MOVES = 0.5
+
+const AI_ID = "AIAlice"
 
 export interface RoomJoinOptions {
   name: string
   avatar?: string
+  useAI?: string
 }
 
 class RoomHandler extends EventEmitter {
@@ -36,12 +42,16 @@ class RoomHandler extends EventEmitter {
   private timeSincePieceCapture = 0
   private timeSinceTaunt = TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
+  private aiBrain?:AIBrain
+  private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
+  private isAiMoving = false
+
   constructor(room: PickleChessRoom) {
     super()
     this.room = room
     this.state = room.state
-    this.board = new BoardLogic(this.state)
     this.characters = []
+    this.board = new BoardLogic(this.characters)
   }
 
   update(dt: number) {
@@ -55,7 +65,15 @@ class RoomHandler extends EventEmitter {
     this.timeSincePieceCapture += dt
     this.timeSinceTaunt += dt
 
-    if (this.timeSincePieceCapture > 45_000) {
+
+    if (this.aiBrain) {
+      this.timeSinceAIMove += dt
+      if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
+        this.moveAI()
+      }
+    }
+
+    if (this.timeSincePieceCapture > 45) {
       this.shipTaunt()
     }
 
@@ -63,7 +81,7 @@ class RoomHandler extends EventEmitter {
     this.checkForOver()
     this.timeSinceMusic += dt
     // try every 20s incase music is failing
-    if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20_000) {
+    if (this.state.nowPlaying.duration === 0 && this.timeSinceMusic > 20) {
       this.timeSinceMusic = 0
       this.setupMusic()
     }
@@ -76,8 +94,9 @@ class RoomHandler extends EventEmitter {
   async setup() {
     this.setupMusic()
     const rawBoard = await getAiBoard()
-    this.board.populateTileMap(rawBoard)
-    this.room.onMessage(Messages.setDestination, this.handleSetDestination.bind(this))
+    const tiles = this.board.populateTileMap(rawBoard)
+    tiles.forEach((tile) => this.state.board.set(tile.id, tile))
+
     this.room.onMessage(Messages.tileClick, this.handleTileClick.bind(this))
     this.room.onMessage(Messages.characterClick, this.handleCharacterClick.bind(this))
     this.boardLoaded = true
@@ -86,6 +105,42 @@ class RoomHandler extends EventEmitter {
 
   private isPlaying() {
     return this.state.roomState === RoomState.playing
+  }
+
+  private async moveAI() {
+    if (!this.aiBrain || this.isAiMoving) {
+      // console.log("not moving AI: ", !!this.aiBrain, this.isAiMoving)
+      return
+    }
+    try {
+      this.isAiMoving = true
+      console.log("moving AI")
+      const action = await this.aiBrain.getAction(AI_ID)
+      console.log("move: ", action)
+      const tile = this.board.getTile(action.from.x, action.from.y)
+      if (!tile) {
+        console.error('AI tried to use a bad tile', action.from)
+        return
+      }
+      const character = this.board.characterAt(tile)
+      if (!character || character.state.playerId !== AI_ID) {
+        console.error('AI tried to move a character that was not theirs', character)
+        return
+      }
+      const destinationTile = this.board.getTile(action.to.x, action.to.y)
+      if (!destinationTile) {
+        console.error('AI tried to move to a bad tile', action.to)
+        return
+      }
+      character.setDestination(destinationTile)
+      this.timeSinceAIMove = 0
+    } catch (err) {
+      throw err
+    } finally {
+      this.isAiMoving = false
+
+    }
+
   }
 
   checkForOver() {
@@ -158,10 +213,6 @@ class RoomHandler extends EventEmitter {
     this.timeSinceMusic = 0
   }
 
-  private handleSetDestination(client: Client, message: SetDestinationMessage) {
-    console.log(client.sessionId, "set destination", message);
-  }
-
   private handleCharacterClick(client: Client, { id }: CharacterClickMessage) {
     console.log(client.sessionId, "clicked character", id);
     if (!this.isPlaying()) {
@@ -232,6 +283,7 @@ class RoomHandler extends EventEmitter {
   }
 
   private async shipTaunt() {
+    return
     if (this.tauntFetching || this.timeSinceTaunt <= TIME_BETWEEN_TAUNTS) {
       return
     }
@@ -267,6 +319,38 @@ class RoomHandler extends EventEmitter {
     }, 1000)
   }
 
+  createAICharacter() {
+    const avatar = "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb"
+    this.state.players.set(AI_ID, new Player({
+      id:AI_ID,
+      name: "Alice",
+      avatar: avatar,
+    }))
+    for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
+      const tile = this.board.randomAvailableInitialLocation(AI_ID)
+      const character = new Character({
+        id: `${AI_ID}-${i}`,
+        playerId: AI_ID,
+        tileId: tile.id,
+        avatar: avatar,
+      })
+      character.locomotion.assign({
+        walkSpeed: 2.0,
+      })
+      character.locomotion.position.assign({
+        x: tile.x,
+        z: tile.y,
+      })
+      character.locomotion.destination.assign({
+        x: tile.x,
+        z: tile.y,
+      })
+      this.state.characters.set(character.id, character)
+      this.characters.push(new CharacterLogic(character, this.board))
+    }
+    this.aiBrain = new AIBrain(this.board, this.characters, Array.from(this.state.players.keys()) )
+  }
+
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
     const handleJoin = () => {
       console.log(client.sessionId, "joined!", options);
@@ -296,6 +380,9 @@ class RoomHandler extends EventEmitter {
         })
         this.state.characters.set(character.id, character)
         this.characters.push(new CharacterLogic(character, this.board))
+      }
+      if (options.useAI) {
+        this.createAICharacter()
       }
       if (this.playerCount() >= NUMBER_OF_PLAYERS) {
         this.room.lock()
