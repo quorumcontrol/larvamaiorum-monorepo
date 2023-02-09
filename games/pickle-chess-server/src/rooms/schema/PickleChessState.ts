@@ -12,6 +12,11 @@ export enum Messages {
   tileClick = "tileClick",
   characterClick = "characterClick",
   hudText = "hudText",
+  taunt = "taunt",
+}
+
+export interface Taunt {
+  text: string
 }
 
 export interface HudTextMessage {

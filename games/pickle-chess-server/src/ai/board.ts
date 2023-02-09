@@ -1,11 +1,6 @@
-import { generateCompletions } from "./textAI"
+import { fetchApiKey, generateCompletions } from "./textAI"
 
 export const fetchBoard = async () => {
-  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("missing api key")
-  }
-
   const userPrompt = `
 You are designing a top-down level for a 3d game. There are 5 tile types:
 
@@ -42,7 +37,7 @@ Design a fun board with between 9 and 15 columns and between 11 and 14 rows.
   const resp = await generateCompletions(
     userPrompt,
     {
-      apiKey,
+      apiKey: fetchApiKey(),
       prompt: userPrompt,
       engine: "text-davinci-003",
       maxTokens: 1024,

@@ -6,6 +6,7 @@ import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
+import { GameState, getTaunt } from "../ai/taunt"
 
 const CHARACTERS_PER_PLAYER = 8
 const NUMBER_OF_PLAYERS = 2
@@ -27,6 +28,11 @@ class RoomHandler extends EventEmitter {
 
   private boardLoaded = false
   private timeSinceMusic = 0
+  private tauntFetching?: Promise<string>
+
+  private gameClock = 0
+  private timeSincePieceCapture = 0
+  private timeSinceTaunt = 0
 
   constructor(room: PickleChessRoom) {
     super()
@@ -43,6 +49,14 @@ class RoomHandler extends EventEmitter {
     if (this.state.roomState !== RoomState.playing) {
       return
     }
+    this.gameClock += dt
+    this.timeSincePieceCapture += dt
+    this.timeSinceTaunt += dt
+
+    if (this.timeSincePieceCapture > 45_000) {
+      this.shipTaunt()
+    }
+
     this.handleCharacterRemovals()
     this.checkForOver()
     this.timeSinceMusic += dt
@@ -107,8 +121,23 @@ class RoomHandler extends EventEmitter {
         character.stop()
         this.state.characters.delete(character.state.id)
         characters.splice(i, 1)
+        this.shipTaunt()
+        this.timeSincePieceCapture = 0
       }
     })
+  }
+
+  private getGameState():GameState {
+    return {
+      players: Array.from(this.state.players.values()).reduce((acc, player) => {
+        acc[player.name] = {
+          characters: this.characters.filter((character) => character.state.playerId === player.id).length
+        }
+        return acc
+      }, {} as GameState["players"]),
+      timeSincePieceCapture: this.timeSincePieceCapture,
+      gameClock: this.gameClock,
+    }
   }
 
   private async setupMusic() {
@@ -196,12 +225,30 @@ class RoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
+  private getTaunt() {
+    return getTaunt(this.getGameState())
+  }
+
+  private async shipTaunt() {
+    if (this.tauntFetching) {
+      return
+    }
+    const taunt = await this.getTaunt()
+    this.tauntFetching = undefined
+    this.timeSinceTaunt = 0
+    if (taunt) {
+      console.log("taunt", taunt)
+      this.room.broadcast(Messages.taunt, taunt)
+    }
+  }
+
   private startCountdown() {
     let countdown = 15
     this.state.assign({
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown
     })
+    this.shipTaunt()
     const interval = this.room.clock.setInterval(() => {
       countdown--
       this.state.assign({

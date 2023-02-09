@@ -1,6 +1,15 @@
 import axios, { AxiosPromise } from "axios";
 // import ThenArg from "./ThenArg";
 
+
+export const fetchApiKey = () => {
+  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("missing api key")
+  }
+  return apiKey
+}
+
 interface CompletionParameters {
   apiKey: string;
   engine: string;
