@@ -13,6 +13,8 @@ const NUMBER_OF_PLAYERS = 2
 
 const BOARD_LOAD_EVENT = "boardLoaded"
 
+const TIME_BETWEEN_TAUNTS = 15_000
+
 export interface RoomJoinOptions {
   name: string
   avatar?: string
@@ -32,7 +34,7 @@ class RoomHandler extends EventEmitter {
 
   private gameClock = 0
   private timeSincePieceCapture = 0
-  private timeSinceTaunt = 0
+  private timeSinceTaunt = TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
   constructor(room: PickleChessRoom) {
     super()
@@ -230,7 +232,7 @@ class RoomHandler extends EventEmitter {
   }
 
   private async shipTaunt() {
-    if (this.tauntFetching) {
+    if (this.tauntFetching || this.timeSinceTaunt <= TIME_BETWEEN_TAUNTS) {
       return
     }
     const taunt = await this.getTaunt()
