@@ -117,6 +117,9 @@ class RoomHandler extends EventEmitter {
       console.log("moving AI")
       const action = await this.aiBrain.getAction(AI_ID)
       console.log("move: ", action)
+      if (!action) {
+        return
+      }
       const tile = this.board.getTile(action.from.x, action.from.y)
       if (!tile) {
         console.error('AI tried to use a bad tile', action.from)
@@ -135,10 +138,10 @@ class RoomHandler extends EventEmitter {
       character.setDestination(destinationTile)
       this.timeSinceAIMove = 0
     } catch (err) {
-      throw err
+      console.error("error moving AI: ", err)
+      return
     } finally {
       this.isAiMoving = false
-
     }
 
   }
@@ -147,17 +150,10 @@ class RoomHandler extends EventEmitter {
     if (!this.boardLoaded) {
       return
     }
-    // see if one player only has a single character left
-    const players = this.state.players
-    const playerIds = Array.from(players.keys())
-    const playerCharacters = playerIds.map((playerId) => {
-      return this.characters.filter((character) => character.state.playerId === playerId)
-    })
-    const playerWithOneCharacter = playerCharacters.find((characters) => characters.length <= 1)
-    if (playerWithOneCharacter) {
+
+    if (this.board.isOver()) {
       console.log("------------------ game over!")
       this.state.assign({
-        winner: playerWithOneCharacter[0].state.playerId,
         roomState: RoomState.gameOver,
         persistantMessage: "Game Over"
       })
@@ -297,7 +293,7 @@ class RoomHandler extends EventEmitter {
   }
 
   private startCountdown() {
-    let countdown = 15
+    let countdown = 3
     this.state.assign({
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown

@@ -150,6 +150,74 @@ class BoardLogic {
     return false
   }
 
+  isOver() {
+    const playerCharacters = this.characters.reduce((acc, character) => {
+      acc[character.state.playerId] = acc[character.state.playerId] || []
+      acc[character.state.playerId].push(character)
+      return acc
+    }, {} as Record<string, CharacterLogic[]>)
+
+    const playerWithOneCharacter = Object.values(playerCharacters).some((characters) => characters.length <= 1)
+    if (playerWithOneCharacter) {
+      console.log("over because characters removed")
+      return true
+    }
+
+    const playerThatCannotMove = Object.values(playerCharacters).findIndex((characters) => {
+      return !characters.some((character) => {
+        const { x, y } = this.getTile(character.position().x, character.position().z)
+        for (let diffY = -1; diffY <= 1; diffY++) {
+          for (let diffX = -1; diffX <= 1; diffX++) {
+            if (diffX === 0 && diffY === 0) {
+              continue
+            }
+            const tile = this.getTile(x + diffX, y + diffY)
+            const canMove = this.isPassable(character.state.playerId, tile) && !this.killsPlayer(tile, character.state.playerId)
+            if (canMove) {
+              return true
+            }
+          }
+        }
+        return false
+      })
+    })
+
+    if ( playerThatCannotMove >= 0 ) {
+      const characters = Object.values(playerCharacters)[playerThatCannotMove]
+      console.log("over because player cannot move", Object.keys(playerCharacters)[playerThatCannotMove])
+      const isSome = characters.some((character) => {
+        const { x, y } = this.getTile(character.position().x, character.position().z)
+        for (let diffY = -1; diffY <= 1; diffY++) {
+          for (let diffX = -1; diffX <= 1; diffX++) {
+            if (diffX === 0 && diffY === 0) {
+              continue
+            }
+            const tile = this.getTile(x + diffX, y + diffY)
+            return this.isPassable(character.state.playerId, tile) && !this.killsPlayer(tile, character.state.playerId)
+          }
+        }
+        return false
+      })
+      console.log("isSome: ", isSome)
+      characters.forEach((character) => {
+        //log out if the character cannot move and which squares are passable
+        const { x, y } = this.getTile(character.position().x, character.position().z)
+        console.log("character on: ", x, y)
+        for (let diffY = -1; diffY <= 1; diffY++) {
+          for (let diffX = -1; diffX <= 1; diffX++) {
+            if (diffX === 0 && diffY === 0) {
+              continue
+            }
+            const tile = this.getTile(x + diffX, y + diffY)
+            console.log("tile", tile, this.isPassable(character.state.playerId, tile), !this.killsPlayer(tile, character.state.playerId))
+          }
+        }
+      })
+    }
+
+    return playerThatCannotMove >= 0
+  }
+
   randomBoardLocation() {
     const y = randomInt(this.tiles.length)
     const x = randomInt(this.tiles[0].length)

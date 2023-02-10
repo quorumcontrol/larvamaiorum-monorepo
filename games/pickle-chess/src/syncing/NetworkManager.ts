@@ -49,6 +49,10 @@ class NetworkManager extends ScriptTypeBase {
       playButton.enabled = false
       this.go()
     })
+    playButton.element!.once("touchstart", () => {
+      playButton.enabled = false
+      this.go()
+    })
     this.app.on(SELECT_EVT, this.handleLocalCellSelect, this)
   }
 
@@ -61,19 +65,32 @@ class NetworkManager extends ScriptTypeBase {
     if (this.room?.state?.roomState !== RoomState.playing) {
       return
     }
-    // if the user has a character selected
     const isCharacterSelected = this.isCharacterSelected()
 
-    const result = results.find((result) => {
-      const entity = result.entity
-      if (isCharacterSelected) {
-        return entity.tags.has("tile")
-      }
-      return entity.tags.has("tile") || entity.tags.has("character")
-    })
+    let result: RaycastResult | undefined
+    
+    // first see if we can find a character if the user hasn't already selected one.
+    if (!isCharacterSelected) {
+      result = results.find((result) => {
+        if (!result.entity.tags.has("character")) {
+          return false
+        }
+        return mustGetScript<CharacterVisual>(result.entity, "character").playerId === this.room.sessionId
+      })
+    }
+
+    // then we see if we can find a tile (assuming no character)
+    if (!result) {
+      result = results.find((result) => {
+        return result.entity.tags.has("tile")
+      })
+    }
+
+    // and if none of those, we bail
     if (!result) {
       return
     }
+
     const entity = result.entity
     if (entity.tags.has("tile")) {
       const x = entity.name.split("-")[1]

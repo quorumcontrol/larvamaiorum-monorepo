@@ -163,7 +163,6 @@ class LocomotionLogic {
       this.setSpeed(this.state.walkSpeed)
       return
     }
-    console.log("dist: ", dist)
     this.state.assign({
       locomotionState: LocomotionState.arrived
     })

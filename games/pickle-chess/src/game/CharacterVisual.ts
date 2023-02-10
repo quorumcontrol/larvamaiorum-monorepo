@@ -11,7 +11,7 @@ import mustGetScript from "../utils/mustGetScript";
 class CharacterVisual extends ScriptTypeBase {
   private highlightElement: Entity
   private characterState?: Character
-  private playerId?: string
+  playerId?: string
   private focus: Vec3
   private deathEffect:any
   private sound:SoundComponent
