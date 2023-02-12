@@ -1,6 +1,6 @@
 import { AStarFinder } from "astar-typescript"
 import { IPoint } from "astar-typescript/dist/interfaces/astar.interfaces"
-import { PickleChessState, Tile, TileType } from "../rooms/schema/PickleChessState"
+import { Tile, TileType } from "../rooms/schema/PickleChessState"
 import { RawBoard } from "./boardFetching"
 import CharacterLogic from "./CharacterLogic"
 import { randomInt } from "./utils/randoms"

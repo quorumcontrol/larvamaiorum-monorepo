@@ -5,6 +5,7 @@ interface MonteCarloFunctions<GameState, Action, Player> {
     applyAction: (state: GameState, action: Action) => GameState
     stateIsTerminal: (state: GameState) => boolean
     calculateReward: (state: GameState, player: Player) => number
+    filter: (actions: Action[]) => Action[]
 }
 
 interface MonteCarloConfig {
@@ -25,7 +26,8 @@ class MonteCarlo<GameState, Action, Player> {
 
   async getAction(state: GameState, playerId: Player): Promise<Action>{
     const start = Date.now()
-    const actions = this.funcs.generateActions(state)
+    //filter out actions that do not move a character
+    const actions = this.funcs.filter(this.funcs.generateActions(state))
     const scores = new Array(actions.length).fill(0)
     const maxTime = this.config.duration
 

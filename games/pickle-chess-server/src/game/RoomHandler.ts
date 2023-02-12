@@ -293,7 +293,7 @@ class RoomHandler extends EventEmitter {
   }
 
   private startCountdown() {
-    let countdown = 3
+    let countdown = 10
     this.state.assign({
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown

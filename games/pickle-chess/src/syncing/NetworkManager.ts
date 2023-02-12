@@ -8,8 +8,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import { memoize } from "../utils/memoize";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
-import { randomBounded } from "../utils/randoms";
-import { Character, HudTextMessage, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
+import { Character, CharacterRemoveMessage, HudTextMessage, LatencyCheckMessage, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
 
 const ROOM_TYPE = "PickleChessRoom"
 
@@ -40,6 +39,8 @@ class NetworkManager extends ScriptTypeBase {
 
   private client: Client
   private room: Room<PickleChessState>
+
+  private currentLatency: number = 100 //default to 100ms
 
   initialize() {
     this.client = client()
@@ -75,7 +76,7 @@ class NetworkManager extends ScriptTypeBase {
         if (!result.entity.tags.has("character")) {
           return false
         }
-        return mustGetScript<CharacterVisual>(result.entity, "character").playerId === this.room.sessionId
+        return mustGetScript<CharacterVisual>(result.entity, "character").playerId() === this.room.sessionId
       })
     }
 
@@ -110,6 +111,11 @@ class NetworkManager extends ScriptTypeBase {
     const [roomType, params] = roomParams()
     console.log("joining room: ", roomType, params)
     this.room = await this.client.joinOrCreate<PickleChessState>(roomType, params)
+    this.room.onMessage(Messages.latencyCheck, (msg:LatencyCheckMessage) => {
+      this.currentLatency = new Date().getTime() - msg.sentAt
+      console.log("latency: ", this.currentLatency)
+      this.app.fire("latencyUpdate", this.currentLatency)
+    })
 
     this.room.onError((error) => {
       console.error("room error", error)
@@ -126,6 +132,8 @@ class NetworkManager extends ScriptTypeBase {
       this.app.fire(Messages.hudText, msg)
     })
 
+    this.app.fire("latencyUpdate", this.currentLatency)
+
     console.log("new room!", this.room.state.toJSON())
     this.app.fire("newRoom", this.room)
   }
@@ -133,7 +141,10 @@ class NetworkManager extends ScriptTypeBase {
   private handleCharacterRemove(_characterState: Character, id: string) {
     //TODO: effects and stuff
     const character = mustFindByName(this.app.root, id)
-    mustGetScript<CharacterVisual>(character, "character").kill()
+    const script = mustGetScript<CharacterVisual>(character, "character")
+    script.kill()
+    const playerId = script.playerId()
+    this.app.fire(Messages.characterRemove, { id, playerId } as CharacterRemoveMessage)
   }
 
   private handleCharacterAdd(characterState: Character, id: string) {
@@ -146,7 +157,7 @@ class NetworkManager extends ScriptTypeBase {
     character.name = characterState.id
     character.enabled = true
     const { x, z } = characterState.locomotion.position
-    mustGetScript<CharacterVisual>(character, "character").setCharacter(characterState, this.room.sessionId)
+    mustGetScript<CharacterVisual>(character, "character").setCharacter(characterState)
     character.setLocalPosition(x, 0, z)
     boardElement.addChild(character)
   }

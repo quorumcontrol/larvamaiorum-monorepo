@@ -29,7 +29,7 @@ class LocomotionLogic {
     // this.focus = new Vec2(state.focus.x, state.focus.z)
     this.frontOfCharacterOffset = frontOfCharacterOffset
 
-    // this.forward = new Vec2()
+    this.forward = new Vec2()
     // this.updateForward()
 
     this.frontPoint = new Vec2()
@@ -42,8 +42,8 @@ class LocomotionLogic {
     if (this.state.locomotionState === LocomotionState.move) {
       this.position.set(this.state.position.x, this.state.position.z)
       this.destination.set(this.state.destination.x, this.state.destination.z)
-      const vector = new Vec2().sub2(this.destination, this.position).normalize().mulScalar(Math.abs(this.state.speed) * dt)
-      this.position.add(vector)
+      this.forward.sub2(this.destination, this.position).normalize().mulScalar(Math.abs(this.state.speed) * dt)
+      this.position.add(this.forward)
       this.state.position.assign({
         x: this.position.x,
         z: this.position.y,

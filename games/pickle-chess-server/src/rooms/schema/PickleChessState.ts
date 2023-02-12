@@ -12,10 +12,22 @@ export enum Messages {
   characterClick = "characterClick",
   hudText = "hudText",
   taunt = "taunt",
+  characterRemove = "characterRemove",
+  latencyCheck = "l",
 }
 
 export interface Taunt {
   text: string
+}
+
+export interface LatencyCheckMessage {
+  sentAt: number
+  receivedAt?: number
+}
+
+export interface CharacterRemoveMessage {
+  id: string
+  playerId: string
 }
 
 export interface HudTextMessage {

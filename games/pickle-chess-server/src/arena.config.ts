@@ -14,7 +14,7 @@ export default Arena({
          * Define your room handlers:
          */
         gameServer.define('PickleChessRoom', PickleChessRoom);
-
+        // gameServer.simulateLatency(200)
     },
 
     initializeExpress: (app) => {

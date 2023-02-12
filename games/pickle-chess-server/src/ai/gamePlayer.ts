@@ -125,9 +125,6 @@ const generateActions = (state: AIGameState): AIGameAction[] => {
   }
   for (let yDiff = -1; yDiff <= 1; yDiff++) {
     for (let xDiff = -1; xDiff <= 1; xDiff++) {
-      if (xDiff === 0 && yDiff === 0) {
-        continue // ignore the current location
-      }
       characters.forEach((character) => {
         const to = { x: character.location.x + xDiff, y: character.location.y + yDiff }
         if (isMoveable(player, state, to)) {
@@ -212,15 +209,21 @@ const calculateReward = (state: AIGameState, playerId: string): number => {
 
   const isWinning = maxCharacterCountPlayer === state.players.indexOf(playerId)
 
-  const playerScore = isWinning ? (characterCounts[state.players.indexOf(playerId)] - minCharacterCount) : (characterCounts[state.players.indexOf(playerId)] - maxCharacterCount)
+  const playerScore = isWinning ? (characterCounts[state.players.indexOf(playerId)] - minCharacterCount) * 10 : (characterCounts[state.players.indexOf(playerId)] - maxCharacterCount)
 
   // find highest character count for a player and return a huge reward for that player
   if (stateIsTerminal(state)) {
-    const winBoost = isWinning ? 5 : -5
+    const winBoost = isWinning ? 5 : -2
     return winBoost + playerScore
   }
   // otherwise return the difference between the player's character count and the max character count
   return playerScore
+}
+
+const filter = (actions: AIGameAction[]): AIGameAction[] => {
+  return actions.filter((action) => {
+    return action.from.x !== action.to.x && action.from.y !== action.to.y
+  })
 }
 
 // export const getMacao = () => {
@@ -249,8 +252,9 @@ export class AIBrain {
       applyAction,
       stateIsTerminal,
       calculateReward,
+      filter,
     }, {
-      duration: 60,
+      duration: 35,
       maxDepth: 10
     })
   }
