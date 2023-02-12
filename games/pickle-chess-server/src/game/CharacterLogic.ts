@@ -50,9 +50,11 @@ class CharacterLogic {
     // check to see if the destination of the locomotion tile is occupied and if it is then just stop
     const destination = this.locomotion.destination
     if (destination) {
-      const destinationTile = this.board.getTile(destination.x, destination.z)
-      if (destinationTile && this.board.getOccupent(destinationTile.x, destinationTile.y)) {
-        this.stop()
+      const destinationTile = this.board.getTile(destination.x, destination.y)
+      const occupent = this.board.getOccupent(destinationTile.x, destinationTile.y)
+      if (destinationTile && occupent && occupent !== this) {
+        console.log("stopping because destination is occupied", destinationTile.id, occupent.state.tileId)
+        this.locomotion.stop()
         return
       }
     }
