@@ -40,6 +40,8 @@ class NetworkManager extends ScriptTypeBase {
   private client: Client
   private room: Room<PickleChessState>
 
+  private latencyCheckInterval: ReturnType<typeof setInterval>
+
   private currentLatency: number = 100 //default to 100ms
 
   initialize() {
@@ -112,10 +114,14 @@ class NetworkManager extends ScriptTypeBase {
     console.log("joining room: ", roomType, params)
     this.room = await this.client.joinOrCreate<PickleChessState>(roomType, params)
     this.room.onMessage(Messages.latencyCheck, (msg:LatencyCheckMessage) => {
-      this.currentLatency = new Date().getTime() - msg.sentAt
+      this.currentLatency = (new Date().getTime() - msg.sentAt) / 2 // half the time it took to go from here to the server and back
       console.log("latency: ", this.currentLatency)
       this.app.fire("latencyUpdate", this.currentLatency)
     })
+
+    this.latencyCheckInterval = setInterval(() => {
+      this.room.send(Messages.latencyCheck, { sentAt: new Date().getTime() })
+    }, 5000)
 
     this.room.onError((error) => {
       console.error("room error", error)

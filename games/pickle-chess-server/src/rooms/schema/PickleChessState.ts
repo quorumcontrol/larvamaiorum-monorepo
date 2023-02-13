@@ -22,7 +22,6 @@ export interface Taunt {
 
 export interface LatencyCheckMessage {
   sentAt: number
-  receivedAt?: number
 }
 
 export interface CharacterRemoveMessage {

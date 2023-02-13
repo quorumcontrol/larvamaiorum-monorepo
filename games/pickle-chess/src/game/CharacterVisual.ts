@@ -25,7 +25,6 @@ class CharacterVisual extends ScriptTypeBase {
 
   private latency = 100
 
-
   initialize() {
     this.serverPosition = new Vec3()
     this.focus = new Vec3()

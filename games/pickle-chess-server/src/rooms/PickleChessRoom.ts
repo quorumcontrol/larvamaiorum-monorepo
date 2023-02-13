@@ -14,9 +14,9 @@ export class PickleChessRoom extends Room<PickleChessState> {
     this.setSimulationInterval((dt) => {
       this.handler.update(dt / 1000)
     }, 50)
-    this.latencySender = this.clock.setInterval(() => {
-      this.broadcast(Messages.latencyCheck, {sentAt: Date.now()})
-    }, 5000)
+    this.onMessage(Messages.latencyCheck, (client, message: LatencyCheckMessage) => {
+      client.send(Messages.latencyCheck, message)
+    })
   }
 
   onJoin (client: Client, options: any) {
