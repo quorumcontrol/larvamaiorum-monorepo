@@ -1,5 +1,5 @@
 {
-  "name": "playcanvas-typescript-example",
+  "name": "pickle-chess",
   "version": "1.0.0",
   "description": "",
   "private": true,
@@ -50,7 +50,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.1",
-    "playcanvas": "^1.60.0",
+    "playcanvas": "^1.57.1",
     "playcanvas-sync": "github:playcanvas/playcanvas-sync",
     "prettier": "^2.5.1",
     "prop-types": "^15.8.1",
@@ -63,7 +63,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.4.6",
+    "@chakra-ui/react": "^2.4.9",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fontsource/bebas-neue": "^4.5.9",
@@ -77,7 +77,7 @@
     "crypto": "^1.0.1",
     "crypto-browserify": "^3.12.0",
     "debug": "^4.3.4",
-    "framer-motion": "^8.2.4",
+    "framer-motion": "^8.5.5",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
     "stream-browserify": "^3.0.0",
