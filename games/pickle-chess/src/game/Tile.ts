@@ -28,7 +28,7 @@ class TileVisual extends ScriptTypeBase {
     this.tileState = tile
     this.playerId = playerId
     mustFindByName(this.entity, tileTypeToEnglish(tile.type)).enabled = true
-    this.entity.setLocalPosition(tile.x * 1.03, randomBounded(0.01), tile.y * 1.03)
+    this.entity.setLocalPosition(tile.x, randomBounded(0.01), tile.y)
   }
 }
 

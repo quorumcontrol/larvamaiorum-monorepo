@@ -162,39 +162,39 @@ const applyAction = (state: AIGameState, action: AIGameAction): AIGameState => {
   return newState
 }
 
-const stateIsTerminal = (state: AIGameState): boolean => {
-  const playerCharacters = state.players.map((player) => {
-    return state.characters.filter((character) => character.playerId === player)
+const isPlayerDead = (playerId: string, state: AIGameState): boolean => {
+  const characters = state.characters.filter((character) => {
+    return character.playerId === playerId
   })
-
-  const playerWithOneCharacter = playerCharacters.some((characters) => characters.length <= 1)
-  if (playerWithOneCharacter) {
+  if (characters.length <= 1) {
     return true
   }
-
-  const isPlayerThatCannotMove = playerCharacters.some((characters) => {
-    return !characters.some((character) => {
-      const { location: { x, y } } = state.board[character.location.y][character.location.x]
-      for (let diffY = -1; diffY <= 1; diffY++) {
-        for (let diffX = -1; diffX <= 1; diffX++) {
-          if (diffX === 0 && diffY === 0) {
-            continue
-          }
-          const tile = (state.board[y + diffY] || [])[x + diffX]
-          if (!tile) {
-            continue
-          }
-          const canMove = isMoveable(character.playerId, state, { x: tile.location.x, y: tile.location.y })
-          if (canMove) {
-            return true
-          }
+  return !characters.some((character) => {
+    const { location: { x, y } } = state.board[character.location.y][character.location.x]
+    for (let diffY = -1; diffY <= 1; diffY++) {
+      for (let diffX = -1; diffX <= 1; diffX++) {
+        if (diffX === 0 && diffY === 0) {
+          continue
+        }
+        const tile = (state.board[y + diffY] || [])[x + diffX]
+        if (!tile) {
+          continue
+        }
+        const canMove = isMoveable(character.playerId, state, { x: tile.location.x, y: tile.location.y })
+        if (canMove) {
+          return true
         }
       }
-      return false
-    })
+    }
+    return false
   })
+}
 
-  return isPlayerThatCannotMove
+const stateIsTerminal = (state: AIGameState): boolean => {
+  const livingPlayerIds = state.players.filter((playerId) => {
+    return !isPlayerDead(playerId, state)
+  })
+  return livingPlayerIds.length <= 1
 }
 
 const calculateReward = (state: AIGameState, playerId: string): number => {
@@ -226,27 +226,17 @@ const filter = (actions: AIGameAction[]): AIGameAction[] => {
   })
 }
 
-// export const getMacao = () => {
-//   return new Macao({
-//     generateActions,
-//     applyAction,
-//     stateIsTerminal,
-//     calculateReward,
-//   }, {
-//     duration: 30,
-//   })
-// }
-
 export class AIBrain {
   private board: BoardLogic
   private characters: CharacterLogic[]
-  private players: string[]
   private montecarlo: MonteCarlo<AIGameState, AIGameAction, string>
 
-  constructor(board: BoardLogic, characters: CharacterLogic[], playerIds: string[]) {
+  id: string
+
+  constructor(id:string, board: BoardLogic, characters: CharacterLogic[]) {
+    this.id = id
     this.board = board
     this.characters = characters
-    this.players = playerIds
     this.montecarlo = new MonteCarlo<AIGameState, AIGameAction, string>({
       generateActions,
       applyAction,
@@ -254,13 +244,20 @@ export class AIBrain {
       calculateReward,
       filter,
     }, {
-      duration: 35,
-      maxDepth: 10
+      duration: 40,
+      maxDepth: 5,
     })
   }
 
   getAction(playerId: string): Promise<AIGameAction | undefined> {
     return this.montecarlo.getAction(this.getGameState(playerId), playerId)
+  }
+
+  private players() {
+    return Object.keys(this.characters.reduce((playerIds, character) => {
+      playerIds[character.state.playerId] = true
+      return playerIds
+    }, {} as Record<string, boolean>))
   }
 
   private getGameState(playerId: string): AIGameState {
@@ -285,11 +282,13 @@ export class AIBrain {
       }
     })
 
+    const players = this.players()
+
     return {
       board: aiBoard,
       characters: aiCharacters,
-      players: this.players,
-      player: this.players.indexOf(playerId),
+      players: players,
+      player: players.indexOf(playerId),
     }
   }
 
