@@ -13,11 +13,11 @@ const SecretIndex: NextPage = () => {
   const { data:username } = useUsername(address)
 
   const gameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({id: address, name: username, avatar })).toString("base64")
+    return Buffer.from(JSON.stringify({id: address, name: username, avatar, numberOfHumans: 2 })).toString("base64")
   }, [address, username, avatar])
 
   const AIGameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({useAI: true, id: address, name: username, avatar })).toString("base64")
+    return Buffer.from(JSON.stringify({numberOfHumans: 1, numberOfAi: 1, id: address, name: username, avatar })).toString("base64")
   }, [address, username, avatar])
 
   return (

@@ -31,7 +31,7 @@ There should never be a a part of the board that is unreachable. For example, no
 
 Stone and water tiles should be used sparingly to create obstacles and challenges for the player.
 
-Design a fun board with between 9 and 15 columns and between 11 and 14 rows. 
+Design a fun board with between 20 and 30 columns and between 20 and 30 rows. 
   `.trim()
 
   const resp = await generateCompletions(
@@ -40,7 +40,7 @@ Design a fun board with between 9 and 15 columns and between 11 and 14 rows.
       apiKey: fetchApiKey(),
       prompt: userPrompt,
       engine: "text-davinci-003",
-      maxTokens: 1024,
+      maxTokens: 2048,
       stop: "",
       temperature: 0.8,
       topP: 1,

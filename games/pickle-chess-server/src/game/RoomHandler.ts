@@ -9,8 +9,22 @@ import { getRandomTrack } from "./music"
 import { GameState, getTaunt } from "../ai/taunt"
 import { AIBrain } from "../ai/gamePlayer"
 
+const AI_NAMES = [
+  "alice",
+  "bob",
+  "charlie",
+  "dave",
+]
+
+const AI_AVATARS = [
+  "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
+  "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
+  "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
+  "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
+]
+
 const CHARACTERS_PER_PLAYER = 8
-const NUMBER_OF_PLAYERS = 2
+// const NUMBER_OF_PLAYERS = 2
 
 const BOARD_LOAD_EVENT = "boardLoaded"
 
@@ -18,12 +32,11 @@ const TIME_BETWEEN_TAUNTS = 15
 
 const TIME_BETWEEN_AI_MOVES = 0.5
 
-const AI_ID = "AIAlice"
-
 export interface RoomJoinOptions {
   name: string
   avatar?: string
-  useAI?: string
+  numberOfAi?: number
+  numberOfHumans: number
 }
 
 class RoomHandler extends EventEmitter {
@@ -42,16 +55,20 @@ class RoomHandler extends EventEmitter {
   private timeSincePieceCapture = 0
   private timeSinceTaunt = TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
-  private aiBrain?:AIBrain
+  private aiBrains?:AIBrain[]
   private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
   private isAiMoving = false
 
-  constructor(room: PickleChessRoom) {
+  private options:RoomJoinOptions
+
+  constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
     super()
     this.room = room
     this.state = room.state
     this.characters = []
     this.board = new BoardLogic(this.characters)
+    this.options = opts
+    this.options.numberOfAi ||= 0
   }
 
   update(dt: number) {
@@ -66,7 +83,7 @@ class RoomHandler extends EventEmitter {
     this.timeSinceTaunt += dt
 
 
-    if (this.aiBrain) {
+    if (this.aiBrains) {
       this.timeSinceAIMove += dt
       if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
         this.moveAI()
@@ -93,7 +110,7 @@ class RoomHandler extends EventEmitter {
 
   async setup() {
     this.setupMusic()
-    const rawBoard = await getAiBoard()
+    const rawBoard = await getAiBoard(this.expectedPlayerCount())
     const tiles = this.board.populateTileMap(rawBoard)
     tiles.forEach((tile) => this.state.board.set(tile.id, tile))
 
@@ -103,39 +120,48 @@ class RoomHandler extends EventEmitter {
     this.emit(BOARD_LOAD_EVENT)
   }
 
+  private expectedPlayerCount() {
+    return this.options.numberOfHumans + this.options.numberOfAi
+  }
+
   private isPlaying() {
     return this.state.roomState === RoomState.playing
   }
 
   private async moveAI() {
-    if (!this.aiBrain || this.isAiMoving) {
+    if (!this.aiBrains || this.isAiMoving) {
       // console.log("not moving AI: ", !!this.aiBrain, this.isAiMoving)
       return
     }
     try {
       this.isAiMoving = true
-      console.log("moving AI")
-      const action = await this.aiBrain.getAction(AI_ID)
-      console.log("move: ", action)
-      if (!action) {
-        return
-      }
-      const tile = this.board.getTile(action.from.x, action.from.y)
-      if (!tile) {
-        console.error('AI tried to use a bad tile', action.from)
-        return
-      }
-      const character = this.board.characterAt(tile)
-      if (!character || character.state.playerId !== AI_ID) {
-        console.error('AI tried to move a character that was not theirs', character)
-        return
-      }
-      const destinationTile = this.board.getTile(action.to.x, action.to.y)
-      if (!destinationTile) {
-        console.error('AI tried to move to a bad tile', action.to)
-        return
-      }
-      character.setDestination(destinationTile)
+      // console.log("moving AI")
+      await Promise.all(this.aiBrains.map(async (brain) => {
+        if (this.board.isPlayerDead(brain.id)) {
+          return
+        }
+        const action = await brain.getAction(brain.id)
+        // console.log("move: ", action)
+        if (!action) {
+          return
+        }
+        const tile = this.board.getTile(action.from.x, action.from.y)
+        if (!tile) {
+          console.error('AI tried to use a bad tile', action.from)
+          return
+        }
+        const character = this.board.characterAt(tile)
+        if (!character || character.state.playerId !== brain.id) {
+          console.error('AI tried to move a character that was not theirs', character)
+          return
+        }
+        const destinationTile = this.board.getTile(action.to.x, action.to.y)
+        if (!destinationTile) {
+          console.error('AI tried to move to a bad tile', action.to)
+          return
+        }
+        character.setDestination(destinationTile)
+      }))
       this.timeSinceAIMove = 0
     } catch (err) {
       console.error("error moving AI: ", err)
@@ -161,6 +187,7 @@ class RoomHandler extends EventEmitter {
   }
 
   handleCharacterRemovals() {
+    const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
     // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
     this.characters.forEach((character, i, characters) => {
       const playerId = character.state.playerId
@@ -170,7 +197,7 @@ class RoomHandler extends EventEmitter {
         console.error("tile not found", x,z)
         return
       }
-      if (this.board.killsPlayer(playerTile, playerId)) {
+      if (this.board.killsPlayer(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
         character.stop()
         this.state.characters.delete(character.state.id)
         characters.splice(i, 1)
@@ -293,6 +320,11 @@ class RoomHandler extends EventEmitter {
   }
 
   private startCountdown() {
+    if (this.options.numberOfAi > 0) {
+      for (let i = 0; i < this.options.numberOfAi; i++) {
+        this.createAICharacter(i)
+      }
+    }
     let countdown = 10
     this.state.assign({
       persistantMessage: `${countdown}`,
@@ -315,18 +347,20 @@ class RoomHandler extends EventEmitter {
     }, 1000)
   }
 
-  createAICharacter() {
-    const avatar = "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb"
-    this.state.players.set(AI_ID, new Player({
-      id:AI_ID,
-      name: "Alice",
+  createAICharacter(idx:number) {
+    const avatar = AI_AVATARS[idx]
+    console.log("creating AI character:", AI_NAMES[idx])
+    const id = `AI-${AI_NAMES[idx]}`
+    this.state.players.set(id, new Player({
+      id,
+      name: AI_NAMES[idx],
       avatar: avatar,
     }))
     for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
-      const tile = this.board.randomAvailableInitialLocation(AI_ID)
+      const tile = this.board.randomAvailableInitialLocation(id)
       const character = new Character({
-        id: `${AI_ID}-${i}`,
-        playerId: AI_ID,
+        id: `${id}-${i}`,
+        playerId: id,
         tileId: tile.id,
         avatar: avatar,
       })
@@ -344,7 +378,8 @@ class RoomHandler extends EventEmitter {
       this.state.characters.set(character.id, character)
       this.characters.push(new CharacterLogic(character, this.board))
     }
-    this.aiBrain = new AIBrain(this.board, this.characters, Array.from(this.state.players.keys()) )
+    this.aiBrains ||= [] 
+    this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
@@ -377,10 +412,7 @@ class RoomHandler extends EventEmitter {
         this.state.characters.set(character.id, character)
         this.characters.push(new CharacterLogic(character, this.board))
       }
-      if (options.useAI) {
-        this.createAICharacter()
-      }
-      if (this.playerCount() >= NUMBER_OF_PLAYERS) {
+      if (this.playerCount() >= this.options.numberOfHumans) {
         this.room.lock()
         this.startCountdown()
       }

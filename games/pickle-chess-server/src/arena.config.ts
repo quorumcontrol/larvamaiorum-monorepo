@@ -13,7 +13,7 @@ export default Arena({
         /**
          * Define your room handlers:
          */
-        gameServer.define('PickleChessRoom', PickleChessRoom);
+        gameServer.define('PickleChessRoom', PickleChessRoom).filterBy(['numberOfHumans', 'numberOfAi']);
         // gameServer.simulateLatency(200)
     },
 

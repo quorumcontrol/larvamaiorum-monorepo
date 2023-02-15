@@ -1,5 +1,5 @@
 import { Room, Client, Delayed } from "colyseus";
-import RoomHandler from "../game/RoomHandler";
+import RoomHandler, { RoomJoinOptions } from "../game/RoomHandler";
 import { LatencyCheckMessage, Messages, PickleChessState } from "./schema/PickleChessState";
 
 export class PickleChessRoom extends Room<PickleChessState> {
@@ -7,9 +7,9 @@ export class PickleChessRoom extends Room<PickleChessState> {
   handler: RoomHandler
   latencySender: Delayed
 
-  onCreate (options: any) {
+  onCreate (options: RoomJoinOptions) {
     this.setState(new PickleChessState());
-    this.handler = new RoomHandler(this)
+    this.handler = new RoomHandler(this, options)
     this.handler.setup()
     this.setSimulationInterval((dt) => {
       this.handler.update(dt / 1000)
@@ -19,7 +19,7 @@ export class PickleChessRoom extends Room<PickleChessState> {
     })
   }
 
-  onJoin (client: Client, options: any) {
+  onJoin (client: Client, options: RoomJoinOptions) {
     client.send(Messages.latencyCheck, {sentAt: Date.now()})
     this.handler.handlePlayerJoin(client, options)
   }
