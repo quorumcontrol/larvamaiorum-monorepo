@@ -1,23 +1,32 @@
 import { AStarFinder } from "astar-typescript"
 import { IPoint } from "astar-typescript/dist/interfaces/astar.interfaces"
-import { Tile, TileType } from "../rooms/schema/PickleChessState"
-import { RawBoard } from "./boardFetching"
+import { TileType } from "../rooms/schema/PickleChessState"
 import CharacterLogic from "./CharacterLogic"
 import { randomInt } from "./utils/randoms"
 
-const tileFloor = (num: number) => {
-  return Math.max(0, Math.round(num))
+interface Character {
+  id: string
+  playerId: string
+  tileId: string
+  position: IPoint
 }
 
-class BoardLogic {
+export interface Tile {
+  id: string
+  type: TileType
+  x: number
+  y: number
+}
+
+class BoardLogic<CharacterType extends Character> {
   // private state: PickleChessState
-  private characters: CharacterLogic[]
+  private characters: CharacterType[]
 
   tiles: Tile[][]
 
-  constructor(characters: CharacterLogic[], tiles?: Tile[]) {
+  constructor(characters: CharacterType[], tiles?: Tile[]) {
     if (tiles) {
-      this.populateInternalTiles(tiles)
+      this.populateTiles(tiles)
     } else {
       this.tiles = []
     }
@@ -25,9 +34,12 @@ class BoardLogic {
     // this.state = state
   }
 
-  private populateInternalTiles(tiles: Tile[]) {
-    this.tiles = Array(tiles.length).fill([])
-    tiles.forEach((tile) => this.tiles[tile.y].push(tile))
+  populateTiles(tiles: Tile[]) {
+    this.tiles = []
+    tiles.forEach((tile) => {
+      this.tiles[tile.y] ||= []
+      this.tiles[tile.y][tile.x] = tile
+    })
   }
 
   getOccupent(x: number, y: number) {
@@ -35,8 +47,8 @@ class BoardLogic {
     return this.characterAt(tile)
   }
 
-  characterAt(tile: Tile) {
-    return this.characters.find((character) => character.state.tileId === tile.id)
+  characterAt(tile: Tile):CharacterType | undefined {
+    return this.characters.find((character) => character.tileId === tile.id)
   }
 
   isPassable(playerId: string, tile?: Tile) {
@@ -47,7 +59,7 @@ class BoardLogic {
       return false
     }
     const character = this.characterAt(tile)
-    if (character && character.state.playerId === playerId) {
+    if (character && character.playerId === playerId) {
       return false
     }
     return true
@@ -62,12 +74,12 @@ class BoardLogic {
       return false
     }
 
-    return character.state.playerId !== playerId
+    return character.playerId !== playerId
   }
 
   getTile(x: number, y: number) {
-    const column = this.tiles[tileFloor(y)] || []
-    return column[tileFloor(x)]
+    const column = this.tiles[Math.round(y)] || []
+    return column[Math.round(x)]
   }
 
   findPath(from: IPoint, to: IPoint, movingCharacter: CharacterLogic) {
@@ -78,10 +90,10 @@ class BoardLogic {
             return 1
           }
           const character = this.characterAt(tile)
-          if (character && character.state.id !== movingCharacter.state.id) {
+          if (character && character.id !== movingCharacter.id) {
             return 1
           }
-          if (this.killsPlayer(tile, movingCharacter.state.playerId)) {
+          if (this.killsPlayer(tile, movingCharacter.playerId)) {
             return 1
           }
           return 0
@@ -94,25 +106,6 @@ class BoardLogic {
     return aStar.findPath(from, to)
   }
 
-  populateTileMap(board: RawBoard) {
-    const allTiles: Tile[] = []
-    for (let y = 0; y < board.length; y++) {
-      this.tiles[y] = []
-      for (let x = 0; x < board[y].length; x++) {
-        const tileType = board[y][x]
-        const id = `tile-${x}-${y}`
-        const tile = new Tile({
-          id,
-          x,
-          y,
-          type: tileType,
-        })
-        this.tiles[y][x] = tile
-        allTiles.push(tile)
-      }
-    }
-    return allTiles
-  }
 
   killsPlayer(playerTile: Tile, playerId: string) {
     const { x, y } = playerTile
@@ -151,20 +144,20 @@ class BoardLogic {
   }
 
   isPlayerDead(playerId: string) {
-    const characters = this.characters.filter((character) => character.state.playerId === playerId)
+    const characters = this.characters.filter((character) => character.playerId === playerId)
     if (characters.length <= 1) {
       return true
     }
 
     return !characters.some((character) => {
-      const { x, y } = this.getTile(character.position().x, character.position().z)
+      const { x, y } = this.getTile(character.position.x, character.position.y)
       for (let diffY = -1; diffY <= 1; diffY++) {
         for (let diffX = -1; diffX <= 1; diffX++) {
           if (diffX === 0 && diffY === 0) {
             continue
           }
           const tile = this.getTile(x + diffX, y + diffY)
-          const canMove = this.isPassable(character.state.playerId, tile) && !this.killsPlayer(tile, character.state.playerId)
+          const canMove = this.isPassable(character.playerId, tile) && !this.killsPlayer(tile, character.playerId)
           if (canMove) {
             return true
           }
@@ -176,7 +169,7 @@ class BoardLogic {
 
   private players() {
     return Object.keys(this.characters.reduce((acc, character) => {
-      acc[character.state.playerId] = true
+      acc[character.playerId] = true
       return acc
     }, {} as Record<string, boolean>))
   }

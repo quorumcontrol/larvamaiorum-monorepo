@@ -6,6 +6,7 @@ interface MonteCarloFunctions<GameState, Action, Player> {
     stateIsTerminal: (state: GameState) => boolean
     calculateReward: (state: GameState, player: Player) => number
     filter: (actions: Action[]) => Action[]
+    shortCircuits: (state:GameState, actions: Action[], playerId: Player) => Action[]
 }
 
 interface MonteCarloConfig {
@@ -24,26 +25,32 @@ class MonteCarlo<GameState, Action, Player> {
     this.config = config as MonteCarloConfig
   }
 
-  async getAction(state: GameState, playerId: Player): Promise<Action>{
+  async getScoredActions(state: GameState, playerId: Player): Promise<Action[]> {
     const start = Date.now()
     //filter out actions that do not move a character
     const actions = this.funcs.filter(this.funcs.generateActions(state))
+    
+    const shortCircuted = this.funcs.shortCircuits(state, actions, playerId)
+    if (shortCircuted.length > 0) {
+      console.log("short circuited: ", shortCircuted.length, " actions", shortCircuted)
+      return shortCircuted
+    }
+
     const scores = new Array(actions.length).fill(0)
     const maxTime = this.config.duration
 
-    // first make a bucket for each action, then walk the tree for each action and add up the scores from each run
-    // and then loop for the configured duration.
     while (Date.now() - start < maxTime) {
       await Promise.all(actions.map(async (action, i) => {
         scores[i] += await this.scoreAction(state, action, playerId, 0)
         return
       }))
     }
-    // console.log("actions", actions, "scores: ", scores)
-    // now pick the action with the highest score
-    const maxScore = Math.max(...scores)
-    const maxScoreIndex = scores.findIndex((score) => score === maxScore)
-    return actions[maxScoreIndex]
+    // return actions sorted by scores where highest score is first
+    return actions.map((action, i) => ({ action, score: scores[i] })).sort((a, b) => b.score - a.score).map((a) => a.action)
+  }
+
+  async getAction(state: GameState, playerId: Player): Promise<Action>{
+    return (await this.getScoredActions(state, playerId))[0]
   }
 
   private async scoreAction(state: GameState, action: Action, player: Player, depth: number): Promise<number> {
