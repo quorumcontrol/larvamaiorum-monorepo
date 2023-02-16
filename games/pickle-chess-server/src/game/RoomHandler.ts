@@ -1,13 +1,13 @@
 import { Client } from "colyseus"
 import { PickleChessRoom } from "../rooms/PickleChessRoom"
-import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, SetDestinationMessage, TileClickmessage } from "../rooms/schema/PickleChessState"
-import { getAiBoard } from "./boardFetching"
+import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, Tile, TileClickmessage } from "../rooms/schema/PickleChessState"
+import { getAiBoard, RawBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
 import { GameState, getTaunt } from "../ai/taunt"
-import { AIBrain } from "../ai/gamePlayer"
+import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 
 const AI_NAMES = [
   "alice",
@@ -30,7 +30,7 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 
 const TIME_BETWEEN_TAUNTS = 15
 
-const TIME_BETWEEN_AI_MOVES = 0.5
+const TIME_BETWEEN_AI_MOVES = 0.8
 
 export interface RoomJoinOptions {
   name: string
@@ -45,7 +45,7 @@ class RoomHandler extends EventEmitter {
 
   private characters: CharacterLogic[]
 
-  board: BoardLogic
+  board: BoardLogic<CharacterLogic>
 
   private boardLoaded = false
   private timeSinceMusic = 0
@@ -111,7 +111,8 @@ class RoomHandler extends EventEmitter {
   async setup() {
     this.setupMusic()
     const rawBoard = await getAiBoard(this.expectedPlayerCount())
-    const tiles = this.board.populateTileMap(rawBoard)
+    const tiles = this.tileMap(rawBoard)
+    this.board.populateTiles(tiles)
     tiles.forEach((tile) => this.state.board.set(tile.id, tile))
 
     this.room.onMessage(Messages.tileClick, this.handleTileClick.bind(this))
@@ -120,12 +121,49 @@ class RoomHandler extends EventEmitter {
     this.emit(BOARD_LOAD_EVENT)
   }
 
+  tileMap(board: RawBoard) {
+    const allTiles: Tile[] = []
+    for (let y = 0; y < board.length; y++) {
+      for (let x = 0; x < board[y].length; x++) {
+        const tileType = board[y][x]
+        const id = `tile-${x}-${y}`
+        const tile = new Tile({
+          id,
+          x,
+          y,
+          type: tileType,
+        })
+        allTiles.push(tile)
+      }
+    }
+    return allTiles
+  }
+
   private expectedPlayerCount() {
     return this.options.numberOfHumans + this.options.numberOfAi
   }
 
   private isPlaying() {
     return this.state.roomState === RoomState.playing
+  }
+
+  private handleAiMove(action:AIGameAction, id:string) {
+    const tile = this.board.getTile(action.from.x, action.from.y)
+    if (!tile) {
+      console.error('AI tried to use a bad tile', action.from)
+      return
+    }
+    const character = this.board.characterAt(tile)
+    if (!character || character.playerId !== id) {
+      console.error('AI tried to move a character that was not theirs', character)
+      return
+    }
+    const destinationTile = this.board.getTile(action.to.x, action.to.y)
+    if (!destinationTile) {
+      console.error('AI tried to move to a bad tile', action.to)
+      return
+    }
+    character.setDestination(destinationTile)
   }
 
   private async moveAI() {
@@ -140,27 +178,18 @@ class RoomHandler extends EventEmitter {
         if (this.board.isPlayerDead(brain.id)) {
           return
         }
-        const action = await brain.getAction(brain.id)
-        // console.log("move: ", action)
-        if (!action) {
-          return
+
+        // take the top 3 actions on different tiles
+        let actions = await brain.getActions(brain.id)
+        for (let i = 0; i < 3; i++) {
+          const action = actions.shift()
+          if (!action) {
+            return
+          }
+          this.handleAiMove(action, brain.id)
+          // filter out all actions that have the same to
+          actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
         }
-        const tile = this.board.getTile(action.from.x, action.from.y)
-        if (!tile) {
-          console.error('AI tried to use a bad tile', action.from)
-          return
-        }
-        const character = this.board.characterAt(tile)
-        if (!character || character.state.playerId !== brain.id) {
-          console.error('AI tried to move a character that was not theirs', character)
-          return
-        }
-        const destinationTile = this.board.getTile(action.to.x, action.to.y)
-        if (!destinationTile) {
-          console.error('AI tried to move to a bad tile', action.to)
-          return
-        }
-        character.setDestination(destinationTile)
       }))
       this.timeSinceAIMove = 0
     } catch (err) {
@@ -191,10 +220,10 @@ class RoomHandler extends EventEmitter {
     // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
     this.characters.forEach((character, i, characters) => {
       const playerId = character.state.playerId
-      const {x,z} = character.position()
-      const playerTile = this.board.getTile(x,z)
+      const {x,y} = character.position
+      const playerTile = this.board.getTile(x,y)
       if (!playerTile) {
-        console.error("tile not found", x,z)
+        console.error("tile not found", x,y)
         return
       }
       if (this.board.killsPlayer(playerTile, playerId) || deadPlayerIds.includes(playerId)) {

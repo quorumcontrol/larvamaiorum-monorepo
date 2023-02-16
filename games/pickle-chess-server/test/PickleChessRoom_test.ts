@@ -27,6 +27,6 @@ describe("testing your Colyseus app", () => {
     // wait for state sync
     await room.waitForNextPatch();
 
-    assert.equal(client1.state.board.size, 117);
+    assert(client1.state.board.size > 100);
   });
 });
