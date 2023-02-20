@@ -21,17 +21,35 @@ const getPrompt = (state: GameState) => {
   const winner = player1Score > player2Score ? player1 : player2
   const loser = player1Score > player2Score ? player2 : player1
 
-  const winningString = isTied ? `the game is tied` : `${winner} is winning`
+  const winningString = isTied ? `the game is tied.` : `${winner} is winning.`
 
-  return `You are Minerva, god of war and wisdom, and hosting a game called "pickle chess."
-  ${player1} and ${player2} are playing. The game is similar to checkers and the goal is to remove all the other player’s pieces.
+  let winString = ''
+
+  if (player1Score <= 1 || player2Score <= 1) {
+    winString = `The game is over. ${winner} has won!`
+  }
+
+
+  if (state.gameClock < 5) {
+    return `
+    You are providing color commentary on a game called "Empire Gambit" which is similar to Latrunculi from ancient Rome. You are sarcastic and super funny.
+
+    The game just started between ${player1} and ${player2}. Wish them both good luck in a funny, single sentence.
+    `
+  }
+
+  return `You are providing color commentary on a game called "Empire Gambit" which is similar to Latrunculi from ancient Rome. You are sarcastic and super funny.
+
+  ${player1} and ${player2} are playing.
   
   ${winningString} ${state.players[winner].characters} to ${state.players[loser].characters}.
   
-  The game has been running for ${Math.floor(state.gameClock / 1000)} seconds.
-  It has been ${Math.floor(timeSinceLastPieceRemoved / 1000)} seconds since a piece was removed.
+  The game has been running for ${Math.floor(state.gameClock)} seconds.
+  It has been ${Math.floor(timeSinceLastPieceRemoved)} seconds since a piece was removed.
   
-  Write a 1 sentence commentary, as Minerva, to say to the two players.`.trim()
+  ${winString}
+
+  Write a 1 sentence commentary to say to the audience watching the game.`.trim()
 }
 
 export const getTaunt = async (state: GameState) => {

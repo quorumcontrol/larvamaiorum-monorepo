@@ -8,7 +8,7 @@ import { createScript } from "../utils/createScriptDecorator";
 import { memoize } from "../utils/memoize";
 import mustFindByName from "../utils/mustFindByName";
 import mustGetScript from "../utils/mustGetScript";
-import { Character, CharacterRemoveMessage, HudTextMessage, LatencyCheckMessage, Messages, PickleChessState, RoomState, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
+import { Character, CharacterRemoveMessage, HudTextMessage, LatencyCheckMessage, Messages, PickleChessState, RoomState, TauntMessage, Tile, tileTypeToEnglish } from "./schema/PickleChessState";
 
 const ROOM_TYPE = "PickleChessRoom"
 
@@ -122,6 +122,10 @@ class NetworkManager extends ScriptTypeBase {
     this.latencyCheckInterval = setInterval(() => {
       this.room.send(Messages.latencyCheck, { sentAt: new Date().getTime() })
     }, 5000)
+
+    this.room.onMessage(Messages.taunt, (msg:TauntMessage) => {
+      this.app.fire(Messages.taunt, msg)
+    })
 
     this.room.onError((error) => {
       console.error("room error", error)

@@ -46,7 +46,6 @@ class CharacterVisual extends ScriptTypeBase {
 
     this.app.on(Messages.characterRemove, ({id, playerId}: CharacterRemoveMessage) => {
       if (this.characterState?.playerId !== playerId) {
-        // console.log("taunting!", this.characterState?.id)
         setTimeout(() => {
           this.entity.anim?.setTrigger("taunt", true)
         }, randomInt(300))

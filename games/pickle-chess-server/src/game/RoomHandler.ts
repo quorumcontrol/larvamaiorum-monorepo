@@ -1,6 +1,6 @@
 import { Client } from "colyseus"
 import { PickleChessRoom } from "../rooms/PickleChessRoom"
-import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, Tile, TileClickmessage } from "../rooms/schema/PickleChessState"
+import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, TauntMessage, Tile, TileClickmessage } from "../rooms/schema/PickleChessState"
 import { getAiBoard, RawBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
@@ -8,6 +8,7 @@ import EventEmitter from "events"
 import { getRandomTrack } from "./music"
 import { GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
+import { speak } from "../ai/uberduck"
 
 const AI_NAMES = [
   "alice",
@@ -339,17 +340,18 @@ class RoomHandler extends EventEmitter {
   }
 
   private async shipTaunt() {
-    return
+    // return
     if (this.tauntFetching || this.timeSinceTaunt <= TIME_BETWEEN_TAUNTS) {
       return
     }
     const taunt = await this.getTaunt()
+    if (taunt) {
+      const audio = await speak(taunt)
+      console.log("taunt", taunt)
+      this.room.broadcast(Messages.taunt, {text: taunt, audio} as TauntMessage)
+    }
     this.tauntFetching = undefined
     this.timeSinceTaunt = 0
-    if (taunt) {
-      console.log("taunt", taunt)
-      this.room.broadcast(Messages.taunt, taunt)
-    }
   }
 
   private startCountdown() {

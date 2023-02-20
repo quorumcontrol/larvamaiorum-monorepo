@@ -16,8 +16,9 @@ export enum Messages {
   latencyCheck = "l",
 }
 
-export interface Taunt {
+export interface TauntMessage {
   text: string
+  audio: string
 }
 
 export interface LatencyCheckMessage {
