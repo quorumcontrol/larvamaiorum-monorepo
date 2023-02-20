@@ -30,7 +30,7 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 
 const TIME_BETWEEN_TAUNTS = 15
 
-const TIME_BETWEEN_AI_MOVES = 0.8
+const TIME_BETWEEN_AI_MOVES = 0.5
 
 export interface RoomJoinOptions {
   name: string
@@ -181,15 +181,11 @@ class RoomHandler extends EventEmitter {
 
         // take the top 3 actions on different tiles
         let actions = await brain.getActions(brain.id)
-        for (let i = 0; i < 3; i++) {
-          const action = actions.shift()
-          if (!action) {
-            return
-          }
+        actions.slice(0, 2).forEach((action, _i, actions) => {
           this.handleAiMove(action, brain.id)
           // filter out all actions that have the same to
           actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
-        }
+        })
       }))
       this.timeSinceAIMove = 0
     } catch (err) {
@@ -218,7 +214,9 @@ class RoomHandler extends EventEmitter {
   handleCharacterRemovals() {
     const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
     // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-    this.characters.forEach((character, i, characters) => {
+    const toDelete:CharacterLogic[] = []
+
+    this.characters.forEach((character) => {
       const playerId = character.state.playerId
       const {x,y} = character.position
       const playerTile = this.board.getTile(x,y)
@@ -226,13 +224,19 @@ class RoomHandler extends EventEmitter {
         console.error("tile not found", x,y)
         return
       }
-      if (this.board.killsPlayer(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
-        character.stop()
-        this.state.characters.delete(character.state.id)
-        characters.splice(i, 1)
-        this.shipTaunt()
-        this.timeSincePieceCapture = 0
+      if (this.board.killsCharacter(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
+        toDelete.push(character)
       }
+    })
+    toDelete.forEach((character) => {
+      character.stop()
+      this.state.characters.delete(character.state.id)
+      const idx = this.characters.indexOf(character)
+      if (idx > -1) {
+        this.characters.splice(idx, 1)
+      }
+      this.shipTaunt()
+      this.timeSincePieceCapture = 0
     })
   }
 

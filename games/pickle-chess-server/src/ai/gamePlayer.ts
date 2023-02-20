@@ -35,12 +35,13 @@ export const generateActions = (state: AIGameState): AIGameAction[] => {
     console.error("no players found for player: ", player, "players: ", state.players, "player: ", state.player, "characters: ", state.characters)
     throw new Error('missing characters')
   }
-  for (let yDiff = -1; yDiff <= 1; yDiff++) {
-    for (let xDiff = -1; xDiff <= 1; xDiff++) {
+  for (let yDiff = 1; yDiff >= -1; yDiff--) {
+    for (let xDiff = 1; xDiff >= -1; xDiff--) {
       characters.forEach((character) => {
         const to = { x: character.position.x + xDiff, y: character.position.y + yDiff }
+        const tile = state.board.getTile(to.x, to.y)
         // console.log("check", to, "player", player, "for character", character.id, "tile", state.board.getTile(to.x, to.y), "isPassable", state.board.isPassable(player, state.board.getTile(to.x, to.y)))
-        if (locationsEqual(character.position, to) || (state.board.isPassable(player, state.board.getTile(to.x, to.y)) && !state.board.getOccupent(to.x, to.y))) {
+        if (locationsEqual(character.position, to) || (state.board.isPassableTerrain(tile) && !state.board.getOccupent(to.x, to.y)) && !state.board.killsCharacter(tile, character.playerId, character)) {
           actions.push({ playerId: player, from: { ...character.position }, to })
         }
       })
@@ -87,7 +88,8 @@ export const applyAction = (state: AIGameState, action: AIGameAction): AIGameSta
 
   const deadPlayerIds = Array.from(Object.values(newState.players)).filter((player) => newState.board.isPlayerDead(player)).map((player) => player)
   // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-  newState.characters.forEach((character, i, characters) => {
+  const toDelete:AICharacter[] = []
+  newState.characters.forEach((character) => {
     const playerId = character.playerId
     const { x, y } = character.position
     const playerTile = newState.board.getTile(x, y)
@@ -95,11 +97,12 @@ export const applyAction = (state: AIGameState, action: AIGameAction): AIGameSta
       console.error("tile not found", x, y)
       return
     }
-    if (newState.board.killsPlayer(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
-      characters.splice(i, 1)
+    if (newState.board.killsCharacter(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
+      toDelete.push(character)
     }
   })
 
+  newCharacters = newCharacters.filter((character) => !toDelete.includes(character))
 
   // console.log("apply action: ", action, "state", state.characters, "new characters", newCharacters, "newPlayer", newState.player)
   return { ...newState, characters: newCharacters, player: (state.player + 1) % state.players.length }
@@ -133,7 +136,7 @@ export const calculateReward = (state: AIGameState, playerId: string): number =>
 }
 
 export const filter = (actions: AIGameAction[]): AIGameAction[] => {
-  return actions
+  return actions.filter((action) => (action.from.x !== action.to.x || action.from.y !== action.to.y))
 }
 
 export class AIBrain {
@@ -155,8 +158,8 @@ export class AIBrain {
       filter,
       shortCircuits,
     }, {
-      duration: 40,
-      maxDepth: 5,
+      duration: 35,
+      maxDepth: 8,
     })
   }
 

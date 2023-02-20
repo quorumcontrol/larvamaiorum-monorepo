@@ -14,6 +14,24 @@ interface MonteCarloConfig {
   maxDepth: number,
 }
 
+export function shuffle<T>(array: T[]): T[] {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+};
+
 class MonteCarlo<GameState, Action, Player> {
   funcs: MonteCarloFunctions<GameState, Action, Player>
   config: MonteCarloConfig
@@ -40,7 +58,7 @@ class MonteCarlo<GameState, Action, Player> {
     const maxTime = this.config.duration
 
     while (Date.now() - start < maxTime) {
-      await Promise.all(actions.map(async (action, i) => {
+      await Promise.all(shuffle(actions).map(async (action, i) => {
         scores[i] += await this.scoreAction(state, action, playerId, 0)
         return
       }))
@@ -59,6 +77,12 @@ class MonteCarlo<GameState, Action, Player> {
       return this.funcs.calculateReward(newState, player)
     }
     const newActions = this.funcs.generateActions(newState)
+    // const shortCircuted = this.funcs.shortCircuits(newState, newActions, player)
+    // if (shortCircuted.length > 0) {
+    //   console.log("short circuited: ", shortCircuted.length, " actions", shortCircuted)
+    //   return (await this.scoreAction(newState, shortCircuted[0], player, depth + 1)) / (depth + 1)
+    // }
+
     // now pick a *random* action to walk on this tree
     const randomAction = newActions[randomInt(newActions.length)]
     // the further away the reward is, the less valuable it is

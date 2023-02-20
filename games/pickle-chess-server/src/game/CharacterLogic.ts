@@ -12,7 +12,7 @@ class CharacterLogic {
   constructor(state: Character, board: BoardLogic<CharacterLogic>) {
     this.state = state
     this.board = board
-    this.locomotion = new LocomotionLogic(state.locomotion, 0.75)
+    this.locomotion = new LocomotionLogic(state.locomotion)
   }
 
   get playerId() {

@@ -1,5 +1,4 @@
-import { Room } from "colyseus"
-import { Vec2, math } from "playcanvas"
+import { Vec2 } from "playcanvas"
 import { Locomotion, LocomotionState } from "../rooms/schema/PickleChessState"
 
 class LocomotionLogic {
@@ -8,34 +7,25 @@ class LocomotionLogic {
   // focus: Vec2
   frontPoint: Vec2
 
-  private forward:Vec2
-
-  private frontOfCharacterOffset:number
+  private forward: Vec2
 
   private state: Locomotion
 
-  // private addionalSpeed = 0.0 // todo
-  private limiter?:number
-
-  private debugRoom?:Room
 
   // frontOfCharacterOffset is the halfextent from the pivot point to the front of the character
   // this is useful because deer and humans have different sizes and so when we are making them not overlap, we should use the front point
   // and not the pivot point
-  constructor(state: Locomotion, frontOfCharacterOffset:number, room?:Room) {
+  constructor(state: Locomotion) {
     this.state = state
     this.position = new Vec2(state.position.x, state.position.z)
     this.destination = new Vec2(state.destination.x, state.destination.z)
     // this.focus = new Vec2(state.focus.x, state.focus.z)
-    this.frontOfCharacterOffset = frontOfCharacterOffset
 
     this.forward = new Vec2()
     // this.updateForward()
 
     this.frontPoint = new Vec2()
     // this.updateFrontPoint()
-
-    this.debugRoom = room
   }
 
   update(dt: number) {
@@ -128,14 +118,6 @@ class LocomotionLogic {
     this.state.assign({
       locomotionState: state,
     })
-  }
-
-  setLimiter(limit?:number) {
-    this.limiter = limit
-  }
-
-  clearLimiter() {
-    this.limiter = undefined
   }
 
   // private updateFrontPoint() {

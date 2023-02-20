@@ -131,7 +131,7 @@ export const createNewAiBoard = async (): Promise<RawBoard> => {
 
 export const getAiBoard = async (numberOfPlayers:number): Promise<RawBoard> => {
   // return bigBoards[3]
-  // return pregeneratedBoards[14]
+  return pregeneratedBoards[14]
   if (numberOfPlayers > 3) {
     return bigBoards[randomInt(bigBoards.length)]
   }

@@ -3,7 +3,7 @@ import { AICharacter, AIGameState, applyAction, generateActions, shortCircuits }
 import BoardLogic, { Tile } from "../src/game/BoardLogic";
 import { TileType } from "../src/rooms/schema/PickleChessState";
 
-describe.only("AI Logic", () => {
+describe("AI Logic", () => {
 
     it("short circuits correctly", () => {
         const tiles: Tile[] = []
@@ -47,7 +47,7 @@ describe.only("AI Logic", () => {
 
         const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
 
-        assert(board.isPassable(players[0], board.getTile(1,2)))
+        assert(board.isPassableTerrainAndNotOwnCharacter(players[0], board.getTile(1,2)))
 
         const state:AIGameState = {
             board,
