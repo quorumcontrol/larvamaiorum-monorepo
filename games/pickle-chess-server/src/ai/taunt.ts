@@ -1,55 +1,86 @@
 import { fetchApiKey, generateCompletions } from "./textAI"
 
+export enum GameEvent {
+  started,
+  pieceCaptured,
+  filler,
+  over,
+}
+
 export interface GameState {
+  event: GameEvent
+
   players: {
     [name: string]: {
       characters: number
     }
   },
+  ranked: string[],
   gameClock: number
   timeSincePieceCapture: number
+  winner?:string
 }
 
+const winningString = (state:GameState) => {
+  const ranked = state.ranked
+  const isTied = ranked[0] === ranked[1]
+  if (ranked.length > 2 && isTied) {
+    return `${ranked[0]} and ${ranked[1]} are tied for first place.`
+  }
+  const winningString = isTied ? `the game is tied.` : `${ranked[0]} is winning.`
+  return `${winningString}. The scores are: ${ranked.map((name) => `${name}: ${state.players[name].characters}`).join(', ')}.`
+}
+
+const promptExtension = (state:GameState) => {
+  switch (state.event) {
+    case GameEvent.pieceCaptured:
+      return `A piece was just removed! Please comment on that.`
+    case GameEvent.filler:
+      return `It has been ${Math.floor(state.timeSincePieceCapture)} seconds since a piece was removed.`
+    default:
+      return ''
+  }
+}
+
+const introPrompt = `
+You are the announcer for a game called "Empire Gambit." It is based on Latrunculi. The hook for the game is that it is as strategic as chess, but more accessible. Similar to how pickle ball is a more accessible game to tennis.
+
+You are sarcastic and super funny, please feel free to make jokes.
+`.trim()
+
+const endPrompt = `Write a 1 sentence high energy, and funny commentary on the game.`
+
+
 const getPrompt = (state: GameState) => {
-  const playerNames = Object.keys(state.players)
-  const player1 = playerNames[0]
-  const player2 = playerNames[1]
-  const player1Score = state.players[player1].characters
-  const player2Score = state.players[player2].characters
-  const timeSinceLastPieceRemoved = state.timeSincePieceCapture
-  const isTied = player1Score === player2Score
-  const winner = player1Score > player2Score ? player1 : player2
-  const loser = player1Score > player2Score ? player2 : player1
-
-  const winningString = isTied ? `the game is tied.` : `${winner} is winning.`
-
-  let winString = ''
-
-  if (player1Score <= 1 || player2Score <= 1) {
-    winString = `The game is over. ${winner} has won!`
-  }
-
-
-  if (state.gameClock < 5) {
+  if (state.event === GameEvent.started) {
     return `
-    You are providing color commentary on a game called "Empire Gambit" which is similar to Latrunculi from ancient Rome. You are sarcastic and super funny.
+${introPrompt}
 
-    The game just started between ${player1} and ${player2}. Wish them both good luck in a funny, single sentence.
-    `
+The game just started between ${state.ranked.join(', ')}. Wish them good luck in a funny, single sentence.
+    `.trim()
   }
 
-  return `You are providing color commentary on a game called "Empire Gambit" which is similar to Latrunculi from ancient Rome. You are sarcastic and super funny.
+  if (state.event === GameEvent.over) {
+    return `
+${introPrompt}
 
-  ${player1} and ${player2} are playing.
+The game is over! ${state.winner} won! ${endPrompt}
+    `.trim()
+  }
+
+
+  return `${introPrompt}
+
+  ${state.ranked.join(', ')} are playing.
   
-  ${winningString} ${state.players[winner].characters} to ${state.players[loser].characters}.
+  ${winningString(state)}
   
   The game has been running for ${Math.floor(state.gameClock)} seconds.
-  It has been ${Math.floor(timeSinceLastPieceRemoved)} seconds since a piece was removed.
-  
-  ${winString}
 
-  Write a 1 sentence commentary to say to the audience watching the game.`.trim()
+  ${promptExtension(state)}
+  
+  ${endPrompt}
+`.trim()
 }
 
 export const getTaunt = async (state: GameState) => {
@@ -61,17 +92,17 @@ export const getTaunt = async (state: GameState) => {
         apiKey: fetchApiKey(),
         prompt,
         engine: "text-curie-001",
-        maxTokens: 240,
+        maxTokens: 512,
         stop: "",
         temperature: 0.9,
         topP: 1,
-        presencePenalty: 0,
-        frequencyPenalty: 0,
+        presencePenalty: 0.4,
+        frequencyPenalty: 0.2,
       }
     )
     return resp.data.choices[0].text.trim()
   } catch (err) {
-    console.error("error fetchinng taunt: ", err)
+    console.error("error fetchinng taunt: ", (err as any).response)
     return undefined
   }
 

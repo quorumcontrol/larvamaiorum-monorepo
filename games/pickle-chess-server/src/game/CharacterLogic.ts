@@ -37,7 +37,7 @@ class CharacterLogic {
 
   setDestination(tile: Tile) {
     this.userSetDestination = tile
-    console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
+    // console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
   }
 
   stop() {
@@ -58,8 +58,8 @@ class CharacterLogic {
       return
     }
     if (this.state.tileId !== tile.id) {
-      console.log(position)
-      console.log("character moved to tile", tile.id, "from", this.state.tileId)
+      // console.log(position)
+      // console.log("character moved to tile", tile.id, "from", this.state.tileId)
     }
     this.state.tileId = tile.id
 
@@ -67,11 +67,13 @@ class CharacterLogic {
     const destination = this.locomotion.destination
     if (destination) {
       const destinationTile = this.board.getTile(destination.x, destination.y)
-      const occupent = this.board.getOccupent(destinationTile.x, destinationTile.y)
-      if (destinationTile && occupent && occupent !== this) {
-        console.log("stopping because destination is occupied", destinationTile.id, occupent.tileId)
-        this.locomotion.stop()
-        return
+      if (destinationTile.id !== tile.id) {
+        const occupent = this.board.getOccupent(destinationTile.x, destinationTile.y)
+        if (destinationTile && occupent && occupent !== this) {
+          console.log("stopping because destination is occupied", destinationTile.id, occupent.tileId)
+          this.locomotion.stop()
+          return
+        }
       }
     }
 

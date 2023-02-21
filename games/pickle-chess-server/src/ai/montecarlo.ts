@@ -50,7 +50,7 @@ class MonteCarlo<GameState, Action, Player> {
     
     const shortCircuted = this.funcs.shortCircuits(state, actions, playerId)
     if (shortCircuted.length > 0) {
-      console.log("short circuited: ", shortCircuted.length, " actions", shortCircuted)
+      // console.log("short circuited: ", shortCircuted.length, " actions", shortCircuted)
       return shortCircuted
     }
 

@@ -140,8 +140,8 @@ describe.only("BoardLogic", () => {
         }
 
         const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
-        // assert(board.killsCharacter(board.getTile(1,0), players[0]))
-        assert(board.killsCharacter(board.getTile(1,1), players[0]))
+        assert(board.killsCharacter(board.getTile(1,1), players[0], undefined, true))
+        // assert(board.killsCharacter(board.getTile(1,0), players[0], undefined, true))
     })
 
     it("does not kill a single player when they are only on a single side", () => {
@@ -171,7 +171,42 @@ describe.only("BoardLogic", () => {
 
         const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
         // assert(board.killsCharacter(board.getTile(1,0), players[0]))
-        assert(!board.killsCharacter(board.getTile(1,0), players[0]))
+        assert(!board.killsCharacter(board.getTile(1,0), players[0], undefined))
+    })
+
+    it('handles an unusual situation', () => {
+        const tiles = getTiles()
+
+        // tiles.find((t) => t.x === 1 && t.y === 0)!.type = TileType.water
+        // tiles.find((t) => t.x === 2 && t.y === 1)!.type = TileType.water
+        // tiles.find((t) => t.x === 0 && t.y === 2)!.type = TileType.water
+        // tiles.find((t) => t.x === 1 && t.y === 3)!.type = TileType.water
+
+        const p1One:AICharacter = {
+            id: "p1One",
+            playerId: players[0],
+            ...playerPositionArgs(1,0),
+        }
+        const p1Two:AICharacter = {
+            id: "p1Two",
+            playerId: players[0],
+            ...playerPositionArgs(3,0)
+        }
+        const p2One:AICharacter = {
+            id: "p2One",
+            playerId: players[1],
+            ...playerPositionArgs(2,0),
+        }
+        //ignored
+        const p2Two:AICharacter = {
+            id: "p2Two",
+            playerId: players[1],
+            ...playerPositionArgs(2,1),
+        }
+
+        const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
+        assert(board.killsCharacter(board.getTile(2,0), players[1]))
+        assert(!board.killsCharacter(board.getTile(3,0), players[0], undefined, true))
     })
 
 })

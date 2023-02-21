@@ -6,7 +6,7 @@ import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
-import { GameState, getTaunt } from "../ai/taunt"
+import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
 
@@ -92,7 +92,7 @@ class RoomHandler extends EventEmitter {
     }
 
     if (this.timeSincePieceCapture > 45) {
-      this.shipTaunt()
+      this.shipTaunt(GameEvent.filler)
     }
 
     this.handleCharacterRemovals()
@@ -225,32 +225,49 @@ class RoomHandler extends EventEmitter {
         console.error("tile not found", x,y)
         return
       }
-      if (this.board.killsCharacter(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
+      if (this.board.killsCharacter(playerTile, playerId, undefined, true) || deadPlayerIds.includes(playerId)) {
         toDelete.push(character)
       }
     })
     toDelete.forEach((character) => {
       character.stop()
-      this.state.characters.delete(character.state.id)
+      this.state.characters.delete(character.id)
       const idx = this.characters.indexOf(character)
       if (idx > -1) {
-        this.characters.splice(idx, 1)
+        const deleted = this.characters.splice(idx, 1)
+        if (deleted.length !== 1) {
+          console.error("deleted incorrect characters", deleted)
+          throw new Error('oops')
+        }
+      } else {
+        console.error("missing character")
+        throw new Error("oops")
       }
-      this.shipTaunt()
       this.timeSincePieceCapture = 0
     })
+    if (toDelete.length > 0) {
+      this.shipTaunt(GameEvent.pieceCaptured)
+    }
   }
 
-  private getGameState():GameState {
+  private getGameState(event:GameEvent):GameState {
+    const players = Array.from(this.state.players.values()).reduce((acc, player) => {
+      acc[player.name] = {
+        characters: this.characters.filter((character) => character.state.playerId === player.id).length
+      }
+      return acc
+    }, {} as GameState["players"])
+    const ranked = Object.keys(players).sort((a,b) => players[a].characters - players[b].characters)
+
+    const winner = this.board.isOver() ? ranked[0] : undefined
+
     return {
-      players: Array.from(this.state.players.values()).reduce((acc, player) => {
-        acc[player.name] = {
-          characters: this.characters.filter((character) => character.state.playerId === player.id).length
-        }
-        return acc
-      }, {} as GameState["players"]),
+      event,
+      players,
+      ranked: ranked,
       timeSincePieceCapture: this.timeSincePieceCapture,
       gameClock: this.gameClock,
+      winner,
     }
   }
 
@@ -335,16 +352,16 @@ class RoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
-  private getTaunt() {
-    return getTaunt(this.getGameState())
+  private getTaunt(event:GameEvent) {
+    return getTaunt(this.getGameState(event))
   }
 
-  private async shipTaunt() {
-    // return
+  private async shipTaunt(event:GameEvent) {
+    return
     if (this.tauntFetching || this.timeSinceTaunt <= TIME_BETWEEN_TAUNTS) {
       return
     }
-    const taunt = await this.getTaunt()
+    const taunt = await this.getTaunt(event)
     if (taunt) {
       const audio = await speak(taunt)
       console.log("taunt", taunt)
@@ -365,7 +382,7 @@ class RoomHandler extends EventEmitter {
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown
     })
-    this.shipTaunt()
+    this.shipTaunt(GameEvent.started)
     const interval = this.room.clock.setInterval(() => {
       countdown--
       this.state.assign({
