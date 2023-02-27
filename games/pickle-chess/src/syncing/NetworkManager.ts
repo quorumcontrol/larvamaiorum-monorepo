@@ -42,9 +42,12 @@ class NetworkManager extends ScriptTypeBase {
 
   private latencyCheckInterval: ReturnType<typeof setInterval>
 
-  private currentLatency: number = 100 //default to 100ms
+  private latencyMeasurements:number[]
+
+  private currentLatency: number = 50 // ms
 
   initialize() {
+    this.latencyMeasurements = []
     this.client = client()
     const playButton = mustFindByName(this.app.root, "PlayButton")
 
@@ -113,8 +116,14 @@ class NetworkManager extends ScriptTypeBase {
     const [roomType, params] = roomParams()
     console.log("joining room: ", roomType, params)
     this.room = await this.client.joinOrCreate<PickleChessState>(roomType, params)
+
     this.room.onMessage(Messages.latencyCheck, (msg:LatencyCheckMessage) => {
-      this.currentLatency = (new Date().getTime() - msg.sentAt) / 2 // half the time it took to go from here to the server and back
+      const latency = (new Date().getTime() - msg.sentAt) / 2
+      this.latencyMeasurements.push(latency)
+      if (this.latencyMeasurements.length > 5) {
+        this.latencyMeasurements.shift()
+      }
+      this.currentLatency = this.latencyMeasurements.reduce((sum, measurement) => sum + measurement, 0) / this.latencyMeasurements.length
       console.log("latency: ", this.currentLatency)
       this.app.fire("latencyUpdate", this.currentLatency)
     })

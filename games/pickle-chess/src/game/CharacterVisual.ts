@@ -23,7 +23,7 @@ class CharacterVisual extends ScriptTypeBase {
 
   private unsubs: (() => void)[]
 
-  private latency = 100
+  private latency = 50 //ms
 
   initialize() {
     this.serverPosition = new Vec3()

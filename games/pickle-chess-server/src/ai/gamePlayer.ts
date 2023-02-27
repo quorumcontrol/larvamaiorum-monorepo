@@ -181,17 +181,25 @@ export class AIBrain {
   private getGameState(playerId: string): AIGameState {
 
     const aiCharacters = this.characters.map((character) => {
-      const position = character.position
-      if (!position) {
-        throw new Error("character has no position")
-      }
-      const { x, y, id } = this.board.getTile(position.x, position.y)
-      return {
-        id: character.state.id,
-        playerId: character.state.playerId,
-        position: { x, y },
-        tileId: id,
-      }
+      try {
+        const position = character.position
+        if (!position) {
+          throw new Error("character has no position")
+        }
+        const { x, y, id } = this.board.getTile(position.x, position.y)
+        return {
+          id: character.state.id,
+          playerId: character.state.playerId,
+          position: { x, y },
+          tileId: id,
+        }
+      } catch (err) {
+        console.error("err: ", err)
+        console.error("tiles: ", this.board.tiles)
+        console.error("character: ", character.position, character.state.id, character.state.playerId)
+        throw err
+    }
+
     })
 
     const players = this.players()

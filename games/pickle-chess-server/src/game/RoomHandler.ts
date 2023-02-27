@@ -32,7 +32,7 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 const MIN_TIME_BETWEEN_TAUNTS = 5
 const MAX_TIME_BETWEEN_TAUNTS = 45
 
-const TIME_BETWEEN_AI_MOVES = 0.5
+const TIME_BETWEEN_AI_MOVES = 0.75
 
 export interface RoomJoinOptions {
   name: string
@@ -184,6 +184,9 @@ class RoomHandler extends EventEmitter {
         // take the top 3 actions on different tiles
         let actions = await brain.getActions(brain.id)
         actions.slice(0, 2).forEach((action, _i, actions) => {
+          if (!action.to) {
+            return
+          }
           this.handleAiMove(action, brain.id)
           // filter out all actions that have the same to
           actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
@@ -361,10 +364,11 @@ class RoomHandler extends EventEmitter {
 
   private async shipTaunt(event:GameEvent, extraText?:string) {
     // return
-    console.log("ship taunt: ", event, extraText)
     if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
       return
     }
+    console.log("ship taunt: ", event, extraText)
+
     this.tauntFetching = true
     const taunt = await getTaunt(this.getGameState(event), extraText)
     if (taunt) {

@@ -32,7 +32,12 @@ class LocomotionLogic {
     if (this.state.locomotionState === LocomotionState.move) {
       this.position.set(this.state.position.x, this.state.position.z)
       this.destination.set(this.state.destination.x, this.state.destination.z)
-      this.forward.sub2(this.destination, this.position).normalize().mulScalar(Math.abs(this.state.speed) * dt)
+
+      const distanceToTravel = Math.abs(this.state.speed) * dt
+      const distanceToDestination = this.position.distance(this.destination)
+
+      this.forward.sub2(this.destination, this.position).normalize().mulScalar(Math.min(distanceToTravel, distanceToDestination))
+
       this.position.add(this.forward)
       this.state.position.assign({
         x: this.position.x,
@@ -141,7 +146,7 @@ class LocomotionLogic {
     //   this.setSpeed(this.state.maxSpeed)
     //   return
     // }
-    if (dist > 0.05) {
+    if (dist > 0.1) {
       this.setSpeed(this.state.walkSpeed)
       return
     }

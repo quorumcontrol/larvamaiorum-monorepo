@@ -59,7 +59,7 @@ class CharacterLogic {
     }
     if (this.state.tileId !== tile.id) {
       // console.log(position)
-      // console.log("character moved to tile", tile.id, "from", this.state.tileId)
+      console.log("character moved to tile", tile.id, "from", this.state.tileId)
     }
     this.state.tileId = tile.id
 
@@ -79,6 +79,7 @@ class CharacterLogic {
 
     if (this.locomotion.getState() === LocomotionState.arrived) {
       if (this.userSetDestination.id === tile.id) {
+        console.log("larger arrived")
         this.stop()
         return
       }
