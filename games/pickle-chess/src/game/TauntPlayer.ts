@@ -8,6 +8,7 @@ class TauntPlayer extends ScriptTypeBase {
 
     initialize() {
         this.audio = new Audio()
+        this.audio.volume = 0.5
         this.app.on(Messages.taunt, (msg: TauntMessage) => {
             this.handleAudio(msg.audio)
         })

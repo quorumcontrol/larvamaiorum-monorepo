@@ -29,7 +29,8 @@ const CHARACTERS_PER_PLAYER = 8
 
 const BOARD_LOAD_EVENT = "boardLoaded"
 
-const TIME_BETWEEN_TAUNTS = 15
+const MIN_TIME_BETWEEN_TAUNTS = 5
+const MAX_TIME_BETWEEN_TAUNTS = 45
 
 const TIME_BETWEEN_AI_MOVES = 0.5
 
@@ -50,11 +51,11 @@ class RoomHandler extends EventEmitter {
 
   private boardLoaded = false
   private timeSinceMusic = 0
-  private tauntFetching?: Promise<string>
+  private tauntFetching = false
 
   private gameClock = 0
   private timeSincePieceCapture = 0
-  private timeSinceTaunt = TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
+  private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
   private aiBrains?:AIBrain[]
   private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
@@ -91,7 +92,7 @@ class RoomHandler extends EventEmitter {
       }
     }
 
-    if (this.timeSincePieceCapture > 45) {
+    if (this.timeSinceTaunt > MAX_TIME_BETWEEN_TAUNTS) {
       this.shipTaunt(GameEvent.filler)
     }
 
@@ -246,7 +247,13 @@ class RoomHandler extends EventEmitter {
       this.timeSincePieceCapture = 0
     })
     if (toDelete.length > 0) {
-      this.shipTaunt(GameEvent.pieceCaptured)
+      const removedCounts = toDelete.reduce((acc, character) => {
+        acc[this.state.players.get(character.playerId).name] = (acc[character.state.playerId] || 0) + 1
+        return acc
+      }, {} as {[key:string]:number})
+
+      const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
+      this.shipTaunt(evt, Object.keys(removedCounts).map((playerName) => `${playerName} just lost ${removedCounts[playerName]} pieces`).join("! ") + "!")
     }
   }
 
@@ -257,7 +264,7 @@ class RoomHandler extends EventEmitter {
       }
       return acc
     }, {} as GameState["players"])
-    const ranked = Object.keys(players).sort((a,b) => players[a].characters - players[b].characters)
+    const ranked = Object.keys(players).sort((a,b) => players[b].characters - players[a].characters)
 
     const winner = this.board.isOver() ? ranked[0] : undefined
 
@@ -352,16 +359,14 @@ class RoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
-  private getTaunt(event:GameEvent) {
-    return getTaunt(this.getGameState(event))
-  }
-
-  private async shipTaunt(event:GameEvent) {
-    return
-    if (this.tauntFetching || this.timeSinceTaunt <= TIME_BETWEEN_TAUNTS) {
+  private async shipTaunt(event:GameEvent, extraText?:string) {
+    // return
+    console.log("ship taunt: ", event, extraText)
+    if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
       return
     }
-    const taunt = await this.getTaunt(event)
+    this.tauntFetching = true
+    const taunt = await getTaunt(this.getGameState(event), extraText)
     if (taunt) {
       const audio = await speak(taunt)
       console.log("taunt", taunt)

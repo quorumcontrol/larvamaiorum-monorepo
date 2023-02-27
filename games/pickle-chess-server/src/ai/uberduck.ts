@@ -11,7 +11,6 @@ const waitForSpeech = async (uuid: string) => {
     let response = await sdk.get_speak_status_speak_status_get({ uuid })
 
     while (!response.data.finished_at && !response.data.failed_at) {
-        console.log("response: ", response)
         response = await new Promise((resolve) => setTimeout(() => {
             resolve(sdk.get_speak_status_speak_status_get({ uuid }))
         },
