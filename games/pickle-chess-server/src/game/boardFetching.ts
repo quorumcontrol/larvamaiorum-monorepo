@@ -129,6 +129,10 @@ export const createNewAiBoard = async (): Promise<RawBoard> => {
   return board
 }
 
+export const getBoardById = (id:number) => {
+  return pregeneratedBoards[id]
+}
+
 export const getAiBoard = async (numberOfPlayers:number): Promise<RawBoard> => {
   // return bigBoards[3]
   return pregeneratedBoards[2]

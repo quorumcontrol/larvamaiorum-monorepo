@@ -1,14 +1,15 @@
 import { Room, Client } from "colyseus";
 import RoomHandler, { RoomJoinOptions } from "../game/RoomHandler";
+import TutorialRoomHandler from "../game/TutorialRoom";
 import { LatencyCheckMessage, Messages, PickleChessState } from "./schema/PickleChessState";
 
-export class PickleChessRoom extends Room<PickleChessState> {
+export class TutorialRoom extends Room<PickleChessState> {
 
-  handler: RoomHandler
+  handler: TutorialRoomHandler
 
   onCreate (options: RoomJoinOptions) {
     this.setState(new PickleChessState());
-    this.handler = new RoomHandler(this, options)
+    this.handler = new TutorialRoomHandler(this, options)
     this.handler.setup()
     this.setSimulationInterval((dt) => {
       this.handler.update(dt / 1000)

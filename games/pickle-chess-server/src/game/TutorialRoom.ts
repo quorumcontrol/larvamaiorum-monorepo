@@ -1,7 +1,7 @@
 import { Client } from "colyseus"
 import { PickleChessRoom } from "../rooms/PickleChessRoom"
 import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, TauntMessage, Tile, TileClickmessage } from "../rooms/schema/PickleChessState"
-import { getAiBoard, RawBoard } from "./boardFetching"
+import { getAiBoard, getBoardById, RawBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
@@ -9,6 +9,7 @@ import { getRandomTrack } from "./music"
 import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
+import { TutorialRoom } from "../rooms/TutorialRoom"
 
 const AI_NAMES = [
   "local"
@@ -43,8 +44,8 @@ export interface RoomJoinOptions {
   numberOfHumans: number
 }
 
-class RoomHandler extends EventEmitter {
-  private room: PickleChessRoom
+class TutorialRoomHandler extends EventEmitter {
+  private room: TutorialRoom
   private state: PickleChessState
 
   private characters: CharacterLogic[]
@@ -59,13 +60,13 @@ class RoomHandler extends EventEmitter {
   private timeSincePieceCapture = 0
   private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
-  private aiBrains?:AIBrain[]
-  private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
-  private isAiMoving = false
+  // private aiBrains?:AIBrain[]
+  // private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
+  // private isAiMoving = false
 
   private options:RoomJoinOptions
 
-  constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
+  constructor(room: TutorialRoom, opts: RoomJoinOptions) {
     super()
     this.room = room
     this.state = room.state
@@ -87,12 +88,12 @@ class RoomHandler extends EventEmitter {
     this.timeSinceTaunt += dt
 
 
-    if (this.aiBrains) {
-      this.timeSinceAIMove += dt
-      if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
-        this.moveAI()
-      }
-    }
+    // if (this.aiBrains) {
+    //   this.timeSinceAIMove += dt
+    //   if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
+    //     this.moveAI()
+    //   }
+    // }
 
     if (this.timeSinceTaunt > MAX_TIME_BETWEEN_TAUNTS) {
       this.shipTaunt(GameEvent.filler)
@@ -114,7 +115,7 @@ class RoomHandler extends EventEmitter {
 
   async setup() {
     this.setupMusic()
-    const rawBoard = await getAiBoard(this.expectedPlayerCount())
+    const rawBoard = getBoardById(2)
     const tiles = this.tileMap(rawBoard)
     this.board.populateTiles(tiles)
     tiles.forEach((tile) => this.state.board.set(tile.id, tile))
@@ -143,66 +144,65 @@ class RoomHandler extends EventEmitter {
     return allTiles
   }
 
-  private expectedPlayerCount() {
-    return this.options.numberOfHumans + this.options.numberOfAi
-  }
+  // private expectedPlayerCount() {
+  //   return this.options.numberOfHumans + this.options.numberOfAi
+  // }
 
   private isPlaying() {
     return this.state.roomState === RoomState.playing
   }
 
-  private handleAiMove(action:AIGameAction, id:string) {
-    const tile = this.board.getTile(action.from.x, action.from.y)
-    if (!tile) {
-      console.error('AI tried to use a bad tile', action.from)
-      return
-    }
-    const character = this.board.characterAt(tile)
-    if (!character || character.playerId !== id) {
-      console.error('AI tried to move a character that was not theirs', character)
-      return
-    }
-    const destinationTile = this.board.getTile(action.to.x, action.to.y)
-    if (!destinationTile) {
-      console.error('AI tried to move to a bad tile', action.to)
-      return
-    }
-    character.setDestination(destinationTile)
-  }
+  // private handleAiMove(action:AIGameAction, id:string) {
+  //   const tile = this.board.getTile(action.from.x, action.from.y)
+  //   if (!tile) {
+  //     console.error('AI tried to use a bad tile', action.from)
+  //     return
+  //   }
+  //   const character = this.board.characterAt(tile)
+  //   if (!character || character.playerId !== id) {
+  //     console.error('AI tried to move a character that was not theirs', character)
+  //     return
+  //   }
+  //   const destinationTile = this.board.getTile(action.to.x, action.to.y)
+  //   if (!destinationTile) {
+  //     console.error('AI tried to move to a bad tile', action.to)
+  //     return
+  //   }
+  //   character.setDestination(destinationTile)
+  // }
 
-  private async moveAI() {
-    if (!this.aiBrains || this.isAiMoving) {
-      // console.log("not moving AI: ", !!this.aiBrain, this.isAiMoving)
-      return
-    }
-    try {
-      this.isAiMoving = true
-      // console.log("moving AI")
-      await Promise.all(this.aiBrains.map(async (brain) => {
-        if (this.board.isPlayerDead(brain.id)) {
-          return
-        }
+  // private async moveAI() {
+  //   if (!this.aiBrains || this.isAiMoving) {
+  //     // console.log("not moving AI: ", !!this.aiBrain, this.isAiMoving)
+  //     return
+  //   }
+  //   try {
+  //     this.isAiMoving = true
+  //     // console.log("moving AI")
+  //     await Promise.all(this.aiBrains.map(async (brain) => {
+  //       if (this.board.isPlayerDead(brain.id)) {
+  //         return
+  //       }
 
-        // take the top 3 actions on different tiles
-        let actions = await brain.getActions(brain.id)
-        actions.slice(0, 2).forEach((action, _i, actions) => {
-          if (!action.to) {
-            return
-          }
-          this.handleAiMove(action, brain.id)
-          // filter out all actions that have the same to
-          actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
-        })
-      }))
-      this.timeSinceAIMove = 0
-    } catch (err) {
-      console.error("error moving AI: ", err)
-      return
-    } finally {
-      this.isAiMoving = false
-    }
-
-  }
+  //       // take the top 3 actions on different tiles
+  //       let actions = await brain.getActions(brain.id)
+  //       actions.slice(0, 2).forEach((action, _i, actions) => {
+  //         if (!action.to) {
+  //           return
+  //         }
+  //         this.handleAiMove(action, brain.id)
+  //         // filter out all actions that have the same to
+  //         actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
+  //       })
+  //     }))
+  //     this.timeSinceAIMove = 0
+  //   } catch (err) {
+  //     console.error("error moving AI: ", err)
+  //     return
+  //   } finally {
+  //     this.isAiMoving = false
+  //   }
+  // }
 
   checkForOver() {
     if (!this.boardLoaded) {
@@ -419,8 +419,14 @@ class RoomHandler extends EventEmitter {
       name: AI_NAMES[idx],
       avatar: avatar,
     }))
-    for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
-      const tile = this.board.randomAvailableInitialLocation(id)
+    const locations = [
+      {x: 0, y:0},
+      {x: 4, y: 6},
+      {x: 4, y: 5},
+      {x: 7, y: 8}
+    ]
+    for (let i = 0; i < 4; i++) {
+      const tile = this.board.getTile(locations[i].x, locations[i].y)
       const character = new Character({
         id: `${id}-${i}`,
         playerId: id,
@@ -441,8 +447,8 @@ class RoomHandler extends EventEmitter {
       this.state.characters.set(character.id, character)
       this.characters.push(new CharacterLogic(character, this.board))
     }
-    this.aiBrains ||= [] 
-    this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
+    // this.aiBrains ||= [] 
+    // this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
@@ -453,7 +459,7 @@ class RoomHandler extends EventEmitter {
         name: options.name,
         avatar: options.avatar,
       }))
-      for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
+      for (let i = 0; i < 2; i++) {
         const tile = this.board.randomAvailableInitialLocation(client.sessionId)
         const character = new Character({
           id: `${client.sessionId}-${i}`,
@@ -488,4 +494,4 @@ class RoomHandler extends EventEmitter {
   }
 }
 
-export default RoomHandler
+export default TutorialRoomHandler

@@ -27,7 +27,8 @@ const roomParams = () => {
     const params = new URLSearchParams(document.location.search);
     const encodedMatchData = params.get("m")
     if (encodedMatchData) {
-      return [ROOM_TYPE, JSON.parse(atob(encodedMatchData))]
+      const matchData = JSON.parse(atob(encodedMatchData))
+      return [matchData.roomType || ROOM_TYPE, matchData]
     }
     return [ROOM_TYPE, { name: params.get("name") }]
   }
