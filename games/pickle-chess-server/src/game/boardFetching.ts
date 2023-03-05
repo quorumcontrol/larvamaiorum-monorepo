@@ -117,11 +117,14 @@ const bigBoards = [
   [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 5, 5, 5]],
 ]
 
+const boardRegex = /\[\s*(\[(\s*\d+,\s*)+\d+\],?\s*)+\]/
+
 export const createNewAiBoard = async (): Promise<RawBoard> => {
   const aiResponse = await fetchBoard()
-  const text = aiResponse.choices[0].text
-  console.log("ai response: ", text)
+  console.log("ai response: ", aiResponse)
+  const text = aiResponse.match(boardRegex)[0]
   const board = JSON.parse(text.trim())
+  console.log("board: ", board)
   if (!validateBoard(board)) {
     console.error("invalid board: ", board)
     return createNewAiBoard()
