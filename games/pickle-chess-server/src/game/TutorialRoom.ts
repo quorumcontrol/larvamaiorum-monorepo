@@ -95,9 +95,9 @@ class TutorialRoomHandler extends EventEmitter {
     //   }
     // }
 
-    if (this.timeSinceTaunt > MAX_TIME_BETWEEN_TAUNTS) {
-      this.shipTaunt(GameEvent.filler)
-    }
+    // if (this.timeSinceTaunt > MAX_TIME_BETWEEN_TAUNTS) {
+    //   this.shipTaunt(GameEvent.filler)
+    // }
 
     this.handleCharacterRemovals()
     this.checkForOver()
