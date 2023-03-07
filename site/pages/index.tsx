@@ -71,31 +71,44 @@ const Home: NextPage = () => {
                 </Text>
               </Box>
               <Link href="/delphs-table">
-                    <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                      PLAY MiNIGAME
-                    </Button>
-                  </Link>
+                <Button variant="primary" mt="10" px="1.5rem" py="2rem">
+                  PLAY MiNIGAME
+                </Button>
+              </Link>
             </Box>
           </Flex>
 
-          <Flex
-            w="100%"
-            overflow="hidden"
-            alignItems="center"
-            p={boxPadding}
-            pb="50px"
-          >
-              <VStack alignItems="center">
-                <Heading size={["xl", "2xl"]}>Our Partners</Heading>
-                <HStack spacing="4">
-                  <Image src={initializedLogo} alt="Initialized Capital logo" height="50px" objectFit="contain" />
-                  <Image src={gameTradeLogo} alt="GameTrade Market logo" height="50px" objectFit="contain" />
-                  <Image src={boostVCLogo} alt="Boost VC logo" height="50px" objectFit="contain"/>
-                  <Image src={iaVenturesLogo} alt="IA Ventures logo" height="50px" objectFit="contain" />
-                  <Image src={skaleLogo} alt="SKALE logo" height="50px" objectFit="contain" />
-                </HStack>
-              </VStack>
-          </Flex>
+          <VStack alignItems="center" spacing={[1, 4]}>
+            <Heading size={"lg"}>Our Partners</Heading>
+            <Stack
+              direction={["column", "row"]}
+              spacing={[1,4]}
+            >
+              <Box>
+                <Image src={initializedLogo} alt="Initialized Capital logo" height="50px" objectFit="contain" />
+              </Box>
+              <Box>
+
+              <Image src={gameTradeLogo} alt="GameTrade Market logo" height="50px" objectFit="contain" />
+              </Box>
+
+              <Box>
+
+              <Image src={boostVCLogo} alt="Boost VC logo" height="50px" objectFit="contain" />
+              </Box>
+
+              <Box>
+
+              <Image src={iaVenturesLogo} alt="IA Ventures logo" height="50px" objectFit="contain" />
+              </Box>
+
+              <Box>
+
+              <Image src={skaleLogo} alt="SKALE logo" height="50px" objectFit="contain" />
+              </Box>
+
+            </Stack>
+          </VStack>
 
           <Flex
             w="100%"
