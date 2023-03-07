@@ -7,6 +7,7 @@ import {
   Button,
   Flex,
   Spacer,
+  HStack,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Image from "next/image";
@@ -17,6 +18,12 @@ import Carousel, { Slide } from "../src/components/Carousel";
 import Link from "next/link";
 import border from "../src/utils/dashedBorder";
 import Video from "../src/components/Video";
+
+import skaleLogo from "../assets/images/partners/Skale.png";
+import boostVCLogo from "../assets/images/partners/boostVC.png";
+import gameTradeLogo from "../assets/images/partners/GameTradeMarket.png";
+import iaVenturesLogo from "../assets/images/partners/IAVentures.png";
+import initializedLogo from "../assets/images/partners/Initialized.png";
 
 const boxPadding = ["0", "50px"];
 
@@ -69,6 +76,25 @@ const Home: NextPage = () => {
                     </Button>
                   </Link>
             </Box>
+          </Flex>
+
+          <Flex
+            w="100%"
+            overflow="hidden"
+            alignItems="center"
+            p={boxPadding}
+            pb="50px"
+          >
+              <VStack alignItems="center">
+                <Heading size={["xl", "2xl"]}>Our Partners</Heading>
+                <HStack spacing="4">
+                  <Image src={initializedLogo} alt="Initialized Capital logo" height="50px" objectFit="contain" />
+                  <Image src={gameTradeLogo} alt="GameTrade Market logo" height="50px" objectFit="contain" />
+                  <Image src={boostVCLogo} alt="Boost VC logo" height="50px" objectFit="contain"/>
+                  <Image src={iaVenturesLogo} alt="IA Ventures logo" height="50px" objectFit="contain" />
+                  <Image src={skaleLogo} alt="SKALE logo" height="50px" objectFit="contain" />
+                </HStack>
+              </VStack>
           </Flex>
 
           <Flex
@@ -214,7 +240,7 @@ const Home: NextPage = () => {
             </Box>
           </Box>
 
-          <Flex
+          {/* <Flex
             w="100%"
             backgroundImage={["none", border]}
             borderBottom={["1px dashed", "none"]}
@@ -250,7 +276,7 @@ const Home: NextPage = () => {
                 <Image src={historiaTitle} alt="Historia Colossei I: Cover" />
               </Box>
             </Stack>
-          </Flex>
+          </Flex> */}
         </VStack>
       </Layout>
     </>
