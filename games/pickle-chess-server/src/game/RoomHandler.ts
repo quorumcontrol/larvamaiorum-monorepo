@@ -11,19 +11,19 @@ import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
 
 const AI_NAMES = [
-  "local"
-  // "alice",
-  // "bob",
-  // "charlie",
-  // "dave",
+  // "local"
+  "alice",
+  "bob",
+  "charlie",
+  "dave",
 ]
 
 const AI_AVATARS = [
-  "http://localhost:8000/glb/femaledefault.glb",
-  // "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
-  // "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
-  // "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
-  // "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
+  // "http://localhost:8000/glb/femaledefault.glb",
+  "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
+  "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
+  "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
+  "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
 ]
 
 const CHARACTERS_PER_PLAYER = 8

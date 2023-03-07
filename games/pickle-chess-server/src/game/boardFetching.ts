@@ -5,6 +5,7 @@ import { randomInt } from "./utils/randoms"
 export type RawBoard = number[][]
 
 const pregeneratedBoards: RawBoard[] = [
+  [[1,1,1,1,1,1,1,5,2,2,2,2],[1,1,1,1,1,1,1,3,3,2,2,2],[1,1,1,1,1,1,1,3,3,3,3,3],[1,1,1,1,1,1,1,2,2,2,2,5],[1,1,1,1,1,1,1,5,2,2,2,2],[1,1,4,4,4,4,4,4,4,2,2,2],[1,1,1,1,1,1,1,5,2,2,2,2],[1,1,1,1,1,1,1,3,3,3,3,3],[1,1,1,1,1,1,1,3,3,2,2,2],[1,1,1,1,1,1,1,2,2,2,2,5],[1,1,1,1,1,1,1,5,2,2,2,2],[1,1,4,4,4,4,4,4,4,2,2,2]],
   [[1, 3, 3, 5, 5, 5, 5, 5, 5], [1, 3, 3, 3, 3, 5, 5, 5, 5], [1, 1, 1, 1, 1, 2, 2, 2, 2], [1, 3, 3, 3, 3, 1, 1, 1, 1], [1, 1, 1, 4, 4, 2, 2, 2, 2], [1, 3, 3, 4, 4, 2, 2, 2, 2], [1, 3, 3, 4, 4, 1, 1, 1, 1], [1, 1, 1, 4, 4, 2, 2, 2, 2], [1, 3, 3, 3, 3, 2, 2, 2, 2], [1, 3, 3, 3, 3, 1, 1, 1, 1], [2, 1, 1, 1, 1, 2, 2, 2, 2]],
   [[2, 3, 4, 3, 2, 1, 1, 2, 3], [1, 4, 3, 4, 1, 2, 3, 2, 1], [2, 3, 4, 3, 2, 4, 3, 2, 1], [1, 2, 3, 4, 1, 4, 3, 4, 3], [3, 1, 2, 3, 4, 3, 4, 3, 2], [2, 1, 2, 3, 2, 1, 2, 3, 4], [3, 2, 1, 4, 3, 2, 1, 4, 3], [1, 2, 3, 2, 1, 2, 3, 2, 1], [3, 4, 3, 4, 3, 4, 3, 4, 3], [2, 3, 4, 3, 2, 3, 4, 3, 2], [1, 2, 3, 4, 1, 2, 3, 4, 1], [4, 3, 4, 3, 4, 3, 4, 3, 4], [3, 4, 3, 2, 1, 2, 3, 4, 3], [2, 1, 2, 3, 4, 3, 2, 1, 2], [1, 4, 3, 2, 1, 4, 3, 2, 1]],
   [[2, 3, 4, 3, 1, 3, 2, 3, 2], [3, 2, 3, 1, 3, 2, 3, 1, 3], [1, 3, 2, 3, 1, 3, 2, 3, 2], [2, 3, 1, 3, 2, 3, 1, 3, 2], [1, 3, 2, 3, 1, 3, 2, 3, 2], [2, 3, 1, 3, 2, 3, 1, 3, 2], [3, 2, 3, 1, 3, 2, 3, 1, 3], [1, 3, 2, 3, 4, 3, 2, 3, 1], [3, 1, 3, 2, 3, 1, 3, 2, 3], [2, 3, 2, 3, 1, 3, 2, 3, 2], [3, 1, 3, 2, 3, 1, 3, 2, 3], [1, 3, 2, 3, 1, 3, 2, 3, 2], [2, 3, 1, 3, 2, 3, 1, 3, 2]],
@@ -119,15 +120,15 @@ const bigBoards = [
 
 const boardRegex = /\[\s*(\[(\s*\d+,\s*)+\d+\],?\s*)+\]/
 
-export const createNewAiBoard = async (): Promise<RawBoard> => {
-  const aiResponse = await fetchBoard()
+export const createNewAiBoard = async (numberOfPlayers:number): Promise<RawBoard> => {
+  const aiResponse = await fetchBoard(numberOfPlayers)
   console.log("ai response: ", aiResponse)
   const text = aiResponse.match(boardRegex)[0]
   const board = JSON.parse(text.trim())
   console.log("board: ", board)
   if (!validateBoard(board)) {
     console.error("invalid board: ", board)
-    return createNewAiBoard()
+    return createNewAiBoard(numberOfPlayers)
   }
   return board
 }
@@ -138,14 +139,20 @@ export const getBoardById = (id:number) => {
 
 export const getAiBoard = async (numberOfPlayers:number): Promise<RawBoard> => {
   // return bigBoards[3]
-  return pregeneratedBoards[2]
-  if (numberOfPlayers > 3) {
-    return bigBoards[randomInt(bigBoards.length)]
+  // return pregeneratedBoards[0]
+  try {
+    return await createNewAiBoard(numberOfPlayers)
+  } catch(err) {
+    console.error("oops: ", err)
+    if (numberOfPlayers > 3) {
+      return bigBoards[randomInt(bigBoards.length)]
+    }
+  
+    const rand = randomInt(pregeneratedBoards.length)
+    console.log("using board: ", rand)
+    return pregeneratedBoards[rand]
   }
-
-  const rand = randomInt(pregeneratedBoards.length)
-  console.log("using board: ", rand)
-  return pregeneratedBoards[rand]
+  
 }
 
 export const validateBoard = (board: RawBoard) => {

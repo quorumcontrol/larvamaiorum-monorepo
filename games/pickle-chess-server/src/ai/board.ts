@@ -1,6 +1,8 @@
 import { generateCompletions } from "./textAI"
 
-export const fetchBoard = async () => {
+export const fetchBoard = async (numberOfPlayers:number) => {
+  const numberRange = numberOfPlayers > 3 ? [15,20] : [8,12]
+
   const systemPrompt = `
 You are designing a top-down level for a 3d game. There are 5 tile types:
 
@@ -32,7 +34,7 @@ There should never be a a part of the board that is unreachable. For example, no
 Stone and water tiles should be used sparingly to create obstacles and challenges for the player.
   `.trim()
 
-  const prompt = `Design a fun board with between 8 and 12 columns and between 8 and 12 rows. Only output the array, without comment.`
+  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. Only output the array, without comment.`
 
   const resp = await generateCompletions({
     system: systemPrompt,
