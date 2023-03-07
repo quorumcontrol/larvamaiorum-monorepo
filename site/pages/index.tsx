@@ -20,7 +20,7 @@ import border from "../src/utils/dashedBorder";
 import Video from "../src/components/Video";
 
 import skaleLogo from "../assets/images/partners/Skale.png";
-import boostVCLogo from "../assets/images/partners/boostVC.png";
+import boostVCLogo from "../assets/images/partners/BoostVC.png";
 import gameTradeLogo from "../assets/images/partners/GameTradeMarket.png";
 import iaVenturesLogo from "../assets/images/partners/IAVentures.png";
 import initializedLogo from "../assets/images/partners/Initialized.png";
