@@ -1,0 +1,11 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.13.0"
+  },
+  "dependencies": {
+    "@skaleboarder/safe-tools": "^0.0.4",
+    "hardhat-deploy": "^0.11.25"
+  }
+}
