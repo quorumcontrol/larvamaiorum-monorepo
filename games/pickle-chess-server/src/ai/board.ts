@@ -1,7 +1,9 @@
-import { fetchApiKey, generateCompletions } from "./textAI"
+import { generateCompletions } from "./textAI"
 
-export const fetchBoard = async () => {
-  const userPrompt = `
+export const fetchBoard = async (numberOfPlayers:number) => {
+  const numberRange = numberOfPlayers > 3 ? [15,20] : [8,12]
+
+  const systemPrompt = `
 You are designing a top-down level for a 3d game. There are 5 tile types:
 
 1: grass
@@ -30,25 +32,15 @@ You design the board by using a matrix of numbers. For example a 2x2 board with 
 There should never be a a part of the board that is unreachable. For example, no row or column should be made of all water or stone tiles. Additionally water or stone tiles should never create a square or box on the board. Stone and water tiles should never account for greater than 20% of any row or column.
 
 Stone and water tiles should be used sparingly to create obstacles and challenges for the player.
-
-Design a fun board with between 20 and 30 columns and between 20 and 30 rows. 
   `.trim()
 
-  const resp = await generateCompletions(
-    userPrompt,
-    {
-      apiKey: fetchApiKey(),
-      prompt: userPrompt,
-      engine: "text-davinci-003",
-      maxTokens: 2048,
-      stop: "",
-      temperature: 0.8,
-      topP: 1,
-      presencePenalty: 0,
-      frequencyPenalty: 0,
-    }
-  )
+  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. Only output the array, without comment.`
 
-  return resp.data
+  const resp = await generateCompletions({
+    system: systemPrompt,
+    prompt,
+  })
+
+  return resp.data.choices[0].message.content
 
 }

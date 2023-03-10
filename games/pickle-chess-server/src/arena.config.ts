@@ -5,6 +5,7 @@ import { monitor } from "@colyseus/monitor";
  * Import your Room files
  */
 import { PickleChessRoom } from "./rooms/PickleChessRoom";
+import { TutorialRoom } from "./rooms/TutorialRoom";
 
 export default Arena({
     getId: () => "Your Colyseus App",
@@ -14,7 +15,8 @@ export default Arena({
          * Define your room handlers:
          */
         gameServer.define('PickleChessRoom', PickleChessRoom).filterBy(['numberOfHumans', 'numberOfAi']);
-        // gameServer.simulateLatency(60)
+        gameServer.define('TutorialRoom', TutorialRoom).filterBy(['numberOfHumans', 'numberOfAi']);
+        // gameServer.simulateLatency(50)
     },
 
     initializeExpress: (app) => {

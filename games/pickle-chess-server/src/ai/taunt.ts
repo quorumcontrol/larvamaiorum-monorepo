@@ -1,4 +1,4 @@
-import { fetchApiKey, generateCompletions } from "./textAI"
+import { generateCompletions } from "./textAI"
 
 export enum GameEvent {
   started = "started",
@@ -54,23 +54,19 @@ const endPrompt = `Write a witty one sentence commentary on the game in progress
 const getPrompt = (state: GameState, extraText:string = "") => {
   if (state.event === GameEvent.started) {
     return `
-${introPrompt}
-
 The game just started between ${state.ranked.join(', ')}. Introduce yourself and warn them that you might not make any sense due to all the wootgump you just took.
     `.trim()
   }
 
   if (state.event === GameEvent.over) {
     return `
-${introPrompt}
-
 The game is over! ${state.winner} won! ${endPrompt}
     `.trim()
   }
 
 
   return `
-${introPrompt} ${state.ranked.join(', ')} are playing.
+${state.ranked.join(', ')} are playing.
 
 ${winningString(state)}
 
@@ -88,21 +84,11 @@ export const getTaunt = async (state: GameState, extraText?:string) => {
   const prompt = getPrompt(state, extraText)
   console.log("prompt: ", prompt)
   try {
-    const resp = await generateCompletions(
+    const resp = await generateCompletions({
+      system: introPrompt,
       prompt,
-      {
-        apiKey: fetchApiKey(),
-        prompt,
-        engine: "text-davinci-003",
-        maxTokens: 512,
-        stop: "",
-        temperature: 0.9,
-        topP: 1,
-        presencePenalty: 0.4,
-        frequencyPenalty: 0.2,
-      }
-    )
-    return resp.data.choices[0].text.trim()
+  })
+    return resp.data.choices[0].message.content
   } catch (err) {
     console.error("error fetchinng taunt: ", (err as any).response)
     return undefined
