@@ -2,10 +2,14 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "@types/dotenv": "^8.2.0",
     "hardhat": "^2.13.0"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2",
     "@skaleboarder/safe-tools": "^0.0.4",
-    "hardhat-deploy": "^0.11.25"
+    "dotenv": "^16.0.3",
+    "hardhat-deploy": "^0.11.25",
+    "solidity-json-writer": "^1.1.0"
   }
 }
