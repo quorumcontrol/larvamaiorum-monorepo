@@ -16,10 +16,13 @@ contract PlayerProfile is ERC721, ERC721Enumerable, Pausable, AccessControl, ERC
     using JsonWriter for JsonWriter.Json;
 
     error UnauthorizedError();
+    error NameAlreadyTaken();
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     Counters.Counter private _tokenIdCounter;
+
+    mapping(bytes32 => bool) private _usedNames;
 
     mapping(uint256 => Metadata) private _metadata;
 
@@ -69,6 +72,13 @@ contract PlayerProfile is ERC721, ERC721Enumerable, Pausable, AccessControl, ERC
     function setMetadata(Metadata calldata meta, uint256 tokenID) public {
         if(!hasRole(MINTER_ROLE, msg.sender) && ownerOf(tokenID) != msg.sender) {
             revert UnauthorizedError();
+        }
+        Metadata storage existing = _metadata[tokenID];
+        
+        _usedNames[keccak256(bytes(existing.name))] = false;
+        
+        if(_usedNames[keccak256(bytes(meta.name))]) {
+            revert NameAlreadyTaken();
         }
         _metadata[tokenID] = meta;
     }

@@ -37,7 +37,7 @@ const config: HardhatUserConfig = {
       },
       accounts: [{
         privateKey: process.env.DELPHS_PRIVATE_KEY!,
-        balance: utils.parseEther("100").toString()
+        balance: utils.parseEther("200").toString()
       }]
     },
     skale: {
