@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
-import ethers, { providers } from "ethers"
+import ethers, { BigNumber, providers } from "ethers"
 import '@rainbow-me/rainbowkit/styles.css';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import {
@@ -14,17 +14,32 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { mainnet, polygon, optimism, arbitrum } from 'wagmi/chains';
-import { RainbowKitWalletWrapper } from '@skaleboarder/rainbowkit';
-import addresses from "../addresses.json"
+import { RainbowKitWalletWrapper, createChain } from '@skaleboarder/rainbowkit';
+import addresses from "../contract-deployments/skale/addresses.json"
 
+
+const skaleMainnet = createChain({
+  id: BigNumber.from('0x3d91725c').toNumber(),
+  name: 'Crypto Rome',
+  rpcUrls: {
+    default: {
+      http: ['http://localhost:8545'],
+    },
+    public: {
+      http: ['http://localhost:8545'],
+    }
+  },
+  explorer: "https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/";
+
+})
 
 const skaleProvider = new providers.StaticJsonRpcProvider("http://localhost:8545/")
 
 const wrapper = new RainbowKitWalletWrapper({
     ethers,
     provider: skaleProvider,
-    chainId: addresses.chainId,
-    deploys: addresses.contracts,
+    chainId: skaleMainnet.id.toString(),
+    deploys: addresses,
 })
 
 const { chains, provider } = configureChains(
