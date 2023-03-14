@@ -17,6 +17,7 @@ contract PlayerProfile is ERC721, ERC721Enumerable, Pausable, AccessControl, ERC
 
     error UnauthorizedError();
     error NameAlreadyTaken();
+    error OnlyOneProfilePerAddress();
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -47,11 +48,15 @@ contract PlayerProfile is ERC721, ERC721Enumerable, Pausable, AccessControl, ERC
         _unpause();
     }
 
-    function safeMint(address to, Metadata calldata meta) public onlyRole(MINTER_ROLE) {
+    function safeMint(Metadata calldata meta) public {
+        address to = msg.sender;
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _metadata[tokenId] = meta;
+        if(balanceOf(to) > 1) {
+            revert OnlyOneProfilePerAddress();
+        }
     }
 
     function uri(uint256 tokenID) public view returns (string memory) {

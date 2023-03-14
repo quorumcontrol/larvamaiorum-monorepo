@@ -22,7 +22,7 @@ import { Link } from "@chakra-ui/next-js";
 import logo from "../assets/empireGambitLogo.png";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-// import NavigationProfile from "./NavigationProfile";
+import NavigationProfile from "./NavigationProfile";
 
 const NavItem: React.FC<{ href: string; children: React.ReactNode, isMobile?: boolean }> = ({
   href,
@@ -95,9 +95,9 @@ const Navigation = () => {
         <NavItem href="/about">About</NavItem>
         <NavItem href="/sneapeak">Sneak Peak</NavItem>
 
-        {/* <Spacer /> */}
+        <Spacer />
 
-        {/* <NavigationProfile /> */}
+        <NavigationProfile />
       </HStack>
     </>
   );

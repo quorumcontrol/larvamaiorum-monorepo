@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { fetchAddresses } from "@/fetchAddresses";
+import { fetchAddresses } from "@/utils/fetchAddresses";
 
 const deployCtx = createContext({} as ReturnType<typeof fetchAddresses>)
 

@@ -7,6 +7,7 @@ describe("PoWSecure", () => {
         const deployer = (await ethers.getSigners())[0]
         const fact = await ethers.getContractFactory("PoWSecure")
         expect(Buffer.from(fact.bytecode.slice(2), "hex").byteLength).to.be.lessThan(24576)
+        const faucet = await fact.deploy(deployer.address)
         await faucet.deployed()
     })
 

@@ -4,7 +4,7 @@ import "hardhat-deploy"
 import dotenv from "dotenv"
 
 import "./tasks/buildAddressList"
-import { utils, BigNumber } from "ethers";
+import { BigNumber } from "ethers";
 
 dotenv.config();
 
@@ -32,13 +32,13 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      forking: {
-        url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
-      },
-      accounts: [{
-        privateKey: process.env.DELPHS_PRIVATE_KEY!,
-        balance: utils.parseEther("200").toString()
-      }]
+      // forking: {
+      //   url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
+      // },
+      // accounts: [{
+      //   privateKey: process.env.DELPHS_PRIVATE_KEY!,
+      //   balance: utils.parseEther("200").toString()
+      // }]
     },
     skale: {
       url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",

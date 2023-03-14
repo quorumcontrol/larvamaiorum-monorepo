@@ -21,7 +21,7 @@ const func: DeployFunction = async function ({
     const signer = await ethers.getSigner(deployer)
     const tx = await signer.sendTransaction({
       to: faucet.address,
-      value: 100,
+      value: 50,
     })
     console.log("sending 100 ether... tx hash: ", tx.hash)
     await tx.wait()
