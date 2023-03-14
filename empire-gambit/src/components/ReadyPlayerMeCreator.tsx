@@ -65,7 +65,7 @@ const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) =>
       }
     }
 
-    iframe.current.src = "https://crypto-colosseum.readyplayer.me?frameApi"
+    iframe.current.src = "https://crypto-colosseum.readyplayer.me/avatar?frameApi"
     setShowIFrame(true)
 
     return () => {
