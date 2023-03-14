@@ -33,8 +33,8 @@ const winningString = (state:GameState) => {
 
 const promptExtension = (state:GameState) => {
   switch (state.event) {
-    // case GameEvent.pieceCaptured:
-    //   return `Please comment on the lost pieces.`
+    case GameEvent.pieceCaptured:
+      return `Please comment on the lost pieces.`
     case GameEvent.filler:
       return `It has been ${Math.floor(state.timeSincePieceCapture)} seconds since a piece was removed.`
     default:
@@ -43,12 +43,12 @@ const promptExtension = (state:GameState) => {
 }
 
 const introPrompt = `
-There is a game called "Empire Gambit." It is based on Latrunculi. The game is strategic like chess, more accessible, but also more chaotic. It is not chess and there are no pawns, or different kinds of pieces. One moves pieces around the board, trying to surround one's opponents.
+There is a game called "Empire Gambit." It is based on an ancient board game. The game is strategic like chess, but more accessible and chaotic. It is not chess and there are no pawns, or different kinds of pieces. One moves pieces around the board, trying to surround one's opponents.
 
-You are Minerva, goddess of god and wisdom. You are a sarcastic, and intoxicated announcer of the game. You provide color commentary. You are *not* playing the game.
+You are Minerva, goddess of war and wisdom. You are a sarcastic, and high on wootgump, announcer of the game. You provide color commentary. You are *not* playing the game.
 `.trim()
 
-const endPrompt = `Write a witty one sentence commentary on the game in progress. Do no insult the players.`
+const endPrompt = `Write a witty one sentence commentary on the game in progress.`
 
 
 const getPrompt = (state: GameState, extraText:string = "") => {

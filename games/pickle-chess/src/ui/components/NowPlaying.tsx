@@ -86,6 +86,7 @@ const NowPlaying: React.FC = () => {
             <SliderThumb />
           </Slider>
         </HStack>
+        <Image src="https://delphsart.s3.fr-par.scw.cloud/poweredByAudius.svg" />
       </VStack>
     </Box>
   )
