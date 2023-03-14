@@ -6,7 +6,7 @@ dotenv.config({
 })
 
 async function main() {
-  return createNewAiBoard()
+  return createNewAiBoard(2)
 }
 
 // run main, wait for the result, catch the errors and exit

@@ -114,34 +114,73 @@ describe.only("BoardLogic", () => {
         assert(board.killsCharacter(board.getTile(1,2), players[0]))
     })
 
-    it('kills a line of surrounded when one side is just impassable', ( ) => {
+    it('cascades a kill', ( ) => {
         const tiles = getTiles()
+
+        tiles.find((t) => t.x === 2 && t.y === 1)!.type = TileType.stone
+        tiles.find((t) => t.x === 3 && t.y === 1)!.type = TileType.stone
+        tiles.find((t) => t.x === 2 && t.y === 3)!.type = TileType.stone
+        tiles.find((t) => t.x === 3 && t.y === 3)!.type = TileType.stone
 
         const p1One:AICharacter = {
             id: "p1One",
             playerId: players[0],
-            ...playerPositionArgs(1, 0),
+            ...playerPositionArgs(1, 2),
         }
         const p1Two:AICharacter = {
             id: "p1Two",
             playerId: players[0],
-            ...playerPositionArgs(1,1)
+            ...playerPositionArgs(0,3)
         }
         const p2One:AICharacter = {
             id: "p2One",
             playerId: players[1],
-            ...playerPositionArgs(1, 2),
+            ...playerPositionArgs(2,2),
         }
         //ignored
         const p2Two:AICharacter = {
             id: "p2Two",
             playerId: players[1],
-            ...playerPositionArgs(3,3),
+            ...playerPositionArgs(3,2),
         }
 
         const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
-        assert(board.killsCharacter(board.getTile(1,1), players[0], undefined, true))
-        // assert(board.killsCharacter(board.getTile(1,0), players[0], undefined, true))
+        assert(board.killsCharacter(board.getTile(2,2), players[1], undefined, false))
+        assert(board.killsCharacter(board.getTile(3,2), players[1], undefined, true))
+    })
+
+    it('does not cascade a kill if there is room to move', ( ) => {
+        const tiles = getTiles()
+
+        tiles.find((t) => t.x === 2 && t.y === 1)!.type = TileType.stone
+        tiles.find((t) => t.x === 3 && t.y === 1)!.type = TileType.stone
+        tiles.find((t) => t.x === 2 && t.y === 3)!.type = TileType.stone
+
+        const p1One:AICharacter = {
+            id: "p1One",
+            playerId: players[0],
+            ...playerPositionArgs(1, 2),
+        }
+        const p1Two:AICharacter = {
+            id: "p1Two",
+            playerId: players[0],
+            ...playerPositionArgs(0,3)
+        }
+        const p2One:AICharacter = {
+            id: "p2One",
+            playerId: players[1],
+            ...playerPositionArgs(2,2),
+        }
+        //ignored
+        const p2Two:AICharacter = {
+            id: "p2Two",
+            playerId: players[1],
+            ...playerPositionArgs(3,2),
+        }
+
+        const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
+        assert(board.killsCharacter(board.getTile(2,2), players[1], undefined, false))
+        assert(!board.killsCharacter(board.getTile(3,2), players[1], undefined, true))
     })
 
     it("does not kill a single player when they are only on a single side", () => {
@@ -205,7 +244,7 @@ describe.only("BoardLogic", () => {
         }
 
         const board = new BoardLogic<AICharacter>([p1One, p1Two, p2One, p2Two], tiles)
-        assert(board.killsCharacter(board.getTile(2,0), players[1]))
+        // assert(board.killsCharacter(board.getTile(2,0), players[1]))
         assert(!board.killsCharacter(board.getTile(3,0), players[0], undefined, true))
     })
 

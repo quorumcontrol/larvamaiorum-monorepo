@@ -1,7 +1,7 @@
 import { generateCompletions } from "./textAI"
 
 export const fetchBoard = async (numberOfPlayers:number) => {
-  const numberRange = numberOfPlayers > 3 ? [15,20] : [8,12]
+  const numberRange = numberOfPlayers > 3 ? [15,25] : [9,13]
 
   const systemPrompt = `
 You are designing a top-down level for a 3d game. There are 5 tile types:
@@ -34,13 +34,20 @@ There should never be a a part of the board that is unreachable. For example, no
 Stone and water tiles should be used sparingly to create obstacles and challenges for the player.
   `.trim()
 
-  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. Only output the array, without comment.`
+  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. The board does not have to be square. Only output the array, without comment.`
 
-  const resp = await generateCompletions({
-    system: systemPrompt,
-    prompt,
-  })
-
-  return resp.data.choices[0].message.content
+  try {
+    console.log("fetching board")
+    const resp = await generateCompletions({
+      system: systemPrompt,
+      prompt,
+      timeout: 15_000,
+    })
+  
+    return resp.data.choices[0].message.content  
+  } catch (err) {
+    console.error("error getting board from openai")
+    throw err
+  }
 
 }
