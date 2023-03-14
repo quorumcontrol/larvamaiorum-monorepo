@@ -33,11 +33,24 @@ import { Web3AuthConnector } from "../utils/web3AuthConnector"
 
 
 const addresses = fetchAddresses("localhost")
-console.log("addresses: ", addresses)
 
-const skaleMainnet = createChain({
-  id: BigNumber.from('0x3d91725c').toNumber(),
-  name: 'Crypto Rome',
+// const skaleMainnet = createChain({
+//   id: BigNumber.from('0x3d91725c').toNumber(),
+//   name: 'Crypto Rome',
+//   rpcUrls: {
+//     default: {
+//       http: ['http://localhost:8545'],
+//     },
+//     public: {
+//       http: ['http://localhost:8545'],
+//     }
+//   },
+//   explorer: "https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/"
+// })
+
+const localDev = createChain({
+  id: 31337,
+  name: 'Local Rome',
   rpcUrls: {
     default: {
       http: ['http://localhost:8545'],
@@ -46,8 +59,7 @@ const skaleMainnet = createChain({
       http: ['http://localhost:8545'],
     }
   },
-  explorer: "https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/"
-
+  explorer: "http://no.explorer"
 })
 
 const skaleProvider = new providers.StaticJsonRpcProvider("http://localhost:8545/")
@@ -56,7 +68,7 @@ const skaleProvider = new providers.StaticJsonRpcProvider("http://localhost:8545
 const wrapperConfigs = {
   ethers,
   provider: skaleProvider,
-  chainId: skaleMainnet.id.toString(),
+  chainId: localDev.id.toString(),
   deploys: addresses,
   faucet: async (address:string) => {
     console.log("faucet called!", address)
