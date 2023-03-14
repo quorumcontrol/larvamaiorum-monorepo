@@ -2,10 +2,13 @@ import { Box, BoxProps } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react"
 import useIsClientSide from "../hooks/useIsClientSide"
 
-type ReadyPlayerMeCreatorProps = BoxProps & {onPicked:(url:string)=>any}
+type ReadyPlayerMeCreatorProps = BoxProps & {
+  onPicked:(url:string)=>any
+  visible?:boolean
+}
 
 const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) => {
-  const {onPicked, ...boxProps} = userProps
+  const {onPicked, visible, ...boxProps} = userProps
   const [showIframe, setShowIFrame] = useState(false)
   const iframe = useRef<HTMLIFrameElement>(null)
   const isClient = useIsClientSide()
@@ -62,7 +65,7 @@ const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) =>
       }
     }
 
-    iframe.current.src = "https://delphs.readyplayer.me?frameApi"
+    iframe.current.src = "https://crypto-colosseum.readyplayer.me?frameApi"
     setShowIFrame(true)
 
     return () => {
@@ -70,6 +73,10 @@ const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) =>
       document.removeEventListener("message", subscribe)
     }
   }, [isClient, onPicked])
+
+  if (!visible) {
+    return null
+  }
 
   return (
     <Box

@@ -1,9 +1,11 @@
-import { useProvider, useAccount } from "wagmi"
+import { useProvider, useAccount, useSigner } from "wagmi"
 import { PlayerProfile, PlayerProfile__factory } from "../contract-types"
-import { useQuery } from "react-query"
+import { useMutation, useQuery, useQueryClient } from "react-query"
 import { useDeploys } from "@/contexts/deploys"
 import { useSafeFromUser } from "./useSafe"
-import { constants } from "ethers"
+import { constants, Signer } from "ethers"
+
+const PROFILE_QUERY_KEY = "profile"
 
 interface User {
   profile?: PlayerProfile.MetadataStructOutput
@@ -11,11 +13,53 @@ interface User {
   safeAddress: string
 }
 
-const usePlayerProfile = () => {
+const usePlayerProfile = (signer?: Signer | null) => {
   const provider = useProvider()
   const { PlayerProfile: { address: playerProfileContractAddress } } = useDeploys()
 
-  return PlayerProfile__factory.connect(playerProfileContractAddress, provider)
+  return PlayerProfile__factory.connect(playerProfileContractAddress, signer || provider)
+}
+
+export const useMintProfile = () => {
+  const queryClient = useQueryClient()
+  const { address } = useAccount()
+
+  const { data: signer } = useSigner()
+  // make sure the use has a safe
+  const { data: safeAddr } = useSafeFromUser()
+  const playerProfile = usePlayerProfile(signer)
+
+  return useMutation(async (metadata: PlayerProfile.MetadataStruct) => {
+    if (!safeAddr) {
+      console.error("user does not yet have a safe", safeAddr, signer)
+      throw new Error("user does not yet have a safe")
+    }
+    const tx = await playerProfile.safeMint(metadata)
+    console.log("minting profile", tx.hash)
+    await tx.wait()
+    return metadata
+  }, {
+    onMutate: async (metadata) => {
+      await queryClient.cancelQueries([PROFILE_QUERY_KEY, address])
+      const previousProfile = queryClient.getQueryData([PROFILE_QUERY_KEY, address])
+      
+      queryClient.setQueryData([PROFILE_QUERY_KEY, address], {
+        address,
+        safeAddress: safeAddr!,
+        profile: metadata,
+      })
+
+      return { previousProfile, metadata }
+    },
+    onSettled: (metadata, error, _vars, context) => {
+      if (error) {
+        console.error("error minting profile", error, metadata, context)
+        queryClient.setQueryData([PROFILE_QUERY_KEY, address], context?.previousProfile)
+        return
+      }
+      // we *might* want to invalidate the query here or do so with a timeout maybe?
+    },
+  })
 }
 
 export const useUser = () => {
@@ -24,7 +68,7 @@ export const useUser = () => {
   const playerProfile = usePlayerProfile()
 
   return useQuery(
-    "profile",
+    [PROFILE_QUERY_KEY, address],
     async (): Promise<User> => {
       try {
         if (safeAddr === constants.AddressZero) {
@@ -36,8 +80,8 @@ export const useUser = () => {
         if (!safeAddr) {
           throw new Error("no safe address")
         }
+
         const tokens = await playerProfile.balanceOf(safeAddr)
-        console.log("tokens: ", tokens)
         if (tokens.isZero()) {
           return {
             address: address!,

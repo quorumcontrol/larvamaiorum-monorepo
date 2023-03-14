@@ -1,6 +1,6 @@
 import DistractionFreeLayout from "@/components/DistractionFreeLayout";
 import ReadyPlayerMeCreator from "@/components/ReadyPlayerMeCreator";
-import { useUser } from "@/hooks/useUser";
+import { useMintProfile, useUser } from "@/hooks/useUser";
 import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Router from "next/router";
@@ -9,8 +9,8 @@ import { useForm } from "react-hook-form";
 import { useAccount, useSigner } from "wagmi";
 
 interface FormData {
-  username: string
-  email: string
+  username?: string
+  email?: string
   avatar?: string
 }
 
@@ -19,7 +19,11 @@ const EditProfilePage: NextPage = () => {
   const { isConnected, isConnecting } = useAccount()
   const { data: signer } = useSigner()
   const { data: user, isLoading: _userDataLoading } = useUser()
-  const [loading, _setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [formState, setFormState] = useState<FormData>({})
+
+  const { mutateAsync } = useMintProfile()
 
   const {
     handleSubmit,
@@ -33,13 +37,49 @@ const EditProfilePage: NextPage = () => {
     }
   }, [isConnected, isConnecting])
 
-  const onAvatarPicked = useCallback((picked:string) => {
-    console.log("avatar: ", picked)
-  }, [])
+  const onAvatarPicked = useCallback(async (avatar: string) => {
+    try {
+      setLoading(true)
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("on submit", data)
-  })
+      setFormState((s) => {
+        return {
+          ...s,
+          avatar,
+        }
+      })
+      if (!formState.username || !avatar) {
+        console.error("missing username or avatar", formState, avatar)
+        throw new Error("missing username or avatar")
+      }
+      const result = await mutateAsync({
+        name: formState.username,
+        animationUrl: avatar,
+        image: avatar.replace(".glb", ".png"),
+        description: "",
+      })
+      console.log("complete!", result)
+      await Router.push("/game")
+    } catch (err) {
+      console.error("error saving the profile", err)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+
+  }, [formState, mutateAsync])
+
+  const onSubmit = async (data:FormData) => {
+    setTabIndex(1)
+
+    console.log("on submit email/name", data)
+    setFormState((s) => {
+      return {
+        ...s,
+        ...data,
+      }
+    })
+    return true
+  }
 
   if (!signer || !isConnected) {
     return (
@@ -49,13 +89,23 @@ const EditProfilePage: NextPage = () => {
     )
   }
 
-  const handleTabsChange = (index:number) => {
+  const handleTabsChange = (index: number) => {
+    console.log('setting index: ', index)
     setTabIndex(index)
   }
 
+  if (loading) {
+    return (
+      <DistractionFreeLayout>
+        <Spinner />
+      </DistractionFreeLayout>
+    )
+  }
+
+  console.log("tab index: ", tabIndex)
   return (
     <DistractionFreeLayout>
-      <Tabs tabIndex={tabIndex} onChange={handleTabsChange}>
+      <Tabs index={tabIndex} onChange={handleTabsChange}>
         <TabList>
           <Tab>Name</Tab>
           <Tab>Avatar</Tab>
@@ -63,8 +113,7 @@ const EditProfilePage: NextPage = () => {
 
         <TabPanels>
           <TabPanel>
-
-            <form onSubmit={onSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <VStack spacing="5" alignItems="left">
 
                 <FormControl
@@ -103,8 +152,7 @@ const EditProfilePage: NextPage = () => {
 
                 <FormControl>
                   <Button variant="primary" disabled={loading} type="submit">
-                    {!loading && "Next"}
-                    {loading && <Spinner />}
+                    Next
                   </Button>
                   {loading && (
                     <FormHelperText>Confirm in your wallet.</FormHelperText>
@@ -117,7 +165,7 @@ const EditProfilePage: NextPage = () => {
 
           </TabPanel>
           <TabPanel>
-            <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" minH="500px" />
+            <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" minH="500px" visible={tabIndex === 1} />
           </TabPanel>
         </TabPanels>
       </Tabs>

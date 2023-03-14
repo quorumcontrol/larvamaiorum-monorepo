@@ -1,8 +1,8 @@
-import addresses from "../contract-deployments/skale/addresses.json"
+import localAddresses from "../contract-deployments/localhost/addresses.json"
 
 export const fetchAddresses = (network: string = "localhost") => {
     switch (network) {
         default:
-            return addresses
+            return localAddresses
     }
 }
