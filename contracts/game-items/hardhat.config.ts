@@ -46,6 +46,7 @@ const config: HardhatUserConfig = {
         (k) => !!k
       ) as string[],
       tags: ["mainnet"],
+      timeout: 10000000,
     },
   },
   deterministicDeployment: (_network: string) => {
