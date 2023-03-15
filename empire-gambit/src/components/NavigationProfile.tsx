@@ -160,7 +160,7 @@ const NavigationProfile: React.FC = () => {
         <VStack alignItems="flex-end" spacing="0">
           <Link href={`/profile/${address}`}>
               <Heading size="md">{user?.profile?.name}</Heading>
-              <Heading size="md">{user?.address}</Heading>
+              {/* <Heading size="md">{user?.address}</Heading> */}
           </Link>
         </VStack>
         <Box>

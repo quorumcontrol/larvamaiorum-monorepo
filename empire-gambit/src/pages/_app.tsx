@@ -16,6 +16,7 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import {
   connectorsForWallets,
+  darkTheme,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
@@ -111,7 +112,7 @@ const connectors = () => {
 }
 
 const wagmiClient = createClient({
-  autoConnect: false,
+  autoConnect: true,
   connectors: connectors,
   provider
 })
@@ -123,7 +124,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <CacheProvider>
       <ChakraProvider theme={theme}>
         <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider chains={chains}>
+          <RainbowKitProvider chains={chains} theme={darkTheme()}>
             <QueryClientProvider client={queryClient}>
               <DeployProvider value={addresses}>
                 <Component {...pageProps} />

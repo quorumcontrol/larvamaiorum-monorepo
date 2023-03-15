@@ -52,11 +52,13 @@ export const useMintProfile = () => {
       return { previousProfile, metadata }
     },
     onSettled: (metadata, error, _vars, context) => {
+      queryClient.cancelQueries([PROFILE_QUERY_KEY, address])
       if (error) {
         console.error("error minting profile", error, metadata, context)
         queryClient.setQueryData([PROFILE_QUERY_KEY, address], context?.previousProfile)
         return
       }
+      
       // we *might* want to invalidate the query here or do so with a timeout maybe?
     },
   })
@@ -103,6 +105,9 @@ export const useUser = () => {
     },
     {
       enabled: !!safeAddr && !!address,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   )
 }   

@@ -51,6 +51,21 @@ const EditProfilePage: NextPage = () => {
         console.error("missing username or avatar", formState, avatar)
         throw new Error("missing username or avatar")
       }
+
+      if (formState.email) {
+        // fire and forget the email subscription
+        fetch("/api/mail", {
+          method: "POST",
+          body: JSON.stringify({
+            email: formState.email,
+          }),
+        }).then((resp) => {
+          console.log("email subscription response: ", resp)
+        }).catch((err) => {
+          console.error("error subscribing to email", err)
+        })
+      }
+
       const result = await mutateAsync({
         name: formState.username,
         animationUrl: avatar,
@@ -68,7 +83,7 @@ const EditProfilePage: NextPage = () => {
 
   }, [formState, mutateAsync])
 
-  const onSubmit = async (data:FormData) => {
+  const onSubmit = async (data: FormData) => {
     setTabIndex(1)
 
     console.log("on submit email/name", data)
