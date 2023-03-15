@@ -1,17 +1,17 @@
 import crypto from "crypto"
-import { BigNumber, constants, providers, utils } from "ethers";
+import { BigNumber, constants, ContractTransaction, providers, utils } from "ethers";
 
 const DIFFICULTY = BigNumber.from(1);
 
 
-async function mineGasForTransaction(tx: providers.TransactionRequest) {
+export async function mineGasForTransaction(tx: providers.TransactionRequest | ContractTransaction) {
   if (!tx.from || !tx.nonce || !tx.gasLimit) {
     throw new Error("Not enough fields for mining gas (from, nonce)")
   }
   let address = tx.from
   let nonce = BigNumber.from(tx.nonce)
   let gas = BigNumber.from(tx.gasLimit)
-  tx.gasPrice = mineFreeGas(gas, address, nonce);
+  return mineFreeGas(gas, address, nonce);
 }
 
 
@@ -32,5 +32,5 @@ function mineFreeGas(gasAmount: BigNumber, address: string, nonce: BigNumber) {
       break;
     }
   }
-  return candidate.toString();
+  return candidate
 }

@@ -11,7 +11,6 @@ import {
   coinbaseWallet,
   injectedWallet,
   metaMaskWallet,
-  rainbowWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
@@ -31,23 +30,24 @@ import {
 import { DeployProvider } from '@/contexts/deploys';
 import theme from '@/components/theme';
 import { Web3AuthConnector } from "../utils/web3AuthConnector"
+import { isLocalhost } from '@/hooks/useIsLocalhost'
+import { localFauct, powFauct } from '@/utils/faucets'
 
-
-const addresses = fetchAddresses("localhost")
-
-// const skaleMainnet = createChain({
-//   id: BigNumber.from('0x3d91725c').toNumber(),
-//   name: 'Crypto Rome',
-//   rpcUrls: {
-//     default: {
-//       http: ['http://localhost:8545'],
-//     },
-//     public: {
-//       http: ['http://localhost:8545'],
-//     }
-//   },
-//   explorer: "https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/"
-// })
+const skaleMainnet = createChain({
+  id: BigNumber.from('0x3d91725c').toNumber(),
+  name: 'Crypto Rome',
+  rpcUrls: {
+    default: {
+      http: ["https://mainnet.skalenodes.com/v1/haunting-devoted-deneb"],
+      webSocket: ["wss://mainnet.skalenodes.com/v1/ws/haunting-devoted-deneb"],
+    },
+    public: {
+      http: ["https://mainnet.skalenodes.com/v1/haunting-devoted-deneb"],
+      webSocket: ["wss://mainnet.skalenodes.com/v1/ws/haunting-devoted-deneb"],
+    }
+  },
+  explorer: "https://haunting-devoted-deneb.explorer.mainnet.skalenodes.com/"
+})
 
 const localDev = createChain({
   id: 31337,
@@ -63,30 +63,26 @@ const localDev = createChain({
   explorer: "http://no.explorer"
 })
 
-const skaleProvider = new providers.StaticJsonRpcProvider("http://localhost:8545/")
+const skaleProvider = new providers.StaticJsonRpcProvider(isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0])
 
+const addresses = isLocalhost() ? fetchAddresses("localhost") : fetchAddresses("skale")
 
 const wrapperConfigs = {
   ethers,
   provider: skaleProvider,
   chainId: localDev.id.toString(),
   deploys: addresses,
-  faucet: async (address:string) => {
-    console.log("faucet called!", address)
-    const resp = await fetch(`/api/localFaucet`, { body: JSON.stringify({ address }), method: "POST" })
-    const json = await resp.json()
-    console.log("resp: ", json)
-  },
+  faucet: isLocalhost() ? localFauct("localhost") : powFauct("skale")
 }
 
 const wrapper = new RainbowKitWalletWrapper(wrapperConfigs)
 
 const { chains, provider } = configureChains(
-  [mainnet, polygon, optimism, arbitrum],
+  [mainnet, polygon, optimism, arbitrum, skaleMainnet],
   [
     jsonRpcProvider({
-      rpc: (chain) => ({
-        http: `http://localhost:8545`,
+      rpc: (_chain) => ({
+        http: skaleProvider.connection.url,
       }),
     }),
   ]
@@ -99,7 +95,7 @@ const connectors = () => {
       wallets: [
         injectedWallet({ chains, shimDisconnect: true }),
         metaMaskWallet({ chains, shimDisconnect: true }),
-        coinbaseWallet({ appName: "Crypto Colosseum", chains }),
+        coinbaseWallet({ appName: "Empire Gambit", chains }),
         walletConnectWallet({ chains }),
         braveWallet({ chains, shimDisconnect: true }),
       ].map((wallet) => wrapper.wrapWallet(wallet)),
