@@ -2,7 +2,7 @@ import Layout from '@/components/Layout'
 import { Box, Center, Heading, Stack, Text, VStack } from '@chakra-ui/react'
 import landingPageBackground from "@/assets/landingPageBackground.png"
 import Image from 'next/image'
-import initializedLogo from "@/assets/partners/initialized.png"
+import initializedLogo from "@/assets/partners/Initialized.png"
 import gameTradeLogo from "@/assets/partners/GameTradeMarket.png"
 import boostVCLogo from "@/assets/partners/BoostVC.png"
 import iaVenturesLogo from "@/assets/partners/IAVentures.png"
