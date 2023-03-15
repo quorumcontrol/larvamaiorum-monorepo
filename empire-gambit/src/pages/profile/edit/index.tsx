@@ -73,7 +73,7 @@ const EditProfilePage: NextPage = () => {
         description: "",
       })
       console.log("complete!", result)
-      await Router.push("/game")
+      await Router.push("/")
     } catch (err) {
       console.error("error saving the profile", err)
       throw err
