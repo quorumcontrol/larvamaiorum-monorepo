@@ -1,16 +1,20 @@
 import { PoWSecure__factory } from "@/contract-types"
 import { Signer } from "ethers"
 import { fetchAddresses } from "./fetchAddresses"
-import { mineGasForTransaction } from "./mine"
+import { AnonymousPoW } from "@skaleproject/pow-ethers"
 
 export const powFauct = (network:string) => {
   return async (address: string, signer?:Signer) => {
     const addresses = fetchAddresses(network)
-    const pow = PoWSecure__factory.connect(addresses.PoWSecure.address, signer)
-    const tx = await pow.pay(address)
+    const pow = PoWSecure__factory.connect(addresses.PoWSecure.address, signer!)
+    const populatedTx = await pow.populateTransaction.pay(address)
 
-    const gasPrice = await mineGasForTransaction(tx)
-    tx.gasPrice = gasPrice
+    const powInstance = new AnonymousPoW({ rpcUrl: signer?.provider!.connection.url })
+    const tx = await powInstance.send({
+      to: pow.address,
+      data: populatedTx.data!,
+    })
+    console.log("funding tx: ", tx.hash)
     await tx.wait()
   }
 }
