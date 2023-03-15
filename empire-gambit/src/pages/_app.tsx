@@ -30,7 +30,7 @@ import {
 import { DeployProvider } from '@/contexts/deploys';
 import theme from '@/components/theme';
 import { Web3AuthConnector } from "../utils/web3AuthConnector"
-import { isLocalhost } from '@/hooks/useIsLocalhost'
+import { isLocalhost } from '@/utils/isLocalhost'
 import { localFauct, powFauct } from '@/utils/faucets'
 
 const skaleMainnet = createChain({
@@ -70,7 +70,7 @@ const addresses = isLocalhost() ? fetchAddresses("localhost") : fetchAddresses("
 const wrapperConfigs = {
   ethers,
   provider: skaleProvider,
-  chainId: localDev.id.toString(),
+  chainId: isLocalhost() ? localDev.id.toString() : skaleMainnet.id.toString(),
   deploys: addresses,
   faucet: isLocalhost() ? localFauct("localhost") : powFauct("skale")
 }

@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy"
 import dotenv from "dotenv"
 
-import "./tasks/buildAddressList"
+import "./tasks"
 import { BigNumber } from "ethers";
 
 dotenv.config();

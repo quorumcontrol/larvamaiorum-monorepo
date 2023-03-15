@@ -7,7 +7,7 @@ const func: DeployFunction = async function ({
   getNamedAccounts,
   ethers
 }: HardhatRuntimeEnvironment) {
-  const { deploy, execute } = deployments;
+  const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
   const faucet = await deploy("PoWSecure", {
@@ -21,9 +21,9 @@ const func: DeployFunction = async function ({
     const signer = await ethers.getSigner(deployer)
     const tx = await signer.sendTransaction({
       to: faucet.address,
-      value: 50,
+      value: utils.parseEther("50"),
     })
-    console.log("sending 100 ether... tx hash: ", tx.hash)
+    console.log("sending 50 ether... tx hash: ", tx.hash)
     await tx.wait()
   }
 };
