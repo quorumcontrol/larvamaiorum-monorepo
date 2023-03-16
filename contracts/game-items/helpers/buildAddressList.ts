@@ -29,6 +29,9 @@ function addressesForDirectory(networkDirectory: string) {
   const addresses: Record<string, { address: string }> = {}
   const files = contractDeployments(networkDirectory)
   files.forEach((file) => {
+    if (path.basename(file) === 'addresses.json') {
+      return
+    }
     const deployment = JSON.parse(fs.readFileSync(file).toString('utf8'))
     addresses[path.basename(file).replace('.json', '')] = {
       address: deployment.address

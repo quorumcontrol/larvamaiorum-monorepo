@@ -17,7 +17,7 @@ const openloginAdapter = new OpenloginAdapter({
     // network: "cyan", // Optional - Provide only if you haven't provided it in the Web3Auth Instantiation Code
     uxMode: "popup",
     whiteLabel: {
-      name: "Crypto Colosseum",
+      name: "Empire Gambit",
       logoLight: "https://cryptocolosseum.com/logo.svg",
       logoDark: "https://cryptocolosseum.com/logo.svg",
       defaultLanguage: "en",

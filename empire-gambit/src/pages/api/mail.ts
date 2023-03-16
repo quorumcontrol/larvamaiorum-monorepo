@@ -1,4 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { isLocalhost } from '@/utils/isLocalhost';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Mailjet from 'node-mailjet'
 
@@ -16,6 +17,11 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { email } = JSON.parse(req.body)
+  if (isLocalhost()) {
+    console.log("localhost, not subscribing", email)
+    res.status(201).json({ ok: true })
+    return
+  }
 
   console.log("subscribing", email)
   const request = mailjet
