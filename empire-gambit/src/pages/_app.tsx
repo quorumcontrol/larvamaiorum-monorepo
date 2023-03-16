@@ -1,3 +1,4 @@
+"use client"
 import type { AppProps } from 'next/app'
 import "@fontsource/cairo"
 import "@fontsource/bebas-neue"

@@ -1,6 +1,5 @@
 import Layout from '@/components/Layout'
 import { Box, Center, Heading, Stack, Text, VStack } from '@chakra-ui/react'
-import landingPageBackground from "@/assets/landingPageBackground.png"
 import Image from 'next/image'
 import initializedLogo from "@/assets/partners/Initialized.png"
 import gameTradeLogo from "@/assets/partners/GameTradeMarket.png"
@@ -13,7 +12,7 @@ export default function Home() {
   return (
     <Layout>
       <VStack>
-        <Box backgroundImage={landingPageBackground.src} p={[2,5]}>
+        <Box p={[2,5]}>
           <Center minH="600px">
             <VStack maxW={["90%", "75%"]}>
               <Heading textAlign={["left", "center"]}>

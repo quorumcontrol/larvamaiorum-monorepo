@@ -1,4 +1,4 @@
-import DistractionFreeLayout from "@/components/DistractionFreeLayout";
+import Layout from "@/components/Layout";
 import ReadyPlayerMeCreator from "@/components/ReadyPlayerMeCreator";
 import { useMintProfile, useUser } from "@/hooks/useUser";
 import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, HStack, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react";
@@ -98,9 +98,9 @@ const EditProfilePage: NextPage = () => {
 
   if (!signer || !isConnected) {
     return (
-      <DistractionFreeLayout>
+      <Layout showNavigation={false}>
         <Spinner />
-      </DistractionFreeLayout>
+      </Layout>
     )
   }
 
@@ -111,18 +111,17 @@ const EditProfilePage: NextPage = () => {
 
   if (loading) {
     return (
-      <DistractionFreeLayout>
+      <Layout showNavigation={false}>
         <HStack>
           <Text>Creating your profile...</Text>
           <Spinner />
         </HStack>
-      </DistractionFreeLayout>
+      </Layout>
     )
   }
 
-  console.log("tab index: ", tabIndex)
   return (
-    <DistractionFreeLayout>
+    <Layout showNavigation={false}>
       <Tabs index={tabIndex} onChange={handleTabsChange}>
         <TabList>
           <Tab>Name</Tab>
@@ -187,7 +186,7 @@ const EditProfilePage: NextPage = () => {
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </DistractionFreeLayout>
+    </Layout>
   )
 }
 
