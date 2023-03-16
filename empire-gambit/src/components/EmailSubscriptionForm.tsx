@@ -52,7 +52,7 @@ const EmailSubscriptionForm: React.FC = () => {
 
   return (
     <Box as="form" onSubmit={onSubmit} pt="10">
-      <Stack direction={["column", "row"]} spacing="10">
+      <Stack direction={["column", "row"]} spacing={[5,10]} alignItems={["center", "left"]}>
 
         <FormControl
           isRequired

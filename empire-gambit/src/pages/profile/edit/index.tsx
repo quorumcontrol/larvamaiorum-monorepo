@@ -1,7 +1,7 @@
 import DistractionFreeLayout from "@/components/DistractionFreeLayout";
 import ReadyPlayerMeCreator from "@/components/ReadyPlayerMeCreator";
 import { useMintProfile, useUser } from "@/hooks/useUser";
-import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, HStack, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Router from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -112,7 +112,10 @@ const EditProfilePage: NextPage = () => {
   if (loading) {
     return (
       <DistractionFreeLayout>
-        <Spinner />
+        <HStack>
+          <Text>Creating your profile...</Text>
+          <Spinner />
+        </HStack>
       </DistractionFreeLayout>
     )
   }

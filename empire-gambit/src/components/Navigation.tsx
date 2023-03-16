@@ -68,8 +68,8 @@ const Navigation = () => {
         </DrawerHeader>
         <VStack alignItems="left" ml="5" mt="5" spacing="5">
           <NavItem isMobile href="/">Home</NavItem>
-          <NavItem isMobile href="/about">About</NavItem>
-          <NavItem isMobile href="/sneapeak">Sneak Peak</NavItem>
+          {/* <NavItem isMobile href="/about">About</NavItem>
+          <NavItem isMobile href="/sneapeak">Sneak Peak</NavItem> */}
         </VStack>
       </DrawerContent>
     </Drawer>
@@ -91,9 +91,9 @@ const Navigation = () => {
           </NextLink>
         </LinkBox>
 
-        <NavItem href="/">Home</NavItem>
-        <NavItem href="/about">About</NavItem>
-        <NavItem href="/sneapeak">Sneak Peak</NavItem>
+        {/* <NavItem href="/">Home</NavItem> */}
+        {/* <NavItem href="/about">About</NavItem>
+        <NavItem href="/sneapeak">Sneak Peak</NavItem> */}
 
         <Spacer />
 

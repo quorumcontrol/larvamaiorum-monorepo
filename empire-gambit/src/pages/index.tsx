@@ -13,20 +13,20 @@ export default function Home() {
   return (
     <Layout>
       <VStack>
-        <Box backgroundImage={landingPageBackground.src} p="12">
-          <Center h="600px">
-            <VStack maxW="64%">
-              <Heading>
+        <Box backgroundImage={landingPageBackground.src} p={[2,5]}>
+          <Center minH="600px">
+            <VStack maxW={["90%", "75%"]}>
+              <Heading textAlign={["left", "center"]}>
                 fast-paced, casual strategy game built by AI.
               </Heading>
-              <Text textAlign="center">
+              <Text textAlign={["left", "center"]}>
                 Experience the ultimate fusion of ancient strategy and disruptive technology with Empire Gambit. The game is built using state-of-the-art AI algorithms that create a dynamic and immersive gameplay experience.
               </Text>
               <EmailSubscriptionForm />
             </VStack>
           </Center>
         </Box>
-        <VStack alignItems="center" spacing={[1, 4]}>
+        <VStack alignItems="center" spacing={[1, 4]} pt={[5,0]}>
           <Heading size={"lg"}>Our Partners</Heading>
           <Stack
             direction={["column", "row"]}
