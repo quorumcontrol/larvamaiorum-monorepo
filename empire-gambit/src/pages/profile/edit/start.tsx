@@ -1,7 +1,8 @@
 import Layout from "@/components/Layout";
 import NavigationProfile from "@/components/NavigationProfile";
+import OnBoardContainer from "@/components/OnBoardContainer";
 import { Link } from "@chakra-ui/next-js";
-import { Box, Button, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { useAccount } from "wagmi";
 
@@ -11,24 +12,32 @@ const StartProfilePage: NextPage = () => {
   if (!isConnected) {
     return (
       <Layout showNavigation={false}>
-        <Heading>Welcome to Empire Gambit</Heading>
-        <Text>First, get connected.</Text>
-        <Box>
-          <NavigationProfile />
-
-        </Box>
+        <OnBoardContainer>
+          <Heading>Welcome to Empire Gambit</Heading>
+          <VStack spacing="5" alignItems="left">
+            <Text>First, get connected.</Text>
+            <Box>
+              <NavigationProfile />
+            </Box>
+          </VStack>
+        </OnBoardContainer>
       </Layout>
     )
   }
 
   return (
     <Layout showNavigation={false}>
-      <Heading>Welcome to Empire Gambit</Heading>
-      <Text>We will create a username and an avatar for you.</Text>
-      <Text>You will need to authorize this device.</Text>
-      <Link href="/profile/edit">
-        <Button variant="primary">start</Button>
-      </Link>
+      <OnBoardContainer>
+        <Box mx="10">
+          <Heading lineHeight="55px">Welcome to Empire Gambit</Heading>
+          <VStack spacing="5" alignItems="left">
+            <Text>We will authorize this device and setup a<br />username and avatar for you.</Text>
+            <Link href="/profile/edit">
+              <Button variant="primary">start</Button>
+            </Link>
+          </VStack>
+        </Box>
+      </OnBoardContainer>
     </Layout>
   )
 }

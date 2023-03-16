@@ -1,7 +1,8 @@
 import Layout from "@/components/Layout";
+import OnBoardContainer from "@/components/OnBoardContainer";
 import ReadyPlayerMeCreator from "@/components/ReadyPlayerMeCreator";
 import { useMintProfile, useUser } from "@/hooks/useUser";
-import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, HStack, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Router from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -122,70 +123,73 @@ const EditProfilePage: NextPage = () => {
 
   return (
     <Layout showNavigation={false}>
-      <Tabs index={tabIndex} onChange={handleTabsChange}>
-        <TabList>
-          <Tab>Name</Tab>
-          <Tab>Avatar</Tab>
-        </TabList>
+      <OnBoardContainer>
+        <Tabs index={tabIndex} onChange={handleTabsChange}>
+          {/* <TabList>
+            <Tab>Name</Tab>
+            <Tab>Avatar</Tab>
+          </TabList> */}
 
-        <TabPanels>
-          <TabPanel>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <VStack spacing="5" alignItems="left">
+          <TabPanels>
+            <TabPanel p="0">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Heading>Create profile</Heading>
+                <VStack spacing="5" alignItems="left" mt="4">
 
-                <FormControl
-                  isRequired
-                  isInvalid={!!errors.username}
-                  isDisabled={loading}
-                >
-                  <FormLabel htmlFor="username">
-                    What do you want to be called?
-                  </FormLabel>
-                  <Input
-                    id="username"
-                    type="text"
-                    {...register("username", { required: true })}
-                    defaultValue={user?.profile?.name}
-                  />
-                  <FormHelperText>You can change this later.</FormHelperText>
-                  <FormErrorMessage>Username is required.</FormErrorMessage>
-                </FormControl>
+                  <FormControl
+                    isRequired
+                    isInvalid={!!errors.username}
+                    isDisabled={loading}
+                  >
+                    <FormLabel htmlFor="username">
+                      What do you want to be called?
+                    </FormLabel>
+                    <Input
+                      id="username"
+                      type="text"
+                      {...register("username", { required: true })}
+                      defaultValue={user?.profile?.name}
+                    />
+                    <FormHelperText>You can change this later.</FormHelperText>
+                    <FormErrorMessage>Username is required.</FormErrorMessage>
+                  </FormControl>
 
-                <FormControl
-                  isInvalid={!!errors.email}
-                  isDisabled={loading}
-                >
-                  <FormLabel htmlFor="username">
-                    Email addres
-                  </FormLabel>
-                  <Input
-                    id="email"
-                    type="text"
-                    {...register("email", { required: false })}
-                  />
-                  <FormHelperText>We will use this only for updates on the game.</FormHelperText>
-                  <FormErrorMessage>There was an error</FormErrorMessage>
-                </FormControl>
+                  <FormControl
+                    isInvalid={!!errors.email}
+                    isDisabled={loading}
+                  >
+                    <FormLabel htmlFor="username">
+                      Email addres
+                    </FormLabel>
+                    <Input
+                      id="email"
+                      type="text"
+                      {...register("email", { required: false })}
+                    />
+                    <FormHelperText>We will use this only for updates on the game.</FormHelperText>
+                    <FormErrorMessage>There was an error</FormErrorMessage>
+                  </FormControl>
 
-                <FormControl>
-                  <Button variant="primary" disabled={loading} type="submit">
-                    Next
-                  </Button>
-                  {loading && (
-                    <FormHelperText>Confirm in your wallet.</FormHelperText>
-                  )}
-                </FormControl>
-              </VStack>
+                  <FormControl>
+                    <Button variant="primary" disabled={loading} type="submit">
+                      Create
+                    </Button>
+                    {loading && (
+                      <FormHelperText>Confirm in your wallet.</FormHelperText>
+                    )}
+                  </FormControl>
+                </VStack>
 
-            </form>
+              </form>
 
 
-          </TabPanel>
-          <TabPanel>
-            <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" minH="500px" visible={tabIndex === 1} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+            </TabPanel>
+            <TabPanel width={["95vw", "70vw"]} h="90vh">
+              <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" height="100%" visible={tabIndex === 1} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </OnBoardContainer>
     </Layout>
   )
 }

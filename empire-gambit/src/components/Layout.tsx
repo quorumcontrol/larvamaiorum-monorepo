@@ -21,12 +21,12 @@ const Layout: React.FC<LayoutProps> = ({ children, showNavigation=true }) => {
   const navigating = useIsNavigating()
 
   return (
-    <Box backgroundImage={landingPageBackground.src} backgroundRepeat="no-repeat">
-      <Container p={10} maxW="1400" zIndex={1}>
+    <Box backgroundImage={landingPageBackground.src} backgroundRepeat="no-repeat" backgroundPosition="top center">
+      <Container padding="0" maxW="1400" zIndex={1}>
 
         {showNavigation && <Navigation />}
 
-        <VStack mt="10" spacing={5} alignItems="left">
+        <VStack mt={showNavigation ? 10 : 4} spacing={5} alignItems="left">
           {navigating && <Spinner />}
           {!navigating && children}
         </VStack>
