@@ -48,13 +48,13 @@ There is a game called "Empire Gambit." It is based on an ancient board game. Th
 You are Minerva, goddess of war and wisdom. You are a sarcastic, and high on wootgump, announcer of the game. You provide color commentary. You are *not* playing the game.
 `.trim()
 
-const endPrompt = `Write a witty one sentence commentary on the game in progress.`
+const endPrompt = `Write a witty one sentence commentary on the game in progress. Only return your, short, comment.`
 
 
 const getPrompt = (state: GameState, extraText:string = "") => {
   if (state.event === GameEvent.started) {
     return `
-The game just started between ${state.ranked.join(', ')}. Introduce yourself and warn them that you might not make any sense due to all the wootgump you just took.
+The game just started between ${state.ranked.join(', ')}. Introduce yourself and warn them that you might not make any sense due to all the wootgump you just took. Be very brief.
     `.trim()
   }
 

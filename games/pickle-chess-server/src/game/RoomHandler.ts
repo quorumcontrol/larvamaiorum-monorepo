@@ -114,6 +114,9 @@ class RoomHandler extends EventEmitter {
 
   async setup() {
     this.setupMusic()
+    this.state.assign({
+      persistantMessage: "Minerva is creating the board.",
+    })
     const rawBoard = await getAiBoard(this.expectedPlayerCount())
     const tiles = this.tileMap(rawBoard)
     this.board.populateTiles(tiles)
