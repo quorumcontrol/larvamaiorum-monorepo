@@ -52,7 +52,7 @@ const EmailSubscriptionForm: React.FC = () => {
 
   return (
     <Box as="form" onSubmit={onSubmit} pt="10">
-      <Stack direction={["column", "row"]} spacing={[5,10]} alignItems={["center", "left"]}>
+      <Stack direction={["column", "row"]} spacing={[5,10]} align="flex-start">
 
         <FormControl
           isRequired
@@ -67,12 +67,13 @@ const EmailSubscriptionForm: React.FC = () => {
             variant="filled"
             bgColor={"black"}
             {...register("email", { required: true })}
+            h="40px"
           />
           <FormHelperText>You agree to receive emails with the understanding you can opt-out at any time.</FormHelperText>
           <FormErrorMessage>{errors?.email?.message}</FormErrorMessage>
         </FormControl>
         <Box>
-          <Button variant="primary" type="submit">Sign up for early access.</Button>
+          <Button variant="primary" type="submit">Sign up for early access</Button>
         </Box>
       </Stack>
     </Box>

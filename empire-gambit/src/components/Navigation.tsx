@@ -77,17 +77,17 @@ const Navigation = () => {
   return (
     <>
       {MobileNavContent}
-      <HStack spacing="5">
-        <Box display={["flex", "none"]}>
+      <HStack spacing="5" px="5">
+        {/* <Box display={["none", "none"]}>
           <IconButton
             icon={<HamburgerIcon />}
             aria-label="open mobile nav"
             onClick={onOpen}
           />
-        </Box>
-        <LinkBox display={["none", "flex"]}>
+        </Box> */}
+        <LinkBox display="flex">
           <NextLink href="/">
-            <Image src={logo} alt="Crypto Colosseum logo" width="200" priority />
+            <Image src={logo} alt="Empire Gambit logo" width="200" priority />
           </NextLink>
         </LinkBox>
 

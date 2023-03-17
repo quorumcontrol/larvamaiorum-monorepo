@@ -3,7 +3,7 @@ import { SocialIcon } from "react-social-icons"
 
 const Footer: React.FC = () => {
   return (
-    <VStack as="footer" mt="200" textAlign="center" alignItems="center">
+    <VStack as="footer" mt="200" pt="10" textAlign="center" alignItems="center" bgColor="black" w="100vw">
       <HStack>
         <SocialIcon url="https://twitter.com/larva_maiorum" />
         <SocialIcon url="https://discord.gg/tTSNvAuK" />

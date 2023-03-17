@@ -12,24 +12,24 @@ export default function Home() {
   return (
     <Layout>
       <VStack>
-        <Box p={[2,5]}>
+        <Box p={[2,5]} pb="5">
           <Center minH="600px">
-            <VStack maxW={["90%", "75%"]}>
+            <VStack maxW={["90%", "60%"]}>
               <Heading textAlign={["left", "center"]}>
-                fast-paced, casual strategy game built by AI.
+                a fast-paced, casual strategy game. built by AI.
               </Heading>
               <Text textAlign={["left", "center"]}>
-                Experience the ultimate fusion of ancient strategy and disruptive technology with Empire Gambit. The game is built using state-of-the-art AI algorithms that create a dynamic and immersive gameplay experience.
+                Empire Gambit is the ultimate fusion of an ancient strategy game and disruptive technology. Generative AI algorithms create a fun, dynamic, and immersive gameplay experience that changes every time you play.
               </Text>
               <EmailSubscriptionForm />
             </VStack>
           </Center>
         </Box>
-        <VStack alignItems="center" spacing={[1, 4]} pt={[5,0]}>
+        <VStack alignItems="center" spacing={[1, 4]} pt={[5,0]} bgColor={["black", "transparent"]} w="100vw">
           <Heading size={"lg"}>Our Partners</Heading>
           <Stack
             direction={["column", "row"]}
-            spacing={[1, 4]}
+            spacing={[5, 4]}
           >
             <Box>
               <Image src={initializedLogo} alt="Initialized Capital logo" height="50" style={{objectFit: "contain"}} />
