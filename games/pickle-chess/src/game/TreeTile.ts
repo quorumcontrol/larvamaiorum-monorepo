@@ -7,7 +7,7 @@ import { randomBounded } from "../utils/randoms";
 class TreeTile extends ScriptTypeBase {
   initialize() {
     const tree = mustFindByName(this.entity, "Trees")
-    tree.setLocalPosition(randomBounded(0.4), 0.434, randomBounded(0.4))
+    tree.setLocalPosition(randomBounded(0.4), randomBounded(0.4), 0)
   }
 }
 

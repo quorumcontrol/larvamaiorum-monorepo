@@ -6,7 +6,7 @@ import { randomInt } from "../utils/randoms";
 @createScript("grassTile")
 class GrassTile extends ScriptTypeBase {
   initialize() {
-    this.entity.setLocalEulerAngles(0, randomInt(4) * 90, 0)
+    this.entity.setLocalEulerAngles(-90, randomInt(4) * 90, 0)
   }
 }
 

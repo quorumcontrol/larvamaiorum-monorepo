@@ -5,7 +5,7 @@ import NowPlaying from "./NowPlaying"
 const RightSideUI: React.FC = () => {
   return (
     <VStack
-      alignItems="right"
+      alignItems="left"
       paddingRight="10px"
       position="fixed"
       bottom="20px"

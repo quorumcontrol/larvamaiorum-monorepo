@@ -8,7 +8,7 @@ import { randomBounded } from "../utils/randoms";
 class StoneTile extends ScriptTypeBase {
   initialize() {
     const stone = mustFindByName(this.entity, "StoneMountain")
-    stone.setLocalEulerAngles(0, randomBounded(180), 0)
+    stone.setLocalEulerAngles(90, 0, randomBounded(180))
   }
 }
 
