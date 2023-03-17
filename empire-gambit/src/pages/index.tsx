@@ -77,7 +77,7 @@ export default function Home() {
             </VStack>
           </Center>
         </Box>
-        <VStack alignItems="center" spacing={[1, 4]} pt={[5, 0]} bgColor={["black", "transparent"]} w="100vw">
+        <VStack alignItems="center" spacing={[1, 4]} py={[5, 0]} bgColor={["black", "transparent"]} w="100vw">
           <Heading size={"lg"}>Our Partners</Heading>
           <Stack
             direction={["column", "row"]}
