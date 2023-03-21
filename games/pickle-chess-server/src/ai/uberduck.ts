@@ -24,13 +24,19 @@ const waitForSpeech = async (uuid: string) => {
 }
 
 export const speak = async (text: string) => {
-    const initialResponse = await sdk.generate_speech_speak_post({
-        voice: 'carolyn-speaking',
-        pace: 1,
-        speech: text.replace(/lead/g, 'leed'),
-    }, { 'uberduck-id': 'anonymous' })
+    try {
+        const initialResponse = await sdk.generate_speech_speak_post({
+            voice: 'carolyn-speaking',
+            pace: 1,
+            speech: text.replace(/lead/g, 'leed'),
+        }, { 'uberduck-id': 'anonymous' })
 
-    const uuid = initialResponse.data.uuid
+        const uuid = initialResponse.data.uuid
 
-    return waitForSpeech(uuid)
+        return waitForSpeech(uuid)
+    } catch (err) {
+        console.error('error in speak')
+        return undefined
+    }
+
 }

@@ -46,6 +46,11 @@ class BoardLogic<CharacterType extends Character> {
     return this.characterAt(tile)
   }
 
+  getOccupents(x: number, y: number) {
+    const tile = this.getTile(x, y)
+    return this.charactersAt(tile)
+  }
+
   characterAt(tile: Tile): CharacterType | undefined {
     return this.characters.find((character) => character.tileId === tile.id)
   }
@@ -223,63 +228,18 @@ class BoardLogic<CharacterType extends Character> {
   }
 
   // is up a kill square
-  private terminalDirectionalPoint(playerTile: Tile, playerId: string, direction: "up" | "down" | "left" | "right"): IPoint {
+  private terminalDirectionalPoint(playerTile: Tile, playerId: string, direction: "up" | "down" | "left" | "right"): Tile | undefined {
     const offset = this.offsetForDirection(direction)
-    let currentTile = playerTile
-    while (true) {
-      const point = { x: currentTile.x + offset.x, y: currentTile.y + offset.y }
-      const tile = this.getTile(point.x, point.y)
-      // if (direction === "down") console.log("checking terminal tile", tile?.x, tile?.y, this.isOccupiedByPlayer(playerId, tile))
-      if (this.isOccupiedByPlayer(playerId, tile)) {
-        // console.log("occupied by player", playerId, direction, tile.x, tile.y, "original: ", playerTile.x, playerTile.y)
-        currentTile = tile
-        continue
-      }
-      // console.log("returning", point)
-      return point
-    }
+    return this.getTile(playerTile.x + offset.x, playerTile.y + offset.y)
   }
 
-  // private verticalCountOfSamePlayerIds(top: IPoint, bottom: IPoint, playerId: string) {
-  //   // console.log("top: ", top.x, top.y, "bottom: ", bottom.x, bottom.y, "playerId: ", playerId)
-  //   let count = 0
-  //   for (let y = bottom.y; y <= top.y; y++) {
-  //     const tile = this.getTile(bottom.x, y)
-  //     // console.log("checking tile", tile?.x, tile?.y, this.isOccupiedByPlayer(playerId, tile))
-  //     if (this.isOccupiedByPlayer(playerId, tile)) {
-  //       count++
-  //     }
-  //   }
-  //   return count
-  // }
-
-  // private horizontalCountOfSamePlayerIds(left: IPoint, right: IPoint, playerId: string) {
-  //   let count = 0
-  //   for (let x = left.x; x <= right.x; x++) {
-  //     const tile = this.getTile(x, left.y)
-  //     if (this.isOccupiedByPlayer(playerId, tile)) {
-  //       count++
-  //     }
-  //   }
-  //   return count
-  // }
 
   killsCharacter(playerTile: Tile, playerId: string, excluding?: CharacterType, debug?: boolean) {
 
-    // first find if the tile above and below is occupied by an opponent
-    const pointAbove = this.terminalDirectionalPoint(playerTile, playerId, "up")
-    const pointBelow = this.terminalDirectionalPoint(playerTile, playerId, "down")
-    const pointLeft = this.terminalDirectionalPoint(playerTile, playerId, "left")
-    const pointRight = this.terminalDirectionalPoint(playerTile, playerId, "right")
-
-    // const isWorthConsidering = (tile: Tile) => {
-    //   return this.isOccupiedByOpposingPlayer(playerId, tile) || !this.isPassableTerrain(tile)
-    // }
-
-    const tileAbove = this.getTile(pointAbove.x, pointAbove.y)
-    const tileBelow = this.getTile(pointBelow.x, pointBelow.y)
-    const tileLeft = this.getTile(pointLeft.x, pointLeft.y)
-    const tileRight = this.getTile(pointRight.x, pointRight.y)
+    const tileAbove = this.terminalDirectionalPoint(playerTile, playerId, "up")
+    const tileBelow = this.terminalDirectionalPoint(playerTile, playerId, "down")
+    const tileLeft =  this.terminalDirectionalPoint(playerTile, playerId, "left")
+    const tileRight = this.terminalDirectionalPoint(playerTile, playerId, "right")
 
     if (this.isOccupiedByOpposingPlayer(playerId, tileAbove) && this.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
       if (debug) console.log("normal above and below kill", playerTile.x, playerTile.y)
@@ -311,16 +271,7 @@ class BoardLogic<CharacterType extends Character> {
       return false
     }
 
-    // const impassabeSides = this.impassableKillSquareCount(playerTile, playerId, excluding)
-    // if (debug) console.log("moveableCount:",moveableCount, "opponentSides:", opponentSides)
-
     switch (moveableCount) {
-      // case 2:
-      //   if (debug && opponentSides === 2) console.log("kill", playerTile.x, playerTile.y, "2/2")
-      //   return opponentSides === 2
-      // case 1:
-      //   if (debug && opponentSides === 2) console.log("kill", playerTile.x, playerTile.y, "3/1")
-      //   return opponentSides === 2
       case 0:
         return true // player cannot move but at least one side is an opponent
     }

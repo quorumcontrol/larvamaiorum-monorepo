@@ -18,10 +18,10 @@ export interface GameState {
   ranked: string[],
   gameClock: number
   timeSincePieceCapture: number
-  winner?:string
+  winner?: string
 }
 
-const winningString = (state:GameState) => {
+const winningString = (state: GameState) => {
   const ranked = state.ranked
   const isTied = state.players[ranked[0]].characters === state.players[ranked[1]].characters
   if (ranked.length > 2 && isTied) {
@@ -31,7 +31,7 @@ const winningString = (state:GameState) => {
   return `${winningString} The scores are: ${ranked.map((name) => `${name}: ${state.players[name].characters}`).join(', ')}.`
 }
 
-const promptExtension = (state:GameState) => {
+const promptExtension = (state: GameState) => {
   switch (state.event) {
     case GameEvent.pieceCaptured:
       return `Please comment on the lost pieces.`
@@ -51,7 +51,7 @@ You are Minerva, goddess of war and wisdom. You are a sarcastic, and high on woo
 const endPrompt = `Write a witty one sentence commentary on the game in progress. Only return your, short, comment.`
 
 
-const getPrompt = (state: GameState, extraText:string = "") => {
+const getPrompt = (state: GameState, extraText: string = "") => {
   if (state.event === GameEvent.started) {
     return `
 The game just started between ${state.ranked.join(', ')}. Introduce yourself and warn them that you might not make any sense due to all the wootgump you just took. Be very brief.
@@ -80,17 +80,17 @@ ${endPrompt}
 `.trim()
 }
 
-export const getTaunt = async (state: GameState, extraText?:string) => {
+export const getTaunt = async (state: GameState, extraText?: string) => {
   const prompt = getPrompt(state, extraText)
   console.log("prompt: ", prompt)
   try {
     const resp = await generateCompletions({
       system: introPrompt,
       prompt,
-  })
+    })
     return resp.data.choices[0].message.content
   } catch (err) {
-    console.error("error fetchinng taunt: ", (err as any).response)
+    console.error("error fetching taunt: ", (err as any).response)
     return undefined
   }
 

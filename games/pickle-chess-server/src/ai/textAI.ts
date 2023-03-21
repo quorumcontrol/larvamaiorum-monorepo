@@ -1,14 +1,14 @@
 import { memoize } from "./memoize";
 import { Configuration, OpenAIApi } from "openai"
 
-const fetchOpenAiClient = memoize(() => {
+export const fetchOpenAiClient = memoize(() => {
   const configuration = new Configuration({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
   return new OpenAIApi(configuration);
 })
 
-interface CompletionParameters {
+export interface CompletionParameters {
   system: string
   prompt: string
   timeout?: number

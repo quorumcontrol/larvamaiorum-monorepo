@@ -16,7 +16,7 @@ const client = memoize(() => {
   if (typeof document !== 'undefined') {
     const params = new URLSearchParams(document.location.search);
     if (params.get('arena')) {
-      return new Client("wss://uxddx0.colyseus.de")
+      return new Client("wss://pyy9eo.us-west-1.colyseus.dev")
     }
   }
   return new Client("ws://localhost:2567")
@@ -137,6 +137,10 @@ class NetworkManager extends ScriptTypeBase {
       this.app.fire(Messages.taunt, msg)
     })
 
+    // this.room.onMessage(Messages.hudText, (msg) => {
+    //   this.app.fire(Messages.hudText, msg)
+    // })
+
     this.room.onError((error) => {
       console.error("room error", error)
     })
@@ -165,6 +169,7 @@ class NetworkManager extends ScriptTypeBase {
     script.kill()
     const playerId = script.playerId()
     this.app.fire(Messages.characterRemove, { id, playerId } as CharacterRemoveMessage)
+    this.app.fire("camera:shake")
   }
 
   private handleCharacterAdd(characterState: Character, id: string) {

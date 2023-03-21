@@ -11,19 +11,19 @@ import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
 
 const AI_NAMES = [
-  // "local"
-  "alice",
-  "bob",
-  "charlie",
-  "dave",
+  "local"
+  // "alice",
+  // "bob",
+  // "charlie",
+  // "dave",
 ]
 
 const AI_AVATARS = [
-  // "http://localhost:8000/glb/femaledefault.glb",
-  "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
-  "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
-  "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
-  "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
+  "http://localhost:8000/glb/femaledefault.glb",
+  // "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
+  // "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
+  // "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
+  // "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
 ]
 
 const CHARACTERS_PER_PLAYER = 8
@@ -43,6 +43,14 @@ export interface RoomJoinOptions {
   numberOfHumans: number
 }
 
+interface HistoryEntry {
+  time: number
+  event: {
+    type: GameEvent,
+    announcer: string,
+  }
+}
+
 class RoomHandler extends EventEmitter {
   private room: PickleChessRoom
   private state: PickleChessState
@@ -59,11 +67,14 @@ class RoomHandler extends EventEmitter {
   private timeSincePieceCapture = 0
   private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
-  private aiBrains?:AIBrain[]
+  private aiBrains?: AIBrain[]
   private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
   private isAiMoving = false
 
-  private options:RoomJoinOptions
+  private options: RoomJoinOptions
+
+  private clients: Record<string, Client>
+  private history: HistoryEntry[]
 
   constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
     super()
@@ -73,6 +84,8 @@ class RoomHandler extends EventEmitter {
     this.board = new BoardLogic(this.characters)
     this.options = opts
     this.options.numberOfAi ||= 0
+    this.clients = {}
+    this.history = []
   }
 
   update(dt: number) {
@@ -154,7 +167,7 @@ class RoomHandler extends EventEmitter {
     return this.state.roomState === RoomState.playing
   }
 
-  private handleAiMove(action:AIGameAction, id:string) {
+  private handleAiMove(action: AIGameAction, id: string) {
     const tile = this.board.getTile(action.from.x, action.from.y)
     if (!tile) {
       console.error('AI tried to use a bad tile', action.from)
@@ -218,20 +231,22 @@ class RoomHandler extends EventEmitter {
         roomState: RoomState.gameOver,
         persistantMessage: "Game Over"
       })
+      this.shipTaunt(GameEvent.over)
+      console.log("current history", this.history)
     }
   }
 
   handleCharacterRemovals() {
     const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
     // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-    const toDelete:CharacterLogic[] = []
+    const toDelete: CharacterLogic[] = []
 
     this.characters.forEach((character) => {
       const playerId = character.state.playerId
-      const {x,y} = character.position
-      const playerTile = this.board.getTile(x,y)
+      const { x, y } = character.position
+      const playerTile = this.board.getTile(x, y)
       if (!playerTile) {
-        console.error("tile not found", x,y)
+        console.error("tile not found", x, y)
         return
       }
       if (this.board.killsCharacter(playerTile, playerId, undefined, true) || deadPlayerIds.includes(playerId)) {
@@ -256,23 +271,35 @@ class RoomHandler extends EventEmitter {
     })
     if (toDelete.length > 0) {
       const removedCounts = toDelete.reduce((acc, character) => {
-        acc[this.state.players.get(character.playerId).name] = (acc[character.state.playerId] || 0) + 1
+        acc[character.playerId] = (acc[character.state.playerId] || 0) + 1
         return acc
-      }, {} as {[key:string]:number})
+      }, {} as { [key: string]: number })
 
       const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
-      this.shipTaunt(evt, Object.keys(removedCounts).map((playerName) => `${playerName} just lost ${removedCounts[playerName]} pieces`).join("! ") + "!")
+      this.shipTaunt(evt, Object.keys(removedCounts).map((playerId) => {
+        const playerName = this.state.players.get(playerId)?.name || "unknown"
+        return `${playerName} just lost ${removedCounts[playerName]} pieces`
+      }).join(". "))
+
+      Object.keys(removedCounts).forEach((playerId) => {
+        const client = this.clients[playerId]
+        if (client) {
+          console.log("shipping hudTet")
+          client.send(Messages.hudText, { text: `lost ${removedCounts[playerId]}` })
+        }
+      })
+
     }
   }
 
-  private getGameState(event:GameEvent):GameState {
+  private getGameState(event: GameEvent): GameState {
     const players = Array.from(this.state.players.values()).reduce((acc, player) => {
       acc[player.name] = {
         characters: this.characters.filter((character) => character.state.playerId === player.id).length
       }
       return acc
     }, {} as GameState["players"])
-    const ranked = Object.keys(players).sort((a,b) => players[b].characters - players[a].characters)
+    const ranked = Object.keys(players).sort((a, b) => players[b].characters - players[a].characters)
 
     const winner = this.board.isOver() ? ranked[0] : undefined
 
@@ -318,7 +345,7 @@ class RoomHandler extends EventEmitter {
       console.error("Player not found", client.sessionId)
       return
     }
-    
+
     if (character.state.playerId === player.id) {
       player.highlightedCharacterId = id
       character.state.highlightedForPlayer.set(client.sessionId, true)
@@ -326,15 +353,15 @@ class RoomHandler extends EventEmitter {
     }
   }
 
-  private handleTileClick(client: Client, {x,y}: TileClickmessage) {
-    console.log(client.sessionId, "clicked tile", x,y);
+  private handleTileClick(client: Client, { x, y }: TileClickmessage) {
+    console.log(client.sessionId, "clicked tile", x, y);
     if (!this.isPlaying()) {
       console.log("not handling tile click")
       return
     }
-    const tile = this.board.getTile(x,y)
+    const tile = this.board.getTile(x, y)
     if (!tile) {
-      console.error("Tile not found", x,y)
+      console.error("Tile not found", x, y)
       return
     }
     const player = this.state.players.get(client.sessionId)
@@ -367,9 +394,18 @@ class RoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
-  private async shipTaunt(event:GameEvent, extraText?:string) {
-    // return
-    if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
+  private async shipTaunt(event: GameEvent, extraText?: string) {
+    if (event !== GameEvent.filler) {
+      this.history.push({
+        time: new Date().getTime(),
+        event: {
+          type: event,
+          announcer: "",
+        }
+      })
+    }
+
+    if (this.tauntFetching) { // || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
       return
     }
     console.log("ship taunt: ", event, extraText)
@@ -377,10 +413,18 @@ class RoomHandler extends EventEmitter {
     this.tauntFetching = true
     const taunt = await getTaunt(this.getGameState(event), extraText)
     if (taunt) {
-      const audio = await speak(taunt)
-      console.log("taunt", taunt)
-      this.room.broadcast(Messages.taunt, {text: taunt, audio} as TauntMessage)
+      try {
+        const audio = await speak(taunt)
+        console.log("taunt", taunt)
+        this.room.broadcast(Messages.taunt, { text: taunt, audio } as TauntMessage)
+      } catch (err) {
+        console.error('error speaking', err)
+      }
     }
+    if (event !== GameEvent.filler) {
+      this.history[this.history.length - 1].event.announcer = taunt
+    }
+
     this.tauntFetching = undefined
     this.timeSinceTaunt = 0
   }
@@ -408,12 +452,12 @@ class RoomHandler extends EventEmitter {
           persistantMessage: "",
           roomState: RoomState.playing
         })
-        this.room.broadcast(Messages.hudText, {text: "GO!"}, { afterNextPatch: true })
+        this.room.broadcast(Messages.hudText, { text: "GO!" }, { afterNextPatch: true })
       }
     }, 1000)
   }
 
-  createAICharacter(idx:number) {
+  createAICharacter(idx: number) {
     const avatar = AI_AVATARS[idx]
     console.log("creating AI character:", AI_NAMES[idx])
     const id = `AI-${AI_NAMES[idx]}`
@@ -444,7 +488,7 @@ class RoomHandler extends EventEmitter {
       this.state.characters.set(character.id, character)
       this.characters.push(new CharacterLogic(character, this.board))
     }
-    this.aiBrains ||= [] 
+    this.aiBrains ||= []
     this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
   }
 
@@ -456,6 +500,7 @@ class RoomHandler extends EventEmitter {
         name: options.name,
         avatar: options.avatar,
       }))
+      this.clients[client.sessionId] = client
       for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
         const tile = this.board.randomAvailableInitialLocation(client.sessionId)
         const character = new Character({
@@ -487,7 +532,7 @@ class RoomHandler extends EventEmitter {
       return handleJoin()
     }
     this.once(BOARD_LOAD_EVENT, handleJoin)
-    
+
   }
 }
 

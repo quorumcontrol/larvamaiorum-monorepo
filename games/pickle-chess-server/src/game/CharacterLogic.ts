@@ -47,6 +47,7 @@ class CharacterLogic {
 
   update(dt: number) {
     this.locomotion.update(dt)
+
     if (!this.userSetDestination) {
       return
     }
@@ -57,10 +58,9 @@ class CharacterLogic {
       console.error("no tile for ", Math.floor(position.y), Math.floor(position.x))
       return
     }
-    if (this.state.tileId !== tile.id) {
-      // console.log(position)
-      console.log("character moved to tile", tile.id, "from", this.state.tileId)
-    }
+    // if (this.state.tileId !== tile.id) {
+    //   console.log("character moved to tile", tile.id, "from", this.state.tileId)
+    // }
     this.state.tileId = tile.id
 
     // check to see if the destination of the locomotion tile is occupied and if it is then just stop
@@ -68,14 +68,15 @@ class CharacterLogic {
     if (destination) {
       const destinationTile = this.board.getTile(destination.x, destination.y)
       if (destinationTile.id !== tile.id) {
-        const occupent = this.board.getOccupent(destinationTile.x, destinationTile.y)
-        if (destinationTile && occupent && occupent !== this) {
-          console.log("stopping because destination is occupied", destinationTile.id, occupent.tileId)
+        const occupents = this.board.getOccupents(destinationTile.x, destinationTile.y)
+        if (occupents.filter((c) => c !== this).length >= 1) {
+          console.log("stopping because destination is occupied", destinationTile.id)
           this.locomotion.stop()
           return
         }
       }
     }
+
 
     if (this.locomotion.getState() === LocomotionState.arrived) {
       if (this.userSetDestination.id === tile.id) {
