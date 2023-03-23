@@ -52,3 +52,8 @@ console.log("---")
 
 console.log("---- HYPER LOCAL TUTORIRIAL dev ---- ")
 console.log("player maleDefault: ", `http://localhost:8000?debug=true&ministats=true&m=${Buffer.from(JSON.stringify({roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: "0x123", name: "tobowers", avatar: "http://localhost:8000/glb/maledefault.glb"})).toString("base64url")}`)
+
+console.log("---")
+
+console.log("---- LOCAL TUTORIRIAL dev ---- ")
+console.log("player maleDefault: ", `https://launch.playcanvas.com/1653026?debug=true&ministats=true&m=${Buffer.from(JSON.stringify({roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: "0x123", name: "tobowers", avatar: "https://api.readyplayer.me/v1/avatars/63b2a4248596abea61093458.glb"})).toString("base64url")}`)

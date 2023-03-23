@@ -6,36 +6,32 @@ import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
-import { GameEvent, GameState, getTaunt } from "../ai/taunt"
-import { AIBrain, AIGameAction } from "../ai/gamePlayer"
+import { GameEvent, GameState } from "../ai/taunt"
 import { speak } from "../ai/uberduck"
 import { TutorialRoom } from "../rooms/TutorialRoom"
 
 const AI_NAMES = [
-  "local"
-  // "alice",
-  // "bob",
-  // "charlie",
-  // "dave",
+  // "local"
+  "alice",
+  "bob",
+  "charlie",
+  "dave",
 ]
 
 const AI_AVATARS = [
-  "http://localhost:8000/glb/femaledefault.glb",
-  // "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
-  // "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
-  // "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
-  // "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
+  // "http://localhost:8000/glb/femaledefault.glb",
+  "https://models.readyplayer.me/63d1831323fe23d34bf68a80.glb",
+  "https://models.readyplayer.me/63c27bf8e5b9a435587fc9f7.glb",
+  "https://models.readyplayer.me/63c282c6e5b9a435587fcf53.glb",
+  "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
 ]
 
-const CHARACTERS_PER_PLAYER = 8
+// const CHARACTERS_PER_PLAYER = 8
 // const NUMBER_OF_PLAYERS = 2
 
 const BOARD_LOAD_EVENT = "boardLoaded"
 
-const MIN_TIME_BETWEEN_TAUNTS = 5
-const MAX_TIME_BETWEEN_TAUNTS = 45
-
-const TIME_BETWEEN_AI_MOVES = 0.75
+// const MIN_TIME_BETWEEN_TAUNTS = 5
 
 export interface RoomJoinOptions {
   name: string
@@ -54,11 +50,11 @@ class TutorialRoomHandler extends EventEmitter {
 
   private boardLoaded = false
   private timeSinceMusic = 0
-  private tauntFetching = false
+  // private tauntFetching = false
 
   private gameClock = 0
   private timeSincePieceCapture = 0
-  private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
+  // private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
   // private aiBrains?:AIBrain[]
   // private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
@@ -85,7 +81,7 @@ class TutorialRoomHandler extends EventEmitter {
     }
     this.gameClock += dt
     this.timeSincePieceCapture += dt
-    this.timeSinceTaunt += dt
+    // this.timeSinceTaunt += dt
 
 
     // if (this.aiBrains) {
@@ -258,7 +254,7 @@ class TutorialRoomHandler extends EventEmitter {
       }, {} as {[key:string]:number})
 
       const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
-      this.shipTaunt(evt, Object.keys(removedCounts).map((playerName) => `${playerName} just lost ${removedCounts[playerName]} pieces`).join("! ") + "!")
+      // this.shipTaunt(evt, Object.keys(removedCounts).map((playerName) => `${playerName} just lost ${removedCounts[playerName]} pieces`).join("! ") + "!")
     }
   }
 
@@ -364,23 +360,23 @@ class TutorialRoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
-  private async shipTaunt(event:GameEvent, extraText?:string) {
-    // return
-    if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
-      return
-    }
-    console.log("ship taunt: ", event, extraText)
+  // private async shipTaunt(event:GameEvent, extraText?:string) {
+  //   // return
+  //   if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
+  //     return
+  //   }
+  //   console.log("ship taunt: ", event, extraText)
 
-    this.tauntFetching = true
-    const taunt = await getTaunt(this.getGameState(event), extraText)
-    if (taunt) {
-      const audio = await speak(taunt)
-      console.log("taunt", taunt)
-      this.room.broadcast(Messages.taunt, {text: taunt, audio} as TauntMessage)
-    }
-    this.tauntFetching = undefined
-    this.timeSinceTaunt = 0
-  }
+  //   this.tauntFetching = true
+  //   const taunt = await getTaunt(this.getGameState(event), extraText)
+  //   if (taunt) {
+  //     const audio = await speak(taunt)
+  //     console.log("taunt", taunt)
+  //     this.room.broadcast(Messages.taunt, {text: taunt, audio} as TauntMessage)
+  //   }
+  //   this.tauntFetching = undefined
+  //   this.timeSinceTaunt = 0
+  // }
 
   private startCountdown() {
     if (this.options.numberOfAi > 0) {
@@ -388,12 +384,12 @@ class TutorialRoomHandler extends EventEmitter {
         this.createAICharacter(i)
       }
     }
-    let countdown = 10
+    let countdown = 3
     this.state.assign({
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown
     })
-    this.shipTaunt(GameEvent.started)
+    // this.shipTaunt(GameEvent.started)
     const interval = this.room.clock.setInterval(() => {
       countdown--
       this.state.assign({
@@ -421,9 +417,9 @@ class TutorialRoomHandler extends EventEmitter {
     }))
     const locations = [
       {x: 0, y:0},
+      {x: 4, y: 7},
       {x: 4, y: 6},
-      {x: 4, y: 5},
-      {x: 7, y: 8}
+      {x: 6, y: 8}
     ]
     for (let i = 0; i < 4; i++) {
       const tile = this.board.getTile(locations[i].x, locations[i].y)

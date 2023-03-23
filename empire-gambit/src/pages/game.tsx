@@ -16,8 +16,12 @@ const GamePage: NextPage = () => {
     return Buffer.from(JSON.stringify({id: address, name: username, avatar, numberOfHumans: 2 })).toString("base64")
   }, [address, username, avatar])
 
-  const AIGameParam = useMemo(() => {
+  const aiGameParam = useMemo(() => {
     return Buffer.from(JSON.stringify({numberOfHumans: 1, numberOfAi: 1, id: address, name: username, avatar })).toString("base64")
+  }, [address, username, avatar])
+
+  const tutorialParam = useMemo(() => {
+    return Buffer.from(JSON.stringify({roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: address, name: username, avatar })).toString("base64")
   }, [address, username, avatar])
 
   return (
@@ -25,11 +29,15 @@ const GamePage: NextPage = () => {
       {avatar && username && (
         <VStack spacing={10}>
           <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${gameParam}`} target="_blank">
-              <Button variant={"primary"}>Launch Game (Humans Only)</Button>
+              <Button variant={"secondary"}>Play against people</Button>
           </Link>
 
-          <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${AIGameParam}`} target="_blank">
+          <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${aiGameParam}`} target="_blank">
               <Button variant={"primary"}>Play Against AI</Button>
+          </Link>
+
+          <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${tutorialParam}`} target="_blank">
+              <Button variant={"secondary"}>Practice Room</Button>
           </Link>
           
         </VStack>

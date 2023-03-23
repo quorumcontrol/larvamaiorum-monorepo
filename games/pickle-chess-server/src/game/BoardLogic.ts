@@ -234,7 +234,10 @@ class BoardLogic<CharacterType extends Character> {
   }
 
 
-  killsCharacter(playerTile: Tile, playerId: string, excluding?: CharacterType, debug?: boolean) {
+  killsCharacter(playerTile: Tile, playerId: string, excluding?: CharacterType, debug?: boolean, depth = 0) {
+    if (depth > 4) {
+      return false
+    }
 
     const tileAbove = this.terminalDirectionalPoint(playerTile, playerId, "up")
     const tileBelow = this.terminalDirectionalPoint(playerTile, playerId, "down")
@@ -262,7 +265,7 @@ class BoardLogic<CharacterType extends Character> {
       // check for any surrounding tiles that are occupied by the player and if that character is going to die, then this character is dead
       const playerSurroundingTiles = this.playerOccupiedKillSquares(playerTile, playerId)
       for (let tile of playerSurroundingTiles) {
-        if (this.killsCharacter(tile, playerId, excluding, debug)) {
+        if (this.killsCharacter(tile, playerId, excluding, debug, depth + 1)) {
           if (debug) console.log("surrounding player tile kill", playerTile.x, playerTile.y)
           return true
         }
