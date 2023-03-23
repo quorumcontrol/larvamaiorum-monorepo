@@ -1,5 +1,5 @@
 import { Entity } from "playcanvas";
-import { HudTextMessage, Messages, PickleChessState } from "../syncing/schema/PickleChessState";
+import { HudTextMessage, Messages, PickleChessState, RoomState } from "../syncing/schema/PickleChessState";
 import { ScriptTypeBase } from "../types/ScriptTypeBase";
 import { createScript } from "../utils/createScriptDecorator";
 import mustFindByName from "../utils/mustFindByName";
@@ -11,12 +11,20 @@ class HUD extends ScriptTypeBase {
   private state?: PickleChessState
   private messages: string[]
 
+  private playAgainButton: Entity
+
   private timeSinceLastMessage = 0
 
   initialize() {
     this.messages = []
     this.mainMessage = mustFindByName(this.entity, 'MessageText')
     this.persistantMessage = mustFindByName(this.entity, 'PersistantMessage')
+    this.playAgainButton = mustFindByName(this.entity, "PlayAgainButton")
+    this.playAgainButton.element?.on('click', () => {
+      if (typeof window !== "undefined") {
+        window.location.reload()
+      }
+    })
 
     this.app.on("newRoom", (room) => {
       this.state = room.state
@@ -41,6 +49,9 @@ class HUD extends ScriptTypeBase {
       this.persistantMessage.element!.text = this.state.persistantMessage
     } else {
       this.persistantMessage.enabled = false
+    }
+    if (this.state.roomState === RoomState.gameOver) {
+      this.playAgainButton.enabled = true
     }
   }
 

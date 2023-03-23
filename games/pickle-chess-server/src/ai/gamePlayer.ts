@@ -158,8 +158,8 @@ export class AIBrain {
       filter,
       shortCircuits,
     }, {
-      duration: 20,
-      maxDepth: 5,
+      duration: 10,
+      maxDepth: 4,
     })
   }
 

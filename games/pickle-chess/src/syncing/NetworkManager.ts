@@ -137,10 +137,6 @@ class NetworkManager extends ScriptTypeBase {
       this.app.fire(Messages.taunt, msg)
     })
 
-    // this.room.onMessage(Messages.hudText, (msg) => {
-    //   this.app.fire(Messages.hudText, msg)
-    // })
-
     this.room.onError((error) => {
       console.error("room error", error)
     })
@@ -163,7 +159,6 @@ class NetworkManager extends ScriptTypeBase {
   }
 
   private handleCharacterRemove(_characterState: Character, id: string) {
-    //TODO: effects and stuff
     const character = mustFindByName(this.app.root, id)
     const script = mustGetScript<CharacterVisual>(character, "character")
     script.kill()
