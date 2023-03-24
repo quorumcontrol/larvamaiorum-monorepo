@@ -48,6 +48,7 @@ interface HistoryEntry {
   event: {
     type: GameEvent,
     announcer: string,
+    extra?: string,
   }
 }
 
@@ -100,7 +101,7 @@ class RoomHandler extends EventEmitter {
     this.timeSinceTaunt += dt
 
 
-    if (this.aiBrains) {
+    if (this.aiBrains && this.gameClock >= 4) {
       this.timeSinceAIMove += dt
       if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
         this.moveAI()
@@ -231,7 +232,8 @@ class RoomHandler extends EventEmitter {
         roomState: RoomState.gameOver,
         persistantMessage: "Game Over"
       })
-      this.shipTaunt(GameEvent.over)
+      const living = this.board.livingPlayers().map((playerId) => this.state.players.get(playerId).name).join(",")
+      this.shipTaunt(GameEvent.over, `${living} wins!`)
       console.log("current history", this.history)
     }
   }
@@ -278,7 +280,7 @@ class RoomHandler extends EventEmitter {
       const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
       this.shipTaunt(evt, Object.keys(removedCounts).map((playerId) => {
         const playerName = this.state.players.get(playerId)?.name || "unknown"
-        return `${playerName} just lost ${removedCounts[playerName]} pieces`
+        return `${playerName} just lost ${removedCounts[playerId]} pieces`
       }).join(". "))
 
       Object.keys(removedCounts).forEach((playerId) => {
@@ -397,10 +399,11 @@ class RoomHandler extends EventEmitter {
   private async shipTaunt(event: GameEvent, extraText?: string) {
     if (event !== GameEvent.filler) {
       this.history.push({
-        time: new Date().getTime(),
+        time: Math.round(this.gameClock),
         event: {
           type: event,
           announcer: "",
+          extra: extraText,
         }
       })
     }

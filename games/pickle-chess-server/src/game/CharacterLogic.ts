@@ -80,7 +80,7 @@ class CharacterLogic {
 
     if (this.locomotion.getState() === LocomotionState.arrived) {
       if (this.userSetDestination.id === tile.id) {
-        console.log("larger arrived")
+        // console.log("larger arrived")
         this.stop()
         return
       }

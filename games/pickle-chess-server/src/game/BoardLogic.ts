@@ -313,13 +313,16 @@ class BoardLogic<CharacterType extends Character> {
     }, {} as Record<string, boolean>))
   }
 
+  livingPlayers() {
+    return this.players().filter((playerId) => !this.isPlayerDead(playerId))
+  }
+
   isOver() {
     const players = this.players()
     if (players.length <= 1) {
       return true
     }
-    const livingPlayerCount = players.filter((playerId) => !this.isPlayerDead(playerId)).length
-    return livingPlayerCount <= 1
+    return this.livingPlayers().length <= 1
   }
 
   randomBoardLocation() {
