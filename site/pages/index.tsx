@@ -7,13 +7,12 @@ import {
   Button,
   Flex,
   Spacer,
-  HStack,
+  Link as ChakraLink
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Image from "next/image";
 import Layout from "../src/components/Layout";
 import BadgeClaimCard from "../src/components/BadgeClaimCard";
-import historiaTitle from "../assets/images/historiaTitle.png";
 import Carousel, { Slide } from "../src/components/Carousel";
 import Link from "next/link";
 import border from "../src/utils/dashedBorder";
@@ -32,79 +31,79 @@ const Home: NextPage = () => {
     <>
       <Layout>
         <VStack w="full" spacing="10">
-          <Flex
+          <Stack
+            direction={["column", "row"]}
             p={boxPadding}
-            pb="50px"
-            position="relative"
             w="full"
             overflow="hidden"
+            align="start"
           >
-            <Box
-              as="video"
-              id="video-background"
-              muted
-              autoPlay
-              loop
-              preload="auto"
-              playsInline
-              data-setup="{}"
-              display={["none", "block"]}
-            >
-              <source src="/video/teaserBackground.mp4" type="video/mp4" />
-              <p className="vjs-no-js">
-                To view this video please enable JavaScript, and consider
-                upgrading to a web browser that supports HTML5 video
-              </p>
-            </Box>
             <Box>
               {" "}
               <Box maxW="25em">
                 <Heading size={["lg", "xl"]}>
-                  Become the most powerful and important warrior patron.
-                  <br />
-                  Welcome to Crypto Colosseum.
+                  Empire Gambit is Coming.
                 </Heading>
                 <Text>
-                  Warrior patrons compete for power and prestige. Immerse
-                  yourself in wootgump fueled adventures. Your earnings are only
-                  capped by your skill. Crypto Rome is not a safe place.
+                  The ultimate fusion of an ancient strategy game and disruptive technology. Generative AI algorithms create a fun, dynamic, and immersive gameplay experience that changes every time you play.
                 </Text>
               </Box>
-              <Link href="/delphs-table">
+              <ChakraLink href="https://empiregambit.com" target="_blank">
                 <Button variant="primary" mt="10" px="1.5rem" py="2rem">
-                  PLAY MiNIGAME
+                  EARLY ACCESS
                 </Button>
-              </Link>
+              </ChakraLink>
             </Box>
-          </Flex>
+            <Spacer />
+            <Box>
+              <Box
+                as="video"
+                muted
+                autoPlay
+                loop
+                preload="auto"
+                playsInline
+                data-setup="{}"
+                w="600px"
+                h="337px"
+              >
+                <source src="/video/empireGambitIntroduction.mp4" type="video/mp4" />
+                <p className="vjs-no-js">
+                  To view this video please enable JavaScript, and consider
+                  upgrading to a web browser that supports HTML5 video
+                </p>
+              </Box>
+            </Box>
+
+          </Stack>
 
           <VStack alignItems="center" spacing={[1, 4]}>
             <Heading size={"lg"}>Our Partners</Heading>
             <Stack
               direction={["column", "row"]}
-              spacing={[1,4]}
+              spacing={[1, 4]}
             >
               <Box>
                 <Image src={initializedLogo} alt="Initialized Capital logo" height="50px" objectFit="contain" />
               </Box>
               <Box>
 
-              <Image src={gameTradeLogo} alt="GameTrade Market logo" height="50px" objectFit="contain" />
+                <Image src={gameTradeLogo} alt="GameTrade Market logo" height="50px" objectFit="contain" />
               </Box>
 
               <Box>
 
-              <Image src={boostVCLogo} alt="Boost VC logo" height="50px" objectFit="contain" />
+                <Image src={boostVCLogo} alt="Boost VC logo" height="50px" objectFit="contain" />
               </Box>
 
               <Box>
 
-              <Image src={iaVenturesLogo} alt="IA Ventures logo" height="50px" objectFit="contain" />
+                <Image src={iaVenturesLogo} alt="IA Ventures logo" height="50px" objectFit="contain" />
               </Box>
 
               <Box>
 
-              <Image src={skaleLogo} alt="SKALE logo" height="50px" objectFit="contain" />
+                <Image src={skaleLogo} alt="SKALE logo" height="50px" objectFit="contain" />
               </Box>
 
             </Stack>
