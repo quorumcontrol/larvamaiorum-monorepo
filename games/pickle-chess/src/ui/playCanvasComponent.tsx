@@ -32,11 +32,16 @@ class ReactUI extends ScriptTypeBase {
          height: 100vh;
          top: 0;
          right: 0;
+         pointer-events: none;
+        }
+        
+        #ui-root * {
+          pointer-events: auto;
         }
         `
       const div = document.createElement("div")
       div.id = "ui-root"
-      div.addEventListener("contextmenu", (evt) => evt.preventDefault())
+      // div.addEventListener("contextmenu", (evt) => evt.preventDefault())
       document.body.appendChild(div)
       const root = ReactDOM.createRoot(div)
       const element = <App app={this.app} room={room} />

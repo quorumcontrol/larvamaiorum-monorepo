@@ -65,7 +65,7 @@ TouchInput.prototype.onTouchStartEndCancel = function (event) {
     // we stored the current touch position
     var touches = event.touches;
     if (touches.length == 1) {
-        console.log("setting last touch point", this.lastTouchPoint);
+        // console.log("setting last touch point", this.lastTouchPoint);
         this.lastTouchPoint.set(touches[0].x, touches[0].y);
     } else if (touches.length == 2) {
         // If there are 2 touches on the screen, then set the pinch distance
@@ -94,7 +94,6 @@ TouchInput.prototype.pan = function (touch) {
     camera.screenToWorld(this.lastTouchPoint.x, this.lastTouchPoint.y, distance, toWorldPoint);
 
     worldDiff.sub2(toWorldPoint, fromWorldPoint);
-    console.log('world diff');
 
     this.orbitCamera.pivotPoint.add(worldDiff);
 };
