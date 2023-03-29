@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { isLocalhost } from '@/utils/isLocalhost';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import Mailjet from 'node-mailjet'
+import Mailjet, { Contact, LibraryResponse } from 'node-mailjet'
 
 type Data = {
   ok: boolean
@@ -24,7 +24,7 @@ export default async function handler(
   }
 
   console.log("subscribing", email)
-  const request = mailjet
+  const request:Promise<LibraryResponse<Contact.PostContactResponse>> = mailjet
     .post("contact", { 'version': 'v3' })
     .request({
       "Name": "",
@@ -32,14 +32,33 @@ export default async function handler(
       IsExcludedFromCampaigns: true,
     })
 
-  return request
-    .then((result) => {
-      console.log("result: ", result.body)
-      res.status(201).json({ ok: true })
-    })
-    .catch((err) => {
-      console.log("error: ", err.statusCode, err.body)
+  try {
+
+    const result = await request
+    console.log("result: ", result.body)
+    res.status(201).json({ ok: true })
+    return
+
+  } catch (err: any) {
+    console.log("error posting email: ", err.statusCode, err.body)
+
+    try {
+      // now check to see if the email already exists
+      const exists:LibraryResponse<Contact.GetContactResponse> = await mailjet.get("contact", { 'version': 'v3' }).request({
+        contact_ID: email
+      })
+      if (exists.body.Count > 0) {
+        console.log("email already exists, that's ok")
+        res.status(201).json({ ok: true })
+        return
+      }
+    } catch (err: any) {
+
+      console.error("error fetching email", err.statusCode, err.body)
       res.status(500).json({ ok: false })
-    })
+      return
+    }
+
+  }
 
 }
