@@ -63,6 +63,7 @@ const Home: NextPage = () => {
                 loop
                 preload="auto"
                 playsInline
+                controls
                 data-setup="{}"
                 w="600px"
                 h="337px"
