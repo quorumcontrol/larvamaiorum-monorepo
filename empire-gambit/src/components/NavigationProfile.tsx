@@ -33,16 +33,19 @@ const NavigationProfile: React.FC = () => {
   const [errors, setErrors] = useState("")
   const { connect, connectors } = useConnect()
   const { address, isConnected } = useAccount()
-  const { data: user, isLoading:userDataLoading } = useUser()
+  const { data: user, isLoading:userDataLoading, isFetched } = useUser()
   const isClient = useIsClientSide()
 
   useEffect(() => {
     if (!isConnected || user?.profile || userDataLoading) {
       return
     }
+    if (!isFetched) {
+      return
+    }
 
     Router.push("/profile/edit/start")
-  }, [userDataLoading, user, isConnected])
+  }, [userDataLoading, user, isConnected, address, isFetched])
 
   const onLoginClick = () => {
     setShowModal(true)

@@ -65,7 +65,7 @@ export const useMintProfile = () => {
 }
 
 export const useUser = () => {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const { data: safeAddr } = useSafeFromUser()
   const playerProfile = usePlayerProfile()
 
@@ -104,7 +104,7 @@ export const useUser = () => {
 
     },
     {
-      enabled: !!safeAddr && !!address,
+      enabled: !!safeAddr && !!address && isConnected,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
