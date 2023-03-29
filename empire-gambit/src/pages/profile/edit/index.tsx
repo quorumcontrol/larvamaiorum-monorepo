@@ -159,7 +159,7 @@ const EditProfilePage: NextPage = () => {
                     isDisabled={loading}
                   >
                     <FormLabel htmlFor="username">
-                      Email addres
+                      Email address
                     </FormLabel>
                     <Input
                       id="email"
