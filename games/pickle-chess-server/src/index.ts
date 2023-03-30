@@ -17,6 +17,7 @@ import arenaConfig from "./arena.config";
 import http from "http";
 import express from "express";
 import { Server } from "colyseus";
+import dotenv from 'dotenv'
 
 function setup(app: express.Application, server: http.Server) {
   const gameServer = new Server({ server });
@@ -31,6 +32,9 @@ function setup(app: express.Application, server: http.Server) {
 }
 
 if (process.env.NODE_ENV === "production") {
+  dotenv.config({
+    path: "arena.env"
+  })
   require('greenlock-express')
     .init({
       packageRoot: __dirname,
@@ -51,6 +55,9 @@ if (process.env.NODE_ENV === "production") {
     });
 
 } else {
+  dotenv.config({
+    path: "development.env"
+  })
   // development port
   const PORT = process.env.PORT || 2567;
 
