@@ -69,8 +69,8 @@ const Navigation = () => {
         </DrawerHeader>
         <VStack alignItems="left" ml="5" mt="5" spacing="5">
           <NavItem isMobile href="/">Home</NavItem>
-          <NavItem isMobile href="/delphs-table">Delph&apos;s Table</NavItem>
-          <NavItem isMobile href="/leaderboard">Leaderboard</NavItem>
+          <NavItem isMobile href="https://empiregambit.com">Empire Gambit</NavItem>
+          {/* <NavItem isMobile href="/leaderboard">Leaderboard</NavItem> */}
           <NavItem isMobile href="/badge-of-assembly">Badge of Assembly</NavItem>
           <NavItem isMobile href="/masks">Masks</NavItem>
           <NavItem isMobile href="/classic">Classic</NavItem>
@@ -98,8 +98,8 @@ const Navigation = () => {
           </NextLink>
         </LinkBox>
 
-        <NavItem href="/delphs-table">Delph&apos;s Table</NavItem>
-        <NavItem href="/leaderboard">Leaderboard</NavItem>
+        <NavItem href="https://empiregambit.com">Empire Gambit</NavItem>
+        {/* <NavItem href="/leaderboard">Leaderboard</NavItem> */}
         <NavItem href="/badge-of-assembly">Badge of Assembly</NavItem>
         <NavItem href="/masks">Masks</NavItem>
         <NavItem href="/classic">Classic</NavItem>
