@@ -16,7 +16,7 @@ const client = memoize(() => {
   if (typeof document !== 'undefined') {
     const params = new URLSearchParams(document.location.search);
     if (params.get('arena')) {
-      return new Client("wss://pyy9eo.us-west-1.colyseus.dev")
+      return new Client("wss://arena.empiregambit.com")
     }
   }
   return new Client("ws://localhost:2567")
