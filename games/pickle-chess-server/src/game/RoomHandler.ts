@@ -9,6 +9,7 @@ import { getRandomTrack } from "./music"
 import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
+import { MonteCarloConfig } from "../ai/montecarlo"
 
 const AI_NAMES = [
   // "Locally"
@@ -26,7 +27,7 @@ const AI_AVATARS = [
   "https://models.readyplayer.me/639c401aad3d7939dd3cb573.glb",
 ]
 
-const CHARACTERS_PER_PLAYER = 8
+const CHARACTERS_PER_PLAYER = 6
 // const NUMBER_OF_PLAYERS = 2
 
 const BOARD_LOAD_EVENT = "boardLoaded"
@@ -34,13 +35,12 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 const MIN_TIME_BETWEEN_TAUNTS = 5
 const MAX_TIME_BETWEEN_TAUNTS = 45
 
-const TIME_BETWEEN_AI_MOVES = 0.75
-
 export interface RoomJoinOptions {
   name: string
   avatar?: string
   numberOfAi?: number
   numberOfHumans: number
+  level: number
 }
 
 interface HistoryEntry {
@@ -51,6 +51,63 @@ interface HistoryEntry {
     extra?: string,
   }
 }
+
+interface AIConfig {
+  timeBeforeFirstAction: number
+  numberOfActions: number
+  timeBetweenActions: number
+  montecarlo: MonteCarloConfig
+}
+
+export const configForLevel = (level: number): AIConfig => {
+  if (level === -1) {
+    return {
+      timeBeforeFirstAction: 6,
+      numberOfActions: 1,
+      timeBetweenActions: 5,
+      montecarlo: {
+        duration: 10,
+        maxDepth: 25,
+        reverse: true,
+      }
+    }
+  }
+  if (level >= 0 && level <= 1) {
+    return {
+      timeBeforeFirstAction: 4,
+      numberOfActions: 1,
+      timeBetweenActions: 1.5,
+      montecarlo: {
+        duration: 10,
+        maxDepth: 25,
+      }
+    }
+  }
+  if (level >= 2 && level <= 5) {
+    return {
+      timeBeforeFirstAction: 4,
+      numberOfActions: 2,
+      timeBetweenActions: 1,
+      montecarlo: {
+        duration: 20,
+        maxDepth: 25,
+      }
+    }
+  }
+
+  // TODO: more fine grained levels
+  return {
+    timeBeforeFirstAction: 2,
+    numberOfActions: 3,
+    timeBetweenActions: 0.75,
+    montecarlo: {
+      duration: 20,
+      maxDepth: 50,
+    }
+  }
+}
+
+
 
 class RoomHandler extends EventEmitter {
   private room: PickleChessRoom
@@ -69,13 +126,15 @@ class RoomHandler extends EventEmitter {
   private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
   private aiBrains?: AIBrain[]
-  private timeSinceAIMove = TIME_BETWEEN_AI_MOVES + 1 // start the game off with an AI move
+  private timeSinceAIMove: number 
   private isAiMoving = false
 
   private options: RoomJoinOptions
 
   private clients: Record<string, Client>
   private history: HistoryEntry[]
+
+  private aiConfig: AIConfig
 
   constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
     super()
@@ -85,6 +144,10 @@ class RoomHandler extends EventEmitter {
     this.board = new BoardLogic(this.characters)
     this.options = opts
     this.options.numberOfAi ||= 0
+
+    this.aiConfig = configForLevel(this.options.level || 1)
+    // start the game off with an AI move
+    this.timeSinceAIMove = this.aiConfig.timeBetweenActions + 1
     this.clients = {}
     this.history = []
   }
@@ -101,9 +164,9 @@ class RoomHandler extends EventEmitter {
     this.timeSinceTaunt += dt
 
 
-    if (this.aiBrains && this.gameClock >= 4) {
+    if (this.aiBrains && this.gameClock >= this.aiConfig.timeBeforeFirstAction) {
       this.timeSinceAIMove += dt
-      if (this.timeSinceAIMove >= TIME_BETWEEN_AI_MOVES) {
+      if (this.timeSinceAIMove >= this.aiConfig.timeBetweenActions) {
         this.moveAI()
       }
     }
@@ -200,15 +263,18 @@ class RoomHandler extends EventEmitter {
           return
         }
 
-        // take the top 3 actions on different tiles
+        // take the top actions on different tiles
         let actions = await brain.getActions(brain.id)
-        actions.slice(0, 2).forEach((action, _i, actions) => {
+        actions.slice(0, this.aiConfig.numberOfActions).forEach((action, _i, actions) => {
           if (!action.to) {
             return
           }
           this.handleAiMove(action, brain.id)
           // filter out all actions that have the same to
-          actions = actions.filter((a) => a.to.x !== action.to.x || a.to.y !== action.to.y)
+          actions = actions.filter((a) => {
+            return (a.to.x !== action.to.x || a.to.y !== action.to.y) &&
+              (a.from.x !== action.from.x || a.from.y !== action.from.y)
+          })
         })
       }))
       this.timeSinceAIMove = 0
@@ -492,7 +558,7 @@ class RoomHandler extends EventEmitter {
       this.characters.push(new CharacterLogic(character, this.board))
     }
     this.aiBrains ||= []
-    this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
+    this.aiBrains[idx] = new AIBrain(id, this.board, this.characters, this.aiConfig.montecarlo)
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {

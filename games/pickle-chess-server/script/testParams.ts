@@ -3,6 +3,7 @@ import { randomUUID } from "crypto"
 
 const game = {
   numberOfHumans: 2,
+  level: 4,
 }
 
 console.log("---")

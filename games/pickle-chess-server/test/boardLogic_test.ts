@@ -3,7 +3,7 @@ import { AICharacter, AIGameState, applyAction, generateActions, shortCircuits }
 import BoardLogic, { Tile } from "../src/game/BoardLogic";
 import { TileType } from "../src/rooms/schema/PickleChessState";
 
-describe.only("BoardLogic", () => {
+describe("BoardLogic", () => {
 
     const players = ["p1", "p2"]
 
