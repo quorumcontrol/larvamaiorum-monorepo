@@ -4,7 +4,7 @@ import "@fontsource/cairo"
 import "@fontsource/bebas-neue"
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
-import ethers, { BigNumber, providers } from "ethers"
+import { ethers, BigNumber, providers } from "ethers"
 import '@rainbow-me/rainbowkit/styles.css';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import {
