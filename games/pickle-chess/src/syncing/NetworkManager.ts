@@ -1,3 +1,4 @@
+import { ToastMessage } from "@chakra-ui/react";
 import { Client, Room } from "colyseus.js";
 import { Entity, RaycastResult } from "playcanvas";
 import { SELECT_EVT } from "../controls/CellSelector";
@@ -135,6 +136,10 @@ class NetworkManager extends ScriptTypeBase {
 
     this.room.onMessage(Messages.taunt, (msg:TauntMessage) => {
       this.app.fire(Messages.taunt, msg)
+    })
+
+    this.room.onMessage(Messages.toast, (msg:ToastMessage) => {
+      this.app.fire(Messages.toast, msg)
     })
 
     this.room.onError((error) => {

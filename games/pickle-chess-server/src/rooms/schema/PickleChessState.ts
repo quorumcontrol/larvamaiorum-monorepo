@@ -14,11 +14,17 @@ export enum Messages {
   taunt = "taunt",
   characterRemove = "characterRemove",
   latencyCheck = "l",
+  toast = "toast"
 }
 
 export interface TauntMessage {
   text: string
   audio: string
+}
+
+export interface ToastMessage {
+  text: string
+  audio?: string
 }
 
 export interface LatencyCheckMessage {
