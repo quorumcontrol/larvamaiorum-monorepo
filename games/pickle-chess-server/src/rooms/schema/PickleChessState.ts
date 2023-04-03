@@ -14,11 +14,17 @@ export enum Messages {
   taunt = "taunt",
   characterRemove = "characterRemove",
   latencyCheck = "l",
+  toast = "toast"
 }
 
 export interface TauntMessage {
   text: string
   audio: string
+}
+
+export interface ToastMessage {
+  text: string
+  audio?: string
 }
 
 export interface LatencyCheckMessage {
@@ -109,7 +115,6 @@ export class Locomotion extends Schema {
 export class Player extends Schema {
   @type("string") id: string
   @type("string") name: string
-  @type("string") token: string
 
   @filter(function (this: Player, client: any, value: any) {
     return this.id === client.sessionId;

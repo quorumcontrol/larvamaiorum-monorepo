@@ -41,7 +41,7 @@ Stone and water tiles should be used sparingly to create obstacles and challenge
     const resp = await generateCompletions({
       system: systemPrompt,
       prompt,
-      timeout: 10_000,
+      timeout: 20_000,
     })
   
     return resp.data.choices[0].message.content  

@@ -6,6 +6,7 @@ import { Room } from "colyseus.js"
 import { PickleChessState } from "../syncing/schema/PickleChessState"
 import theme from "../main-site-components/theme"
 import RightSideUI from "./components/RightSideUI"
+import Toaster from "./components/Toaster"
 
 const Fonts = () => (
   <Global
@@ -39,6 +40,7 @@ const App: React.FC<{ app: pc.Application; room: Room<PickleChessState> }> = ({
       <Fonts />
       <AppProvider app={app} room={room}>
         <RightSideUI />
+        <Toaster />
       </AppProvider>
     </ChakraProvider>
   )

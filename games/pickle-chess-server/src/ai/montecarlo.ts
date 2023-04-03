@@ -9,9 +9,10 @@ interface MonteCarloFunctions<GameState, Action, Player> {
     shortCircuits: (state:GameState, actions: Action[], playerId: Player) => Action[]
 }
 
-interface MonteCarloConfig {
+export interface MonteCarloConfig {
   duration: number,
   maxDepth: number,
+  reverse?: boolean
 }
 
 export function shuffle<T>(array: T[]): T[] {
@@ -39,7 +40,7 @@ class MonteCarlo<GameState, Action, Player> {
   constructor(funcs: MonteCarloFunctions<GameState, Action, Player>, config: Partial<MonteCarloConfig> = { }) {
     this.funcs = funcs
     config.duration ||= 30
-    config.maxDepth ||= 1000
+    config.maxDepth ||= 20
     this.config = config as MonteCarloConfig
   }
 
@@ -57,36 +58,42 @@ class MonteCarlo<GameState, Action, Player> {
     const scores = new Array(actions.length).fill(0)
     const maxTime = this.config.duration
 
+    // this freezes the thread so use sparingly
+    // TODO: put the AI into a worker file
     while (Date.now() - start < maxTime) {
-      await Promise.all(shuffle(actions).map(async (action, i) => {
+      shuffle(actions).forEach(async (action, i) => {
         scores[i] += await this.scoreAction(state, action, playerId, 0)
-        return
-      }))
+      })
+      // await Promise.all(shuffle(actions).map(async (action, i) => {
+      //   scores[i] += await this.scoreAction(state, action, playerId, 0)
+      //   return
+      // }))
     }
     // return actions sorted by scores where highest score is first
-    return actions.map((action, i) => ({ action, score: scores[i] })).sort((a, b) => b.score - a.score).map((a) => a.action)
+    const scored = actions.map((action, i) => ({ action, score: scores[i] })).sort((a, b) => b.score - a.score)
+    const acts = scored.map((a) => a.action)
+    if (this.config.reverse) {
+      acts.reverse()
+    }
+    // console.log("scored", scored, "actions: ", acts)
+    return acts
   }
 
   async getAction(state: GameState, playerId: Player): Promise<Action>{
     return (await this.getScoredActions(state, playerId))[0]
   }
 
-  private async scoreAction(state: GameState, action: Action, player: Player, depth: number): Promise<number> {
+  private scoreAction(state: GameState, action: Action, player: Player, depth: number): number {
     const newState = this.funcs.applyAction(state, action)
-    if (this.funcs.stateIsTerminal(newState) || depth > this.config.maxDepth) {
+    if (this.funcs.stateIsTerminal(newState) || depth >= this.config.maxDepth) {
       return this.funcs.calculateReward(newState, player)
     }
     const newActions = this.funcs.generateActions(newState)
-    // const shortCircuted = this.funcs.shortCircuits(newState, newActions, player)
-    // if (shortCircuted.length > 0) {
-    //   console.log("short circuited: ", shortCircuted.length, " actions", shortCircuted)
-    //   return (await this.scoreAction(newState, shortCircuted[0], player, depth + 1)) / (depth + 1)
-    // }
 
     // now pick a *random* action to walk on this tree
     const randomAction = newActions[randomInt(newActions.length)]
     // the further away the reward is, the less valuable it is
-    return (await this.scoreAction(newState, randomAction, player, depth + 1)) / (depth + 1)
+    return this.scoreAction(newState, randomAction, player, depth + 1)
   }
 }
 

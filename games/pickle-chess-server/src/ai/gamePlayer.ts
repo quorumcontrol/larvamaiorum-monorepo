@@ -1,7 +1,7 @@
 import { IPoint } from "astar-typescript/dist/interfaces/astar.interfaces";
 import BoardLogic from "../game/BoardLogic";
 import CharacterLogic from "../game/CharacterLogic";
-import MonteCarlo from "./montecarlo";
+import MonteCarlo, { MonteCarloConfig } from "./montecarlo";
 
 export interface AICharacter {
   id: string
@@ -124,18 +124,18 @@ export const calculateReward = (state: AIGameState, playerId: string): number =>
 
   const isWinning = maxCharacterCountPlayer === state.players.indexOf(playerId)
 
-  const playerScore = isWinning ? (characterCounts[state.players.indexOf(playerId)] - minCharacterCount) * 10 : (characterCounts[state.players.indexOf(playerId)] - maxCharacterCount)
+  const playerScore = isWinning ? (characterCounts[state.players.indexOf(playerId)] - minCharacterCount) * 2 : (characterCounts[state.players.indexOf(playerId)] - maxCharacterCount)
 
   // find highest character count for a player and return a huge reward for that player
   if (stateIsTerminal(state)) {
-    const winBoost = isWinning ? 5 : -5
+    const winBoost = isWinning ? 100 : -100
     return winBoost + playerScore
   }
   // otherwise return the difference between the player's character count and the max character count
   return playerScore
 }
 
-export const filter = (actions: AIGameAction[]): AIGameAction[] => {
+const filter = (actions: AIGameAction[]): AIGameAction[] => {
   return actions.filter((action) => (action.from.x !== action.to.x || action.from.y !== action.to.y))
 }
 
@@ -146,10 +146,11 @@ export class AIBrain {
 
   id: string
 
-  constructor(id: string, board: BoardLogic<CharacterLogic>, characters: CharacterLogic[]) {
+  constructor(id: string, board: BoardLogic<CharacterLogic>, characters: CharacterLogic[], options: MonteCarloConfig) {
     this.id = id
     this.board = board
     this.characters = characters
+    console.log("------------ game player options: ", options)
     this.montecarlo = new MonteCarlo<AIGameState, AIGameAction, string>({
       generateActions,
       applyAction,
@@ -157,10 +158,7 @@ export class AIBrain {
       calculateReward,
       filter,
       shortCircuits,
-    }, {
-      duration: 10,
-      maxDepth: 4,
-    })
+    }, options)
   }
 
   getAction(playerId: string): Promise<AIGameAction | undefined> {

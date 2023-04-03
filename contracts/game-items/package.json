@@ -1,9 +1,12 @@
 {
-  "name": "hardhat-project",
+  "name": "empire-gambit-contracts",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@types/dotenv": "^8.2.0",
     "hardhat": "^2.13.0"
+  },
+  "scripts": {
+    "test": "hardhat test"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",

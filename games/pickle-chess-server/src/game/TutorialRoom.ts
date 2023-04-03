@@ -254,6 +254,9 @@ class TutorialRoomHandler extends EventEmitter {
       }, {} as {[key:string]:number})
 
       const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
+      if (evt === GameEvent.pieceCaptured) {
+        this.speak("great job! Keep going.")
+      }
       // this.shipTaunt(evt, Object.keys(removedCounts).map((playerName) => `${playerName} just lost ${removedCounts[playerName]} pieces`).join("! ") + "!")
     }
   }
@@ -360,23 +363,14 @@ class TutorialRoomHandler extends EventEmitter {
     return this.state.players.size
   }
 
-  // private async shipTaunt(event:GameEvent, extraText?:string) {
-  //   // return
-  //   if (this.tauntFetching || this.timeSinceTaunt <= MIN_TIME_BETWEEN_TAUNTS) {
-  //     return
-  //   }
-  //   console.log("ship taunt: ", event, extraText)
+  private toast(msg: string) {
+    return this.room.broadcast(Messages.toast, { text: msg })
+  }
 
-  //   this.tauntFetching = true
-  //   const taunt = await getTaunt(this.getGameState(event), extraText)
-  //   if (taunt) {
-  //     const audio = await speak(taunt)
-  //     console.log("taunt", taunt)
-  //     this.room.broadcast(Messages.taunt, {text: taunt, audio} as TauntMessage)
-  //   }
-  //   this.tauntFetching = undefined
-  //   this.timeSinceTaunt = 0
-  // }
+  private async speak(text:string) {
+    const audio = await speak(text)
+    return this.room.broadcast(Messages.taunt, {text, audio})
+  }
 
   private startCountdown() {
     if (this.options.numberOfAi > 0) {
@@ -402,8 +396,15 @@ class TutorialRoomHandler extends EventEmitter {
           roomState: RoomState.playing
         })
         this.room.broadcast(Messages.hudText, {text: "GO!"}, { afterNextPatch: true })
+        this.introduceTutorial()
       }
     }, 1000)
+  }
+
+  private async introduceTutorial() {
+    await this.speak("Welcome to Empire Gambit! You are the black-shirted characters. Your goal is to capture the white-shirted characters. You can move your characters by clicking on them and then clicking on a destination tile. You cannot move across stone or water.")
+    await this.speak("Try to remove all your opponent's characters now.")
+    this.toast("Surround your opponent on two sides. Use terrain (stone or water) to trap them too.")
   }
 
   createAICharacter(idx:number) {
@@ -443,8 +444,6 @@ class TutorialRoomHandler extends EventEmitter {
       this.state.characters.set(character.id, character)
       this.characters.push(new CharacterLogic(character, this.board))
     }
-    // this.aiBrains ||= [] 
-    // this.aiBrains[idx] = new AIBrain(id, this.board, this.characters)
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
