@@ -113,7 +113,8 @@ export class Locomotion extends Schema {
 }
 
 export class Player extends Schema {
-  @type("string") id: string
+  @type("string") id: string // this is the client id... is that right?
+  @type("string") address:string // the actual game id (address of safe)
   @type("string") name: string
 
   @filter(function (this: Player, client: any, value: any) {

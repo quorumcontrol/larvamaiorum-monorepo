@@ -9,6 +9,7 @@ import { getRandomTrack } from "./music"
 import { GameEvent, GameState } from "../ai/taunt"
 import { speak } from "../ai/uberduck"
 import { TutorialRoom } from "../rooms/TutorialRoom"
+import { createMatch, setWinner } from "../database/matchWriter"
 
 const AI_NAMES = [
   // "local"
@@ -54,6 +55,8 @@ class TutorialRoomHandler extends EventEmitter {
 
   private gameClock = 0
   private timeSincePieceCapture = 0
+
+  private matchId?:string
   // private timeSinceTaunt = MIN_TIME_BETWEEN_TAUNTS + 1 // start off the game with a taunt
 
   // private aiBrains?:AIBrain[]
@@ -206,11 +209,17 @@ class TutorialRoomHandler extends EventEmitter {
     }
 
     if (this.board.isOver()) {
-      console.log("------------------ game over!")
+      console.log("------------------ game over! winner: ", this.board.winner())
       this.state.assign({
         roomState: RoomState.gameOver,
-        persistantMessage: "Game Over"
+        persistantMessage: "Game Over",
+        winner: this.board.winner(),
       })
+      if (this.matchId) {
+        setWinner(this.matchId, this.state.players.get(this.board.winner()).address)
+      } else {
+        console.error("error, no match id")
+      }
     }
   }
 
@@ -379,6 +388,13 @@ class TutorialRoomHandler extends EventEmitter {
       }
     }
     let countdown = 3
+    
+    createMatch(Array.from(this.state.players.values()).map((player) => player.address)).then((matchId) => {
+      this.matchId = matchId
+    }).catch((err) => {
+      console.error("error creating match", err)
+    })
+
     this.state.assign({
       persistantMessage: `${countdown}`,
       roomState: RoomState.countdown

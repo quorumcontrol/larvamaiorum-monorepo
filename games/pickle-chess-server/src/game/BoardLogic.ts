@@ -325,6 +325,11 @@ class BoardLogic<CharacterType extends Character> {
     return this.livingPlayers().length <= 1
   }
 
+  winner() {
+    // note this only works because isOver expects only one single winner
+    return this.livingPlayers()[0]
+  }
+
   randomBoardLocation() {
     const y = randomInt(this.tiles.length)
     const x = randomInt(this.tiles[0].length)

@@ -3,7 +3,7 @@ import { AICharacter, AIGameState, applyAction, generateActions, shortCircuits, 
 import BoardLogic, { Tile } from "../src/game/BoardLogic";
 import { TileType } from "../src/rooms/schema/PickleChessState";
 
-describe.only("AI Logic", () => {
+describe("AI Logic", () => {
 
     it("short circuits correctly", () => {
         const tiles: Tile[] = []
@@ -68,7 +68,7 @@ describe.only("AI Logic", () => {
 
     })
 
-    it.only("sanity tests", () => {
+    it("sanity tests", () => {
         const tiles: Tile[] = []
         for (let y = 0; y <= 2; y++) {
             for (let x = 0; x <= 3; x++) {
