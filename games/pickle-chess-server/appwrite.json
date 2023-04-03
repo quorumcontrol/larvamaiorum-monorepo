@@ -1,0 +1,21 @@
+{
+    "projectId": "642ab5910b448ff8d7b4",
+    "projectName": "EmpireGambit",
+    "functions": [
+        {
+            "$id": "642ab9963ac5588722c3",
+            "name": "WinRecorder",
+            "runtime": "node-16.0",
+            "path": "functions/WinRecorder",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

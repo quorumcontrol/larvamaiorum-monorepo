@@ -10,6 +10,7 @@ import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
 import { MonteCarloConfig } from "../ai/montecarlo"
+import { createMatch, setWinner } from "../database/matchWriter"
 
 const AI_NAMES = [
   // "Locally"
@@ -37,6 +38,7 @@ const MAX_TIME_BETWEEN_TAUNTS = 45
 
 export interface RoomJoinOptions {
   name: string
+  id: string
   avatar?: string
   numberOfAi?: number
   numberOfHumans: number
@@ -107,8 +109,6 @@ export const configForLevel = (level: number): AIConfig => {
   }
 }
 
-
-
 class RoomHandler extends EventEmitter {
   private room: PickleChessRoom
   private state: PickleChessState
@@ -135,6 +135,8 @@ class RoomHandler extends EventEmitter {
   private history: HistoryEntry[]
 
   private aiConfig: AIConfig
+
+  private matchId?: string
 
   constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
     super()
@@ -293,11 +295,18 @@ class RoomHandler extends EventEmitter {
     }
 
     if (this.board.isOver()) {
-      console.log("------------------ game over!")
+      console.log("------------------ game over! winner: ", this.board.winner())
       this.state.assign({
         roomState: RoomState.gameOver,
-        persistantMessage: "Game Over"
+        persistantMessage: "Game Over",
+        winner: this.board.winner(),
       })
+      if (this.matchId) {
+        setWinner(this.matchId, this.state.players.get(this.board.winner()).address)
+      } else {
+        console.error("no match id set for this match")
+      }
+
       const living = this.board.livingPlayers().map((playerId) => this.state.players.get(playerId).name).join(",")
       this.shipTaunt(GameEvent.over, `${living} wins!`)
       console.log("current history", this.history)
@@ -521,6 +530,13 @@ class RoomHandler extends EventEmitter {
           persistantMessage: "",
           roomState: RoomState.playing
         })
+        createMatch(Array.from(this.state.players.values()).map((player) => player.address)).then((id) => {
+          console.log("create match id: ", id)
+          this.matchId = id
+        }).catch((err) => {
+          console.error("----------> error creating match: ", err)
+          // do nothing for now
+        })
         this.room.broadcast(Messages.hudText, { text: "GO!" }, { afterNextPatch: true })
       }
     }, 1000)
@@ -566,6 +582,7 @@ class RoomHandler extends EventEmitter {
       console.log(client.sessionId, "joined!", options);
       this.state.players.set(client.sessionId, new Player({
         id: client.sessionId,
+        address: options.id,
         name: options.name,
         avatar: options.avatar,
       }))
