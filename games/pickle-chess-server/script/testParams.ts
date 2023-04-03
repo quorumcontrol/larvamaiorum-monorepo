@@ -1,9 +1,6 @@
-import { randomUUID } from "crypto"
-
-
 const game = {
   numberOfHumans: 2,
-  level: 4,
+  level: 6,
 }
 
 console.log("---")

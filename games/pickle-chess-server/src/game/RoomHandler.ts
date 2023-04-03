@@ -101,7 +101,7 @@ export const configForLevel = (level: number): AIConfig => {
     numberOfActions: 3,
     timeBetweenActions: 0.75,
     montecarlo: {
-      duration: 20,
+      duration: 30,
       maxDepth: 50,
     }
   }

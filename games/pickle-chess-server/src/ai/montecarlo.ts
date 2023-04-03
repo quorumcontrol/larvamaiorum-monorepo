@@ -58,11 +58,16 @@ class MonteCarlo<GameState, Action, Player> {
     const scores = new Array(actions.length).fill(0)
     const maxTime = this.config.duration
 
+    // this freezes the thread so use sparingly
+    // TODO: put the AI into a worker file
     while (Date.now() - start < maxTime) {
-      await Promise.all(shuffle(actions).map(async (action, i) => {
+      shuffle(actions).forEach(async (action, i) => {
         scores[i] += await this.scoreAction(state, action, playerId, 0)
-        return
-      }))
+      })
+      // await Promise.all(shuffle(actions).map(async (action, i) => {
+      //   scores[i] += await this.scoreAction(state, action, playerId, 0)
+      //   return
+      // }))
     }
     // return actions sorted by scores where highest score is first
     const scored = actions.map((action, i) => ({ action, score: scores[i] })).sort((a, b) => b.score - a.score)
@@ -78,7 +83,7 @@ class MonteCarlo<GameState, Action, Player> {
     return (await this.getScoredActions(state, playerId))[0]
   }
 
-  private async scoreAction(state: GameState, action: Action, player: Player, depth: number): Promise<number> {
+  private scoreAction(state: GameState, action: Action, player: Player, depth: number): number {
     const newState = this.funcs.applyAction(state, action)
     if (this.funcs.stateIsTerminal(newState) || depth >= this.config.maxDepth) {
       return this.funcs.calculateReward(newState, player)
