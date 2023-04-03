@@ -32,6 +32,8 @@ export type { ERC165 } from "./@openzeppelin/contracts/utils/introspection/ERC16
 export { ERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/ERC165__factory";
 export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC165";
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
+export type { Database } from "./contracts/Database";
+export { Database__factory } from "./factories/contracts/Database__factory";
 export type { PlayerProfile } from "./contracts/PlayerProfile";
 export { PlayerProfile__factory } from "./factories/contracts/PlayerProfile__factory";
 export type { PoWSecure } from "./contracts/PoWSecure";
