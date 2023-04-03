@@ -115,7 +115,6 @@ export class Locomotion extends Schema {
 export class Player extends Schema {
   @type("string") id: string
   @type("string") name: string
-  @type("string") token: string
 
   @filter(function (this: Player, client: any, value: any) {
     return this.id === client.sessionId;
