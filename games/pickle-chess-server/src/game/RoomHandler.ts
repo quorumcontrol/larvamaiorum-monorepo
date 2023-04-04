@@ -10,7 +10,7 @@ import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
 import { MonteCarloConfig } from "../ai/montecarlo"
-import { createMatch, setWinner } from "../database/matchWriter"
+import { createMatch, setWinner, playerDetail } from "../database/matchWriter"
 
 const AI_NAMES = [
   // "Locally"
@@ -579,14 +579,26 @@ class RoomHandler extends EventEmitter {
   }
 
   handlePlayerJoin(client: Client, options: RoomJoinOptions) {
-    const handleJoin = () => {
+    const playerDetailsPromise = playerDetail(options.id)
+
+    const handleJoin = async () => {
       console.log(client.sessionId, "joined!", options);
-      this.state.players.set(client.sessionId, new Player({
+      const details = await playerDetailsPromise
+
+      const player = new Player({
         id: client.sessionId,
         address: options.id,
         name: options.name,
         avatar: options.avatar,
-      }))
+      })
+
+      player.metaGameDetails.assign({
+        ...details,
+        attemptsRemaining: Math.max(details.maxPerDay - details.todaysGames, 0),
+      })
+
+      this.state.players.set(client.sessionId, player)
+
       this.clients[client.sessionId] = client
       for (let i = 0; i < CHARACTERS_PER_PLAYER; i++) {
         const tile = this.board.randomAvailableInitialLocation(client.sessionId)

@@ -112,6 +112,16 @@ export class Locomotion extends Schema {
   @type("number") walkSpeed: number
 }
 
+export class PlayerMetaGameDetails extends Schema {
+  @type("number") level: number
+  @type("number") nextLevelIn: number
+  @type("number") wins: number
+  @type("number") levelupWins: number
+  @type("number") todaysGames: number
+  @type("number") todaysWins: number
+  @type("number") attemptsRemaining: number
+}
+
 export class Player extends Schema {
   @type("string") id: string // this is the client id... is that right?
   @type("string") address:string // the actual game id (address of safe)
@@ -121,6 +131,7 @@ export class Player extends Schema {
     return this.id === client.sessionId;
   })
   @type("string") highlightedCharacterId: string = ""
+  @type(PlayerMetaGameDetails) metaGameDetails: PlayerMetaGameDetails = new PlayerMetaGameDetails()
 }
 
 export class Character extends Schema {

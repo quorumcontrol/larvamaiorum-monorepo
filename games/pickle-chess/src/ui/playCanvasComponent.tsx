@@ -21,7 +21,7 @@ if (typeof global !== "undefined" && typeof document === "undefined") {
 class ReactUI extends ScriptTypeBase {
   initialize() {
     this.app.once("newRoom", (room: Room<PickleChessState>) => {
-      var style = document.createElement("style")
+      const style = document.createElement("style")
 
       // append to head
       document.head.appendChild(style)

@@ -7,6 +7,7 @@ import { PickleChessState } from "../syncing/schema/PickleChessState"
 import theme from "../main-site-components/theme"
 import RightSideUI from "./components/RightSideUI"
 import Toaster from "./components/Toaster"
+import EndScreen from "./components/EndScreen"
 
 const Fonts = () => (
   <Global
@@ -39,6 +40,7 @@ const App: React.FC<{ app: pc.Application; room: Room<PickleChessState> }> = ({
     <ChakraProvider theme={theme}>
       <Fonts />
       <AppProvider app={app} room={room}>
+        <EndScreen />
         <RightSideUI />
         <Toaster />
       </AppProvider>

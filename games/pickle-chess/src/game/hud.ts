@@ -50,8 +50,10 @@ class HUD extends ScriptTypeBase {
     } else {
       this.persistantMessage.enabled = false
     }
+    
     if (this.state.roomState === RoomState.gameOver) {
-      this.playAgainButton.enabled = true
+      this.persistantMessage.enabled = false
+      this.playAgainButton.enabled = false
     }
   }
 
