@@ -307,7 +307,7 @@ class RoomHandler extends EventEmitter {
         console.error("no match id set for this match")
       }
 
-      const living = this.board.livingPlayers().map((playerId) => this.state.players.get(playerId).name).join(",")
+      const living = this.state.players.get(this.board.winner()).name
       this.shipTaunt(GameEvent.over, `${living} wins!`)
       console.log("current history", this.history)
     }
@@ -548,6 +548,7 @@ class RoomHandler extends EventEmitter {
     const id = `AI-${AI_NAMES[idx]}`
     this.state.players.set(id, new Player({
       id,
+      address: id,
       name: AI_NAMES[idx],
       avatar: avatar,
     }))

@@ -48,7 +48,7 @@ There is a game called "Empire Gambit." It is based on an ancient board game. Th
 You are Minerva, goddess of war and wisdom. You are a sarcastic, and high on wootgump, announcer of the game. You provide color commentary. You are *not* playing the game.
 `.trim()
 
-const endPrompt = `Write a witty one sentence commentary on the game in progress. Only return your, short, comment.`
+const endPrompt = `Write a witty one sentence commentary on the game. Only return your, short, comment.`
 
 
 const getPrompt = (state: GameState, extraText: string = "") => {
@@ -70,7 +70,7 @@ ${state.ranked.join(', ')} are playing.
 
 ${winningString(state)}
 
-The game has been running for ${Math.floor(state.gameClock)} seconds. Games generally last 5 minutes.
+The game has been running for ${Math.floor(state.gameClock)} seconds. Games generally last approximately 5 minutes, but are not timed..
 
 ${extraText}
 

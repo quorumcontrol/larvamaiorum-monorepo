@@ -274,14 +274,17 @@ OrbitCamera.prototype.initialize = function () {
         this.app.autoRender = this._defaultAutoRender;
     }, this);
 
+    var self = this;
+
     this.app.on("camera:shake", () => {
         this._shakeTimer = 0
-        var self = this;
 
         const intensity = 0.25
         const multiplier = () => {
             return Math.random() < 0.5 ? -1 : 1
         }
+
+        const originalPosition = self.entity.getLocalPosition().clone()
 
         const doTween = () => {
             // Generate a random displacement for the camera position
@@ -291,8 +294,12 @@ OrbitCamera.prototype.initialize = function () {
                 Math.random() * intensity * multiplier(),
             );
 
+            if (self._shakeTween) {
+                self._shakeTween.stop()
+            }
+
             // Apply the displacement to the camera position
-            var newPos = self.entity.getLocalPosition().clone().add(displacement);
+            var newPos = originalPosition.clone().add(displacement);
             
             // Tween the camera position back to its original position over the specified duration
             self._shakeTween = self.entity.tween(self.entity.getLocalPosition())
@@ -304,10 +311,11 @@ OrbitCamera.prototype.initialize = function () {
                     }
                     self._shakeTween = undefined
                     // Reset the camera position to its original position
-                    self.entity.setPosition(self.originalPos);
+                    self.entity.setPosition(originalPosition);
                 })
                 .start();
         }
+
         doTween()
 
     })

@@ -36,6 +36,7 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 
 export interface RoomJoinOptions {
   name: string
+  id: string
   avatar?: string
   numberOfAi?: number
   numberOfHumans: number
@@ -429,6 +430,7 @@ class TutorialRoomHandler extends EventEmitter {
     const id = `AI-${AI_NAMES[idx]}`
     this.state.players.set(id, new Player({
       id,
+      address: id,
       name: AI_NAMES[idx],
       avatar: avatar,
     }))
@@ -467,6 +469,7 @@ class TutorialRoomHandler extends EventEmitter {
       console.log(client.sessionId, "joined!", options);
       this.state.players.set(client.sessionId, new Player({
         id: client.sessionId,
+        address: options.id,
         name: options.name,
         avatar: options.avatar,
       }))
