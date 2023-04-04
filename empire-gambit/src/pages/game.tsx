@@ -5,24 +5,25 @@ import Link from "next/link"
 import { useMemo } from "react"
 import { useAccount } from "wagmi"
 import { useUser } from "@/hooks/useUser"
+import { useSafeFromUser } from "@/hooks/useSafe"
 
 const GamePage: NextPage = () => {
-  const { address } = useAccount()
   const { data:user } = useUser()
+  const { data: safeAddress } = useSafeFromUser()
 
   const { animationUrl:avatar, name:username } = user?.profile || {}
   
   const gameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({id: address, name: username, avatar, numberOfHumans: 2 })).toString("base64")
-  }, [address, username, avatar])
+    return Buffer.from(JSON.stringify({id: safeAddress, name: username, avatar, numberOfHumans: 2 })).toString("base64")
+  }, [safeAddress, username, avatar])
 
   const aiGameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({numberOfHumans: 1, numberOfAi: 1, id: address, name: username, avatar })).toString("base64")
-  }, [address, username, avatar])
+    return Buffer.from(JSON.stringify({numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar })).toString("base64")
+  }, [safeAddress, username, avatar])
 
   const tutorialParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: address, name: username, avatar })).toString("base64")
-  }, [address, username, avatar])
+    return Buffer.from(JSON.stringify({roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar })).toString("base64")
+  }, [safeAddress, username, avatar])
 
   return (
     <Layout>
