@@ -26,8 +26,9 @@ const waitForSpeech = async (uuid: string) => {
 export const speak = async (text: string) => {
     try {
         const initialResponse = await sdk.generate_speech_speak_post({
-            voice: 'carolyn-speaking',
-            pace: 1,
+            // voice: 'carolyn-speaking',
+            voice: 'general-herring-briefing',
+            pace: 2,
             speech: text.replace(/lead/g, 'leed'),
         }, { 'uberduck-id': 'anonymous' })
 
