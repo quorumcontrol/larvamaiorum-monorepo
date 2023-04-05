@@ -3,14 +3,16 @@
     {
       "subject": "arena.empiregambit.com",
       "altnames": [
-        "arena.empiregambit.com"
+        "arena.empiregambit.com",
+        "arena2.empiregambit.com"
       ],
       "renewAt": 1
     }
   ],
   "defaults": {
     "store": {
-      "module": "greenlock-store-fs"
+      "module": "greenlock-store-fs",
+      "basePath": "/home/empiregambit/.config/greenlock"
     },
     "challenges": {
       "http-01": {
