@@ -3,7 +3,6 @@ import { Button, Heading, VStack } from "@chakra-ui/react"
 import { NextPage } from "next"
 import Link from "next/link"
 import { useMemo } from "react"
-import { useAccount } from "wagmi"
 import { useUser } from "@/hooks/useUser"
 import { useSafeFromUser } from "@/hooks/useSafe"
 import { usePlayerDetails } from "@/hooks/usePlayerDetails"
@@ -20,8 +19,8 @@ const GamePage: NextPage = () => {
   }, [safeAddress, username, avatar])
 
   const aiGameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({ numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar })).toString("base64")
-  }, [safeAddress, username, avatar])
+    return Buffer.from(JSON.stringify({ numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar, level: playerDetails?.level })).toString("base64")
+  }, [safeAddress, username, avatar, playerDetails?.level])
 
   const tutorialParam = useMemo(() => {
     return Buffer.from(JSON.stringify({ roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar })).toString("base64")
