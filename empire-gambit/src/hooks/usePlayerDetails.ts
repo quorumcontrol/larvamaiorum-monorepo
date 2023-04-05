@@ -37,8 +37,8 @@ const playsToday = async (player: string): Promise<[number, number]> => {
       DATABASE_ID,
       LEVEL_MATCH_COLLECTION,
       [
-        Query.greaterThan("$createdAt", today.toISOString()),
         Query.equal("player", player),
+        Query.greaterThan("$createdAt", today.toISOString()),
         Query.equal("winner", true),
         Query.limit(0),
       ]

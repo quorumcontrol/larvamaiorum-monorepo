@@ -35,7 +35,7 @@ const GamePage: NextPage = () => {
             <VStack>
               <Heading size="lg">Level: {playerDetails.level}</Heading>
               <Heading size="lg">Wins until next level: {playerDetails.nextLevelIn}</Heading>
-              <Heading size="lg">Record for today: {playerDetails.wins} / {playerDetails.todaysGames}</Heading>
+              <Heading size="lg">Record for today: {playerDetails.todaysWins} / {playerDetails.todaysGames}</Heading>
               <Heading size="lg">Attempts remaining today: {Math.max(playerDetails.maxPerDay - playerDetails.todaysGames, 0)}</Heading>
             </VStack>
           )}
