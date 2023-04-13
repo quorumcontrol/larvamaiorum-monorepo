@@ -2,7 +2,6 @@
 import type { AppProps } from 'next/app'
 import "@fontsource/cairo"
 import "@fontsource/bebas-neue"
-import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
 import ethers, { BigNumber, providers } from "ethers"
 import '@rainbow-me/rainbowkit/styles.css';
@@ -118,18 +117,16 @@ const queryClient = new QueryClient()
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <CacheProvider>
-      <ChakraProvider theme={theme}>
-        <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider chains={chains} theme={darkTheme()}>
-            <QueryClientProvider client={queryClient}>
-              <DeployProvider value={addresses}>
-                <Component {...pageProps} />
-              </DeployProvider>
-            </QueryClientProvider>
-          </RainbowKitProvider>
-        </WagmiConfig>
-      </ChakraProvider>
-    </CacheProvider>
+    <ChakraProvider theme={theme}>
+      <WagmiConfig client={wagmiClient}>
+        <RainbowKitProvider chains={chains} theme={darkTheme()}>
+          <QueryClientProvider client={queryClient}>
+            <DeployProvider value={addresses}>
+              <Component {...pageProps} />
+            </DeployProvider>
+          </QueryClientProvider>
+        </RainbowKitProvider>
+      </WagmiConfig>
+    </ChakraProvider>
   )
 }
