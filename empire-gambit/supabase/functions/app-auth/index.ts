@@ -3,16 +3,14 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { getServiceClient, User } from "../_shared/serviceClient.ts";
-import { Payload } from "https://deno.land/x/djwt@v2.4/mod.ts";
-import { signPayload } from "../_shared/jwt.ts";
+import { getServiceClient } from "../_shared/serviceClient.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
-import { ethers, BigNumber, providers } from "https://esm.sh/ethers@^5.7";
+import { ethers, providers } from "https://esm.sh/ethers@5.7.2";
 import { WalletDeployer__factory, GnosisSafe__factory } from "https://esm.sh/@skaleboarder/safe-tools@0.0.10"
 
-const deploys = {
-  [BigNumber.from('0x3d91725c').toNumber()]: {
+const deploys:Record<number, {rpc: string, address:string}> = {
+  1032942172: {
     rpc: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
     address: "0x7F425D92f24806450f1673CafDaDfFa20f9F3f10",
   },
@@ -46,6 +44,8 @@ serve(async (req) => {
     chainId: number,
     exp: number
   } = JSON.parse(proofJson);
+
+  // TODO: check exp
 
   const deploy = deploys[proof.chainId];
   if (!deploy) {
