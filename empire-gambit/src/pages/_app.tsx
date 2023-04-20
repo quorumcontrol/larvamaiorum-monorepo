@@ -33,7 +33,7 @@ import { Web3AuthConnector } from "../utils/web3AuthConnector"
 import { isLocalhost } from '@/utils/isLocalhost'
 import { localFauct, powFauct } from '@/utils/faucets'
 import { useState } from 'react'
-import CustomSupabaseContext from '@/contexts/customSupabaseContext'
+import CustomSupabaseContext from '@/contexts/CustomSupabaseContext'
 
 const skaleMainnet = createChain({
   id: BigNumber.from('0x3d91725c').toNumber(),
