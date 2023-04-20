@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "https://deno.land/x/eszip@v0.30.0/mod.ts": "https://deno.land/x/eszip@v0.35.0/mod.ts"
+  }
+}
