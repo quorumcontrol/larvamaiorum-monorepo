@@ -101,7 +101,6 @@ export const useUser = () => {
         console.error("error fetching user", err, safeAddr, address)
         throw err
       }
-
     },
     {
       enabled: !!safeAddr && !!address && isConnected,

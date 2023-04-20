@@ -32,6 +32,8 @@ import theme from '@/components/theme';
 import { Web3AuthConnector } from "../utils/web3AuthConnector"
 import { isLocalhost } from '@/utils/isLocalhost'
 import { localFauct, powFauct } from '@/utils/faucets'
+import { useState } from 'react'
+import CustomSupabaseContext from '@/contexts/customSupabaseContext'
 
 const skaleMainnet = createChain({
   id: BigNumber.from('0x3d91725c').toNumber(),
@@ -65,7 +67,7 @@ const localDev = createChain({
 
 const skaleProvider = new providers.StaticJsonRpcProvider(isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0])
 
-const addresses = isLocalhost() ? fetchAddresses("localhost") : fetchAddresses("skale")
+const addresses = isLocalhost() ? fetchAddresses("locahost") : fetchAddresses("skale")
 
 const wrapperConfigs = {
   ethers,
@@ -115,6 +117,10 @@ const wagmiClient = createClient({
 
 const queryClient = new QueryClient()
 
+// well frack, I think we need to create a new context that allows for the
+// setting of the authorization header with a jwt.
+
+// see: https://github.com/supabase/gotrue-js/pull/340#issuecomment-1218065610
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
@@ -122,7 +128,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <RainbowKitProvider chains={chains} theme={darkTheme()}>
           <QueryClientProvider client={queryClient}>
             <DeployProvider value={addresses}>
-              <Component {...pageProps} />
+              <CustomSupabaseContext pageProps={pageProps}>
+                <Component {...pageProps} />
+              </CustomSupabaseContext>
             </DeployProvider>
           </QueryClientProvider>
         </RainbowKitProvider>
