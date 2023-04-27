@@ -6,6 +6,7 @@ import {
 import { tokenLength } from "./approximateEncoding.ts";
 import { Memory } from "./query_semantically.ts";
 import { backOff } from "https://esm.sh/exponential-backoff@3.1.1";
+import { chatCompletion } from "../chatCompletion.ts";
 
 const memoryToMetadata = (memories: Memory, summaryType: "short" | "long") => {
   return memories.content.slice(0, 1).map((content) => {
@@ -127,21 +128,19 @@ export const answerAsDPrime = (
       // temperature: 0.7,
       max_tokens: 200,
     };
+
+    const answer = await chatCompletion(chatRequest);
   
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(chatRequest),
-    });
+    // const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(chatRequest),
+    // });
   
-    const answer: CreateChatCompletionResponse = await response.json();
-  
-    if (!answer.choices) {
-      console.error("no choices", answer, response.body);
-    }
+    // const answer: CreateChatCompletionResponse = await response.json();
 
     console.log("usage: ", answer.usage)
   
