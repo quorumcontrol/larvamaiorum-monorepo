@@ -3,8 +3,6 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
 import { querySemantically } from "../_shared/gamebot/query_semantically.ts";
-// import { MinimalMessage } from "../_shared/questionAnswer.ts";
-// import { createSpeech } from "../_shared/voice.ts";
 import { answerAsDPrime } from "../_shared/gamebot/dPrime.ts";
 
 export interface MinimalMessage {
@@ -73,8 +71,8 @@ serve(async (req) => {
     const memories = await querySemantically({
       connection,
       client: serviceClient,
-      content: messages.map(m => m.content).join(" "),
-      tagIds: ["lengendsofeleysium", "0xbattleground", "cryptocrusades", "kingdomkarnage", "prospectors", "nftmoon", "tankwars", "untitledplatformer", "warshmallows.com"],
+      content: messages.filter((m) => m.role !== "system").map(m => m.content).join(" "),
+      tagIds: ["empiregambit", "legendsofelysium", "0xbattleground", "cryptocrusades", "kingdomkarnage", "prospectors", "nftmoon", "tankwars", "untitledplatformer", "warshmallows"],
       limit: 5,
       userId: user.id,
     });

@@ -61,6 +61,7 @@ class ContentPipeline {
     console.log(this.url, "is ", chunks.length, "chunks")
     // create a summary of the chunks and the full text
     const summaries = await recursivelySummarize(this.userId, chunks)
+    console.log("summaries: ", summaries)
 
     const relevantChunks = chunks.map((chunk, i) => {
       return {
@@ -69,8 +70,10 @@ class ContentPipeline {
       }
     }).filter((chunk) => !chunk.summary.ignore)
 
+    console.log("relevant chunks: ", relevantChunks)
+
     console.log("getting embeddings for: ", this.url)
-    const embeddings = await Promise.all(relevantChunks.map((chunk) => createEmbedding(this.userId, chunk.text)))
+    const embeddings = await Promise.all(relevantChunks.map((chunk) => createEmbedding(chunk.text, this.userId)))
 
     // create average the chunk embeddings for the full text
     const totalEmbedding = embeddings.reduce((acc, embedding) => {

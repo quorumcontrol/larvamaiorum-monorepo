@@ -5,19 +5,23 @@ import {
   Text,
   Center,
   Flex,
+  FormControl,
+  Input,
 } from "@chakra-ui/react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import RecordButton from "@/components/gamebot/RecordButton";
 import { useGetTranscription } from "@/hooks/useGetTranscription";
-import { Image } from "@chakra-ui/next-js";
+import { Image, Link } from "@chakra-ui/next-js";
 import alienImage from "@/assets/alien.png"
 import { ChatMessageProps } from "@/components/gamebot/ChatMessage";
+import ReactLinkify from "react-linkify";
 
 const ChatInterface = () => {
   const client = useSupabaseClient()
 
   const getTranscription = useGetTranscription()
 
+  const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
   const [messages, setMessages] = useState<ChatMessageProps[]>([])
 
@@ -73,17 +77,17 @@ const ChatInterface = () => {
         throw new Error("no data")
       }
 
-      const audioResp = await client.functions.invoke<{ speech: string }>("voice", {
-        body: {
-          text: messageContent(resp.data.response),
-        },
-      })
+      // const audioResp = await client.functions.invoke<{ speech: string }>("voice", {
+      //   body: {
+      //     text: messageContent(resp.data.response),
+      //   },
+      // })
 
-      console.log("audio:", audioResp)
+      // console.log("audio:", audioResp)
 
-      const { data: { publicUrl } } = client.storage.from("audio").getPublicUrl(audioResp.data?.speech || "")
+      // const { data: { publicUrl } } = client.storage.from("audio").getPublicUrl(audioResp.data?.speech || "")
 
-      new Audio(publicUrl).play()
+      // new Audio(publicUrl).play()
 
       setMessages((messages) => {
         return [...messages, {
@@ -109,6 +113,17 @@ const ChatInterface = () => {
     }
   }
 
+  const handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+    if (evt.key === "Enter") {
+      _handleSendMessage(message)
+      setMessage("")
+    }
+  }
+
+  const createLink = (decoratedHref: string, decoratedText: string, key: number) => {
+    return <Link href={decoratedHref} key={key} textColor="brand.orange" target="_blank">{decoratedText}</Link>
+  }
+
   return (
     <Box bgColor="#000" minH="100vh" minW="100vw">
       <Center>
@@ -130,7 +145,7 @@ const ChatInterface = () => {
                     maxWidth="md"
                     whiteSpace="pre-wrap"
                   >
-                    <Text fontSize="sm" textColor="#fff">{messageContent(message.content)}</Text>
+                    <Text fontSize="sm" textColor="#fff"><ReactLinkify componentDecorator={createLink}>{messageContent(message.content)}</ReactLinkify></Text>
                   </Box>
                 </Box>
               </Flex>
@@ -139,6 +154,10 @@ const ChatInterface = () => {
           {loading && <Text>Loading...</Text>}
 
           <RecordButton mt="5" onRecord={handleAudio} />
+
+          <FormControl>
+            <Input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyDown}/>
+          </FormControl>
 
           <div ref={chatEndRef} id="endOfChat" />
         </VStack>

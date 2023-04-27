@@ -33,7 +33,7 @@ interface SemanticQuery {
  * @returns Memory[]
  */
 export const querySemantically = async (query:SemanticQuery):Promise<Memory> => {
-  const { connection, client, content, tagIds, max = 0.1, limit = 5, userId } = query
+  const { connection, client, content, tagIds, max = 0.2, limit = 5, userId } = query
   const embedding = await createEmbedding(content, userId);
   
   const docs = {
@@ -56,14 +56,17 @@ const queryContents = async (
 ):Promise<Memory["content"]> => {
   const result = await connection.queryObject<Content & Distance>({
     text:
-      `SELECT content.*, embedding <=> $2 AS distance
+      `SELECT content.*, content.embedding <=> $2 AS distance
         FROM content
         JOIN content_tags ON content.id = content_tags.content_id
-        WHERE content_tags.tag_name IN ($1)
+        WHERE content_tags.tag_name = ANY($1)
         AND ABS(embedding <=> $2) <= $3
-        ORDER BY distance LIMIT $4;`,
+        ORDER BY distance
+        LIMIT $4;`,
     args: [tagIds, JSON.stringify(embedding), max, limit],
   });
+
+
   return Promise.all(result.rows.map(async (row) => {
     const { data, error } = await client.storage.from("content").download(`${row.id}/all.txt`)
     if (error) {
@@ -91,9 +94,10 @@ const queryChunks = async (
         FROM content_chunks
         JOIN content ON content_chunks.content_id = content.id
         JOIN content_tags ON content.id = content_tags.content_id
-        WHERE content_tags.tag_name IN ($1)
+        WHERE content_tags.tag_name = ANY($1)
         AND ABS(content_chunks.embedding <=> $2) <= $3
-        ORDER BY distance LIMIT $4;`,
+        ORDER BY distance
+        LIMIT $4;`,
     args: [tagIds, JSON.stringify(embedding), max, limit],
   });
   return Promise.all(result.rows.map(async (row) => {

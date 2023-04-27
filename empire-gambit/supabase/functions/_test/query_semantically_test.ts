@@ -6,6 +6,7 @@ import { saveContent } from "../_shared/gamebot/saveContent.ts";
 import { testServiceClient } from "./_test_service_client.ts";
 import { querySemantically } from "../_shared/gamebot/query_semantically.ts";
 import * as postgres from 'https://deno.land/x/postgres@v0.14.2/mod.ts'
+import { assert } from "https://deno.land/std@0.114.0/_util/assert.ts";
 
 await load({
   export: true,
@@ -31,8 +32,22 @@ describe("QuerySemantically", () => {
     await connection.end()
   })
 
+  it.only("should query content", async () => {
+    const supabase = testServiceClient()
 
-  it("should save the content", async () => {
+    const memories = await querySemantically({
+      connection,
+      client: supabase,
+      content: "Tell me about card games on SKALE?",
+      tagIds: ["lengendsofeleysium", "0xbattleground", "cryptocrusades", "kingdomkarnage", "prospectors", "nftmoon", "tankwars", "untitledplatformer", "warshmallows.com"],
+      limit: 5,
+      userId: "d9c444f1-4e91-4abb-b4c7-1d18318990e9",
+    });
+
+    assert(memories.content.length > 0)
+  })
+
+  it("should query returned content", async () => {
     const supabase = testServiceClient()
 
     const pipeline = new ContentPipeline({

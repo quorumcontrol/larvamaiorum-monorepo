@@ -8,25 +8,36 @@ const Clippings = () => {
   const [loading, setLoading] = useState(false)
   const [url, setUrl] = useState("")
   const [tag, setTag] = useState("")
+  const [scrape, setScrape] = useState("")
+
+  const doScrape = async () => {
+    setLoading(true)
+    try {
+      const scrapeResp = await fetch("/api/scrape", {
+        body: JSON.stringify({
+          url,
+        }),
+        method: "POST",
+      })
+      const { text } = await scrapeResp.json()
+      setScrape(text)
+    } catch (err) {
+      console.error("error: '", err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const updateClipping = () => {
     const asyncFunc = async () => {
       try {
         setLoading(true)
-        const scrape = await fetch("/api/scrape", {
-          body: JSON.stringify({
-            url,
-          }),
-          method: "POST",
-        })
-        const { text } = await scrape.json()
-        console.log("text: ", text)
         const resp = await client.functions.invoke("content", {
           body: {
             url,
             tag,
             scrape: {
-              text,
+              text: scrape,
             },
           }
         })
@@ -46,11 +57,18 @@ const Clippings = () => {
         <Heading>Save a memory</Heading>
         <Text>A prescraped manual url (advanced feature, probably want to leave)</Text>
         <VStack spacing="5" alignItems="left" mt="10">
-          <FormControl>
-            <Input name="url" type="text" placeholder='url to parse' onChange={(evt) => setUrl(evt.target.value)} value={url} />
-          </FormControl>
+          <HStack>
+            <FormControl>
+              <Input name="url" type="text" placeholder='url to parse' onChange={(evt) => setUrl(evt.target.value)} value={url} />
+            </FormControl>
+            <Button variant="solid" onClick={() => doScrape()} disabled={loading}>Scrape</Button>
+          </HStack>
+
           <FormControl>
             <Input name="tag" type="text" placeholder='tag for url' onChange={(evt) => setTag(evt.target.value)} value={tag} />
+          </FormControl>
+          <FormControl>
+            <Textarea name="scrape" placeholder='scrape for the url' onChange={(evt) => setScrape(evt.target.value)} value={scrape} />
           </FormControl>
           <HStack spacing="10">
             <Button

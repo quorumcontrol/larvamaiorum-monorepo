@@ -93,7 +93,7 @@ const RecordButton: React.FC<RecordProps & Partial<IconButtonProps>> = (props) =
     <IconButton
       aria-label="Record audio to transcribe"
       // backgroundColor="accent.500"
-      colorScheme={isRecording ? "secondary" : "primary"}
+      // colorScheme={isRecording ? "secondary" : "primary"}
       onMouseDown={toggleRecording}
       {...pulseEffect}
       {...buttonProps}

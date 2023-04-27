@@ -106,14 +106,15 @@ Only respond in the above format, no additional text.
 type RecursiveSummary = SummarizeResponse & { chunks: SummarizeResponse[] }
 
 export const recursivelySummarize = async (userId: string, chunks: string[]):Promise<RecursiveSummary> => {
-  const processChunks = async (chunks:string[], maxConcurrency = 10) => {
+  const processChunks = async (chunks:string[], maxConcurrency = 20) => {
     const results = new Array(chunks.length);
     const chunksCopy = Array.from([...chunks].entries())
   
     const processNext = async () => {
       const next = chunksCopy.shift();
       if (!next) return;
-  
+      console.log("process next worker started")
+
       const [index, chunk] = next;
       const summary = await summarize(userId, chunk);
       results[index] = summary;
@@ -144,7 +145,7 @@ export const recursivelySummarize = async (userId: string, chunks: string[]):Pro
   // otherwise combine the summaries into a new text
   const text = summaries.filter((summary) => !summary.ignore).map((summary) => summary.longSummary).join(" ")
   if (tokenLength(text) > 1500) {
-    const summary = await recursivelySummarize(userId, splitTextIntoChunks(text))
+    const summary = await recursivelySummarize(userId, splitTextIntoChunks(text, 1500))
     return {
       ignore: summary.ignore,
       shortSummary: summary.shortSummary,
