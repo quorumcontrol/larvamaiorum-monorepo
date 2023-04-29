@@ -35,6 +35,7 @@
   "dependencies": {
     "@colyseus/arena": "^0.14.22",
     "@colyseus/monitor": "^0.14.20",
+    "@google-cloud/text-to-speech": "^4.2.2",
     "@types/chai": "^4.3.4",
     "api": "^5.0.7",
     "appwrite": "^10.2.0",

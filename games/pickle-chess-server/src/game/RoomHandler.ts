@@ -9,6 +9,7 @@ import { getRandomTrack } from "./music"
 import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
 import { speak } from "../ai/uberduck"
+import { speak as googleSpeak } from "../ai/googleTTS"
 import { MonteCarloConfig } from "../ai/montecarlo"
 import { createMatch, setWinner, playerDetail } from "../database/matchWriter"
 
@@ -492,9 +493,11 @@ class RoomHandler extends EventEmitter {
     const taunt = await getTaunt(this.getGameState(event), extraText)
     if (taunt) {
       try {
-        const audio = await speak(taunt)
+        // const audio = await speak(taunt)
+        const rawAudio = await googleSpeak(taunt)
+        console.log("raw audio", typeof rawAudio)
         console.log("taunt", taunt)
-        this.room.broadcast(Messages.taunt, { text: taunt, audio } as TauntMessage)
+        this.room.broadcast(Messages.taunt, { text: taunt, audio: rawAudio } as TauntMessage)
       } catch (err) {
         console.error('error speaking', err)
       }

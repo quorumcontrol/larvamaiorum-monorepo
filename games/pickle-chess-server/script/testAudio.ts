@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config({
     path: "development.env"
   })
-import { speak } from '../src/ai/uberduck'
+import { speak } from '../src/ai/googleTTS'
 
 
 const main = async () => {
