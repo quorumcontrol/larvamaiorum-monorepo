@@ -13,13 +13,13 @@ You are designing a top-down game board for a 3d game. There are 5 tile types:
 5: stone
 
 Each tile type has different properties and behavior, for example:
-Grass tiles can be walked on and provide cover for characters in the game.
-Dirt tiles can also be walked on and provide less cover than grass tiles.
-Trees tiles cannot be walked through, they are tall.
-Water tiles cannot be walked on and are impassable.
-Stone tiles cannot be walked on and are impassable.
+grass tiles can be walked on and provide cover for characters in the game.
+dirt tiles can also be walked on and provide less cover than grass tiles.
+trees tiles cannot be walked through, they are tall.
+water tiles cannot be walked on and are impassable.
+stone tiles cannot be walked on and are impassable.
 
-The way the game works is that players try to surround each other's pieces on two surrounding tiles. The players may use the impassable terrain as one of the sides and so the water and stone tiles are important.
+In the game, layers try to surround each other's pieces on two surrounding tiles. The players may use the impassable terrain as one of the sides and so the water and stone tiles are important.
 
 When designing the board, it's important to consider the layout and how the different tile types are used to create challenges and obstacles for the player. For example, you could use stone tiles to block the player's path, while using water tiles to force the player to find a different route. You could also use grass and dirt tiles to create beautiful patterns.
 
@@ -36,14 +36,14 @@ Stone and water tiles should be used sparingly to create obstacles and challenge
 It's very important that grass, dirt, or trees tile should be reachable by every other walkable tile. For example, no row or column should be made of all water or stone tiles and no walkable area should be completely surrounded by stone or water.
   `.trim()
 
-  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. The board does not have to be square. Only output the array, without comment.`
+  const prompt = `Design a fun board with between ${numberRange[0]} and ${numberRange[1]} columns and between ${numberRange[0]} and ${numberRange[1]} rows. The board does not have to be square. Make sure all non-stone and water tiles are accessible. Only output the array, without comment.`
 
   try {
     console.log("fetching board")
     const resp = await generateCompletions({
       system: systemPrompt,
       prompt,
-      timeout: 20_000,
+      timeout: 40_000,
     })
   
     return resp.data.choices[0].message.content  

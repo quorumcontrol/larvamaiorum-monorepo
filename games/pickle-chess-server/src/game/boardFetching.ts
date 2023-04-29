@@ -1,3 +1,4 @@
+import { AStarFinder } from "astar-typescript"
 import { fetchBoard } from "../ai/board"
 import { TileType } from "../rooms/schema/PickleChessState"
 import { randomInt } from "./utils/randoms"
@@ -168,29 +169,44 @@ export const getAiBoard = async (numberOfPlayers: number): Promise<RawBoard> => 
 }
 
 export const validateBoard = (board: RawBoard) => {
-  // first of all make sure all rows and columns have one passable
-  const rowLength = board[0].length
+  const aStar = new AStarFinder({
+    grid: {
+      matrix: board.map((column) => column.map((tile) => {
+        if ([TileType.water, TileType.stone].includes(tile)) {
+          return 1
+        }
+        return 0
+      }))
+    },
+    diagonalAllowed: true,
+    includeEndNode: true,
+    includeStartNode: false,
+  });
+  
+  // for every accessible tile on the board, make sure that it can reach every other reachable tile.
 
-  if (!board.every((row, i) => {
-    // allow the first and last row to be impassable
-    if (i === 0 || i === board.length - 1) {
+  const reachableTiles = board.reduce((acc, column, y) => {
+    column.forEach((tile, x) => {
+      if (tile < TileType.water) {
+        acc.push({ x, y })
+      }
+    })
+    return acc
+  }, [] as { x: number, y: number }[])
+
+  console.log("reachable tiles: ", reachableTiles)
+
+  return reachableTiles.every((start) => {
+    return reachableTiles.every((end) => {
+      if (start.x === end.x && start.y === end.y) {
+        return true
+      }
+      const path = aStar.findPath(start, end)
+      if (path.length === 0) {
+        console.log("no path from ", start, " to ", end)
+        return false
+      }
       return true
-    }
-    return row.some((tile) => tile < TileType.water)
-  })) {
-    console.log("invalid board, no passable tiles in any row")
-    return false
-  }
-
-  // check to make sure every column except the first and last has at least one passable tile
-  for (let i = 1; i < rowLength - 1; i++) {
-    if (board.every((row) => {
-      row[i] >= TileType.water
-    })) {
-      console.log("invalid board, no passable tiles in any column")
-      return false
-    }
-  }
-
-  return true
+    })
+  })
 }
