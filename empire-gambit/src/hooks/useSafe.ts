@@ -1,6 +1,6 @@
 import { useDeploys } from "@/contexts/deploys"
-import { useAccount, useProvider, useQuery } from "wagmi"
-import { WalletDeployer__factory } from "@skaleboarder/safe-tools"
+import { useAccount, useProvider, useQuery, useSigner } from "wagmi"
+import { SafeSigner, WalletDeployer__factory } from "@skaleboarder/safe-tools"
 
 const useWalletDeployer = () => {
     const provider = useProvider()
@@ -11,15 +11,16 @@ const useWalletDeployer = () => {
 
 export const useSafeFromUser = () => {
     const { address, isConnected } = useAccount()
-    const walletDeployer = useWalletDeployer()
+    const { data:signer } = useSigner()
 
     return useQuery(
         ["safeFromUser", address],
         async () => {
-            return walletDeployer.ownerToSafe(address!)
+            const safe = await (signer as SafeSigner).waitForSafe()
+            return safe.getAddress()
         },
         {
-            enabled: isConnected && !!address,
+            enabled: isConnected && !!signer,
         }
     )
 }

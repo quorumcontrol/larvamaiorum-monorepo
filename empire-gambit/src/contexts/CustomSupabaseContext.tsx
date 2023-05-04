@@ -2,6 +2,7 @@ import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
 import { useAccount, useSigner } from "wagmi"
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { SafeSigner } from "@skaleboarder/safe-tools"
 
 // TODO: wrap the jwt stuff into a useQuery so that it does retries, refreshes, etc.
 
@@ -16,6 +17,8 @@ const CustomSupabaseContext:React.FC<{children:React.ReactNode, pageProps:any}> 
     }
 
     const doAsync = async () => {
+      console.log("waiting for user's safe")
+      await (signer as SafeSigner).waitForSafe()
       console.log("getting new supabase email, password confirmation based on signature")
       const proof = {
         address: await signer.getAddress(),
