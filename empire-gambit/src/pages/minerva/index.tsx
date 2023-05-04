@@ -91,6 +91,8 @@ const FortuneTeller = () => {
   const handleNewMessage = async (newMessage: Message) => {
     const existing = history
 
+    console.log("new message: ", newMessage)
+
     const card = existing.slice(-1)[0]?.card
     if (card) {
       setImagePrompt(`The tarot card: ${card}`)
@@ -120,7 +122,7 @@ const FortuneTeller = () => {
       setImagePrompt(resp.data.raw)
       setEffectTrigger(false)
     } else {
-      // do an effect :)
+      console.log("effect trigger")
       setEffectTrigger(true)
     }
 
