@@ -86,7 +86,7 @@ export const createImage = async (prompt: string) => {
 const systemPrompt = `
 You are a bot that takes a user's message and returns an image prompt to accompany the message.
 
-Here are example prompts for Stable Diffusion which is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input, cultivates autonomous freedom to produce incredible imagery. Stable Diffusion is similar to DALLE-2.
+Here are example prompts for Stable Diffusion which is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. Stable Diffusion is similar to DALLE-2.
 
 Prompt 1:
 Symmetry!! a 2 8 mm macro photo from the back of a woman in china, seen from a distance, splash art, movie still, bokeh, canon 5 0 mm, cinematic lighting, dramatic, film, photography, golden hour, depth of field, award - winning, anamorphic lens flare, 8 k, hyper detailed, 3 5 mm film grain，full body::9
@@ -106,7 +106,7 @@ IMPORTANT: The prompt should be a single line of text, and should not start with
 export const getImagePrompt = async (userPrompt: string) => {
   const prompt = `
 Please create a Stable Diffusion prompt for an image to accompany this: "${userPrompt}"
-The image should be interesting, god-like, and vaguely ancient Roman themed.
+The image should be detailed, cinematic, and vaguely ancient Roman themed.
 
 Do not start with "Create" or "generate." just describe the image in detail.  
 `.trim()
@@ -120,7 +120,7 @@ Do not start with "Create" or "generate." just describe the image in detail.
     temperature: 0.6,
     frequency_penalty: 0,
     presence_penalty: 0,
-    max_tokens: 150,
+    max_tokens: 100,
   }
 
   const resp = await chatCompletion(request)
@@ -134,6 +134,6 @@ export const imageFromPrompt = async (userPrompt: string) => {
   if (!prompt) {
     throw new Error("No prompt returned from OpenAI")
   }
-  const image = await createImage(prompt)
+  const image = await createImage(`${prompt}. realistic, ultra high detail, bioluminescent glows`)
   return image
 }

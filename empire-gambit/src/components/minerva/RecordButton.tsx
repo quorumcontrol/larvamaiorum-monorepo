@@ -52,7 +52,7 @@ const RecordButton: React.FC<RecordProps & Partial<ButtonProps>> = (props) => {
       mimeType = "audio/wav"
     }
 
-    const options = { mimeType: mimeType, bitsPerSecond: 64000 }; // Set the bitrate to 32 kbps
+    const options = { mimeType: mimeType, bitsPerSecond: 64000 }; // Set the bitrate to 64 kbps
 
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

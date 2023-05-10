@@ -1,9 +1,8 @@
 import { Box, BoxProps, keyframes, Image } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useState } from "react";
 
 type EtheralImageProps = BoxProps & {
-  prompt?: string
+  src?: string
 }
 
 const opacityTransitionTime = 3
@@ -24,59 +23,10 @@ const floatAnimation = keyframes`
 `
 
 const EtherealImage: React.FC<EtheralImageProps> = (props) => {
-  const { prompt, ...boxProps } = props
-  const client = useSupabaseClient()
-
-  const [artworkSource, setArtworkSource] = useState<string>();
+  const { src, ...boxProps } = props
   const [opacity, setOpacity] = useState(1);
 
-  useEffect(() => {
-    // return
-    if (!prompt || !client.functions) {
-      return
-    }
-
-    let timeout: ReturnType<typeof setTimeout> | undefined
-
-    const doAsync = async () => {
-      console.log("prompt with: ", prompt)
-      setOpacity(0)
-      const resp = await client.functions.invoke("images", {
-        body: {
-          prompt,
-        }
-      })
-
-      console.log("image response: ", resp)
-
-      if (!resp.data) {
-        console.error("error getting images: ", resp.error)
-        return
-      }
-
-      const { path } = resp.data
-
-      const { data: { publicUrl } } = client.storage.from("images").getPublicUrl(path)
-
-      setArtworkSource(publicUrl)
-      // timeout = setTimeout(() => {
-      //   timeout = undefined
-      //   setOpacity(0.9)
-      // }, opacityTransitionTime * 1000)
-
-    }
-    doAsync()
-
-    return () => {
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-    }
-
-  }, [prompt, client])
-
-
-  if (!artworkSource) {
+  if (!src) {
     return <Box
       maxW="md"
       borderRadius="lg"
@@ -88,41 +38,40 @@ const EtherealImage: React.FC<EtheralImageProps> = (props) => {
     >
       <Box w="512px" h="704px" />
     </Box>
-
   }
 
-      return (
-      <Box
-        w="512px"
-        h="704px"  
-      
-        // boxShadow="xl"
-        animation={`${floatAnimation} 7s ease-in-out infinite`}
-        // boxShadow="0 0 20px 20px rgb(0,0,0,1) inset"
-        {...boxProps}
-      >
-        <Image
-          opacity={opacity}
-          transition={`all ${opacityTransitionTime}s ease-in-out`}
+  return (
+    <Box
+      w="512px"
+      h="704px"
 
-          borderRadius="2xl"
-          onLoad={() => {
-            console.log('image load')
-            setOpacity(0.9)
-          }}
-          src={artworkSource}
-          alt="Card Placeholder"
-          width="512px"
-          height="704px"
-          objectFit="contain"
-          style={{
-            maskImage: "radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)",
-            "WebkitMaskImage": "radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)"
-          }}
-        />
-      </Box>
-      )
+      // boxShadow="xl"
+      animation={`${floatAnimation} 7s ease-in-out infinite`}
+      // boxShadow="0 0 20px 20px rgb(0,0,0,1) inset"
+      {...boxProps}
+    >
+      <Image
+        opacity={opacity}
+        transition={`all ${opacityTransitionTime}s ease-in-out`}
+
+        borderRadius="2xl"
+        onLoad={() => {
+          console.log('image load')
+          setOpacity(0.9)
+        }}
+        src={src}
+        alt="Card Placeholder"
+        width="512px"
+        height="704px"
+        objectFit="contain"
+        style={{
+          maskImage: "radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)",
+          "WebkitMaskImage": "radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)"
+        }}
+      />
+    </Box>
+  )
 
 }
 
-      export default EtherealImage
+export default EtherealImage

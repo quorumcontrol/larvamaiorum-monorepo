@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Center, HStack, Text, VStack, useDisclosure } from '@chakra-ui/react';
 
 import AppLayout from '@/components/minerva/AppLayout';
@@ -9,11 +9,30 @@ import EtherealImage from '@/components/minerva/EtherealImage';
 import { useEnvironmentSound } from '@/hooks/minerva/useEnvironmentSound';
 import ThankYouModal from '@/components/minerva/ThankYouModal';
 import { PageEffects } from '@/components/minerva/PageEffects';
+import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser'
+import { useImageFromPrompt } from '@/hooks/useImageFromPrompt';
+import MinervaText from '@/components/minerva/MinervaText';
+import MiddleVideos from '@/components/minerva/MiddleVideos';
+import { useSpeechQueue } from '@/hooks/minerva/useSpeechQueue';
+
+const sayRegex = /<MESSAGE>([\s\S]*?)(<\/?MESSAGE>|<\/[\s\S]*|$)/s
+const actionRegex = /<ACTION>([\s\S]*?)<\/ACTION>/
+
+async function requestMicrophonePermission(): Promise<boolean> {
+  try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+    return true; // User has approved microphone access
+  } catch (e) {
+    console.error('Microphone access denied', e);
+    return false; // User has denied microphone access
+  }
+}
 
 interface Message {
   role: "user" | "assistant"
   content: string
   raw?: string
+  action?: string
   card?: {
     name: string
   }
@@ -36,29 +55,31 @@ const FortuneTeller = () => {
 
   const { isOpen, onClose, onOpen } = useDisclosure()
 
-  const [imagePrompt, setImagePrompt] = useState<string>()
+  const { queueSpeech } = useSpeechQueue()
+
+  const { getImage } = useImageFromPrompt()
+
+  const [action, setAction] = useState<string>("")
+
+  const [drawnCard, setDrawnCard] = useState<{ image: string, name: string }>()
+
+  const [src, setSrc] = useState<string>()
 
   const [history, setHistory] = useState<Message[]>([])
 
-  const historyRef = useRef<HTMLDivElement>(null);
+  // const historyRef = useRef<HTMLDivElement>(null);
 
   const [complete, setComplete] = useState(false)
 
   const [thankYouNft, setThankYouNft] = useState<ThankYouNft>()
 
+  const [started, setStarted] = useState(false)
+
   const { start } = useEnvironmentSound()
 
   const [effectTrigger, setEffectTrigger] = useState(false)
 
-  const scrollToBottom = () => {
-    if (historyRef.current) {
-      historyRef.current.scrollTop = historyRef.current.scrollHeight;
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [history]);
+  const lastUserMessage = history.reverse().find((msg) => msg.role === "user")
 
   const fetchGift = async () => {
     const { data, error } = await client.functions.invoke("gift", {
@@ -76,7 +97,7 @@ const FortuneTeller = () => {
       return
     }
 
-    const { data: { publicUrl }} = client.storage.from("images").getPublicUrl(data.imagePath)
+    const { data: { publicUrl } } = client.storage.from("images").getPublicUrl(data.imagePath)
 
     setThankYouNft({
       title: data.title,
@@ -88,51 +109,190 @@ const FortuneTeller = () => {
   }
 
 
+  const drawCard = async () => {
+    const { data: { card, image }, error } = await client.functions.invoke("card")
+    if (error) {
+      console.error("error getting card", error)
+      throw error
+    }
+
+    const { data: { publicUrl } } = client.storage.from("images").getPublicUrl(image)
+
+    setDrawnCard({
+      image: publicUrl,
+      name: card,
+    })
+  }
+
+  const updateImage = async () => {
+    const src = await getImage(history.slice(-3, -1).map((msg) => msg.content).join("\n\n"))
+    setSrc(src)
+  }
+
+  useEffect(() => {
+    console.log("new action", action)
+    switch (action.toLowerCase()) {
+      case "performeffect":
+        setEffectTrigger(false)
+        updateImage()
+        break;
+      case "drawcard":
+        console.log("drawing card")
+        drawCard()
+        break;
+      case "complete":
+        console.log("complete")
+        setComplete(true)
+        fetchGift()
+        break;
+      case "nothing":
+        console.log("setting effect trigger to true")
+        setEffectTrigger(true)
+        break;
+    }
+  }, [action])
+
+  const speak = (buffer:string, spokenSet: Set<string>, isOver=false) => {
+    const sentenceRegex = /[\.\?!\n]\s+/
+    const sentences = buffer.split(sentenceRegex)
+    for (const sentence of sentences) {
+      // if we're over then speak even if the sentence doesn't have a break point.
+      // otherwise, only speak full sentences.
+      if (!isOver && !sentence.match(sentenceRegex)) {
+        continue
+      }
+      // ignore anything we've already spoken
+      if (spokenSet.has(sentence)) {
+        continue
+      }
+      spokenSet.add(sentence)
+      queueSpeech(sentence)
+    }
+  }
+
+  const parseMessage = () => {
+    setHistory((history) => {
+      const last = history.slice(-1)[0]
+      if (!last || (last && last.role === "user")) {
+        // console.log("not last: ", last)
+        return history
+      }
+      // console.log("parsing", last.raw)
+      const actionMatch = last?.raw?.match(actionRegex)
+      const messageMatch = last?.raw?.match(sayRegex)
+
+      if (messageMatch) {
+        last.content = messageMatch[1].trim()
+      } else {
+        // console.log("no msg: ", last.raw)
+      }
+
+      if (actionMatch) {
+        // console.log("action: ", actionMatch[1])
+        last.action = actionMatch[1].trim()
+        setAction((prev) => {
+          if (prev === last.action) {
+            return prev
+          }
+          return last.action!
+        })
+      }
+
+      return [
+        ...history.slice(0, -1),
+        {
+          ...last,
+        }
+      ]
+    })
+  }
+
   const handleNewMessage = async (newMessage: Message) => {
     const existing = history
 
     console.log("new message: ", newMessage)
 
-    const card = existing.slice(-1)[0]?.card
-    if (card) {
-      setImagePrompt(`The tarot card: ${card}`)
-    }
-
     setHistory((prev) => [...prev, newMessage])
 
-    const resp = await client.functions.invoke("chat", {
-      body: {
-        history: [...existing.map((msg) => {
-          return {
-            role: msg.role,
-            content: msg.raw || msg.content
-          }
-        }), card ? { ...newMessage, content: `I drew the ${card} card.\n\n${newMessage.content}` } : newMessage],
+    const historyParam = [...existing.map((msg) => {
+      return {
+        role: msg.role,
+        content: msg.raw || msg.content
       }
+    }), drawnCard ? { ...newMessage, content: `I drew the ${drawnCard.name} card.\n\n${newMessage.content}` } : newMessage]
+
+    const session = await client.auth.getSession()
+
+    console.log("history: ", historyParam)
+
+    const stream = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/streaming-chat`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.data.session?.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ history: historyParam })
     })
 
-    console.log(resp)
-
-    if (resp.data.complete) {
-      setComplete(true)
-      fetchGift()
+    if (!stream.body) {
+      throw new Error("missing body")
     }
 
-    if (!card && resp.data.image) {
-      setImagePrompt(resp.data.raw)
-      setEffectTrigger(false)
-    } else {
-      console.log("effect trigger")
-      setEffectTrigger(true)
+    let buffer = ""
+
+    const spokenSentences = new Set<string>()
+
+    function onParse(event: ParsedEvent | ReconnectInterval) {
+      if (event.type === 'event') {
+        if (event.data === "[DONE]") {
+          console.log("done")
+          setLoading(false)
+          speak(buffer, spokenSentences, true)
+          return
+        }
+        const delta = JSON.parse(event.data).choices[0].delta.content
+        // console.log("delta", delta)
+        if (!delta) {
+          return
+        }
+        buffer += delta
+        setHistory((prev) => {
+          const last = prev.slice(-1)[0]
+          if (!last || last.role !== "assistant") {
+            return [
+              ...prev,
+              { role: "assistant", raw: delta, content: "" }
+            ]
+          }
+          return [
+            ...prev.slice(0, -1),
+            {
+              ...last,
+              raw: buffer,
+              content: ""
+            }
+          ]
+        })
+
+        parseMessage()
+        speak(buffer, spokenSentences)
+      } else if (event.type === 'reconnect-interval') {
+        console.log('We should set reconnect interval to %d milliseconds', event.value)
+      }
     }
 
-    setHistory((prev) => [...prev, { role: "assistant", content: resp.data.response, raw: resp.data.raw, card: resp.data.card, image: resp.data.image }])
+    const parser = createParser(onParse)
+    const decoder = new TextDecoderStream()
 
-    const { data: { publicUrl } } = client.storage.from("audio").getPublicUrl(resp.data.speech)
+    const sseStream = stream.body.pipeThrough(decoder).getReader()
 
-    // const path = await waitForSpeech(resp.data.speech.uuid)
-    new Audio(publicUrl).play()
-    setLoading(false)
+    let done, value;
+    while (!done) {
+      ({ value, done } = await sseStream.read())
+      if (!done && value) {
+        parser.feed(value)
+      }
+    }
   }
 
   const handleAudio = async (audioBlob: Blob) => {
@@ -144,6 +304,13 @@ const FortuneTeller = () => {
     const newMessage: Message = { role: "user", content: transcription }
 
     handleNewMessage(newMessage)
+  }
+
+  const handleStart = () => {
+    requestMicrophonePermission()
+    start()
+    setEffectTrigger(true)
+    setStarted(true)
   }
 
   return (
@@ -161,31 +328,17 @@ const FortuneTeller = () => {
         <Center flexDirection="column" h="100%">
           <HStack spacing="xl">
 
-            <EtherealImage prompt={imagePrompt} />
+            <EtherealImage src={drawnCard?.image || src} />
             <VStack spacing="6">
-              <Box
-                as="video"
-                w="485px"
-                h="485px"
-                borderRadius="50%"
-                boxShadow="xl"
-                src={loading ? "/videos/psychedelic.mp4" : "/videos/minervaLoop.mp4"}
-                autoPlay
-                muted
-                loop
-                objectFit="cover"
-                opacity={loading ? 0.3 : 1.0}
-                transition={`all 4s ease-in-out`}
-                style={{
-                  maskImage: "radial-gradient(circle at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)",
-                  "WebkitMaskImage": "radial-gradient(circle at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)"
-                }}
-              />
-              {!complete && <RecordButton onRecord={handleAudio} loading={loading} onFirstClick={start} />}
+              <MiddleVideos onStartClick={handleStart} loading={loading} />
+              <Box maxW="400px">
+                {history.slice(-1)[0]?.role === "assistant" && <MinervaText>{history.slice(-1)[0]?.content}</MinervaText>}
+              </Box>
+
+              {!complete && started && <RecordButton onRecord={handleAudio} loading={loading} />}
               {complete && <Text fontSize="xl" color="white">Thank you for sharing your journey.</Text>}
-              <Box
-                ref={historyRef}
-                maxH="15em"
+              <Center
+                maxH="5em"
                 w="lg"
                 fontSize={"sm"}
                 mt={4}
@@ -194,38 +347,20 @@ const FortuneTeller = () => {
                 whiteSpace="pre-wrap"
                 color="white"
                 bgColor="rgba(0, 0, 0, 0.8)"
-                css={{
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                  },
-                }}
+
               >
-                {history.map((message, index) => {
-                  return (
-                    <Box key={index} mb={2}>
-                      <Text fontWeight="bold" mr={2}>
-                        {message.role === "user" ? "You" : "Minerva"}
-                      </Text>
-                      <Text>{message.content}</Text>
-                    </Box>
-                  )
-                })
-                }
-              </Box>
+                {lastUserMessage && (
+                  <Box mb={2}>
+                    <Text>You: {lastUserMessage.content}</Text>
+                  </Box>
+                )}
+              </Center>
             </VStack>
 
 
-            <EtherealImage prompt={imagePrompt} />
+            <EtherealImage src={drawnCard?.image || src} />
 
           </HStack>
-
-
-
         </Center>
       </Box>
       <Box
