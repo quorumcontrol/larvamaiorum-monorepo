@@ -36,35 +36,9 @@ export const PageEffects: React.FC<PageEffectsProps> = (props) => {
       console.log("settin src")
 
       el.currentTime = 0
-      // el.play()
     }
 
-    // return () => {
-    //   console.log("setting in progress false")
-    //   setInProgress(false)
-    //   el.removeEventListener("ended", onEnded)
-    // }
   }, [trigger, inProgress, videoElement])
-
-  // useEffect(() => {
-  //   if (!videoElement.current || !src || inProgress || !trigger) {
-  //     return
-  //   }
-
-  //   console.log("setting up video listeners")
-
-  //   const el = videoElement.current
-
-  //   const onEnded = () => {
-  //     console.log("set complete")
-  //     setInProgress(false)
-  //   }
-
-  //   el.addEventListener("ended", onEnded)
-
-  //   el.currentTime = 0
-  //   el.play()
-  // }, [videoElement, trigger, src, inProgress])
 
   return (
     <Box

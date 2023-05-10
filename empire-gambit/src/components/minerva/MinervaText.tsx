@@ -1,6 +1,4 @@
-import { Box, Text, TextProps, keyframes } from "@chakra-ui/react"
-import { useState } from "react"
-
+import { Box, BoxProps, Text, keyframes } from "@chakra-ui/react"
 
 const getNodeText = (node: React.ReactNode): string => {
   if (!node) {
@@ -24,11 +22,12 @@ const appearAnimation = keyframes`
 }
 `
 
-const MinervaText: React.FC<TextProps> = ({ children }) => {
+const MinervaText: React.FC<BoxProps> = (props) => {
+  const { children, ...boxProps } = props
   const text = getNodeText(children)
 
   return (
-    <Box>
+    <Box {...boxProps}>
       <Text>
       {text.split(" ").map((word, i) => {
         return (

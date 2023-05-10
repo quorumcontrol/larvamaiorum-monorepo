@@ -4,52 +4,48 @@ import { useState } from "react";
 
 export const useSpeechQueue = () => {
   const client = useSupabaseClient();
-  const [queue] = useState(new SimpleSyncher());
-  const [_audio, setAudio] = useState<HTMLAudioElement>();
+  const [playQueue] = useState(new SimpleSyncher());
+  const [audio] = useState(
+    (typeof Audio === "undefined") ? undefined : new Audio(),
+  );
 
-  const findOrCreateAudio = () => {
-    let audio: HTMLAudioElement;
-    setAudio((prev) => {
-      if (prev) {
-        audio = prev;
-        return prev;
-      }
-      audio = new Audio();
-      return audio;
-    });
-    return audio!;
-  };
-
-  // TODO: let's actually *fetch* the audio before playing it
   const queueSpeech = (text: string) => {
-    queue.push(async () => {
-      const { data, error } = await client.functions.invoke("voice", {
-        body: { text },
-      });
+    if (!audio) {
+      console.error("must be serverside audio");
+      return;
+    }
+
+    if (!text) {
+      console.error("no text: ", text);
+      return;
+    }
+
+    const fetchPromise = client.functions.invoke("voice", {
+      body: { text },
+    });
+
+    playQueue.push(async () => {
+      const { data, error } = await fetchPromise;
       if (error) {
         console.error(error);
         throw error;
       }
 
-      const { data: { publicUrl } } = client.storage.from("audio").getPublicUrl(
-        data.speech,
-      );
-      console.log("speech back: ", publicUrl);
-
-      if (!publicUrl) {
-        console.error("no public url from text")
+      const { speech: { audio_url } } = data;
+      
+      if (!audio_url) {
+        console.error("no public url from text", data);
+        throw new Error("no public url");
       }
 
-      const audio = findOrCreateAudio();
-
-      audio.src = publicUrl;
-      console.log("Playing: ", publicUrl);
+      audio.src = audio_url;
+      console.log("Playing: ", audio_url);
       audio.play();
       await new Promise((resolve) => {
         audio.onended = () => {
-          resolve(publicUrl);
+          resolve(audio_url);
         };
-      })
+      });
     });
   };
 

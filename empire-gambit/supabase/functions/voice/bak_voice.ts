@@ -5,7 +5,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
-import { createSpeech } from "../_shared/coqui.ts";
+import { createSpeech } from "../_shared/voice.ts";
+import { getServiceClient } from "../_shared/serviceClient.ts";
 
 serve(async (req) => {
   console.log("Hello from voice!");
@@ -35,14 +36,10 @@ serve(async (req) => {
     return new Response("Not authorized", { status: 401 });
   }
 
-  const { text, emotion } = await req.json()
+  const { text } = await req.json()
   console.log("received text: ", text)
-  if (!text) {
-    throw new Error("must specify a text")
-  }
  
-  const speech = await createSpeech(user.id, text, emotion)
-  console.log("speech: ", speech)
+  const speech = await createSpeech(getServiceClient(), user.id, text)
 
   return new Response(
     JSON.stringify({

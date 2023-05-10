@@ -124,6 +124,10 @@ Do not start with "Create" or "generate." just describe the image in detail.
   }
 
   const resp = await chatCompletion(request)
+  if (!resp.choices) {
+    console.error("bad response: ", resp)
+    throw new Error("bad response")
+  }
   const imagePrompt = resp.choices[0].message?.content.trim()
   return imagePrompt
 }
