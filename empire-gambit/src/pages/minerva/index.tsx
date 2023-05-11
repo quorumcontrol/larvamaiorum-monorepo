@@ -239,6 +239,7 @@ const FortuneTeller = () => {
     const stream = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/streaming-chat`, {
       method: "POST",
       headers: {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         Authorization: `Bearer ${session.data.session?.access_token}`,
         'Content-Type': 'application/json',
       },
