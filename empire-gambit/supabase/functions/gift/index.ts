@@ -7,7 +7,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { nftMinter } from "../_shared/nftMinter.ts";
 import { imageFromPrompt } from "../_shared/image.ts";
-// import { speak } from "../_shared/uberduck.ts";
+import { mint } from "../_shared/blockchain.ts";
 
 function base64ToByteArray(base64String: string): Uint8Array {
   const binaryString = atob(base64String);
@@ -19,7 +19,6 @@ function base64ToByteArray(base64String: string): Uint8Array {
 
   return byteArray;
 }
-
 
 serve(async (req) => {
   console.log("Hello from gift!");
@@ -56,13 +55,25 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
-  const { history } = await req.json()
+  const { to, history } = await req.json()
   console.log("received history: ", history)
   
   const nft = await nftMinter(history)
   console.log("nft: ", nft)
 
   const image = await imageFromPrompt(`${nft.title} - ${nft.description}`, 768, 768)
+
+  const imageUrl = `data:image/png;base64,${image.base64}`
+  mint(to, {
+    name: nft.title,
+    description: nft.description,
+    image: imageUrl,
+  }).catch((err) => {
+    console.error("error minting nft", err)
+  }).then((tx) => {
+    console.log("minted nft", tx)
+  })
+
   const bytes = base64ToByteArray(image.base64)
   const storeResponse = await supabaseServiceClient.storage.from("images").upload(`user-${user.id}/${crypto.randomUUID()}.png`, bytes, { contentType: "image/png"})
 

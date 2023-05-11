@@ -25,3 +25,13 @@ export const getLarvaMaiorum = async (hre:HardhatRuntimeEnvironment) => {
 
   return LarvaMaiorum__factory.connect(deploy.address, await getDeployer(hre))
 }
+
+export const getMinervaReadings = async (hre:HardhatRuntimeEnvironment) => {
+  const deploy = await import(
+    `../deployments/${hre.network.name}/MinervaReadings.json`
+  );
+
+  const { MinervaReadings__factory } = await import("../typechain-types");
+
+  return MinervaReadings__factory.connect(deploy.address, await getDeployer(hre))
+}

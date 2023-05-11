@@ -1,6 +1,5 @@
 import { task } from 'hardhat/config'
-import { BigNumber } from 'ethers'
-import { getLarvaMaiorum } from './helpers'
+import { getLarvaMaiorum, getMinervaReadings } from './helpers'
 
 task('mint')
   .addParam('to', 'the address to send the token')
@@ -16,4 +15,17 @@ task('mint')
       }
 
       console.log('done, minted: ', amount)
+  })
+
+task("minerva:new-minter", "add the minter role to a wallet on MinervaReadings")
+  .addParam("minter", "the address of the new minter")
+  .setAction(async ({minter}, hre) => {
+    const minervaReadings = await getMinervaReadings(hre)
+    const tx = await minervaReadings.grantRole(
+      await minervaReadings.MINTER_ROLE(),
+      minter,
+    )
+    console.log("tx", tx.hash)
+    await tx.wait()
+    console.log("done")
   })
