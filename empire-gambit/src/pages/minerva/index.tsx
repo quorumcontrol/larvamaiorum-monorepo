@@ -48,6 +48,18 @@ interface ThankYouNft {
   imageUrl: string
 }
 
+function getEdgeFunctionUrl() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!.replace(/\/$/, '')
+  const isPlatform = supabaseUrl.match(/(supabase\.co)|(supabase\.in)/)
+
+  if (isPlatform) {
+    const [schemeAndProjectId, domain, tld] = supabaseUrl.split('.')
+    return `${schemeAndProjectId}.functions.${domain}.${tld}`
+  } else {
+    return `${supabaseUrl}/functions/v1`
+  }
+}
+
 const FortuneTeller = () => {
   const [loading, setLoading] = useState(false)
   const getTranscription = useGetTranscription()
@@ -236,7 +248,7 @@ const FortuneTeller = () => {
       throw new Error("missing access token")
     }
 
-    const stream = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/streaming-chat`, {
+    const stream = await fetch(`${getEdgeFunctionUrl()}/streaming-chat`, {
       method: "POST",
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
