@@ -1,13 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Center, HStack, Heading, Image, Text, VStack, useDisclosure } from '@chakra-ui/react';
-
+import React, {  useEffect, useState } from 'react';
+import { Box, Center, HStack, Heading, Image, Text, VStack } from '@chakra-ui/react';
 import AppLayout from '@/components/minerva/AppLayout';
 import RecordButton from '@/components/minerva/RecordButton';
 import { useGetTranscription } from '@/hooks/minerva/useGetTranscription';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import EtherealImage from '@/components/minerva/EtherealImage';
 import { useEnvironmentSound } from '@/hooks/minerva/useEnvironmentSound';
-import ThankYouModal from '@/components/minerva/ThankYouModal';
 import { PageEffects } from '@/components/minerva/PageEffects';
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser'
 import { useImageFromPrompt } from '@/hooks/useImageFromPrompt';
@@ -54,9 +52,7 @@ const FortuneTeller = () => {
   const getTranscription = useGetTranscription()
   const client = useSupabaseClient()
 
-  const { isOpen, onClose, onOpen } = useDisclosure()
-
-  const { queueSpeech } = useSpeechQueue()
+  const { queueSpeech, setOnEnded } = useSpeechQueue()
 
   const { getImage } = useImageFromPrompt()
 
@@ -105,8 +101,6 @@ const FortuneTeller = () => {
       description: data.description,
       imageUrl: publicUrl,
     })
-
-    onOpen()
   }
 
 
@@ -226,7 +220,7 @@ const FortuneTeller = () => {
 
     const newParam = [...historyParam.slice(0, -1), {
       ...last,
-      content: `${last.content} - MAKE SURE TO RESPOND with both <ACTION></ACTION> and <MESSAGE></MESSAGE> tags from the system prompt.`
+      content: `${last.content}\n\nMAKE SURE TO RESPOND with both <ACTION></ACTION> and <MESSAGE></MESSAGE> tags from the system prompt.`
     }]
 
     handleStream(newParam)
@@ -257,7 +251,9 @@ const FortuneTeller = () => {
         if (event.data === "[DONE]") {
           console.log("done")
           if (isBufferValid(buffer, historyParam)) {
-            setLoading(false)
+            setOnEnded(() => {
+              setLoading(false)
+            })
             speak(buffer, spokenSentences, true)
           }
           return
@@ -359,10 +355,9 @@ const FortuneTeller = () => {
         trigger={effectTrigger}
       />
 
-      {/* <ThankYouModal title={thankYouNft?.title ?? ""} description={thankYouNft?.description ?? ""} imageUrl={thankYouNft?.imageUrl ?? ""} isOpen={isOpen} onClose={onClose} /> */}
-
       <Box bg="brand.background" minH="100vh" p={4}>
         <Center flexDirection="column" h="100%">
+          {!started && <Heading>Minerva, the fate teller</Heading> }
           {thankYouNft && (
             <HStack spacing="8" py="8" w="3xl">
               <Image src={thankYouNft.imageUrl} w="256px" height="355px" alt={`Your NFT image: ${thankYouNft.title}`} objectFit="contain" />

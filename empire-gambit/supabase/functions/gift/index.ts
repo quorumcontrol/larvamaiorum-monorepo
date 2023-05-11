@@ -62,7 +62,7 @@ serve(async (req) => {
   const nft = await nftMinter(history)
   console.log("nft: ", nft)
 
-  const image = await imageFromPrompt(`${nft.title} - ${nft.description}`)
+  const image = await imageFromPrompt(`${nft.title} - ${nft.description}`, 768, 768)
   const bytes = base64ToByteArray(image.base64)
   const storeResponse = await supabaseServiceClient.storage.from("images").upload(`user-${user.id}/${crypto.randomUUID()}.png`, bytes, { contentType: "image/png"})
 

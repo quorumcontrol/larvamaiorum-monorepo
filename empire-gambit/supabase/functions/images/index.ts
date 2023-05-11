@@ -50,11 +50,15 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const { 
+      prompt,
+      width,
+      height, 
+    } = await req.json();
 
     console.log("user", user.id);
 
-    const image = await imageFromPrompt(prompt)
+    const image = await imageFromPrompt(prompt, width, height)
     const bytes = base64ToByteArray(image.base64)
     const storeResponse = await supabaseServiceClient.storage.from("images").upload(`user-${user.id}/${crypto.randomUUID()}.png`, bytes, { contentType: "image/png"})
   

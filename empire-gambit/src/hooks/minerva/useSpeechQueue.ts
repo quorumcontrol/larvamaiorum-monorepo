@@ -51,5 +51,8 @@ export const useSpeechQueue = () => {
 
   return {
     queueSpeech,
+    setOnEnded: (fn: ()=>any) => {
+      playQueue.onEnded(fn)
+    }
   };
 };

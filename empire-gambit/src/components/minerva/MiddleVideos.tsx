@@ -19,7 +19,7 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
   }
 
   return (
-    <VStack>
+    <VStack spacing="8">
       {!introPlaying && (
         <Box
           as="video"

@@ -12,6 +12,8 @@ interface queuedFunction {
 export class SimpleSyncher {
   private queue: queuedFunction[]
   private started: boolean
+  private onEndCallback?: ()=>any
+
   constructor() {
     this.started = false
     this.queue = []
@@ -33,7 +35,14 @@ export class SimpleSyncher {
       this.run()
     } else {
       this.started = false
+      if (this.onEndCallback) {
+        this.onEndCallback()
+      }
     }
+  }
+
+  onEnded(fn: ()=>any) {
+    this.onEndCallback = fn
   }
 
   push<T>(fn:()=>Promise<T>):Promise<T> {

@@ -1,5 +1,23 @@
 import { CreateChatCompletionRequest } from "https://esm.sh/openai@3.2.1";
 import { chatCompletion } from "./chatCompletion.ts";
+import { backOff } from "https://esm.sh/exponential-backoff@3.1.1";
+
+interface GenerationResponse {
+  artifacts: Array<{
+    base64: string;
+    seed: number;
+    finishReason: string;
+  }>;
+}
+
+interface Payload {
+  engines: Array<{
+    id: string;
+    name: string;
+    description: string;
+    type: string;
+  }>;
+}
 
 export const getEngines = async () => {
   const apiHost = "https://api.stability.ai";
@@ -19,21 +37,14 @@ export const getEngines = async () => {
     throw new Error(`Non-200 response: ${await response.text()}`);
   }
 
-  interface Payload {
-    engines: Array<{
-      id: string;
-      name: string;
-      description: string;
-      type: string;
-    }>;
-  }
+
 
   // Do something with the payload...
   const payload = (await response.json()) as Payload;
   return payload;
 };
 
-export const createImage = async (prompt: string) => {
+export const createImage = (prompt: string, width = 512, height=704) => {
   const apiHost = "https://api.stability.ai";
 
   const apiKey = Deno.env.get("DREAMSTUDIO_API_KEY");
@@ -41,46 +52,46 @@ export const createImage = async (prompt: string) => {
 
   const engineId = "stable-diffusion-xl-beta-v2-2-2";
 
-  const response = await fetch(
-    `${apiHost}/v1/generation/${engineId}/text-to-image`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
+  return backOff(async () => {
+    const response = await fetch(
+      `${apiHost}/v1/generation/${engineId}/text-to-image`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          text_prompts: [
+            {
+              text: prompt,
+            },
+          ],
+          cfg_scale: 5,
+          height,
+          width,
+          samples: 1,
+          steps: 30,
+        }),
       },
-      body: JSON.stringify({
-        text_prompts: [
-          {
-            text: prompt,
-          },
-        ],
-        cfg_scale: 5,
-        height: 704,
-        width: 512,
-        samples: 1,
-        steps: 30,
-      }),
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error(`Non-200 response: ${await response.text()}`);
-  }
-
-  interface GenerationResponse {
-    artifacts: Array<{
-      base64: string;
-      seed: number;
-      finishReason: string;
-    }>;
-  }
-
-  const responseJSON = (await response.json()) as GenerationResponse;
-  console.log("resp:", responseJSON)
+    );
   
-  return responseJSON.artifacts[0]
+    if (!response.ok) {
+      throw new Error(`Non-200 response: ${await response.text()}`);
+    }
+  
+  
+    const responseJSON = (await response.json()) as GenerationResponse;
+    console.log("resp:", responseJSON)
+    
+    return responseJSON.artifacts[0]
+  }, {
+    numOfAttempts: 5,
+    startingDelay: 500,
+    delayFirstAttempt: false,
+  })
+  
 };
 
 const systemPrompt = `
@@ -103,7 +114,7 @@ Seamless pattern, indonesia culture, red and black, 4k, detail
 IMPORTANT: The prompt should be a single line of text, and should not start with "Create" or "generate." just describe the image in detail.
 `.trim()
 
-export const getImagePrompt = async (userPrompt: string) => {
+export const getImagePrompt = (userPrompt: string) => {
   const prompt = `
 Please create a Stable Diffusion prompt for an image to accompany this: "${userPrompt}"
 The image should be detailed, cinematic, and vaguely ancient Roman themed.
@@ -123,21 +134,28 @@ Do not start with "Create" or "generate." just describe the image in detail.
     max_tokens: 100,
   }
 
-  const resp = await chatCompletion(request)
-  if (!resp.choices) {
-    console.error("bad response: ", resp)
-    throw new Error("bad response")
-  }
-  const imagePrompt = resp.choices[0].message?.content.trim()
-  return imagePrompt
+  return backOff(async () =>{
+    const resp = await chatCompletion(request)
+    if (!resp.choices) {
+      console.error("bad response from image prompt chat completion: ", resp)
+      throw new Error("bad response")
+    }
+    const imagePrompt = resp.choices[0].message?.content.trim()
+    return imagePrompt
+  }, {
+    numOfAttempts: 5,
+    startingDelay: 500,
+    delayFirstAttempt: false,
+  })
+  
 }
 
-export const imageFromPrompt = async (userPrompt: string) => {
+export const imageFromPrompt = async (userPrompt: string, width?:number, height?:number) => {
   const prompt = await getImagePrompt(userPrompt)
   console.log("prompt: ", prompt, "from", userPrompt)
   if (!prompt) {
     throw new Error("No prompt returned from OpenAI")
   }
-  const image = await createImage(`${prompt}. realistic, ultra high detail, bioluminescent glows`)
+  const image = await createImage(`${prompt}. realistic, ultra high detail, bioluminescent glows`, width, height)
   return image
 }
