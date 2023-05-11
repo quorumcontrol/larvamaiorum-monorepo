@@ -61,7 +61,7 @@ serve(async (req) => {
   const nft = await nftMinter(history)
   console.log("nft: ", nft)
 
-  const image = await imageFromPrompt(`${nft.title} - ${nft.description}`, 768, 768)
+  const image = await imageFromPrompt(`${nft.title} - ${nft.description}`, 512, 512)
 
   const imageUrl = `data:image/png;base64,${image.base64}`
   mint(to, {

@@ -12,6 +12,7 @@ import { useImageFromPrompt } from '@/hooks/useImageFromPrompt';
 import MinervaText from '@/components/minerva/MinervaText';
 import MiddleVideos from '@/components/minerva/MiddleVideos';
 import { useSpeechQueue } from '@/hooks/minerva/useSpeechQueue';
+import { useAccount } from 'wagmi';
 
 const sayRegex = /<MESSAGE>([\s\S]*?)(<\/?MESSAGE>|<\/[\s\S]*|$)/s
 const actionRegex = /<ACTION>([\s\S]*?)<\/ACTION>/
@@ -52,6 +53,8 @@ const FortuneTeller = () => {
   const getTranscription = useGetTranscription()
   const client = useSupabaseClient()
 
+  const { address } = useAccount()
+
   const { queueSpeech, setOnEnded } = useSpeechQueue()
 
   const { getImage } = useImageFromPrompt()
@@ -81,6 +84,7 @@ const FortuneTeller = () => {
   const fetchGift = async () => {
     const { data, error } = await client.functions.invoke("gift", {
       body: {
+        to: address,
         history: history.map((msg) => {
           return {
             role: msg.role,
@@ -102,7 +106,6 @@ const FortuneTeller = () => {
       imageUrl: publicUrl,
     })
   }
-
 
   const drawCard = async () => {
     const { data: { card, image }, error } = await client.functions.invoke("card")
