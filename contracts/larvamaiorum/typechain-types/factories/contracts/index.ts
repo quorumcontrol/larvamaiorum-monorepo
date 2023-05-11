@@ -3,4 +3,5 @@
 /* eslint-disable */
 export { AllowListSetter__factory } from "./AllowListSetter__factory";
 export { LarvaMaiorum__factory } from "./LarvaMaiorum__factory";
+export { MinervaReadings__factory } from "./MinervaReadings__factory";
 export { TestToken__factory } from "./TestToken__factory";

@@ -73,6 +73,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC721Pausable__factory>;
     getContractFactory(
+      name: "ERC721URIStorage",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721URIStorage__factory>;
+    getContractFactory(
       name: "IERC721Enumerable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Enumerable__factory>;
@@ -104,6 +108,10 @@ declare module "hardhat/types/runtime" {
       name: "LarvaMaiorum",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LarvaMaiorum__factory>;
+    getContractFactory(
+      name: "MinervaReadings",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MinervaReadings__factory>;
     getContractFactory(
       name: "TestToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -185,6 +193,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ERC721Pausable>;
     getContractAt(
+      name: "ERC721URIStorage",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721URIStorage>;
+    getContractAt(
       name: "IERC721Enumerable",
       address: string,
       signer?: ethers.Signer
@@ -224,6 +237,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.LarvaMaiorum>;
+    getContractAt(
+      name: "MinervaReadings",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MinervaReadings>;
     getContractAt(
       name: "TestToken",
       address: string,

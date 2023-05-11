@@ -45,7 +45,7 @@ describe("AllowListSetter", function () {
     await expect(allowListSetter.connect(alice).buy(alice.address)).to.be.revertedWith('ERC20: insufficient allowance')
   })
 
-  describe('on live testnet', () => {
+  describe.skip('on live testnet', () => {
     const wootgumpAddress = "0x8D1E200a2C572f9738f26554AAcbC2F9a462EF2D"
     const delphAddress = '0x6DE3D3747D54d0Adc11e5Cf678D4045B0441D332'
     const meAddr = '0xe546b43E7fF912FEf7ED75D69c1d1319595F6080'

@@ -3,4 +3,5 @@
 /* eslint-disable */
 export type { AllowListSetter } from "./AllowListSetter";
 export type { LarvaMaiorum } from "./LarvaMaiorum";
+export type { MinervaReadings } from "./MinervaReadings";
 export type { TestToken } from "./TestToken";

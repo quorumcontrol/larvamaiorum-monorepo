@@ -36,6 +36,8 @@ export type { ERC721Enumerable } from "./@openzeppelin/contracts/token/ERC721/ex
 export { ERC721Enumerable__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable__factory";
 export type { ERC721Pausable } from "./@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable";
 export { ERC721Pausable__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable__factory";
+export type { ERC721URIStorage } from "./@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage";
+export { ERC721URIStorage__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage__factory";
 export type { IERC721Enumerable } from "./@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable";
 export { IERC721Enumerable__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable__factory";
 export type { IERC721Metadata } from "./@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata";
@@ -52,5 +54,7 @@ export type { AllowListSetter } from "./contracts/AllowListSetter";
 export { AllowListSetter__factory } from "./factories/contracts/AllowListSetter__factory";
 export type { LarvaMaiorum } from "./contracts/LarvaMaiorum";
 export { LarvaMaiorum__factory } from "./factories/contracts/LarvaMaiorum__factory";
+export type { MinervaReadings } from "./contracts/MinervaReadings";
+export { MinervaReadings__factory } from "./factories/contracts/MinervaReadings__factory";
 export type { TestToken } from "./contracts/TestToken";
 export { TestToken__factory } from "./factories/contracts/TestToken__factory";
