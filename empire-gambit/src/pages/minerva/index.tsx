@@ -231,6 +231,10 @@ const FortuneTeller = () => {
 
   const handleStream = async (historyParam: { role: string, content: string }[]) => {
     const session = await client.auth.getSession()
+    if (!session.data.session?.access_token) {
+      console.error("missing access token, session: ", session)
+      throw new Error("missing access token")
+    }
 
     const stream = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/streaming-chat`, {
       method: "POST",
