@@ -9,14 +9,16 @@ import * as postgres from "https://deno.land/x/postgres@v0.14.2/mod.ts";
 import { ethers, providers } from "https://esm.sh/ethers@5.7.2";
 import { WalletDeployer__factory, GnosisSafe__factory } from "https://esm.sh/@skaleboarder/safe-tools@0.0.10"
 
-const deploys:Record<number, {rpc: string, address:string}> = {
+const walletDeployerAddress = "0xda8c9400c2e4656E7B0AaaC213e482bb8fA3248E"
+
+const deploys:Record<number, {rpc: string, address?:string}> = {
   1032942172: {
     rpc: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
-    address: "0x7F425D92f24806450f1673CafDaDfFa20f9F3f10",
+    // address: "0x7F425D92f24806450f1673CafDaDfFa20f9F3f10",
   },
   31337: {
-    rpc: 'http://localhost:8545',
-    address: "0x7F425D92f24806450f1673CafDaDfFa20f9F3f10"
+    rpc: 'http://host.docker.internal:8545',
+    // address: "0x7F425D92f24806450f1673CafDaDfFa20f9F3f10"
   },
 }
 
@@ -29,7 +31,7 @@ const pool = new postgres.Pool(databaseUrl, 3, true);
 serve(async (req) => {
   console.log("hello auth");
 
-  console.log("Hello from chat!");
+  console.log("Hello from app-auth!");
   if (req.method === "OPTIONS") {
     console.log("OPTIONS", corsHeaders);
     return new Response("ok", { headers: corsHeaders });
@@ -37,13 +39,15 @@ serve(async (req) => {
 
   const { proofJson, signature }: {proofJson: string, signature:string } = await req.json();
 
-  console.log("proofJSON: ", proofJson)
 
   const proof:{
     address: string,
     chainId: number,
     exp: number
   } = JSON.parse(proofJson);
+
+  console.log("proof: ", proof, signature)
+
 
   // TODO: check exp
 
@@ -56,7 +60,9 @@ serve(async (req) => {
 
   const provider = new providers.StaticJsonRpcProvider(deploy.rpc)
 
-  const walletFactory = WalletDeployer__factory.connect(deploy.address, provider)
+  console.log("block: ", provider.blockNumber)
+
+  const walletFactory = WalletDeployer__factory.connect(walletDeployerAddress, provider)
 
   const safeAddr = await walletFactory.ownerToSafe(proof.address)
   const safe = GnosisSafe__factory.connect(safeAddr, provider)
