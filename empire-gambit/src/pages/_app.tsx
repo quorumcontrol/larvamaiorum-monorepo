@@ -67,6 +67,7 @@ const localDev = createChain({
 const skaleProvider = new providers.StaticJsonRpcProvider(isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0])
 
 const addresses = isLocalhost() ? fetchAddresses("localhost") : fetchAddresses("skale")
+console.log("addresses: ", addresses)
 
 const wrapperConfigs = {
   ethers,

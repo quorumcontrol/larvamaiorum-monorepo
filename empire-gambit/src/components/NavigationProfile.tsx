@@ -36,16 +36,16 @@ const NavigationProfile: React.FC = () => {
   const { data: user, isLoading:userDataLoading, isFetched } = useUser()
   const isClient = useIsClientSide()
 
-  useEffect(() => {
-    if (!isConnected || user?.profile || userDataLoading) {
-      return
-    }
-    if (!isFetched) {
-      return
-    }
+  // useEffect(() => {
+  //   if (!isConnected || user?.profile || userDataLoading) {
+  //     return
+  //   }
+  //   if (!isFetched) {
+  //     return
+  //   }
 
-    Router.push("/profile/edit/start")
-  }, [userDataLoading, user, isConnected, address, isFetched])
+  //   Router.push("/profile/edit/start")
+  // }, [userDataLoading, user, isConnected, address, isFetched])
 
   const onLoginClick = () => {
     setShowModal(true)
@@ -151,11 +151,11 @@ const NavigationProfile: React.FC = () => {
     )
   }
 
-  if (userDataLoading || (isConnected && !user?.profile && !userDataLoading)) {
-    return(
-      <Spinner />
-    )
-  }
+  // if (userDataLoading || (isConnected && !user?.profile && !userDataLoading)) {
+  //   return(
+  //     <Spinner />
+  //   )
+  // }
 
   return (
     <LinkBox>

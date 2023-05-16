@@ -7,12 +7,12 @@
   },
   "scripts": {
     "test": "hardhat test",
-    "addresses:localhost": "npx hardhat --network localhost deploy --export ./deployments/localhost/addresses.json"
+    "addresses": "npx hardhat build-address-list"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
-    "@skaleboarder/safe-tools": "^0.0.13",
-    "@skaleproject/pow-ethers": "^0.3.1-1",
+    "@skaleboarder/safe-tools": "^0.0.17",
+    "@skaleproject/pow-ethers": "^0.3.1",
     "dotenv": "^16.0.3",
     "hardhat-deploy": "^0.11.25",
     "solidity-json-writer": "^1.1.0"
