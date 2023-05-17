@@ -13,7 +13,7 @@ import {
   ProofOfRelayer,
   WalletDeployer__factory,
   addresses,
-} from "https://esm.sh/@skaleboarder/safe-tools@0.0.20";
+} from "https://esm.sh/@skaleboarder/safe-tools@0.0.21";
 
 const walletDeployerAddress = addresses.default.WalletDeployer
 
@@ -76,6 +76,7 @@ serve(async (req) => {
     const safe = GnosisSafe__factory.connect(safeAddr, provider);
     const isOwner = await safe.isOwner(device);
     if (!isOwner) {
+      console.error("device is not owner of safe", device)
       return new Response("Invalid signature", {
         headers: corsHeaders,
         status: 400,
@@ -95,6 +96,7 @@ serve(async (req) => {
     const devicesMatch = proof.tokenRequest.device === device;
     const ownersMatch = proof.tokenRequest.owner === proof.owner;
     if (!isValid || !devicesMatch || !ownersMatch) {
+      console.error("invalid token request proof")
       return new Response("Invalid token request for proof", {
         headers: corsHeaders,
         status: 400,

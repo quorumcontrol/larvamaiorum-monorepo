@@ -33,6 +33,7 @@ import { Web3AuthConnector } from "../utils/web3AuthConnector"
 import { isLocalhost } from '@/utils/isLocalhost'
 import { localFauct, powFauct } from '@/utils/faucets'
 import CustomSupabaseContext from '@/contexts/CustomSupabaseContext'
+import { MultiCaller } from '@skaleboarder/safe-tools'
 
 const skaleMainnet = createChain({
   id: BigNumber.from('0x3d91725c').toNumber(),
@@ -64,7 +65,15 @@ const localDev = createChain({
   explorer: "http://no.explorer"
 })
 
-const skaleProvider = new providers.StaticJsonRpcProvider(isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0])
+const getProvider = () => {
+  const provider = new providers.StaticJsonRpcProvider(isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0])
+  const multicaller = new MultiCaller(provider, {
+    delay: 16,
+  })
+  return multicaller.wrappedProvider()
+}
+
+const skaleProvider = getProvider()
 
 const addresses = isLocalhost() ? fetchAddresses("localhost") : fetchAddresses("skale")
 console.log("addresses: ", addresses)
@@ -73,7 +82,6 @@ const wrapperConfigs = {
   ethers,
   provider: skaleProvider,
   chainId: isLocalhost() ? localDev.id.toString() : skaleMainnet.id.toString(),
-  deploys: addresses,
   faucet: isLocalhost() ? localFauct("localhost") : powFauct("skale"),
   signerOptions: {
     multicall: true,
