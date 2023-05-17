@@ -4,7 +4,13 @@ import { writeAll } from "https://deno.land/std@0.162.0/streams/conversion.ts";
 import { compress } from "https://deno.land/x/brotli@0.1.7/mod.ts";
 import { build } from "https://deno.land/x/eszip@v0.35.0/mod.ts"; // this was upgraded from eszip@0.30.0
 import { Buffer } from "https://deno.land/std@0.127.0/io/buffer.ts";
+import { load as loadEnv } from "https://deno.land/std@0.182.0/dotenv/mod.ts";
 
+
+await loadEnv({
+  export: true,
+  envPath: "./.env.local",
+});
 /*
  * This is annoyingly needed because the staqndard build script has a eszip with a bug
  * 
@@ -84,18 +90,23 @@ async function buildAndWrite(p: string, importMapPath: string) {
 
   console.log("bytes: ", buffer.bytes().length);
 
+  const token = Deno.env.get("PERSONAL_BEARER_TOKEN")
+  if (!token) {
+    throw new Error("PERSONAL_BEARER_TOKEN not set")
+  }
+
   const resp = await fetch("https://api.supabase.com/v1/projects/dnkdtluccsyosksucviy/functions?slug=app-auth&name=app-auth", {
     method: "POST",
     body: buffer.bytes(),
     headers: {
-      "Authorization": `Bearer ${Deno.env.get("PERSONAL_BEARER_TOKEN")}`,
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/vnd.denoland.eszip",
     }
   })
   console.log("resp: ", resp)
 }
 
-buildAndWrite("app-auth", "import_maps.json");
+buildAndWrite("functions/app-auth/index.ts", "functions/import_maps.json");
 
 // Adapted from https://github.com/denoland/deno/blob/bacbf949256e32ca84e7f11c0171db7d9a644b44/cli/auth_tokens.rs#L38
 

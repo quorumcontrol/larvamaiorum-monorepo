@@ -13,7 +13,7 @@ import {
   ProofOfRelayer,
   WalletDeployer__factory,
   addresses,
-} from "https://esm.sh/@skaleboarder/safe-tools@0.0.21";
+} from "https://esm.sh/@skaleboarder/safe-tools@0.0.23";
 
 const walletDeployerAddress = addresses.default.WalletDeployer
 

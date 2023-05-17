@@ -95,7 +95,7 @@ const { chains, provider } = configureChains(
   [
     jsonRpcProvider({
       rpc: (_chain) => ({
-        http: skaleProvider.connection.url,
+        http: isLocalhost() ? localDev.rpcUrls.default.http[0] : skaleMainnet.rpcUrls.default.http[0]
       }),
     }),
   ]
