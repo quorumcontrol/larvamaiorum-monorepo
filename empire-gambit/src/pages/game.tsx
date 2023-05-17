@@ -1,16 +1,19 @@
 import Layout from "@/components/Layout"
-import { Button, Heading, VStack } from "@chakra-ui/react"
+import { Button, Heading, Spinner, VStack } from "@chakra-ui/react"
 import { NextPage } from "next"
 import Link from "next/link"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useUser } from "@/hooks/useUser"
 import { useSafeFromUser } from "@/hooks/useSafe"
 import { usePlayerDetails } from "@/hooks/usePlayerDetails"
+import Router from "next/router"
+import useIsClientSide from "@/hooks/useIsClientSide"
 
 const GamePage: NextPage = () => {
   const { data: user } = useUser()
   const { data: safeAddress } = useSafeFromUser()
   const { data: playerDetails } = usePlayerDetails(safeAddress)
+  const isClient = useIsClientSide()
 
   const { animationUrl: avatar, name: username } = user?.profile || {}
 
@@ -25,6 +28,24 @@ const GamePage: NextPage = () => {
   const tutorialParam = useMemo(() => {
     return Buffer.from(JSON.stringify({ roomType: "TutorialRoom", numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar })).toString("base64")
   }, [safeAddress, username, avatar])
+
+  useEffect(() => {
+    if (!user || user.profile) {
+      return
+    }
+    Router.push("/profile/edit/start")
+  }, [user]) 
+
+  if (!isClient || !user) {
+    return (
+      <Layout>
+        <VStack>
+          <Heading>Loading...</Heading>
+          <Spinner />
+        </VStack>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>

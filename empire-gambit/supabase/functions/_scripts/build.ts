@@ -95,7 +95,7 @@ async function buildAndWrite(p: string, importMapPath: string) {
   console.log("resp: ", resp)
 }
 
-buildAndWrite(Deno.args[0], Deno.args[1]);
+buildAndWrite("app-auth", "import_maps.json");
 
 // Adapted from https://github.com/denoland/deno/blob/bacbf949256e32ca84e7f11c0171db7d9a644b44/cli/auth_tokens.rs#L38
 

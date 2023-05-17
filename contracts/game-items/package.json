@@ -6,12 +6,13 @@
     "hardhat": "^2.13.0"
   },
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "addresses": "npx hardhat build-address-list"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
-    "@skaleboarder/safe-tools": "^0.0.4",
-    "@skaleproject/pow-ethers": "^0.3.1-1",
+    "@skaleboarder/safe-tools": "^0.0.23",
+    "@skaleproject/pow-ethers": "^0.3.1",
     "dotenv": "^16.0.3",
     "hardhat-deploy": "^0.11.25",
     "solidity-json-writer": "^1.1.0"

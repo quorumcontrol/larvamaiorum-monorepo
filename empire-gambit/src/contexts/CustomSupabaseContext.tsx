@@ -17,22 +17,14 @@ const CustomSupabaseContext:React.FC<{children:React.ReactNode, pageProps:any}> 
     }
 
     const doAsync = async () => {
-      console.log("waiting for user's safe")
-      await (signer as SafeSigner).waitForSafe()
+      console.log("waiting for user's proof")
+      const proof = await (signer as SafeSigner).proofOfRelayer()
       console.log("getting new supabase email, password confirmation based on signature")
-      const proof = {
-        address: await signer.getAddress(),
-        chainId: await signer.getChainId(),
-        exp: Math.ceil(new Date().getTime() / 1000) + (10 * 60) // 10 minutes
-      }
-  
-      const signature = await signer.signMessage(JSON.stringify(proof))
   
       // using a fresh client here to avoid looping the useEffect
       const resp = await supabase.functions.invoke("app-auth", { 
         body: {
-          proofJson: JSON.stringify(proof),
-          signature,
+          proof: proof,
         }
       })
       
