@@ -1,6 +1,7 @@
 import { Box, VStack } from "@chakra-ui/react"
 import StartButton from "./StartButton"
 import { useRef, useState } from "react"
+import MinervaLoop from "./MinervaLoop"
 
 interface MiddleVideosProps {
   loading: boolean
@@ -21,26 +22,7 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
   return (
     <VStack spacing="8">
       {!introPlaying && (
-        <Box
-          as="video"
-          w="485px"
-          h="485px"
-          borderRadius="50%"
-          boxShadow="xl"
-          src={loading ? "/videos/psychedelic.mp4" : "/videos/minervaLoop.mp4"}
-          autoPlay
-          muted
-          loop
-          // opacity={started && !introPlaying ? 1.0 : 0}
-          playsInline
-          objectFit="cover"
-          opacity={loading ? 0.3 : 1.0}
-          transition={`all 4s ease-in-out`}
-          style={{
-            maskImage: "radial-gradient(circle at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)",
-            "WebkitMaskImage": "radial-gradient(circle at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)"
-          }}
-        />
+        <MinervaLoop loading={loading} />
       )}
       <Box
         display={introPlaying ? "block" : "none"}

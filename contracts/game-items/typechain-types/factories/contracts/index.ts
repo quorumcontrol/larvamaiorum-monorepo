@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export { Database__factory } from "./Database__factory";
+export { EmpireGambitToken__factory } from "./EmpireGambitToken__factory";
 export { PlayerProfile__factory } from "./PlayerProfile__factory";
 export { PoWSecure__factory } from "./PoWSecure__factory";

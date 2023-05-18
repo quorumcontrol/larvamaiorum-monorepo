@@ -2,5 +2,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Database } from "./Database";
+export type { EmpireGambitToken } from "./EmpireGambitToken";
 export type { PlayerProfile } from "./PlayerProfile";
 export type { PoWSecure } from "./PoWSecure";
