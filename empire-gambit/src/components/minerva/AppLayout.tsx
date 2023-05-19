@@ -10,6 +10,7 @@ import { useTokenBalance } from '@/hooks/useTokens';
 
 import templeSrc from "../../assets/templeAtNight.png"
 import marketSrc from "../../assets/market.png"
+import soldierSrc from "../../assets/soldier_checklist.png"
 
 const pulseAnimation = keyframes`
   0% {
@@ -31,6 +32,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { data: maskBalance, isLoading } = useMaskInventory()
   const { data: tokenBalance } = useTokenBalance()
   const isClient = useIsClientSide()
+
+  console.log("mask balance: ", maskBalance)
 
   if (!isClient || isLoading) {
     return (
@@ -73,7 +76,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Box bg="brand.background" minH="100vh" p={4}>
           <Center flexDirection="column" h="100%">
             <VStack spacing="8">
-              <MinervaText>My visitor, you must have tokens or a mask to continue this ceremony.</MinervaText>
+              <MinervaText>Guest, please let me know who you are.</MinervaText>
+              <NavigationProfile />
               <Box
                 animation={`${pulseAnimation} 10s infinite ease-in-out`}
                 style={{
@@ -81,7 +85,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   "WebkitMaskImage": "radial-gradient(circle at center, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 70%)"
                 }}
               >
-                <Image src={marketSrc} alt="a dark temple at night" boxSize="lg" />
+                <Image src={soldierSrc} alt="a roman soldier with a checklist" boxSize="lg" />
               </Box>
             </VStack>
           </Center>
@@ -90,7 +94,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     )
   }
 
-  if (maskBalance && maskBalance <= 0) {
+  if ((maskBalance || 0) <= 0) {
     return (
       <>
         <PageEffects
@@ -110,7 +114,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   "WebkitMaskImage": "radial-gradient(circle at center, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 70%)"
                 }}
               >
-                <Image src={marketSrc} alt="a dark temple at night" boxSize="lg" />
+                <Image src={marketSrc} alt="a marketplace in ancient rome" boxSize="lg" />
               </Box>
             </VStack>
           </Center>
