@@ -1,23 +1,22 @@
 
 import { useDeploys } from "@/contexts/deploys";
 import { EmpireGambitToken__factory } from "@/contract-types";
-import { LarvaMaiorum__factory } from "@/larva-maiorum-types";
-import { providers } from "ethers";
 import { useQuery } from "react-query";
-import { useAccount, useProvider } from "wagmi";
+import { useProvider } from "wagmi";
+import { useSafeFromUser } from "./useSafe";
 
 export const useTokenBalance = () => {
   const deploys = useDeploys()
-  const { address, isConnected } = useAccount()
+  const { data: safeAddr } = useSafeFromUser()
   const provider = useProvider()
 
-  return useQuery(["token-balance", address], async () => {
-    if (!isConnected || !address) return undefined
+  return useQuery(["token-balance", safeAddr], async () => {
+    if (!safeAddr) return undefined
 
     const token = EmpireGambitToken__factory.connect(deploys.EmpireGambitToken.address, provider)
-    return token.balanceOf(address)
+    return token.balanceOf(safeAddr)
   }, {
-    enabled: isConnected && !!address
+    enabled: !!safeAddr
   })
 }
 

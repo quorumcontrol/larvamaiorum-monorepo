@@ -36,7 +36,7 @@ import CustomSupabaseContext from '@/contexts/CustomSupabaseContext'
 import { MultiCaller } from '@skaleboarder/safe-tools'
 
 const skaleMainnet = createChain({
-  id: BigNumber.from('0x3d91725c').toNumber(),
+  id: 1032942172,
   name: 'Crypto Rome',
   rpcUrls: {
     default: {

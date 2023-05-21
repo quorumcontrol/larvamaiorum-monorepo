@@ -1,7 +1,9 @@
-import { Box, VStack } from "@chakra-ui/react"
+import { Box, Text, VStack } from "@chakra-ui/react"
 import StartButton from "./StartButton"
 import { useRef, useState } from "react"
 import MinervaLoop from "./MinervaLoop"
+import { useTokenBalance } from "@/hooks/useTokens"
+import { utils } from "ethers"
 
 interface MiddleVideosProps {
   loading: boolean
@@ -12,6 +14,7 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
   const [introPlaying, setIntroPlaying] = useState(false)
   const introVideo = useRef<HTMLVideoElement>(null)
   const [introComplete, setIntroComplete] = useState(false)
+  const { data: tokenBalance } = useTokenBalance()
 
   const handleStart = () => {
     setIntroPlaying(true)
@@ -21,6 +24,12 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
 
   return (
     <VStack spacing="8">
+      {!introPlaying && !introComplete && (
+        <VStack>
+          <StartButton onClick={handleStart} />
+          <Text fontSize="sm">Uses 1 of your {tokenBalance ? utils.formatEther(tokenBalance) : ""} tokens.</Text>
+        </VStack>
+      )}
       {!introPlaying && (
         <MinervaLoop loading={loading} />
       )}
@@ -42,8 +51,6 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
           "WebkitMaskImage": "radial-gradient(circle at center, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 85%)"
         }}
       />
-
-      {!introPlaying && !introComplete && <StartButton onClick={handleStart} />}
     </VStack>
 
   )

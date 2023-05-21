@@ -11,6 +11,8 @@ import { useTokenBalance } from '@/hooks/useTokens';
 import templeSrc from "../../assets/templeAtNight.png"
 import marketSrc from "../../assets/market.png"
 import soldierSrc from "../../assets/soldier_checklist.png"
+import { constants } from 'ethers';
+import TokenCodeForm from '../TokenCodeForm';
 
 const pulseAnimation = keyframes`
   0% {
@@ -30,12 +32,10 @@ const pulseAnimation = keyframes`
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const session = useSession()
   const { data: maskBalance, isLoading } = useMaskInventory()
-  const { data: tokenBalance } = useTokenBalance()
+  const { data: tokenBalance, isLoading: tokenBalanceLoading } = useTokenBalance()
   const isClient = useIsClientSide()
 
-  console.log("mask balance: ", maskBalance)
-
-  if (!isClient || isLoading) {
+  if (!isClient || isLoading || tokenBalanceLoading) {
     return (
       <>
         <PageEffects
@@ -94,7 +94,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     )
   }
 
-  if ((maskBalance || 0) <= 0) {
+  if ((maskBalance || 0) <= 0 && (tokenBalance || constants.Zero).lte(constants.Zero)) {
     return (
       <>
         <PageEffects
@@ -107,6 +107,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Center flexDirection="column" h="100%">
             <VStack spacing="8">
               <MinervaText>My visitor, you must have tokens or a mask to continue this ceremony.</MinervaText>
+              <TokenCodeForm />
               <Box
                 animation={`${pulseAnimation} 10s infinite ease-in-out`}
                 style={{
