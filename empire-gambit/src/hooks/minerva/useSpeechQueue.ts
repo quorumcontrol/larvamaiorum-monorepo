@@ -36,11 +36,16 @@ export const useSpeechQueue = () => {
         throw new Error("no public url");
       }
 
-      var audioData = Buffer.from(audio_url.split(",")[1], "base64");
-      const buffer = await audioContext.decodeAudioData(audioData);
+      const response = await fetch(audio_url);
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = await audioContext.decodeAudioData(arrayBuffer);
+
       const sourceNode = audioContext.createBufferSource();
       sourceNode.buffer = buffer;
       sourceNode.loop = false;
+
+      sourceNode.connect(audioContext.destination)
 
       const startTime = audioContext.currentTime;
       sourceNode.start(startTime);
@@ -48,6 +53,7 @@ export const useSpeechQueue = () => {
       await new Promise((resolve) => {
         sourceNode.onended = () => {
           resolve(audio_url);
+          sourceNode.disconnect()
         };
       });
     });
