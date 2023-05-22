@@ -30,7 +30,7 @@ serve(async (req) => {
     data: { user },
   } = await supabaseClient.auth.getUser();
 
-  if (!user) {
+  if (!user || !user.email) {
     console.error("no user")
     return new Response("Not authorized", { status: 401 });
   }

@@ -3,12 +3,12 @@ import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Spinner } fr
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useState } from "react"
 import { useQueryClient } from "react-query"
-import { useMutation, useProvider } from "wagmi"
+import { useMutation, useProvider, useSigner } from "wagmi"
 
 const useTokenCode = () => {
   const queryClient = useQueryClient()
   const client = useSupabaseClient()
-  const provider = useProvider()
+  const { data: signer } = useSigner()
 
   return useMutation(
     ["use-token-code"],
@@ -25,8 +25,9 @@ const useTokenCode = () => {
       }
 
       const { txHash } = data
+      console.log("txHash", txHash, "provider", signer?.provider)
 
-      await provider.waitForTransaction(txHash)
+      await signer?.provider?.waitForTransaction(txHash)
     }, {
     onSuccess: () => {
       console.log("invalidating")

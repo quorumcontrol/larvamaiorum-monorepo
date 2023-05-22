@@ -6,22 +6,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { getServiceClient } from "../_shared/serviceClient.ts";
-import { ethers, providers, utils } from "https://esm.sh/ethers@5.7.2";
+import { utils } from "https://esm.sh/ethers@5.7.2";
 import { safeAddress } from "https://esm.sh/@skaleboarder/safe-tools@0.0.24"
-import SimpleSyncher from "../_shared/SimpleSyncher.ts";
-
-const tokenAddress = "0xEeeefF87F0eCfF90dF0AdE8133dA0b20eA69f4e8";
-
-const syncer = new SimpleSyncher();
-
-const rpcs: Record<number, { rpc: string; address?: string }> = {
-  1032942172: {
-    rpc: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
-  },
-  31337: {
-    rpc: "http://host.docker.internal:8545",
-  },
-};
+import { contract, syncer } from "../_shared/tokenContract.ts";
 
 serve(async (req) => {
   console.log("Hello from code-minter!");
@@ -55,19 +42,7 @@ serve(async (req) => {
 
   const { code: codeString, chainId } = await req.json();
 
-  const provider = new providers.StaticJsonRpcProvider(rpcs[chainId].rpc);
-  const signer = new ethers.Wallet(Deno.env.get("TOKEN_MINTER_PK")!).connect(
-    provider,
-  );
-  // const token = EmpireGambitToken__factory.connect(signer, tokenAddress);
-
-  const token = new ethers.Contract(
-    tokenAddress,
-    [
-      "function mint(address to, uint256 value)",
-    ],
-    signer,
-  );
+  const token = contract(chainId);
 
   const userAddress = user.email.split("@")[0];
   const safe = await safeAddress(userAddress, chainId);
@@ -82,7 +57,11 @@ serve(async (req) => {
 
   console.log("found code", data)
 
-  // await serviceClient.from("token_promo_codes").delete().eq("code", codeString);
+  serviceClient.from("token_promo_codes").delete().eq("code", codeString).then(({ error }) => {
+    if (error) {
+      console.error("error deleting token: ", error);
+    }
+  })
 
   const { amount } = data;
 

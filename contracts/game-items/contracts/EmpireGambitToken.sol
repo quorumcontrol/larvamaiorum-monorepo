@@ -19,7 +19,7 @@ contract EmpireGambitToken is ERC20, ERC20Burnable, AccessControl {
         _mint(to, amount);
     }
 
-    function adminBurn(address acct, uint256 amount) public onlyRole(MINTER_ROLE) {
+    function adminBurn(address acct, uint256 amount) public onlyRole(BURNER_ROLE) {
         _burn(acct, amount);
     }
 }

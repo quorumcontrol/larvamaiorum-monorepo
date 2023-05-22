@@ -4,6 +4,9 @@ import { useRef, useState } from "react"
 import MinervaLoop from "./MinervaLoop"
 import { useTokenBalance } from "@/hooks/useTokens"
 import { utils } from "ethers"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { isLocalhost } from "@/utils/isLocalhost"
+import { useQueryClient } from "react-query"
 
 interface MiddleVideosProps {
   loading: boolean
@@ -15,11 +18,29 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
   const introVideo = useRef<HTMLVideoElement>(null)
   const [introComplete, setIntroComplete] = useState(false)
   const { data: tokenBalance } = useTokenBalance()
+  const queryClient = useQueryClient()
+
+  const client = useSupabaseClient()
 
   const handleStart = () => {
     setIntroPlaying(true)
     introVideo.current?.play()
     onStartClick()
+
+    // fire and forget
+    client.functions.invoke("start-chat", {
+      body: {
+        chainId: isLocalhost() ? 31337 : 1032942172,
+      }
+    }).then(({ error }) => {
+
+      if (error) {
+        console.error("start-chat error", error)
+        return
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["token-balance"] })
+    })
   }
 
   return (
@@ -52,9 +73,7 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
         }}
       />
     </VStack>
-
   )
-
 }
 
 export default MiddleVideos
