@@ -1,7 +1,8 @@
+import { fetchAudioContext } from "@/utils/audioContext";
 
 export const useEnvironmentSound = () => {
   const start = () => {
-    const audioContext = new AudioContext();
+    const audioContext = fetchAudioContext()
 
     async function loadAudio(url:string) {
       const response = await fetch(url);
@@ -18,6 +19,9 @@ export const useEnvironmentSound = () => {
     }
 
     async function setupAudio() {
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
       const audioBuffer1 = await loadAudio('/audio/voices-of-ghosts.mp3');
       const audioBuffer2 = await loadAudio('/audio/campfire.mp3');
 
