@@ -1,9 +1,10 @@
 import { createClient, User as SupabaseUser } from "https://esm.sh/@supabase/supabase-js@2.15.0";
+import { Database } from "../_shared/db.types.ts";
 
 export type User = SupabaseUser
 
 export const getServiceClient = () => {
-  return createClient(
+  return createClient<Database>(
     // Supabase API URL - env var exported by default.
     Deno.env.get("SUPABASE_URL") ?? "",
     // Supabase API ANON KEY - env var exported by default.

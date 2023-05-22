@@ -2,13 +2,15 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
-import { minervaChat } from "../_shared/streamingChat.ts";
+import { contract, syncer } from "../_shared/tokenContract.ts";
+import { safeAddress } from "https://esm.sh/@skaleboarder/safe-tools@0.0.24";
+import { utils } from "https://esm.sh/ethers@5.7.2";
 
 serve(async (req) => {
-  console.log("Hello from streaming chat!");
+  console.log("Hello from streaming start-chat!");
   if (req.method === "OPTIONS") {
     console.log("OPTIONS", corsHeaders);
     return new Response("ok", { headers: corsHeaders });
@@ -30,27 +32,36 @@ serve(async (req) => {
     data: { user },
   } = await supabaseClient.auth.getUser();
 
-  if (!user) {
-    console.error("no user")
+  if (!user || !user.email) {
+    console.error("no user");
     return new Response("Not authorized", { status: 401 });
   }
 
-  const { history } = await req.json()
-  console.log("received history: ", history)
-  
-  const chat = await minervaChat(history)
-  console.log("chat: ", chat)
+  const { chainId } = await req.json();
+  console.log("received chainId: ", chainId);
 
-  if (!chat.body) {
-    console.error("error no body", chat)
-    return new Response("Unknown Error", { status: 500 });
-  }
+  const token = contract(chainId);
 
-  // const speech = await createSpeech(getServiceClient(), user.id, chat.response)
-  return new Response(chat.body, {
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'text/event-stream',
+  const userAddress = user.email.split("@")[0];
+  const safe = await safeAddress(userAddress, chainId);
+
+  const tx = await syncer.push(async () => {
+    console.log("adminBurn", safe);
+    const tx = await token.adminBurn(safe, utils.parseEther("1"), {
+      gasLimit: 1_000_000,
+    });
+    return tx;
+  });
+
+  return new Response(
+    JSON.stringify({
+      tx: tx.hash,
+    }),
+    {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/event-stream",
+      },
     },
-  })
-})
+  );
+});
