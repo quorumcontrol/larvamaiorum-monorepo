@@ -36,10 +36,17 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       // keep the accounts the same here so that the deterministic deployment addresses are kept
-      accounts: [{
-        privateKey: process.env.DELPHS_PRIVATE_KEY!,
-        balance: utils.parseEther("200").toString(),
-      }],
+      accounts: [
+        {
+          privateKey: process.env.DELPHS_PRIVATE_KEY!,
+          balance: utils.parseEther("200").toString(),
+        },
+        {
+          privateKey:
+            "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a", // just acct#2 from hardhat - it's ok that this is checked in
+          balance: utils.parseEther("200").toString(),
+        },
+      ],
       // forking: {
       //   url: "https://mainnet.skalenodes.com/v1/haunting-devoted-deneb",
       // },

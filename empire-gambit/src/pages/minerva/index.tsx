@@ -1,5 +1,5 @@
-import React, {  useEffect, useState } from 'react';
-import { Box, Center, HStack, Heading, Image, Text, VStack } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { Box, Center, HStack, Heading, Image, Stack, Text, VStack } from '@chakra-ui/react';
 import AppLayout from '@/components/minerva/AppLayout';
 import RecordButton from '@/components/minerva/RecordButton';
 import { useGetTranscription } from '@/hooks/minerva/useGetTranscription';
@@ -377,45 +377,36 @@ const FortuneTeller = () => {
 
       <Box bg="brand.background" minH="100vh" p={4}>
         <Center flexDirection="column" h="100%">
-          {!started && <Heading>Minerva, the fate teller</Heading> }
+          {!started && <Heading textAlign="center">Minerva, the fate teller</Heading>}
           {thankYouNft && (
-            <HStack spacing="8" py="8" w="3xl">
+            <Stack spacing="8" py="8" w={["100vw", "3xl"]} direction={["column", "row"]}>
               <Image src={thankYouNft.imageUrl} w="256px" height="355px" alt={`Your NFT image: ${thankYouNft.title}`} objectFit="contain" />
               <VStack alignItems="left">
                 <Heading>{thankYouNft.title}</Heading>
                 <Text>{thankYouNft.description}</Text>
                 <Text fontSize="sm" pt="8">Minerva offers you this token of her appreciation as a digital collectible sent to your wallet. Thank you for sharing your journey.</Text>
               </VStack>
-            </HStack>
+            </Stack>
           )}
           {!thankYouNft && (
             <HStack spacing="xl">
 
-              <EtherealImage src={drawnCard?.image || src} />
+              <EtherealImage src={drawnCard?.image || src}  display={["none", "box"]}/>
+              
               <VStack spacing="6">
                 <MiddleVideos onStartClick={handleStart} loading={loading} />
                 {history.slice(-1)[0]?.role === "assistant" && <MinervaText maxW="400px">{history.slice(-1)[0]?.content}</MinervaText>}
 
                 {!complete && started && <RecordButton onRecord={handleAudio} loading={loading} />}
                 {complete && <Text fontSize="xl" color="white">Thank you for sharing your journey.</Text>}
-                <Center
-                  maxH="5em"
-                  w="lg"
-                  fontSize={"sm"}
-                  px={4}
-                  color="white"
-                  bgColor="rgba(0, 0, 0, 0.8)"
-
-                >
-                  {lastUserMessage && (
-                    <Box mb={2}>
-                      <Text>You: {lastUserMessage.content}</Text>
-                    </Box>
-                  )}
-                </Center>
+                {lastUserMessage && (
+                  <Box mb={2}>
+                    <Text>You: {lastUserMessage.content}</Text>
+                  </Box>
+                )}
               </VStack>
 
-              <EtherealImage src={drawnCard?.image || src} />
+              <EtherealImage src={drawnCard?.image || src} display={["none", "box"]} />
 
             </HStack>
           )}
