@@ -2,7 +2,7 @@ import { ethers } from "https://esm.sh/ethers@5.7.2";
 import { providers } from "https://esm.sh/ethers@5.7.2";
 import SimpleSyncher from "./SimpleSyncher.ts";
 
-const tokenAddress = "0x1C4cF9B664b008C1729C80E2A4C44C83a0604a62";
+const tokenAddress = "0x05D07647d7A5a9CB08702b30e0Fe75fBbAd603fd";
 
 export const syncer = new SimpleSyncher();
 

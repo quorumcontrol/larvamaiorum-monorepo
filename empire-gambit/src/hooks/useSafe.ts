@@ -11,7 +11,10 @@ const useWalletDeployer = () => {
 
 export const useSafeFromUser = () => {
     const { address, isConnected } = useAccount()
-    const { data:signer } = useSigner()
+    const { data:signer, isLoading, error,  } = useSigner()
+
+
+    // console.log("signer: ", isConnected, signer, isLoading, error)
 
     return useQuery(
         ["safeFromUser", address],

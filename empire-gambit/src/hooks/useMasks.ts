@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 
 const calypsoProvider = new providers.StaticJsonRpcProvider("https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague")
 
-const larvaAddress = "0xc5C5EbfAc4901cB62c497802b00864204AB0deFa"
+const larvaAddress = "0xc5c5ebfac4901cb62c497802b00864204ab0defa"
 
 export const useMaskInventory = () => {
   const { address, isConnected } = useAccount()
