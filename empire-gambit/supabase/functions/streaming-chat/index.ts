@@ -8,7 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { minervaChat } from "../_shared/streamingChat.ts";
 
 serve(async (req) => {
-  console.log("Hello from streaming chat!");
+  console.log("Hello from streaming streaming chat!");
   if (req.method === "OPTIONS") {
     console.log("OPTIONS", corsHeaders);
     return new Response("ok", { headers: corsHeaders });

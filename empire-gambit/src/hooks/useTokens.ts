@@ -13,13 +13,10 @@ export const useTokenBalance = () => {
   return useQuery(["token-balance", safeAddr], async () => {
     if (!safeAddr) return undefined
 
-    console.log("safe addr: ", safeAddr)
+    // console.log("safe addr: ", safeAddr)
 
     const token = EmpireGambitToken__factory.connect(deploys.EmpireGambitToken.address, provider)
-    const balance = await token.balanceOf(safeAddr)
-
-    console.log("balance", balance.toString())
-    return balance
+    return token.balanceOf(safeAddr)
   }, {
     enabled: !!safeAddr
   })

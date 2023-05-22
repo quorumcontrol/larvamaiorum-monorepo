@@ -61,7 +61,7 @@ const TokenCodeForm: React.FC = () => {
   return (
     <HStack alignItems="top">
       <FormControl isInvalid={!!error} >
-        <Input placeholder="Enter Token Code" name="code" minW="18em" value={code} onChange={(evt) => setCode(evt.target.value)} />
+        <Input placeholder="Enter Token Code" name="code" minW="12em" value={code} onChange={(evt) => setCode(evt.target.value)} />
         <FormErrorMessage>{error}</FormErrorMessage>
       </FormControl>
       <FormControl>
