@@ -79,8 +79,6 @@ const FortuneTeller = () => {
 
   const [history, setHistory] = useState<Message[]>([])
 
-  // const historyRef = useRef<HTMLDivElement>(null);
-
   const [complete, setComplete] = useState(false)
 
   const [thankYouNft, setThankYouNft] = useState<ThankYouNft>()

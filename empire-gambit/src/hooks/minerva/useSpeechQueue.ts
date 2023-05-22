@@ -1,18 +1,16 @@
 import SimpleSyncher from "@/utils/SimpleSyncher";
+import { fetchAudio, fetchAudioContext } from "@/utils/audioContext";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 
 export const useSpeechQueue = () => {
   const client = useSupabaseClient();
   const [playQueue] = useState(new SimpleSyncher());
-  const [audio] = useState(
-    (typeof Audio === "undefined") ? undefined : new Audio(),
-  );
 
   const queueSpeech = (text: string) => {
-    if (!audio) {
-      console.error("must be serverside audio");
-      return;
+    const audioContext = fetchAudioContext();
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
     }
 
     if (!text) {
@@ -32,15 +30,16 @@ export const useSpeechQueue = () => {
       }
 
       const { speech: { audio_url } } = data;
-      
+
       if (!audio_url) {
         console.error("no public url from text", data);
         throw new Error("no public url");
       }
 
-      audio.src = audio_url;
-      console.log("Playing: ", audio_url);
-      audio.play();
+      const audio = fetchAudio()
+      audio.src = audio_url
+      audio.play()
+
       await new Promise((resolve) => {
         audio.onended = () => {
           resolve(audio_url);
@@ -51,8 +50,8 @@ export const useSpeechQueue = () => {
 
   return {
     queueSpeech,
-    setOnEnded: (fn: ()=>any) => {
-      playQueue.onEnded(fn)
-    }
+    setOnEnded: (fn: () => any) => {
+      playQueue.onEnded(fn);
+    },
   };
 };
