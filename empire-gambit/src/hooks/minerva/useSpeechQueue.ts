@@ -1,5 +1,5 @@
 import SimpleSyncher from "@/utils/SimpleSyncher";
-import { fetchAudioContext } from "@/utils/audioContext";
+import { fetchAudio, fetchAudioContext } from "@/utils/audioContext";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 
@@ -36,24 +36,13 @@ export const useSpeechQueue = () => {
         throw new Error("no public url");
       }
 
-      const response = await fetch(audio_url);
-
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = await audioContext.decodeAudioData(arrayBuffer);
-
-      const sourceNode = audioContext.createBufferSource();
-      sourceNode.buffer = buffer;
-      sourceNode.loop = false;
-
-      sourceNode.connect(audioContext.destination)
-
-      const startTime = audioContext.currentTime;
-      sourceNode.start(startTime);
+      const audio = fetchAudio()
+      audio.src = audio_url
+      audio.play()
 
       await new Promise((resolve) => {
-        sourceNode.onended = () => {
+        audio.onended = () => {
           resolve(audio_url);
-          sourceNode.disconnect()
         };
       });
     });

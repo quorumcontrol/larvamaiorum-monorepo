@@ -1,8 +1,9 @@
-import { fetchAudioContext } from "@/utils/audioContext";
+import { fetchAudio, fetchAudioContext } from "@/utils/audioContext";
 
 export const useEnvironmentSound = () => {
   const start = () => {
     const audioContext = fetchAudioContext()
+    const audioElement = fetchAudio()
 
     async function loadAudio(url:string) {
       const response = await fetch(url);
@@ -43,6 +44,10 @@ export const useEnvironmentSound = () => {
       const startTime = audioContext.currentTime;
       sourceNode1.start(startTime);
       sourceNode2.start(startTime);
+
+      let elementSource = audioContext.createMediaElementSource(audioElement);
+      elementSource.connect(audioContext.destination);
+      audioElement.play()
     }
 
     setupAudio()
