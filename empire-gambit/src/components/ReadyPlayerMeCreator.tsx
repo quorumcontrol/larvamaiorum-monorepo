@@ -1,6 +1,7 @@
 import { Box, BoxProps } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react"
 import useIsClientSide from "../hooks/useIsClientSide"
+import { AvatarCreatorViewer } from '@readyplayerme/rpm-react-sdk';
 
 type ReadyPlayerMeCreatorProps = BoxProps & {
   onPicked:(url:string)=>any
@@ -9,84 +10,100 @@ type ReadyPlayerMeCreatorProps = BoxProps & {
 
 const ReadyPlayerMeCreator: React.FC<ReadyPlayerMeCreatorProps> = (userProps) => {
   const {onPicked, visible, ...boxProps} = userProps
-  const [showIframe, setShowIFrame] = useState(false)
-  const iframe = useRef<HTMLIFrameElement>(null)
-  const isClient = useIsClientSide()
+  // const [showIframe, setShowIFrame] = useState(false)
+  // const iframe = useRef<HTMLIFrameElement>(null)
+  // const isClient = useIsClientSide()
 
-  useEffect(() => {
-    if (!iframe.current || !isClient) {
-      return
-    }
+  const handleOnAvatarExported = (url: string) => {
+    console.log(`Avatar URL is: ${url}`)
+    onPicked(url)
+  }
 
-    window.addEventListener("message", subscribe)
-    document.addEventListener("message", subscribe)
+  // useEffect(() => {
+  //   if (!iframe.current || !isClient) {
+  //     return
+  //   }
 
-    function subscribe(event: any) {
-      if (!iframe.current) {
-        console.error("tried to subscribe to an non-existant iframe")
-        return
-      }
-      const json = parse(event)
+  //   window.addEventListener("message", subscribe)
+  //   document.addEventListener("message", subscribe)
 
-      if (json?.source !== "readyplayerme") {
-        return
-      }
+  //   function subscribe(event: any) {
+  //     if (!iframe.current) {
+  //       console.error("tried to subscribe to an non-existant iframe")
+  //       return
+  //     }
+  //     const json = parse(event)
 
-      // Susbribe to all events sent from Ready Player Me once frame is ready
-      if (json.eventName === "v1.frame.ready") {
-        iframe.current!.contentWindow!.postMessage(
-          JSON.stringify({
-            target: "readyplayerme",
-            type: "subscribe",
-            eventName: "v1.**",
-          }),
-          "*"
-        )
-      }
+  //     if (json?.source !== "readyplayerme") {
+  //       return
+  //     }
 
-      // Get avatar GLB URL
-      if (json.eventName === "v1.avatar.exported") {
-        console.log(`Avatar: `, json.data)
-        setShowIFrame(false)
-        onPicked(json.data.url)
-      }
+  //     // Susbribe to all events sent from Ready Player Me once frame is ready
+  //     if (json.eventName === "v1.frame.ready") {
+  //       iframe.current!.contentWindow!.postMessage(
+  //         JSON.stringify({
+  //           target: "readyplayerme",
+  //           type: "subscribe",
+  //           eventName: "v1.**",
+  //         }),
+  //         "*"
+  //       )
+  //     }
 
-      // Get user id
-      if (json.eventName === "v1.user.set") {
-        console.log(`User with id ${json.data.id} set: `, json)
-      }
-    }
+  //     // Get avatar GLB URL
+  //     if (json.eventName === "v1.avatar.exported") {
+  //       console.log(`Avatar: `, json.data)
+  //       setShowIFrame(false)
+  //       onPicked(json.data.url)
+  //     }
 
-    function parse(event: any) {
-      try {
-        return JSON.parse(event.data)
-      } catch (error) {
-        return null
-      }
-    }
+  //     // Get user id
+  //     if (json.eventName === "v1.user.set") {
+  //       console.log(`User with id ${json.data.id} set: `, json)
+  //     }
+  //   }
 
-    iframe.current.src = "https://crypto-colosseum.readyplayer.me/avatar?frameApi"
-    setShowIFrame(true)
+  //   function parse(event: any) {
+  //     try {
+  //       return JSON.parse(event.data)
+  //     } catch (error) {
+  //       return null
+  //     }
+  //   }
 
-    return () => {
-      window.removeEventListener("message", subscribe)
-      document.removeEventListener("message", subscribe)
-    }
-  }, [isClient, onPicked])
+  //   iframe.current.src = "https://crypto-colosseum.readyplayer.me/avatar?frameApi"
+  //   setShowIFrame(true)
+
+  //   return () => {
+  //     window.removeEventListener("message", subscribe)
+  //     document.removeEventListener("message", subscribe)
+  //   }
+  // }, [isClient, onPicked])
 
   if (!visible) {
     return null
   }
 
   return (
-    <Box
-      id="readyplayerme"
-      as="iframe"
-      allow="camera *; microphone *; clipboard-write"
-      ref={iframe}
-      {...boxProps}
-      display={showIframe ? undefined : "none"}
+    <Box {...boxProps}>
+    <AvatarCreatorViewer 
+        subdomain="crypto-colosseum" 
+        onAvatarExported={handleOnAvatarExported}
+        editorConfig={{
+          quickStart: true,
+          clearCache: true,
+        }}
     />
+        
+    </Box>
+    // <Box
+    //   id="readyplayerme"
+    //   as="iframe"
+    //   allow="camera *; microphone *; clipboard-write"
+    //   ref={iframe}
+    //   {...boxProps}
+    //   display={showIframe ? undefined : "none"}
+    // />
   )
 }
 
