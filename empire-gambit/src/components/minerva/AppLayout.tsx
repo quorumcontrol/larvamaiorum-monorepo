@@ -1,5 +1,5 @@
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-import { Box, Button, Center, Heading, Text, VStack, keyframes } from '@chakra-ui/react'
+import { useSession } from '@supabase/auth-helpers-react'
+import { Box, Center, VStack, keyframes } from '@chakra-ui/react'
 import { Image } from "@chakra-ui/next-js";
 import { useMaskInventory } from '@/hooks/useMasks'
 import NavigationProfile from '../NavigationProfile'
@@ -13,6 +13,7 @@ import marketSrc from "../../assets/market.png"
 import soldierSrc from "../../assets/soldier_checklist.png"
 import { constants } from 'ethers';
 import TokenCodeForm from '../TokenCodeForm';
+import { useAccount } from 'wagmi';
 
 const pulseAnimation = keyframes`
   0% {
@@ -31,11 +32,12 @@ const pulseAnimation = keyframes`
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const session = useSession()
+  const { isConnected } = useAccount()
   const { data: maskBalance, isLoading } = useMaskInventory()
   const { data: tokenBalance, isLoading: tokenBalanceLoading } = useTokenBalance()
-  const isClient = useIsClientSide()
+  const isClientSide = useIsClientSide()
 
-  if (!isClient || isLoading || tokenBalanceLoading) {
+  if (!isClientSide || isLoading || tokenBalanceLoading) {
     return (
       <>
         <PageEffects
@@ -64,7 +66,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     )
   }
 
-  if (!session) {
+  if (!session || !isConnected ) {
     return (
       <>
         <PageEffects
