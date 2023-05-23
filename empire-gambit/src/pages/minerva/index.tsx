@@ -389,7 +389,7 @@ const FortuneTeller = () => {
           {!thankYouNft && (
             <HStack spacing="xl">
 
-              <EtherealImage src={drawnCard?.image || src}  display={["none", "box"]}/>
+              <EtherealImage src={drawnCard?.image || src}  display={["none", "block"]}/>
               
               <VStack spacing="6">
                 <MiddleVideos onStartClick={handleStart} loading={loading} />
@@ -404,7 +404,7 @@ const FortuneTeller = () => {
                 )}
               </VStack>
 
-              <EtherealImage src={drawnCard?.image || src} display={["none", "box"]} />
+              <EtherealImage src={drawnCard?.image || src} display={["none", "block"]} />
 
             </HStack>
           )}
