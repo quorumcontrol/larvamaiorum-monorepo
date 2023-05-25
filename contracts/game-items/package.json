@@ -11,10 +11,16 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
+    "@react-three/drei": "^9.69.2",
+    "@react-three/fiber": "^8.13.0",
+    "@readyplayerme/visage": "^3.6.0",
     "@skaleboarder/safe-tools": "^0.0.23",
     "@skaleproject/pow-ethers": "^0.3.1",
     "dotenv": "^16.0.3",
     "hardhat-deploy": "^0.11.25",
-    "solidity-json-writer": "^1.1.0"
+    "solidity-json-writer": "^1.1.0",
+    "suspend-react": "^0.0.10",
+    "three": "^0.152.2",
+    "three-stdlib": "^2.22.4"
   }
 }
