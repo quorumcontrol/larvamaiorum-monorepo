@@ -67,6 +67,7 @@ export enum TileType {
   trees = 3,
   water = 4,
   stone = 5,
+  disabled = 6,
 }
 
 export const tileTypeToEnglish = (tileType: TileType) => {
@@ -81,6 +82,8 @@ export const tileTypeToEnglish = (tileType: TileType) => {
       return "Water"
     case TileType.stone:
       return "Stone"
+    case TileType.disabled:
+      return "Disabled"
   }
 }
 

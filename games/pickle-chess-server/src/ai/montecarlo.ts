@@ -60,14 +60,15 @@ class MonteCarlo<GameState, Action, Player> {
 
     // this freezes the thread so use sparingly
     // TODO: put the AI into a worker file
+    let iterations = 0
     while (Date.now() - start < maxTime) {
-      shuffle(actions).forEach(async (action, i) => {
-        scores[i] += await this.scoreAction(state, action, playerId, 0)
+      shuffle(actions).forEach((action, i) => {
+        scores[i] += this.scoreAction(state, action, playerId, 0)
       })
-      // await Promise.all(shuffle(actions).map(async (action, i) => {
-      //   scores[i] += await this.scoreAction(state, action, playerId, 0)
-      //   return
-      // }))
+      iterations++
+      if (iterations % 1000 === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+      }
     }
     // return actions sorted by scores where highest score is first
     const scored = actions.map((action, i) => ({ action, score: scores[i] })).sort((a, b) => b.score - a.score)

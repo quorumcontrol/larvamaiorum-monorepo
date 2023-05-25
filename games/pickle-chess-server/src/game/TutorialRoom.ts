@@ -1,12 +1,11 @@
 import { Client } from "colyseus"
-import { PickleChessRoom } from "../rooms/PickleChessRoom"
 import { Character, CharacterClickMessage, Messages, PickleChessState, Player, RoomState, TauntMessage, Tile, TileClickmessage } from "../rooms/schema/PickleChessState"
-import { getAiBoard, getBoardById, RawBoard } from "./boardFetching"
+import { getBoardById, RawBoard } from "./boardFetching"
 import BoardLogic from "./BoardLogic"
 import CharacterLogic from "./CharacterLogic"
 import EventEmitter from "events"
 import { getRandomTrack } from "./music"
-import { GameEvent, GameState } from "../ai/taunt"
+import { GameEvent } from "../ai/taunt"
 import { speak } from "../ai/uberduck"
 import { TutorialRoom } from "../rooms/TutorialRoom"
 import { createMatch, setWinner } from "../database/matchWriter"
@@ -225,22 +224,10 @@ class TutorialRoomHandler extends EventEmitter {
   }
 
   handleCharacterRemovals() {
-    const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
+    // const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
     // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-    const toDelete:CharacterLogic[] = []
+    const toDelete:CharacterLogic[] = this.board.deadCharacters()
 
-    this.characters.forEach((character) => {
-      const playerId = character.state.playerId
-      const {x,y} = character.position
-      const playerTile = this.board.getTile(x,y)
-      if (!playerTile) {
-        console.error("tile not found", x,y)
-        return
-      }
-      if (this.board.killsCharacter(playerTile, playerId, undefined, true) || deadPlayerIds.includes(playerId)) {
-        toDelete.push(character)
-      }
-    })
     toDelete.forEach((character) => {
       character.stop()
       this.state.characters.delete(character.id)
@@ -258,10 +245,10 @@ class TutorialRoomHandler extends EventEmitter {
       this.timeSincePieceCapture = 0
     })
     if (toDelete.length > 0) {
-      const removedCounts = toDelete.reduce((acc, character) => {
-        acc[this.state.players.get(character.playerId).name] = (acc[character.state.playerId] || 0) + 1
-        return acc
-      }, {} as {[key:string]:number})
+      // const removedCounts = toDelete.reduce((acc, character) => {
+      //   acc[this.state.players.get(character.playerId).name] = (acc[character.state.playerId] || 0) + 1
+      //   return acc
+      // }, {} as {[key:string]:number})
 
       const evt = this.board.isOver() ? GameEvent.over : GameEvent.pieceCaptured
       if (evt === GameEvent.pieceCaptured) {
@@ -271,26 +258,26 @@ class TutorialRoomHandler extends EventEmitter {
     }
   }
 
-  private getGameState(event:GameEvent):GameState {
-    const players = Array.from(this.state.players.values()).reduce((acc, player) => {
-      acc[player.name] = {
-        characters: this.characters.filter((character) => character.state.playerId === player.id).length
-      }
-      return acc
-    }, {} as GameState["players"])
-    const ranked = Object.keys(players).sort((a,b) => players[b].characters - players[a].characters)
+  // private getGameState(event:GameEvent):GameState {
+  //   const players = Array.from(this.state.players.values()).reduce((acc, player) => {
+  //     acc[player.name] = {
+  //       characters: this.characters.filter((character) => character.state.playerId === player.id).length
+  //     }
+  //     return acc
+  //   }, {} as GameState["players"])
+  //   const ranked = Object.keys(players).sort((a,b) => players[b].characters - players[a].characters)
 
-    const winner = this.board.isOver() ? ranked[0] : undefined
+  //   const winner = this.board.isOver() ? ranked[0] : undefined
 
-    return {
-      event,
-      players,
-      ranked: ranked,
-      timeSincePieceCapture: this.timeSincePieceCapture,
-      gameClock: this.gameClock,
-      winner,
-    }
-  }
+  //   return {
+  //     event,
+  //     players,
+  //     ranked: ranked,
+  //     timeSincePieceCapture: this.timeSincePieceCapture,
+  //     gameClock: this.gameClock,
+  //     winner,
+  //   }
+  // }
 
   private async setupMusic() {
     const track = await getRandomTrack()

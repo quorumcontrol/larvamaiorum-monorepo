@@ -36,7 +36,7 @@ class CharacterVisual extends ScriptTypeBase {
     this.sound = mustFindByName(this.entity, "Sound").sound!
     this.entity.anim?.setInteger("idleVariation", randomInt(3))
     this.unsubs = []
-    this.entity.on("destroy", () => {
+    this.entity.once("destroy", () => {
      this.unsubs.forEach((unsub) => unsub())
     })
 

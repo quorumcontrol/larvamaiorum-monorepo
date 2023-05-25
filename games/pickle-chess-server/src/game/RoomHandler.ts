@@ -8,7 +8,6 @@ import EventEmitter from "events"
 import { getRandomTrack } from "./music"
 import { GameEvent, GameState, getTaunt } from "../ai/taunt"
 import { AIBrain, AIGameAction } from "../ai/gamePlayer"
-import { speak } from "../ai/uberduck"
 import { speak as googleSpeak } from "../ai/googleTTS"
 import { MonteCarloConfig } from "../ai/montecarlo"
 import { createMatch, setWinner, playerDetail } from "../database/matchWriter"
@@ -36,6 +35,8 @@ const BOARD_LOAD_EVENT = "boardLoaded"
 
 const MIN_TIME_BETWEEN_TAUNTS = 5
 const MAX_TIME_BETWEEN_TAUNTS = 45
+
+const TIME_BETWEEN_SHRINKS = 30
 
 export interface RoomJoinOptions {
   name: string
@@ -139,6 +140,8 @@ class RoomHandler extends EventEmitter {
 
   private matchId?: string
 
+  private timeSinceShrink = 0
+
   constructor(room: PickleChessRoom, opts: RoomJoinOptions) {
     super()
     this.room = room
@@ -165,7 +168,12 @@ class RoomHandler extends EventEmitter {
     this.gameClock += dt
     this.timeSincePieceCapture += dt
     this.timeSinceTaunt += dt
+    this.timeSinceShrink += dt
 
+    if (this.timeSinceShrink > TIME_BETWEEN_SHRINKS) {
+      this.timeSinceShrink = 0
+      this.board.shrinkBoard()
+    }
 
     if (this.aiBrains && this.gameClock >= this.aiConfig.timeBeforeFirstAction) {
       this.timeSinceAIMove += dt
@@ -315,22 +323,8 @@ class RoomHandler extends EventEmitter {
   }
 
   handleCharacterRemovals() {
-    const deadPlayerIds = Array.from(Object.values(this.state.players)).filter((player) => this.board.isPlayerDead(player.id)).map((player) => player.id)
-    // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-    const toDelete: CharacterLogic[] = []
-
-    this.characters.forEach((character) => {
-      const playerId = character.state.playerId
-      const { x, y } = character.position
-      const playerTile = this.board.getTile(x, y)
-      if (!playerTile) {
-        console.error("tile not found", x, y)
-        return
-      }
-      if (this.board.killsCharacter(playerTile, playerId, undefined, true) || deadPlayerIds.includes(playerId)) {
-        toDelete.push(character)
-      }
-    })
+    const toDelete = this.board.deadCharacters()
+    
     toDelete.forEach((character) => {
       character.stop()
       this.state.characters.delete(character.id)

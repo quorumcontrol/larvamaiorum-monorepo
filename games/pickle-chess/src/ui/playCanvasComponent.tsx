@@ -46,7 +46,7 @@ class ReactUI extends ScriptTypeBase {
       const root = ReactDOM.createRoot(div)
       const element = <App app={this.app} room={room} />
       root.render(element)
-      this.entity.on("destroy", () => {
+      this.entity.once("destroy", () => {
         root.unmount()
         document.head.removeChild(style)
         document.body.removeChild(div)
