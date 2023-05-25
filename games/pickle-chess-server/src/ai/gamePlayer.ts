@@ -85,24 +85,9 @@ export const applyAction = (state: AIGameState, action: AIGameAction): AIGameSta
     player: (state.player + 1) % state.players.length
   }
 
+  const toDelete = newState.board.deadCharacters().map((character) => character.id)
 
-  const deadPlayerIds = Array.from(Object.values(newState.players)).filter((player) => newState.board.isPlayerDead(player)).map((player) => player)
-  // loop through all the characters, if any character is surrounded on two sides by an opponent's character, then remove it. If they are in a corner then they can be boxed in on one side.
-  const toDelete:AICharacter[] = []
-  newState.characters.forEach((character) => {
-    const playerId = character.playerId
-    const { x, y } = character.position
-    const playerTile = newState.board.getTile(x, y)
-    if (!playerTile) {
-      console.error("tile not found", x, y)
-      return
-    }
-    if (newState.board.killsCharacter(playerTile, playerId) || deadPlayerIds.includes(playerId)) {
-      toDelete.push(character)
-    }
-  })
-
-  newCharacters = newCharacters.filter((character) => !toDelete.includes(character))
+  newCharacters = newCharacters.filter((character) => !toDelete.includes(character.id))
 
   // console.log("apply action: ", action, "state", state.characters, "new characters", newCharacters, "newPlayer", newState.player)
   return { ...newState, characters: newCharacters, player: (state.player + 1) % state.players.length }

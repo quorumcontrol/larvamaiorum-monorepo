@@ -14,9 +14,19 @@ class TileVisual extends ScriptTypeBase {
 
   private playerId?: string
 
+  private currentType?: Entity
+
+  private listenerUnbind?:any
+
   initialize() {
     this.highlightElement = mustFindByName(this.entity, "Highlight")
+    this.entity.once("destroy", () => {
+      if (this.listenerUnbind) {
+        this.listenerUnbind()
+      }
+    })
   }
+
 
   update(): void {
     if (this.tileState && this.playerId) {
@@ -27,8 +37,16 @@ class TileVisual extends ScriptTypeBase {
   setTile(tile: Tile, playerId: string) {
     this.tileState = tile
     this.playerId = playerId
-    mustFindByName(this.entity, tileTypeToEnglish(tile.type)).enabled = true
+    this.currentType = mustFindByName(this.entity, tileTypeToEnglish(tile.type))
+    this.currentType.enabled = true
     this.entity.setLocalPosition(tile.x, randomBounded(0.01), tile.y)
+    this.listenerUnbind = tile.listen("type", (newValue) => {
+      if (this.currentType) {
+        this.currentType.enabled = false
+      }
+      this.currentType = mustFindByName(this.entity, tileTypeToEnglish(newValue))
+      this.currentType.enabled = true
+    })
   }
 }
 

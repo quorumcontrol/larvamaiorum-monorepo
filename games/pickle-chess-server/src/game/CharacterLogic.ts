@@ -37,7 +37,7 @@ class CharacterLogic {
 
   setDestination(tile: Tile) {
     this.userSetDestination = tile
-    // console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
+    console.log("setting destination", tile.x, tile.y, "current: ", this.state.locomotion.position.toJSON())
   }
 
   stop() {

@@ -63,7 +63,7 @@ class BoardLogic<CharacterType extends Character> {
     if (!tile) {
       return false
     }
-    if ([TileType.water, TileType.stone].includes(tile.type)) {
+    if (tile.type > 3) {
       return false
     }
     return true
@@ -115,13 +115,21 @@ class BoardLogic<CharacterType extends Character> {
     const aStar = new AStarFinder({
       grid: {
         matrix: this.tiles.map((column) => column.map((tile) => {
-          if ([TileType.water, TileType.stone].includes(tile.type)) {
-            return 1
-          }
           const character = this.characterAt(tile)
-          if (character && character.id !== movingCharacter.id) {
+          if (character) {
+            // if there's a character on this tile and it is the character we're moving then of course it's allowed to move.
+            if (character.id === movingCharacter.id) {
+              return 0
+            }
+            // but if there's already another character on the tile, then we cannot move there.
             return 1
           }
+
+          if (!this.isPassableTerrain(tile)) {
+            return 1
+          }
+
+          // if a character moving to this tile would kill them, then do not let them move there.
           if (this.killsCharacter(tile, movingCharacter.playerId, movingCharacter)) {
             return 1
           }
@@ -132,25 +140,12 @@ class BoardLogic<CharacterType extends Character> {
       includeEndNode: true,
       includeStartNode: false,
     });
-    return aStar.findPath(from, to)
+    const path = aStar.findPath(from, to)
+    if (path.length === 0) {
+      console.log("no path", from.x, from.y, to.x, to.y, aStar.getGrid().getGridNodes().map((col, y) => col.map((n, x) => [x,y, n.getIsWalkable()])))
+    }
+    return path
   }
-
-  // private impassableKillSquareCount(playerTile: Tile, playerId: string, excluding?: CharacterType) {
-  //   let tileCount = 0
-  //   for (let diffY = -1; diffY <= 1; diffY++) {
-  //     for (let diffX = -1; diffX <= 1; diffX++) {
-  //       // ignore diagonals and the center
-  //       if (Math.abs(diffX) === Math.abs(diffY)) {
-  //         continue
-  //       }
-  //       const tile = this.getTile(playerTile.x + diffX, playerTile.y + diffY)
-  //       if (!this.isPassableTerrainAndNotOwnCharacter(playerId, tile, excluding)) {
-  //         tileCount++
-  //       }
-  //     }
-  //   }
-  //   return tileCount
-  // }
 
   private killSquaresWithOpponent(playerTile: Tile, playerId: string) {
     let tileCount = 0
@@ -244,6 +239,10 @@ class BoardLogic<CharacterType extends Character> {
     const tileLeft =  this.terminalDirectionalPoint(playerTile, playerId, "left")
     const tileRight = this.terminalDirectionalPoint(playerTile, playerId, "right")
 
+    if ([tileAbove, tileBelow, tileLeft, tileRight].every((t) => !t || !this.isPassableTerrain(t))) {
+      return true
+    }
+
     if (this.isOccupiedByOpposingPlayer(playerId, tileAbove) && this.isOccupiedByOpposingPlayer(playerId, tileBelow)) {
       if (debug) console.log("normal above and below kill", playerTile.x, playerTile.y)
       return true
@@ -306,6 +305,51 @@ class BoardLogic<CharacterType extends Character> {
     })
   }
 
+  private findNextShrinkage() {
+    let i = 0;
+    let tile = this.getTile(i, i)
+    while (tile && tile.type === TileType.disabled) {
+      i++
+      tile = this.getTile(i, i)
+    }
+    return i
+  }
+
+  shrinkBoard() {
+   const nextShrinkage = this.findNextShrinkage()
+
+   const outerColumn = this.tiles.length - 1
+   const outerRow = this.tiles[0].length - 1
+
+   this.tiles.forEach((row, x) => {
+      row.forEach((tile, y) => {
+        if (x === nextShrinkage || y == nextShrinkage || x === outerColumn - nextShrinkage || y === outerRow - nextShrinkage) {
+          tile.type = TileType.disabled
+        }
+      })
+   })
+  }
+
+  deadCharacters() {
+    const deadPlayerIds = this.deadPlayers()
+
+    const toDelete:CharacterType[] = []
+    this.characters.forEach((character) => {
+      const playerId = character.playerId
+      const { x, y } = character.position
+      const playerTile = this.getTile(x, y)
+      if (!playerTile) {
+        console.error("tile not found", x, y)
+        return
+      }
+      if (this.killsCharacter(playerTile, playerId, undefined, true) || deadPlayerIds.includes(playerId)) {
+        toDelete.push(character)
+      }
+    })
+    
+    return toDelete
+  }
+
   private players() {
     return Object.keys(this.characters.reduce((acc, character) => {
       acc[character.playerId] = true
@@ -315,6 +359,10 @@ class BoardLogic<CharacterType extends Character> {
 
   livingPlayers() {
     return this.players().filter((playerId) => !this.isPlayerDead(playerId))
+  }
+
+  private deadPlayers() {
+    return this.players().filter((playerId) => this.isPlayerDead(playerId))
   }
 
   isOver() {
@@ -339,7 +387,7 @@ class BoardLogic<CharacterType extends Character> {
   randomAvailableInitialLocation(playerId: string): Tile {
     const location = this.randomBoardLocation()
     const tile = this.getTile(location.x, location.y)
-    if ([TileType.stone, TileType.water].includes(tile.type) || this.getOccupent(tile.x, tile.y) || this.killsCharacter(tile, playerId)) {
+    if (!this.isPassableTerrain(tile) || this.getOccupent(tile.x, tile.y) || this.killsCharacter(tile, playerId)) {
       return this.randomAvailableInitialLocation(playerId)
     }
     return tile
