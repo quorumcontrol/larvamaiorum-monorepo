@@ -34,6 +34,7 @@ import { isLocalhost } from '@/utils/isLocalhost'
 import { localFauct, powFauct } from '@/utils/faucets'
 import CustomSupabaseContext from '@/contexts/CustomSupabaseContext'
 import { MultiCaller } from '@skaleboarder/safe-tools'
+import Head from 'next/head'
 
 const skaleMainnet = createChain({
   id: 1032942172,
@@ -134,18 +135,23 @@ const queryClient = new QueryClient()
 // see: https://github.com/supabase/gotrue-js/pull/340#issuecomment-1218065610
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider theme={theme}>
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider chains={chains} theme={darkTheme()}>
-          <QueryClientProvider client={queryClient}>
-            <DeployProvider value={addresses}>
-              <CustomSupabaseContext pageProps={pageProps}>
-                <Component {...pageProps} />
-              </CustomSupabaseContext>
-            </DeployProvider>
-          </QueryClientProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </ChakraProvider>
+    <>
+      <Head> 
+        <link rel="icon" type="image/png" href="/favicon.png" />
+      </Head>
+      <ChakraProvider theme={theme}>
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider chains={chains} theme={darkTheme()}>
+            <QueryClientProvider client={queryClient}>
+              <DeployProvider value={addresses}>
+                <CustomSupabaseContext pageProps={pageProps}>
+                  <Component {...pageProps} />
+                </CustomSupabaseContext>
+              </DeployProvider>
+            </QueryClientProvider>
+          </RainbowKitProvider>
+        </WagmiConfig>
+      </ChakraProvider>
+    </>
   )
 }
