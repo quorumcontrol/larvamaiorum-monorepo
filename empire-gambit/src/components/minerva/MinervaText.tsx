@@ -1,4 +1,4 @@
-import { Box, BoxProps, Text, keyframes } from "@chakra-ui/react"
+import { Box, BoxProps, Heading, Text, keyframes } from "@chakra-ui/react"
 
 const getNodeText = (node: React.ReactNode): string => {
   if (!node) {
@@ -8,6 +8,10 @@ const getNodeText = (node: React.ReactNode): string => {
   if (node instanceof Array) return node.map(getNodeText).join('')
   // if (typeof node === 'object' && node) return getNodeText(node.props?.children)
   return ""
+}
+
+interface MinervaTextProps extends BoxProps {
+  useHeading?: boolean
 }
 
 
@@ -22,21 +26,23 @@ const appearAnimation = keyframes`
 }
 `
 
-const MinervaText: React.FC<BoxProps> = (props) => {
-  const { children, ...boxProps } = props
+const MinervaText: React.FC<MinervaTextProps> = (props) => {
+  const { children, useHeading, ...boxProps } = props
   const text = getNodeText(children)
+
+  const TextTag = useHeading ? Heading : Text
 
   return (
     <Box {...boxProps}>
-      <Text>
+      <TextTag>
       {text.split(" ").map((word, i) => {
         return (
-          <Box as="span" display="inline-block" key={`${word}-${i}`} animation={`${appearAnimation} 1s ease-in-out ${i * 0.25}`}>
+          <Box as="span" display="inline-block" key={`${word}-${i}`} animation={`${appearAnimation} ${i * 0.25}s ease-in-out 0s 1`}>
             {word}&nbsp;
           </Box>
         )
       })}
-      </Text>
+      </TextTag>
     </Box>
   )
 }

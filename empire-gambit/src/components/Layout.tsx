@@ -21,8 +21,8 @@ const Layout: React.FC<LayoutProps> = ({ children, showNavigation=true }) => {
   const navigating = useIsNavigating()
 
   return (
-    <Box backgroundImage={landingPageBackground.src} backgroundRepeat="no-repeat" backgroundPosition="top center">
-      <Container padding="0" maxW="1400" zIndex={1}>
+    <Box>
+      <Container padding="0" w={["600px", "1400px"]} maxW="1400px" zIndex={1}>
 
         {showNavigation && <Navigation />}
 

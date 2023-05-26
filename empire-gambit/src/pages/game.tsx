@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout"
-import { Box, Button, Center, HStack, Heading, Spinner, VStack } from "@chakra-ui/react"
+import { Box, Button, HStack, Heading, Spinner, VStack, keyframes } from "@chakra-ui/react"
 import { NextPage } from "next"
 import Link from "next/link"
 import { useEffect, useMemo } from "react"
@@ -10,6 +10,22 @@ import Router from "next/router"
 import { Avatar } from '@readyplayerme/visage';
 import useIsClientSide from "@/hooks/useIsClientSide"
 
+
+const pulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+`
+
 const GamePage: NextPage = () => {
   const { data: user } = useUser()
   const { data: safeAddress } = useSafeFromUser()
@@ -18,9 +34,9 @@ const GamePage: NextPage = () => {
 
   const { animationUrl: avatar, name: username } = user?.profile || {}
 
-  const gameParam = useMemo(() => {
-    return Buffer.from(JSON.stringify({ id: safeAddress, name: username, avatar, numberOfHumans: 2 })).toString("base64")
-  }, [safeAddress, username, avatar])
+  // const gameParam = useMemo(() => {
+  //   return Buffer.from(JSON.stringify({ id: safeAddress, name: username, avatar, numberOfHumans: 2 })).toString("base64")
+  // }, [safeAddress, username, avatar])
 
   const aiGameParam = useMemo(() => {
     return Buffer.from(JSON.stringify({ numberOfHumans: 1, numberOfAi: 1, id: safeAddress, name: username, avatar, level: playerDetails?.level })).toString("base64")
@@ -51,9 +67,10 @@ const GamePage: NextPage = () => {
   return (
     <Layout>
       {avatar && username && (
-        <Center>
+        <VStack>
+          <Heading>Let&apos;s Gambit</Heading>
           <HStack>
-            <Box height="600px">
+            <Box height="400px">
               <Avatar
                 modelSrc={avatar}
                 animationSrc="/standingIdle.glb"
@@ -62,9 +79,9 @@ const GamePage: NextPage = () => {
                 cameraInitialDistance={2.5}
                 />
             </Box>
-            <VStack spacing={4} alignItems="left">
+            <VStack spacing={8} alignItems="left">
               {playerDetails && (
-                <VStack alignItems="left" spacing="4">
+                <VStack alignItems="left">
                   <Heading size="md">Level: {playerDetails.level}</Heading>
                   <Heading size="md">Wins until next level: {playerDetails.nextLevelIn}</Heading>
                   <Heading size="md">Record for today: {playerDetails.todaysWins} / {playerDetails.todaysGames}</Heading>
@@ -76,7 +93,7 @@ const GamePage: NextPage = () => {
               </Link> */}
 
               <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${aiGameParam}`} target="_blank">
-                <Button variant={"primary"}>Play Against AI</Button>
+                <Button variant="primary" animation={`${pulseAnimation} 2s infinite`} >Play</Button>
               </Link>
 
               <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${tutorialParam}`} target="_blank">
@@ -85,7 +102,7 @@ const GamePage: NextPage = () => {
 
             </VStack>
           </HStack>
-        </Center>
+        </VStack>
       )}
     </Layout>
   )
