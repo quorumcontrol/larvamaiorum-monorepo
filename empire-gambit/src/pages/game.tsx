@@ -72,7 +72,7 @@ const GamePage: NextPage = () => {
           <HStack>
             <Box height="400px">
               <Avatar
-                modelSrc={avatar}
+                modelSrc={`${avatar}?quality=low`}
                 animationSrc="/standingIdle.glb"
                 halfBody={false}
                 cameraTarget={1.65}
