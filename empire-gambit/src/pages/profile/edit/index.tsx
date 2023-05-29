@@ -123,7 +123,7 @@ const EditProfilePage: NextPage = () => {
 
   return (
     <Layout showNavigation={false}>
-      <OnBoardContainer>
+      {/* <OnBoardContainer> */}
         <Tabs index={tabIndex} onChange={handleTabsChange}>
           {/* <TabList>
             <Tab>Name</Tab>
@@ -184,12 +184,12 @@ const EditProfilePage: NextPage = () => {
 
 
             </TabPanel>
-            <TabPanel width={["95vw", "70vw"]} h="90vh">
+            <TabPanel h="100vh">
               <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" height="100%" visible={tabIndex === 1} />
             </TabPanel>
           </TabPanels>
         </Tabs>
-      </OnBoardContainer>
+      {/* </OnBoardContainer> */}
     </Layout>
   )
 }

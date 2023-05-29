@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout"
-import { Box, Button, HStack, Heading, Spinner, VStack, keyframes } from "@chakra-ui/react"
+import { Box, Button, Heading, Spinner, Stack, VStack, keyframes } from "@chakra-ui/react"
 import { NextPage } from "next"
 import Link from "next/link"
 import { useEffect, useMemo } from "react"
@@ -69,7 +69,7 @@ const GamePage: NextPage = () => {
       {avatar && username && (
         <VStack>
           <Heading>Let&apos;s Gambit</Heading>
-          <HStack>
+          <Stack direction={["column-reverse", "row"]}>
             <Box height="400px">
               <Avatar
                 modelSrc={`${avatar}?quality=low`}
@@ -101,7 +101,7 @@ const GamePage: NextPage = () => {
               </Link>
 
             </VStack>
-          </HStack>
+          </Stack>
         </VStack>
       )}
     </Layout>
