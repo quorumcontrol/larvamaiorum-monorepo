@@ -50,7 +50,7 @@ const GamePage: NextPage = () => {
     if (!user || user.profile) {
       return
     }
-    Router.push("/profile/edit/start")
+    Router.push("/profile/edit")
   }, [user])
 
   if (!isClient || !user) {

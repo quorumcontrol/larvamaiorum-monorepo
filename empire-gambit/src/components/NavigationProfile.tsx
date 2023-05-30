@@ -17,7 +17,7 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount, useConnect } from "wagmi"
 import useIsClientSide from "../hooks/useIsClientSide"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { SocialIcon } from "react-social-icons"
 import { FcGoogle } from "react-icons/fc"
 import { FaApple } from "react-icons/fa"
@@ -25,7 +25,6 @@ import { DiscordLoginButton } from "react-social-login-buttons"
 import web3auth from "../utils/web3auth"
 import { useUser } from "@/hooks/useUser"
 import Link from "next/link"
-import Router from "next/router"
 
 const NavigationProfile: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
@@ -35,17 +34,6 @@ const NavigationProfile: React.FC = () => {
   const { address, isConnected } = useAccount()
   const { data: user, isLoading:userDataLoading, isFetched } = useUser()
   const isClient = useIsClientSide()
-
-  // useEffect(() => {
-  //   if (!isConnected || user?.profile || userDataLoading) {
-  //     return
-  //   }
-  //   if (!isFetched) {
-  //     return
-  //   }
-
-  //   Router.push("/profile/edit/start")
-  // }, [userDataLoading, user, isConnected, address, isFetched])
 
   const onLoginClick = () => {
     setShowModal(true)
