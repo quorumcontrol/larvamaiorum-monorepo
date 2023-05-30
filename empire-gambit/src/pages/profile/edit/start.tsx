@@ -29,7 +29,7 @@ const StartProfilePage: NextPage = () => {
     <Layout showNavigation={false}>
       <OnBoardContainer>
         <Box mx="10">
-          <Heading lineHeight="55px">Welcome to Empire Gambit</Heading>
+          <Heading lineHeight="55px">Welcome to Empire Gambit edit start</Heading>
           <VStack spacing="5" alignItems="left">
             <Text>We will authorize this device and setup a<br />username and avatar for you.</Text>
             <Link href="/profile/edit">

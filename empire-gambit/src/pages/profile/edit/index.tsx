@@ -1,11 +1,13 @@
+import CircularVideo from "@/components/CircularVideo";
 import Layout from "@/components/Layout";
-import OnBoardContainer from "@/components/OnBoardContainer";
+import NavigationProfile from "@/components/NavigationProfile";
 import ReadyPlayerMeCreator from "@/components/ReadyPlayerMeCreator";
+import MinervaText from "@/components/minerva/MinervaText";
 import { useMintProfile, useUser } from "@/hooks/useUser";
-import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Input, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Spinner, Text, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import Router from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAccount, useSigner } from "wagmi";
 
@@ -15,8 +17,28 @@ interface FormData {
   avatar?: string
 }
 
+const PageEffect: React.FC<{ src: string }> = ({ src }) => {
+  return (
+    <Box position="fixed" bottom="0" left="0" width="100vw" pointerEvents="none" zIndex="-1">
+      <Box
+        as="video"
+        muted
+        autoPlay
+        loop
+        preload="auto"
+        w="100vw"
+        h="100vh"
+        objectFit="fill"
+        opacity={0.1}
+        filter="blur(3px)"
+      >
+        <source src={src} type="video/mp4" />
+      </Box>
+    </Box>
+  )
+}
+
 const EditProfilePage: NextPage = () => {
-  const [tabIndex, setTabIndex] = useState(0)
   const { isConnected, isConnecting } = useAccount()
   const { data: signer } = useSigner()
   const { data: user, isLoading: _userDataLoading } = useUser()
@@ -31,12 +53,6 @@ const EditProfilePage: NextPage = () => {
     register,
     formState: { errors },
   } = useForm<FormData>();
-
-  useEffect(() => {
-    if (!isConnected && !isConnecting) {
-      Router.push("/profile/edit/start")
-    }
-  }, [isConnected, isConnecting])
 
   const onAvatarPicked = useCallback(async (avatar: string) => {
     try {
@@ -85,8 +101,6 @@ const EditProfilePage: NextPage = () => {
   }, [formState, mutateAsync])
 
   const onSubmit = async (data: FormData) => {
-    setTabIndex(1)
-
     console.log("on submit email/name", data)
     setFormState((s) => {
       return {
@@ -95,19 +109,6 @@ const EditProfilePage: NextPage = () => {
       }
     })
     return true
-  }
-
-  if (!signer || !isConnected) {
-    return (
-      <Layout showNavigation={false}>
-        <Spinner />
-      </Layout>
-    )
-  }
-
-  const handleTabsChange = (index: number) => {
-    console.log('setting index: ', index)
-    setTabIndex(index)
   }
 
   if (loading) {
@@ -121,76 +122,68 @@ const EditProfilePage: NextPage = () => {
     )
   }
 
+  if (isConnecting || (isConnected && !signer)) {
+    return (
+      <Layout showNavigation={false}>
+        <Spinner />
+      </Layout>
+    )
+  }
+
+  if (!isConnected) {
+    return (
+      <>
+        <Layout showNavigation={false}>
+          <VStack>
+            <CircularVideo src="/videos/imustknowwhoyouare.mp4" w="358px" h="358px" autoPlay />
+            <MinervaText>Visitor, in order to play I must know who you are </MinervaText>
+            <NavigationProfile />
+          </VStack>
+
+        </Layout>
+        <PageEffect src="/videos/network_inverted.mp4" />
+      </>
+    )
+  }
+
+  if (formState.username && !formState.avatar) {
+    return (
+      <>
+        <Layout showNavigation={false}>
+          <VStack h="100vh">
+            <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" height="100%" visible={true}/>
+          </VStack>
+        </Layout>
+      </>
+    )
+  }
+
   return (
-    <Layout showNavigation={false}>
-      {/* <OnBoardContainer> */}
-        <Tabs index={tabIndex} onChange={handleTabsChange}>
-          {/* <TabList>
-            <Tab>Name</Tab>
-            <Tab>Avatar</Tab>
-          </TabList> */}
-
-          <TabPanels>
-            <TabPanel p="0">
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Heading>Create profile</Heading>
-                <VStack spacing="5" alignItems="left" mt="4">
-
-                  <FormControl
-                    isRequired
-                    isInvalid={!!errors.username}
-                    isDisabled={loading}
-                  >
-                    <FormLabel htmlFor="username">
-                      What do you want to be called?
-                    </FormLabel>
-                    <Input
-                      id="username"
-                      type="text"
-                      {...register("username", { required: true })}
-                      defaultValue={user?.profile?.name}
-                    />
-                    <FormHelperText>You can change this later.</FormHelperText>
-                    <FormErrorMessage>Username is required.</FormErrorMessage>
-                  </FormControl>
-
-                  <FormControl
-                    isInvalid={!!errors.email}
-                    isDisabled={loading}
-                  >
-                    <FormLabel htmlFor="username">
-                      Email address
-                    </FormLabel>
-                    <Input
-                      id="email"
-                      type="text"
-                      {...register("email", { required: false })}
-                    />
-                    <FormHelperText>We will use this only for updates on the game.</FormHelperText>
-                    <FormErrorMessage>There was an error</FormErrorMessage>
-                  </FormControl>
-
-                  <FormControl>
-                    <Button variant="primary" disabled={loading} type="submit">
-                      Create
-                    </Button>
-                    {loading && (
-                      <FormHelperText>Confirm in your wallet.</FormHelperText>
-                    )}
-                  </FormControl>
-                </VStack>
-
-              </form>
-
-
-            </TabPanel>
-            <TabPanel h="100vh">
-              <ReadyPlayerMeCreator onPicked={onAvatarPicked} width="100%" height="100%" visible={tabIndex === 1} />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      {/* </OnBoardContainer> */}
-    </Layout>
+    <>
+      <Layout showNavigation={false}>
+        <VStack px="4">
+          <CircularVideo src="/videos/esteemedfriend.mp4" w="358px" h="358px" autoPlay />
+          <MinervaText>Esteemed friend, what can I call you?</MinervaText>
+          <VStack as="form" onSubmit={handleSubmit(onSubmit)} maxW="lg">
+            <FormControl
+              isRequired
+              isInvalid={!!errors.username}
+              isDisabled={loading}
+            >
+              <Input
+                id="username"
+                type="text"
+                {...register("username", { required: true })}
+                defaultValue={user?.profile?.name}
+              />
+              <FormErrorMessage>Username is required.</FormErrorMessage>
+            </FormControl>
+            <Button variant="primary" type="submit">Next</Button>
+          </VStack>
+        </VStack>
+      </Layout>
+      <PageEffect src="/videos/network_inverted.mp4" />
+    </>
   )
 }
 

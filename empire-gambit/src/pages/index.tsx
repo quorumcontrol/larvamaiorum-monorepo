@@ -1,38 +1,16 @@
 import Layout from '@/components/Layout'
-import { Box, Button, Center, Divider, Fade, Heading, Icon, SlideFade, Spacer, Stack, Text, VStack } from '@chakra-ui/react'
+import { Box, Button, Center, Divider, Fade, Heading, SlideFade, Spacer, Stack, Text, VStack } from '@chakra-ui/react'
 import Image from 'next/image'
 import initializedLogo from "@/assets/partners/Initialized.png"
 import gameTradeLogo from "@/assets/partners/GameTradeMarket.png"
 import boostVCLogo from "@/assets/partners/BoostVC.png"
 import iaVenturesLogo from "@/assets/partners/IAVentures.png"
 import skaleLogo from "@/assets/partners/Skale.png"
-import { useEffect, useRef, useState } from 'react'
-import { TbPlayerPlayFilled } from "react-icons/tb"
 import MinervaText from '@/components/minerva/MinervaText'
 import { Link } from '@chakra-ui/next-js'
+import CircularVideo from '@/components/CircularVideo'
 
 export default function Home() {
-  const [playing, setPlaying] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  const onClick = () => {
-    console.log('click')
-    if (!videoRef.current) {
-      console.log("nope")
-      return
-    }
-    setPlaying(true)
-    videoRef.current.play()
-  }
-
-  useEffect(() => {
-    if (!videoRef.current) {
-      return
-    }
-    videoRef.current.addEventListener('ended', () => {
-      setPlaying(false)
-    })
-  }, [videoRef])
 
   return (
     <>
@@ -46,7 +24,6 @@ export default function Home() {
                   a fast-paced, casual strategy game.<br /><Box as="span" color="brand.orange">built by AI.</Box>
                 </Heading>
               </SlideFade>
-
             </Box>
             <Spacer />
             <Box display={["none", "block"]}>
@@ -96,34 +73,11 @@ export default function Home() {
             </Box>
             <Spacer />
             <Box>
-              <Box
+              <CircularVideo
+                src='/videos/minervaTeller.mp4'
                 w="384px"
                 h="384px"
-                position="relative"
-                display="table"
-              >
-                <video ref={videoRef} width="100%" height="100%" style={{ borderRadius: "100%" }}>
-                  <source src="/videos/minervaTeller.mp4" type="video/mp4" />
-                </video>
-                {!playing && (
-                  <Box
-                    position={"absolute"}
-                    boxSize="64px"
-                    margin="auto"
-                    top="0"
-                    left="0"
-                    right="0"
-                    bottom="0"
-                    onClick={onClick}
-                  >
-                    <Icon as={TbPlayerPlayFilled}
-                      boxSize="100%"
-                    />
-                  </Box>
-                )}
-
-
-              </Box>
+              />
             </Box>
           </Stack>
           <Divider />

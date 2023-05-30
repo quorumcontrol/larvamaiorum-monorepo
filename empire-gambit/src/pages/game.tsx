@@ -69,7 +69,26 @@ const GamePage: NextPage = () => {
       {avatar && username && (
         <VStack>
           <Heading>Let&apos;s Gambit</Heading>
-          <Stack direction={["column-reverse", "row"]}>
+          <VStack spacing={8}>
+            {playerDetails && (
+              <VStack>
+                <Heading size="md">Level: {playerDetails.level}</Heading>
+                <Heading size="md">Wins until next level: {playerDetails.nextLevelIn}</Heading>
+                <Heading size="md">Record for today: {playerDetails.todaysWins} / {playerDetails.todaysGames}</Heading>
+                <Heading size="md">Attempts remaining today: {Math.max(playerDetails.maxPerDay - playerDetails.todaysGames, 0)}</Heading>
+              </VStack>
+            )}
+            {/* <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${gameParam}`} target="_blank">
+                <Button variant={"secondary"}>Play against people</Button>
+              </Link> */}
+
+            <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${aiGameParam}`} target="_blank">
+              <Button variant="primary" animation={`${pulseAnimation} 2s infinite`} >Play</Button>
+            </Link>
+
+            <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${tutorialParam}`} target="_blank">
+              <Button variant={"secondary"}>Practice Room</Button>
+            </Link>
             <Box height="400px">
               <Avatar
                 modelSrc={`${avatar}?quality=low`}
@@ -77,31 +96,10 @@ const GamePage: NextPage = () => {
                 halfBody={false}
                 cameraTarget={1.65}
                 cameraInitialDistance={2.5}
-                />
+              />
             </Box>
-            <VStack spacing={8} alignItems="left">
-              {playerDetails && (
-                <VStack alignItems="left">
-                  <Heading size="md">Level: {playerDetails.level}</Heading>
-                  <Heading size="md">Wins until next level: {playerDetails.nextLevelIn}</Heading>
-                  <Heading size="md">Record for today: {playerDetails.todaysWins} / {playerDetails.todaysGames}</Heading>
-                  <Heading size="md">Attempts remaining today: {Math.max(playerDetails.maxPerDay - playerDetails.todaysGames, 0)}</Heading>
-                </VStack>
-              )}
-              {/* <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${gameParam}`} target="_blank">
-                <Button variant={"secondary"}>Play against people</Button>
-              </Link> */}
 
-              <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${aiGameParam}`} target="_blank">
-                <Button variant="primary" animation={`${pulseAnimation} 2s infinite`} >Play</Button>
-              </Link>
-
-              <Link href={`https://playcanv.as/p/SP3UNx7J/?arena=true&m=${tutorialParam}`} target="_blank">
-                <Button variant={"secondary"}>Practice Room</Button>
-              </Link>
-
-            </VStack>
-          </Stack>
+          </VStack>
         </VStack>
       )}
     </Layout>
