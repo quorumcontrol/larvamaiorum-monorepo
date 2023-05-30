@@ -32,8 +32,7 @@ export const generateActions = (state: AIGameState): AIGameAction[] => {
   const player = state.players[state.player]
   const characters = state.characters.filter((character) => character.playerId === player)
   if (characters.length === 0) {
-    console.error("no players found for player: ", player, "players: ", state.players, "player: ", state.player, "characters: ", state.characters)
-    throw new Error('missing characters')
+    return []
   }
   for (let yDiff = 1; yDiff >= -1; yDiff--) {
     for (let xDiff = 1; xDiff >= -1; xDiff--) {

@@ -90,6 +90,9 @@ class MonteCarlo<GameState, Action, Player> {
       return this.funcs.calculateReward(newState, player)
     }
     const newActions = this.funcs.generateActions(newState)
+    if (newActions.length === 0) {
+      return 0
+    }
 
     // now pick a *random* action to walk on this tree
     const randomAction = newActions[randomInt(newActions.length)]

@@ -1,7 +1,7 @@
 import { generateCompletions } from "./textAI"
 
 export const fetchBoard = async (numberOfPlayers:number) => {
-  const numberRange = numberOfPlayers > 3 ? [15,25] : [9,13]
+  const numberRange = numberOfPlayers > 3 ? [15,25] : [8, 10]
 
   const systemPrompt = `
 You are designing a top-down game board for a 3d game. There are 5 tile types:
@@ -13,13 +13,13 @@ You are designing a top-down game board for a 3d game. There are 5 tile types:
 5: stone
 
 Each tile type has different properties and behavior, for example:
-grass tiles can be walked on and provide cover for characters in the game.
-dirt tiles can also be walked on and provide less cover than grass tiles.
-trees tiles cannot be walked through, they are tall.
+grass tiles can be walked on
+dirt tiles can be be walked on
+trees tiles can be walked on
 water tiles cannot be walked on and are impassable.
 stone tiles cannot be walked on and are impassable.
 
-In the game, layers try to surround each other's pieces on two surrounding tiles. The players may use the impassable terrain as one of the sides and so the water and stone tiles are important.
+In the game, players try to surround each other's pieces on two surrounding tiles. The players may use the impassable terrain as one of the sides and so the water and stone tiles are important.
 
 When designing the board, it's important to consider the layout and how the different tile types are used to create challenges and obstacles for the player. For example, you could use stone tiles to block the player's path, while using water tiles to force the player to find a different route. You could also use grass and dirt tiles to create beautiful patterns.
 
@@ -43,7 +43,7 @@ It's very important that grass, dirt, or trees tile should be reachable by every
     const resp = await generateCompletions({
       system: systemPrompt,
       prompt,
-      timeout: 40_000,
+      timeout: 15_000,
     })
   
     return resp.data.choices[0].message.content  
