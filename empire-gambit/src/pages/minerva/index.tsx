@@ -13,6 +13,7 @@ import MinervaText from '@/components/minerva/MinervaText';
 import MiddleVideos from '@/components/minerva/MiddleVideos';
 import { useSpeechQueue } from '@/hooks/minerva/useSpeechQueue';
 import { useAccount } from 'wagmi';
+import UserConversation from '@/components/minerva/UserConversation';
 
 const sayRegex = /<MESSAGE>([\s\S]*?)(<\/?MESSAGE>|<\/[\s\S]*|$)/s
 const actionRegex = /<ACTION>([\s\S]*?)<\/ACTION>/
@@ -344,6 +345,12 @@ const FortuneTeller = () => {
     handleStream(historyParam)
   }
 
+  const handleTextSubmit = async (text: string) => {
+    setLoading(true)
+    const newMessage: Message = { role: "user", content: text }
+    handleNewMessage(newMessage)
+  }
+
   const handleAudio = async (audioBlob: Blob) => {
     setLoading(true)
     const transcription = await getTranscription(audioBlob)
@@ -395,7 +402,7 @@ const FortuneTeller = () => {
                 <MiddleVideos onStartClick={handleStart} loading={loading} />
                 {history.slice(-1)[0]?.role === "assistant" && <MinervaText maxW="400px">{history.slice(-1)[0]?.content}</MinervaText>}
 
-                {!complete && started && <RecordButton onRecord={handleAudio} loading={loading} />}
+                {!complete && started && <UserConversation onRecord={handleAudio} loading={loading} onTextSubmit={handleTextSubmit} /> }
                 {complete && <Text fontSize="xl" color="white">Thank you for sharing your journey.</Text>}
                 {lastUserMessage && (
                   <Box mb={2}>

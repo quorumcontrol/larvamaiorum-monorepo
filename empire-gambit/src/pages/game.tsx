@@ -9,6 +9,7 @@ import { usePlayerDetails } from "@/hooks/usePlayerDetails"
 import Router from "next/router"
 import { Avatar } from '@readyplayerme/visage';
 import useIsClientSide from "@/hooks/useIsClientSide"
+import { useAccount } from "wagmi"
 
 
 const pulseAnimation = keyframes`
@@ -28,6 +29,7 @@ const pulseAnimation = keyframes`
 
 const GamePage: NextPage = () => {
   const { data: user } = useUser()
+  const { isConnected, isConnecting } = useAccount()
   const { data: safeAddress } = useSafeFromUser()
   const { data: playerDetails } = usePlayerDetails(safeAddress)
   const isClient = useIsClientSide()
@@ -47,11 +49,11 @@ const GamePage: NextPage = () => {
   }, [safeAddress, username, avatar])
 
   useEffect(() => {
-    if (!user || user.profile) {
+    if ((isConnected || isConnecting) && (!user || user.profile)) {
       return
     }
     Router.push("/profile/edit")
-  }, [user])
+  }, [user, isConnected, isConnecting])
 
   if (!isClient || !user) {
     return (
