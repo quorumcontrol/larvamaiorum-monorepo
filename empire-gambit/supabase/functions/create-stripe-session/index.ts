@@ -9,8 +9,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import Stripe from 'https://esm.sh/stripe@12.5.0'
 
 
-const TEST_TOKEN = "price_1N9DFiJH583Xouw7qdQF3e67";
-const PROD_TOKEN = "price_1N91X5JH583Xouw73adTKUkw";
+const TEST_TOKEN = "price_1NEVh4JH583Xouw7RkSaUy5K";
+const PROD_TOKEN = "price_1NEWHpJH583Xouw7EmlVhfGe";
 
 const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
   // This is needed to use the Fetch API rather than relying on the Node http
@@ -47,22 +47,29 @@ serve(async (req) => {
     return new Response("Not authorized", { status: 401 });
   }
 
-  const { quantity } = await req.json()
+  const { quantity, successUrl, cancelUrl, testOnly } = await req.json()
 
+  const token = testOnly ? TEST_TOKEN : PROD_TOKEN
   
   const session = await stripe.checkout.sessions.create({
+    allow_promotion_codes: true,
     line_items: [
       {
-        price: TEST_TOKEN,
-        quantity: quantity || 5,
+        price: token,
+        quantity: quantity || 20,
+        adjustable_quantity: {
+          enabled: true,
+          minimum: 8,
+          maximum: 800,
+        },
       },
     ],
     metadata: {
       user: user.id,
     },
     mode: "payment",
-    success_url: `http://localhost:3000/api/success`,
-    cancel_url: "http://localhost:3000/cancel",
+    success_url: successUrl,
+    cancel_url: cancelUrl,
   });
 
   console.log("session: ", session);

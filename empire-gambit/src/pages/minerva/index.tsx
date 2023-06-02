@@ -119,13 +119,17 @@ const FortuneTeller = () => {
   }
 
   const drawCard = async () => {
-    const { data: { card, image }, error } = await client.functions.invoke("card")
+    const { data: { card, path }, error } = await client.functions.invoke("images", {
+      body: {
+        drawCard: true
+      }
+    })
     if (error) {
       console.error("error getting card", error)
       throw error
     }
 
-    const { data: { publicUrl } } = client.storage.from("images").getPublicUrl(image)
+    const { data: { publicUrl } } = client.storage.from("images").getPublicUrl(path)
 
     setDrawnCard({
       image: publicUrl,

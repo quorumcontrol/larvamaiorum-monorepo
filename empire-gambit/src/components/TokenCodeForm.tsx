@@ -1,9 +1,10 @@
 import { isLocalhost } from "@/utils/isLocalhost"
-import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Spinner } from "@chakra-ui/react"
+import { Box, Button, FormControl, FormErrorMessage, HStack, Input, Spinner, VStack } from "@chakra-ui/react"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import Router from "next/router"
 import { useState } from "react"
 import { useQueryClient } from "react-query"
-import { useMutation, useProvider, useSigner } from "wagmi"
+import { useMutation, useSigner } from "wagmi"
 
 const useTokenCode = () => {
   const queryClient = useQueryClient()
@@ -42,6 +43,29 @@ const TokenCodeForm: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const { mutateAsync } = useTokenCode()
+  const client = useSupabaseClient()
+
+  const onBuyTokenClick = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await client.functions.invoke("create-stripe-session", {
+        body: {
+          successUrl: `${window.location.origin}/minerva`,
+          cancelUrl: `${window.location.origin}/`,
+          testOnly: isLocalhost(),
+        }
+      })
+      if (error) {
+        console.error("error doing stripe: ", error)
+      }
+      console.log("data", data)
+      const { url } = data
+      Router.push(url)
+    } finally {
+      setLoading(false)
+    }
+
+  }
 
   const onSubmit = async () => {
     setLoading(true)
@@ -59,16 +83,20 @@ const TokenCodeForm: React.FC = () => {
   }
 
   return (
-    <HStack alignItems="top">
-      <FormControl isInvalid={!!error} >
-        <Input placeholder="Enter Token Code" name="code" minW="12em" value={code} onChange={(evt) => setCode(evt.target.value)} />
-        <FormErrorMessage>{error}</FormErrorMessage>
-      </FormControl>
-      <FormControl>
-        {loading && <Box><Spinner /></Box>}
-        {!loading && <Button type="submit" variant="primary" disabled={!loading} onClick={onSubmit}>Use Code</Button>}
-      </FormControl>
-    </HStack>
+    <VStack spacing="8">
+      <Button variant="primary" onClick={onBuyTokenClick}>Buy Tokens</Button>
+      <HStack alignItems="top">
+        <FormControl isInvalid={!!error} >
+          <Input placeholder="Enter Token Code" name="code" minW="12em" value={code} onChange={(evt) => setCode(evt.target.value)} />
+          <FormErrorMessage>{error}</FormErrorMessage>
+        </FormControl>
+        <FormControl>
+          {loading && <Box><Spinner /></Box>}
+          {!loading && <Button type="submit" variant="secondary" disabled={!loading} onClick={onSubmit}>Use Code</Button>}
+        </FormControl>
+      </HStack>
+    </VStack>
+
   )
 }
 
