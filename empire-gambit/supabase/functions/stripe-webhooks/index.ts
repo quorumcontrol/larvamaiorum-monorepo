@@ -9,6 +9,7 @@ import Stripe from 'https://esm.sh/stripe@12.5.0'
 import { getServiceClient } from "../_shared/serviceClient.ts"
 import { contract, syncer } from "../_shared/tokenContract.ts"
 import {utils} from "https://esm.sh/ethers@5.7.2"
+import { safeAddress } from "https://esm.sh/@skaleboarder/safe-tools@0.0.24"
 
 const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
   // This is needed to use the Fetch API rather than relying on the Node http
@@ -30,7 +31,6 @@ serve(async (request) => {
   const signature = request.headers.get('Stripe-Signature')
 
   const serviceClient = getServiceClient()
-
 
   // First step is to verify the event. The .text() method must be used as the
   // verification relies on the raw request body rather than the parsed JSON.
@@ -63,10 +63,11 @@ serve(async (request) => {
     console.log("number of tokens: ", amount, typeof amount)
 
     const userAddress = user!.email!.split("@")[0];
+    const safe = await safeAddress(userAddress, chainId);
 
     const tokens = contract(chainId)
     const tx = await syncer.push(async () => {
-      return await tokens.mint(userAddress, utils.parseEther(amount.toString()))
+      return await tokens.mint(safe, utils.parseEther(amount.toString()))
     })
 
     console.log("tx: ", tx.hash)

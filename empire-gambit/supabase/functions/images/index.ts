@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { imageFromPrompt } from "../_shared/image.ts";
+import { cards } from "../_shared/tarot.ts";
+import { randomInt } from "../_shared/randomNumber.ts";
 
 function base64ToByteArray(base64String: string): Uint8Array {
   const binaryString = atob(base64String);
@@ -51,8 +53,19 @@ serve(async (req) => {
 
   try {
     const { 
-      prompt,
+      prompt: userPrompt,
+      drawCard,
     } = await req.json();
+    
+    let prompt = ""
+    let card:string | undefined = undefined
+
+    if (drawCard) {
+      card = cards[randomInt(cards.length)];
+      prompt = `The tarot card: ${card}`
+    } else {
+      prompt = userPrompt
+    }
 
     console.log("user", user.id);
 
@@ -67,7 +80,10 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ path: storeResponse.data.path }),
+      JSON.stringify({
+        path: storeResponse.data.path,
+        card,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
