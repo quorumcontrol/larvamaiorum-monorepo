@@ -20,7 +20,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
 })
 
 serve(async (req) => {
-  console.log("Hello from chat!");
+  console.log("Hello from create-stripe-session!");
   if (req.method === "OPTIONS") {
     console.log("OPTIONS", corsHeaders);
     return new Response("ok", { headers: corsHeaders });
