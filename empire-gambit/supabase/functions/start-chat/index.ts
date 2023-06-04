@@ -8,6 +8,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { contract, syncer } from "../_shared/tokenContract.ts";
 import { safeAddress } from "https://esm.sh/@skaleboarder/safe-tools@0.0.24";
 import { utils } from "https://esm.sh/ethers@5.7.2";
+import { getServiceClient } from "../_shared/serviceClient.ts";
 
 serve(async (req) => {
   console.log("Hello from streaming start-chat!");
@@ -37,8 +38,34 @@ serve(async (req) => {
     return new Response("Not authorized", { status: 401 });
   }
 
+  const serviceClient = getServiceClient();
+
+  const { data, error } = await serviceClient.from("free_readings").select("*")
+    .eq("user_id", user.id).eq("day_of_play", new Date().toUTCString()).maybeSingle();
+
+  if (error) {
+    console.error("error getting free readings", error);
+    throw error;
+  }
+
+  if (!data || data.amount === 0) {
+    console.log("incrementing free readings")
+    await serviceClient.rpc("increment_free_reading", { p_user_id: user.id });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        free: true,
+      }),
+      {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+
   const { chainId } = await req.json();
-  console.log("received chainId: ", chainId);
 
   const token = contract(chainId);
 
@@ -47,20 +74,21 @@ serve(async (req) => {
 
   const tx = await syncer.push(async () => {
     console.log("adminBurn", safe);
-    const tx = await token.adminBurn(safe, utils.parseEther("1"), {
+    return await token.adminBurn(safe, utils.parseEther("1"), {
       gasLimit: 1_000_000,
     });
-    return tx;
   });
 
   return new Response(
     JSON.stringify({
+      ok: true,
       tx: tx.hash,
+      free: false,
     }),
     {
       headers: {
         ...corsHeaders,
-        "Content-Type": "text/event-stream",
+        "Content-Type": "application/json",
       },
     },
   );

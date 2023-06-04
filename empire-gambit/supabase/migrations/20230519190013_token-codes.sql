@@ -4,3 +4,7 @@ create table token_promo_codes (
   created_at timestamp with time zone default now(),
   amount INTEGER
 );
+
+alter table token_promo_codes
+  enable row level security;
+  
