@@ -15,6 +15,7 @@ import { constants } from 'ethers';
 import TokenCodeForm from '../TokenCodeForm';
 import { useAccount } from 'wagmi';
 import { useFreeReadingsRemaining } from '@/hooks/minerva/useFreeReadingsRemaining';
+import MinervaHead from './MinervaHead';
 
 const pulseAnimation = keyframes`
   0% {
@@ -42,6 +43,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!isClientSide || isLoading || tokenBalanceLoading || freeRemainingLoading) {
     return (
       <>
+        <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
@@ -71,6 +73,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!session || !isConnected ) {
     return (
       <>
+      <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
@@ -101,6 +104,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if ((maskBalance || 0) === 0 && (tokenBalance || constants.Zero).lte(constants.Zero) && (freeRemaining || 0) > 0) {
     return (
       <>
+      <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
