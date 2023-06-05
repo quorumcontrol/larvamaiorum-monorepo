@@ -98,7 +98,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     )
   }
 
-  if ((maskBalance || 0) === 0 && (tokenBalance || constants.Zero).lte(constants.Zero) && (freeRemaining || 0) === 0) {
+  if ((maskBalance || 0) === 0 && (tokenBalance || constants.Zero).lte(constants.Zero) && (freeRemaining || 0) > 0) {
     return (
       <>
         <PageEffects
