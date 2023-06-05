@@ -35,6 +35,7 @@ import { localFauct, powFauct } from '@/utils/faucets'
 import CustomSupabaseContext from '@/contexts/CustomSupabaseContext'
 import { MultiCaller } from '@skaleboarder/safe-tools'
 import Head from 'next/head'
+import Script from 'next/script'
 
 const skaleMainnet = createChain({
   id: 1032942172,
@@ -141,6 +142,17 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
       </Head>
+      <Script async src="https://www.googletagmanager.com/gtag/js?id=G-PBCW9L8B2G" strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        
+        gtag('config', 'G-PBCW9L8B2G');
+        `}
+      </Script>
+
       <ChakraProvider theme={theme}>
         <WagmiConfig client={wagmiClient}>
           <RainbowKitProvider chains={chains} theme={darkTheme()}>
