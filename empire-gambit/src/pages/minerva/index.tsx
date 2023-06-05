@@ -14,6 +14,7 @@ import MiddleVideos from '@/components/minerva/MiddleVideos';
 import { useSpeechQueue } from '@/hooks/minerva/useSpeechQueue';
 import { useAccount } from 'wagmi';
 import UserConversation from '@/components/minerva/UserConversation';
+import Head from 'next/head';
 
 const sayRegex = /<MESSAGE>([\s\S]*?)(<\/?MESSAGE>|<\/[\s\S]*|$)/s
 const actionRegex = /<ACTION>([\s\S]*?)<\/ACTION>/
@@ -377,6 +378,9 @@ const FortuneTeller = () => {
 
   return (
     <AppLayout>
+      <Head>
+        <meta property="og:url" content="https://empiregambit.com/minerva" />
+      </Head>
       <PageEffects
         position="absolute"
         bottom="0"
@@ -400,13 +404,13 @@ const FortuneTeller = () => {
           {!thankYouNft && (
             <HStack spacing="xl">
 
-              <EtherealImage src={drawnCard?.image || src}  display={["none", "block"]}/>
-              
+              <EtherealImage src={drawnCard?.image || src} display={["none", "block"]} />
+
               <VStack spacing="6">
                 <MiddleVideos onStartClick={handleStart} loading={loading} />
                 {history.slice(-1)[0]?.role === "assistant" && <MinervaText maxW="400px">{history.slice(-1)[0]?.content}</MinervaText>}
 
-                {!complete && started && <UserConversation onRecord={handleAudio} loading={loading} onTextSubmit={handleTextSubmit} /> }
+                {!complete && started && <UserConversation onRecord={handleAudio} loading={loading} onTextSubmit={handleTextSubmit} />}
                 {complete && <Text fontSize="xl" color="white">Thank you for sharing your journey.</Text>}
                 {lastUserMessage && (
                   <Box mb={2}>

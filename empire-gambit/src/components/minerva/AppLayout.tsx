@@ -14,6 +14,8 @@ import soldierSrc from "../../assets/soldier_checklist.png"
 import { constants } from 'ethers';
 import TokenCodeForm from '../TokenCodeForm';
 import { useAccount } from 'wagmi';
+import { useFreeReadingsRemaining } from '@/hooks/minerva/useFreeReadingsRemaining';
+import MinervaHead from './MinervaHead';
 
 const pulseAnimation = keyframes`
   0% {
@@ -35,11 +37,13 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isConnected } = useAccount()
   const { data: maskBalance, isLoading } = useMaskInventory()
   const { data: tokenBalance, isLoading: tokenBalanceLoading } = useTokenBalance()
+  const { data: freeRemaining, isLoading: freeRemainingLoading } = useFreeReadingsRemaining()
   const isClientSide = useIsClientSide()
 
-  if (!isClientSide || isLoading || tokenBalanceLoading) {
+  if (!isClientSide || isLoading || tokenBalanceLoading || freeRemainingLoading) {
     return (
       <>
+        <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
@@ -69,6 +73,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!session || !isConnected ) {
     return (
       <>
+      <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
@@ -96,9 +101,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     )
   }
 
-  if ((maskBalance || 0) <= 0 && (tokenBalance || constants.Zero).lte(constants.Zero)) {
+  if ((maskBalance || 0) === 0 && (tokenBalance || constants.Zero).lte(constants.Zero) && (freeRemaining || 0) > 0) {
     return (
       <>
+      <MinervaHead />
         <PageEffects
           position="absolute"
           bottom="0"
@@ -108,7 +114,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Box bg="brand.background" minH="100vh" p={4}>
           <Center flexDirection="column" h="100%">
             <VStack spacing="8">
-              <MinervaText>My visitor, you must have tokens or a mask to continue this ceremony.</MinervaText>
+              <MinervaText>My visitor, you have used your free reading for today. You must have tokens or a mask to continue this ceremony.</MinervaText>
               <TokenCodeForm />
               <Box
                 animation={`${pulseAnimation} 10s infinite ease-in-out`}

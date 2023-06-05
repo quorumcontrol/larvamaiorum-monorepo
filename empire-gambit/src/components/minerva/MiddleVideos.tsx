@@ -7,6 +7,7 @@ import { utils } from "ethers"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import { isLocalhost } from "@/utils/isLocalhost"
 import { useQueryClient } from "react-query"
+import { useFreeReadingsRemaining } from "@/hooks/minerva/useFreeReadingsRemaining"
 
 interface MiddleVideosProps {
   loading: boolean
@@ -18,6 +19,7 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
   const introVideo = useRef<HTMLVideoElement>(null)
   const [introComplete, setIntroComplete] = useState(false)
   const { data: tokenBalance } = useTokenBalance()
+  const { data: freeRemaining } = useFreeReadingsRemaining()
   const queryClient = useQueryClient()
 
   const client = useSupabaseClient()
@@ -48,7 +50,12 @@ const MiddleVideos: React.FC<MiddleVideosProps> = ({ loading, onStartClick }) =>
       {!introPlaying && !introComplete && (
         <VStack>
           <StartButton onClick={handleStart} />
-          <Text fontSize="sm">Uses 1 of your {tokenBalance ? utils.formatEther(tokenBalance) : ""} tokens.</Text>
+          { freeRemaining || 0 === 0 && (
+            <Text fontSize="sm">This is your free reading for the day.</Text>
+          )}
+          {freeRemaining && freeRemaining > 0 && (
+            <Text fontSize="sm">Uses 1 of your {tokenBalance ? utils.formatEther(tokenBalance) : ""} tokens.</Text>
+          )}
         </VStack>
       )}
       {!introPlaying && (
