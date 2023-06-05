@@ -263,7 +263,13 @@ const FortuneTeller = () => {
     })
 
     if (!stream.body) {
+      console.error('stream missing body')
       throw new Error("missing body")
+    }
+
+    if (stream.status !== 201) {
+      console.error("stream returned bad error code: ", stream)
+      throw new Error('bad status code')
     }
 
     let buffer = ""

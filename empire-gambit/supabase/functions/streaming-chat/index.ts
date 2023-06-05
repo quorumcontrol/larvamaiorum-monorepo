@@ -6,6 +6,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from "../_shared/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.15.0";
 import { minervaChat } from "../_shared/streamingChat.ts";
+import { backOff } from "https://esm.sh/exponential-backoff@3.1.1";
 
 serve(async (req) => {
   console.log("Hello from streaming streaming chat!");
@@ -37,20 +38,37 @@ serve(async (req) => {
 
   const { history } = await req.json()
   console.log("received history: ", history)
+
+  try {
+    return await backOff(async () => {
+      const chat = await minervaChat(history)
+    
+      if (!chat.body) {
+        console.error("missing body", chat)
+        throw new Error(`No Chat Body: ${chat.status}`)
+      }
   
-  const chat = await minervaChat(history)
-  console.log("chat: ", chat)
-
-  if (!chat.body) {
-    console.error("error no body", chat)
-    return new Response("Unknown Error", { status: 500 });
+      if (![200,201].includes(chat.status)) {
+        console.error("invalid status code", chat)
+        throw new Error(`invalid chat completion status code: ${chat.status}`)
+      }
+    
+      // const speech = await createSpeech(getServiceClient(), user.id, chat.response)
+      return new Response(chat.body, {
+        status: 201,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/event-stream',
+        },
+      })
+  
+    }, {
+      numOfAttempts: 5,
+      delayFirstAttempt: false,
+      startingDelay: 250,
+    })
+  } catch (err) {
+    console.error("error", err)
+    return new Response("Unknown Error", { ...corsHeaders, status: 500 });
   }
-
-  // const speech = await createSpeech(getServiceClient(), user.id, chat.response)
-  return new Response(chat.body, {
-    headers: {
-      ...corsHeaders,
-      'Content-Type': 'text/event-stream',
-    },
-  })
 })

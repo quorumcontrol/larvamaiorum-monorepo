@@ -91,5 +91,4 @@ export const minervaChat = (
     };
 
     return streamingChatCompletion(request);
-   
 };
