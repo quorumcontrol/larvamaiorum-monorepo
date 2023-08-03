@@ -111,7 +111,7 @@ const connectors = () => {
         injectedWallet({ chains, shimDisconnect: true }),
         metaMaskWallet({ chains, shimDisconnect: true }),
         coinbaseWallet({ appName: "Empire Gambit", chains }),
-        walletConnectWallet({ chains }),
+        // walletConnectWallet({ chains }),
         braveWallet({ chains, shimDisconnect: true }),
       ].map((wallet) => wrapper.wrapWallet(wallet)),
     },
